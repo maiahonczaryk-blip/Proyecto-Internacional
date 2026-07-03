@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Partner Program | REMAX Inmomás</title>
+  <meta name="description" content="Gana comisiones refiriendo clientes a España. Únete a la red de partners de REMAX Inmomás, Fuster & Associates y Banco UCI.">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" type="image/png" href="Globo_CMYK.png">
+  <style>
+    #partner-registration-form label {
+      color: #374151 !important;
+      font-weight: 600 !important;
+      font-size: 0.85rem !important;
+    }
+    #partner-registration-form input[type="text"],
+    #partner-registration-form input[type="email"],
+    #partner-registration-form select {
+      background: #f9fafb !important;
+      border: 1px solid #d1d5db !important;
+      color: #111827 !important;
+    }
+    #partner-registration-form input::placeholder {
+      color: #9ca3af !important;
+    }
+    #partner-registration-form select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 1rem center !important;
+      appearance: none !important;
+      -webkit-appearance: none !important;
+    }
+    .radio-group label {
+      font-weight: 400 !important;
+      display: inline-flex !important;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+    .radio-group input[type="radio"] {
+      margin: 0;
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    .checkbox-group input[type="checkbox"] {
+      margin-top: 0.2rem;
+      flex-shrink: 0;
+    }
+    .checkbox-group label {
+      font-weight: 400 !important;
+      font-size: 0.85rem !important;
+      color: #4b5563 !important;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body class="lang-en bg-light">
+
+  <!-- ===================== NAVIGATION ===================== -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="index.html" class="nav-logo">
+        <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás" class="nav-logo-img">
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="#stats">
+          <span class="lang-en">Why Spain?</span>
+          <span class="lang-es">¿Por Qué España?</span>
+        </a>
+        <a href="#how-it-works">
+          <span class="lang-en">How it Works</span>
+          <span class="lang-es">Cómo Funciona</span>
+        </a>
+        <a href="#our-team">
+          <span class="lang-en">The Team</span>
+          <span class="lang-es">El Equipo</span>
+        </a>
+        <a href="#register" class="btn btn-primary btn-sm nav-cta" style="background-color: #dc2626; border-color: #dc2626;">
+          <span class="lang-en">Start Earning</span>
+          <span class="lang-es">Empezar a Ganar</span>
+        </a>
+      </div>
+      <div class="nav-right">
+        <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">
+          <span class="lang-label">ES</span>
+        </button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero" id="hero">
+    <div class="hero-split">
+      <div class="hero-text-col">
+        <div class="hero-content" style="max-width: 600px; margin-left: auto;">
+          <div class="hero-badge" style="background: rgba(0, 67, 255, 0.1); color: var(--blue); padding: 0.5rem 1.2rem; border-radius: 2rem; display: inline-block; margin-bottom: 1.5rem; font-weight: 600; font-size: 0.9rem;">
+            <span class="lang-en">★ North America × Spain Collaboration</span>
+            <span class="lang-es">★ North America × Spain Collaboration</span>
+          </div>
+          <h1 class="hero-title" style="font-size: 3.5rem; line-height: 1.1; font-weight: 700; color: var(--text-primary);">
+            <span class="lang-en">Your Clients Buy in Spain.<br><span class="text-accent" style="color: var(--blue);">You Earn the Commission.</span></span>
+            <span class="lang-es">Tus Clientes Compran en España.<br><span class="text-accent" style="color: var(--blue);">Tú Cobras la Comisión.</span></span>
+          </h1>
+          <p class="hero-subtitle" style="font-size: 1.15rem; font-weight: 400; color: var(--text-secondary); margin-top: 1.5rem; line-height: 1.6;">
+            <span class="lang-en">As a Realtor or Broker, you don't have to lose clients who want to invest abroad. Partner with the #1 team on the Costa Blanca. We handle the real estate, legal paperwork, mortgage, and rental management. <strong>100% Traceability with your unique Partner ID.</strong></span>
+            <span class="lang-es">Como Realtor o Broker, no tienes por qué perder a los clientes que quieren invertir en el extranjero. Únete al equipo #1 de la Costa Blanca. Gestionamos la compra, lo legal, la hipoteca y el alquiler. <strong>Trazabilidad 100% con tu ID de Partner único.</strong></span>
+          </p>
+          <div class="hero-ctas" style="margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a href="#how-it-works" class="btn btn-blue" style="padding: 1rem 2rem; font-size: 1.1rem;">
+              <span class="lang-en">Apply for Access</span>
+              <span class="lang-es">Solicitar Acceso</span>
+            </a>
+            <a href="partner-login.html" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1.1rem;">
+              <span class="lang-en">Login to Portal</span>
+              <span class="lang-es">Entrar al Portal</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="hero-image-col">
+        <img src="images/alicante_premium_hero.png" alt="Luxury Villa in Alicante, Spain">
+      </div>
+    </div>
+    
+    <!-- Organic Wave Divider -->
+    <div class="custom-shape-divider-bottom" style="position: absolute; bottom: 0; left: 0; width: 100%; overflow: hidden; line-height: 0; transform: rotate(180deg);">
+        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" style="position: relative; display: block; width: calc(100% + 1.3px); height: 60px;">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" style="fill: #ffffff;"></path>
+        </svg>
+    </div>
+  </section>
+
+  <!-- ===================== STATS / WHY SPAIN ===================== -->
+  <section class="section" id="stats" style="background: #ffffff; padding: 5rem 0;">
+    <div class="container">
+      <div class="text-center reveal">
+        <span class="section-label" style="color: #dc2626;">
+          <span class="lang-en">The Unstoppable Trend</span>
+          <span class="lang-es">La Tendencia Imparable</span>
+        </span>
+        <h2 class="section-title">
+          <span class="lang-en">The Great American <span class="text-accent">Migration to Spain</span></span>
+          <span class="lang-es">La Gran <span class="text-accent">Migración Americana</span> a España</span>
+        </h2>
+        <p class="section-subtitle" style="font-size: 1.1rem; max-width: 800px; margin: 0 auto;">
+          <span class="lang-en">Americans are moving to Spain at record numbers. Give your clients what they are actively looking for: a better lifestyle, lower cost of living, and high-yield real estate investments.</span>
+          <span class="lang-es">Los americanos se están mudando a España en números récord. Dale a tus clientes lo que están buscando activamente: un mejor estilo de vida, menor coste de vida y altas rentabilidades.</span>
+        </p>
+      </div>
+
+      <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 3rem;">
+        <div class="stat-card reveal" style="text-align: center; padding: 2rem; background: #f9fafb; border-radius: 1rem; border-bottom: 4px solid #dc2626;">
+          <div style="font-size: 3rem; font-weight: 800; color: #111827; margin-bottom: 0.5rem;">+13%</div>
+          <h4 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: #1e3a8a;">
+            <span class="lang-en">YoY Growth</span>
+            <span class="lang-es">Crecimiento Anual</span>
+          </h4>
+          <p style="color: #4b5563; font-size: 0.95rem;">
+            <span class="lang-en">Increase in Americans buying property in Spain year over year.</span>
+            <span class="lang-es">Incremento de americanos comprando propiedades en España año tras año.</span>
+          </p>
+        </div>
+        
+        <div class="stat-card reveal" style="text-align: center; padding: 2rem; background: #f9fafb; border-radius: 1rem; border-bottom: 4px solid #1e3a8a;">
+          <div style="font-size: 3rem; font-weight: 800; color: #111827; margin-bottom: 0.5rem;">1st</div>
+          <h4 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: #1e3a8a;">
+            <span class="lang-en">Choice in Europe</span>
+            <span class="lang-es">Opción en Europa</span>
+          </h4>
+          <p style="color: #4b5563; font-size: 0.95rem;">
+            <span class="lang-en">Spain is the #1 destination for US expats moving to Europe.</span>
+            <span class="lang-es">España es el destino #1 para los expatriados de EE.UU. en Europa.</span>
+          </p>
+        </div>
+
+        <div class="stat-card reveal" style="text-align: center; padding: 2rem; background: #f9fafb; border-radius: 1rem; border-bottom: 4px solid #dc2626;">
+          <div style="font-size: 3rem; font-weight: 800; color: #111827; margin-bottom: 0.5rem;">6-8%</div>
+          <h4 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: #1e3a8a;">
+            <span class="lang-en">Average ROI</span>
+            <span class="lang-es">ROI Promedio</span>
+          </h4>
+          <p style="color: #4b5563; font-size: 0.95rem;">
+            <span class="lang-en">Average annual return on Costa Blanca vacation rentals.</span>
+            <span class="lang-es">Retorno anual promedio en alquileres vacacionales en la Costa Blanca.</span>
+          </p>
+        </div>
+
+        <div class="stat-card reveal" style="text-align: center; padding: 2rem; background: #f9fafb; border-radius: 1rem; border-bottom: 4px solid #1e3a8a;">
+          <div style="font-size: 3rem; font-weight: 800; color: #111827; margin-bottom: 0.5rem;">$1 = €0.91</div>
+          <h4 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: #1e3a8a;">
+            <span class="lang-en">Purchasing Power</span>
+            <span class="lang-es">Poder Adquisitivo</span>
+          </h4>
+          <p style="color: #4b5563; font-size: 0.95rem;">
+            <span class="lang-en">The strong US dollar makes Spanish luxury properties an absolute bargain.</span>
+            <span class="lang-es">La fortaleza del dólar convierte las propiedades de lujo en España en una ganga.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== HOW IT WORKS (SIMPLE 3 STEPS) ===================== -->
+  <section class="section bg-light" id="how-it-works">
+    <div class="container">
+      <div class="text-center reveal">
+        <h2 class="section-title">
+          <span class="lang-en">It's incredibly <span class="text-accent">simple.</span></span>
+          <span class="lang-es">Es increíblemente <span class="text-accent">sencillo.</span></span>
+        </h2>
+      </div>
+      
+      <div class="process-timeline" style="margin-top: 3rem; display: flex; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+        <!-- STEP 1 -->
+        <div class="process-step reveal" style="flex: 1; min-width: 250px; background: white; padding: 2rem; border-radius: 1rem; box-shadow: var(--shadow-md); text-align: center; border-top: 4px solid var(--blue);">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🆔</div>
+          <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--blue); font-weight: 700;">
+            <span class="lang-en">1. Get Your Partner ID</span>
+            <span class="lang-es">1. Obtén tu Partner ID</span>
+          </h3>
+          <p style="color: var(--text-secondary);">
+            <span class="lang-en">Register your agency to receive your unique hierarchical Partner ID. Refer clients to our platform and they are permanently linked to your profile.</span>
+            <span class="lang-es">Registra tu agencia para recibir tu Partner ID jerárquico. Refiere clientes a la plataforma y quedarán vinculados a tu perfil permanentemente.</span>
+          </p>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="process-step reveal" style="flex: 1; min-width: 250px; background: white; padding: 2rem; border-radius: 1rem; box-shadow: var(--shadow-md); text-align: center; border-top: 4px solid var(--gold);">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+          <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--blue); font-weight: 700;">
+            <span class="lang-en">2. 100% CRM Traceability</span>
+            <span class="lang-es">2. Trazabilidad CRM 100%</span>
+          </h3>
+          <p style="color: var(--text-secondary);">
+            <span class="lang-en">We handle the property search, legal paperwork, and mortgage. You track every step of the buyer's journey in real-time through your private dashboard.</span>
+            <span class="lang-es">Gestionamos la búsqueda, el papeleo legal y la hipoteca. Tú sigues cada etapa del ciclo de compra en tiempo real a través de tu dashboard privado.</span>
+          </p>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="process-step reveal" style="flex: 1; min-width: 250px; background: white; padding: 2rem; border-radius: 1rem; box-shadow: var(--shadow-md); text-align: center; border-top: 4px solid var(--blue);">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">💼</div>
+          <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--blue); font-weight: 700;">
+            <span class="lang-en">3. Automated Commissions</span>
+            <span class="lang-es">3. Comisiones Automatizadas</span>
+          </h3>
+          <p style="color: var(--text-secondary);">
+            <span class="lang-en">When a transaction closes, the system automatically calculates your splits. Receive your highly competitive referral commission via international wire.</span>
+            <span class="lang-es">Cuando la operación se cierra, el sistema calcula tus porcentajes automáticamente. Recibe tu comisión competitiva vía transferencia internacional.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== THE TEAM (TRUST & SECURITY) ===================== -->
+  <section class="section team" id="our-team">
+    <div class="container">
+      <div class="text-center reveal">
+        <span class="section-label" style="color: #dc2626;">
+          <span class="lang-en">Total Peace of Mind</span>
+          <span class="lang-es">Tranquilidad Total</span>
+        </span>
+        <h2 class="section-title">
+          <span class="lang-en">Why Your Clients Are <span class="text-accent">Safe With Us</span></span>
+          <span class="lang-es">Por Qué Tus Clientes Están <span class="text-accent">Seguros Con Nosotros</span></span>
+        </h2>
+        <p class="section-subtitle" style="font-size: 1.1rem;">
+          <span class="lang-en">You can't recommend just anyone. We've built a 4-pillar alliance of the most trusted names in Spain to guarantee a flawless experience and maximum profitability.</span>
+          <span class="lang-es">No puedes recomendar a cualquiera. Hemos creado una alianza de 4 pilares con las marcas más confiables para garantizar una experiencia perfecta y máxima rentabilidad.</span>
+        </p>
+      </div>
+      
+      <div class="team-grid" style="margin-top: 3rem; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+        
+        <!-- REMAX -->
+        <div class="card team-card remax reveal" style="text-align: center; padding: 2.5rem;">
+          <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás" style="height: 40px; margin: 0 auto 1.5rem auto; display: block;">
+          <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">REMAX Inmomás</h3>
+          <p style="color: #dc2626; font-weight: 600; margin-bottom: 1rem; font-size: 0.9rem;">
+            <span class="lang-en">The Real Estate Experts</span>
+            <span class="lang-es">Los Expertos Inmobiliarios</span>
+          </p>
+          <p style="color: #4b5563; line-height: 1.5; font-size: 0.95rem;">
+            <span class="lang-en">With 30 years in the Costa Blanca, we find the best properties and organize 5-star VIP Discovery Trips for your clients.</span>
+            <span class="lang-es">Con 30 años en la Costa Blanca, encontramos las mejores propiedades y organizamos Viajes VIP de 5 estrellas.</span>
+          </p>
+        </div>
+
+        <!-- FUSTER -->
+        <div class="card team-card fuster reveal" style="text-align: center; padding: 2.5rem; border-top: 4px solid #ff1200;">
+          <div style="font-size: 1.8rem; font-weight: 800; color: #003087; margin-bottom: 1.5rem;">Fuster & Associates</div>
+          <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; font-weight: 700;">Fuster & Associates</h3>
+          <p style="color: #003087; font-weight: 600; margin-bottom: 1rem; font-size: 0.9rem;">
+            <span class="lang-en">The Legal Shield</span>
+            <span class="lang-es">El Escudo Legal</span>
+          </p>
+          <p style="color: #4b5563; line-height: 1.5; font-size: 0.95rem;">
+            <span class="lang-en">Our international lawyers protect your client from day one. We handle Golden Visas, taxes, and 100% remote purchasing.</span>
+            <span class="lang-es">Nuestros abogados internacionales protegen a tu cliente. Gestionamos Golden Visas, impuestos y compras 100% remotas.</span>
+          </p>
+        </div>
+
+        <!-- UCI -->
+        <div class="card team-card reveal" style="text-align: center; padding: 2.5rem; border-top: 4px solid #003087;">
+          <img src="Logo_UCI.png" alt="Banco UCI" style="height: 40px; margin: 0 auto 1.5rem auto; display: block;">
+          <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; font-weight: 700;">Banco UCI</h3>
+          <p style="color: #003087; font-weight: 600; margin-bottom: 1rem; font-size: 0.9rem;">
+            <span class="lang-en">The Financial Power</span>
+            <span class="lang-es">El Poder Financiero</span>
+          </p>
+          <p style="color: #4b5563; line-height: 1.5; font-size: 0.95rem;">
+            <span class="lang-en">We secure mortgages specifically designed for non-residents. Up to 75% financing with pre-approvals in just 48 hours.</span>
+            <span class="lang-es">Hipotecas diseñadas para no residentes. Hasta el 75% de financiación con pre-aprobaciones en solo 48 horas.</span>
+          </p>
+        </div>
+
+        <!-- INMOMAS HOLIDAYS -->
+        <div class="card team-card reveal" style="text-align: center; padding: 2.5rem; border-top: 4px solid #ff1200;">
+          <img src="Inmomas-holidays-Op-3-color-e1752073650140.png" alt="Inmomás Holidays" style="height: 40px; margin: 0 auto 1.5rem auto; display: block;">
+          <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; font-weight: 700;">Inmomás Holidays</h3>
+          <p style="color: #ff1200; font-weight: 600; margin-bottom: 1rem; font-size: 0.9rem;">
+            <span class="lang-en">The ROI Maximizer</span>
+            <span class="lang-es">Maximizador de Rentabilidad</span>
+          </p>
+          <p style="color: #4b5563; line-height: 1.5; font-size: 0.95rem;">
+            <span class="lang-en">If they buy as an investment, our specialized vacation rental division manages the property to guarantee top yields and zero stress.</span>
+            <span class="lang-es">Si compran como inversión, nuestra división de alquiler vacacional gestiona la propiedad para garantizar la máxima rentabilidad sin estrés.</span>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== REGISTRATION FORM (FUNCTIONAL & SALES ORIENTED) ===================== -->
+  <section class="section webinar" id="register" style="background: #003087; color: white;">
+    <div class="container">
+      <div class="webinar-content" style="grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;">
+        
+        <div class="reveal">
+          <h2 style="font-size: 3rem; margin-bottom: 1rem; color: white; line-height: 1.1; font-weight: 700;">
+            <span class="lang-en">Partner Webinar & <span style="color: #ff1200;">Portal Access</span></span>
+            <span class="lang-es">Webinar para Partners y <span style="color: #ff1200;">Acceso al Portal</span></span>
+          </h2>
+          <p style="font-size: 1.2rem; margin-bottom: 2rem; color: rgba(255,255,255,0.8);">
+            <span class="lang-en">Register to attend our exclusive B2B webinar. Upon approval, you'll gain access to your private enterprise portal featuring:</span>
+            <span class="lang-es">Regístrate en nuestro webinar B2B exclusivo. Una vez aprobado, accederás a tu portal privado enterprise con:</span>
+          </p>
+          <ul style="list-style: none; padding: 0; margin-bottom: 2rem;">
+            <li style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem; font-size: 1.1rem;">
+              <span style="color: #ff1200; font-size: 1.5rem;">✓</span> <span class="lang-en">Your unique referral links & CRM tracking</span><span class="lang-es">Tus links de referido únicos y seguimiento CRM en vivo</span>
+            </li>
+            <li style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem; font-size: 1.1rem;">
+              <span style="color: #ff1200; font-size: 1.5rem;">✓</span> <span class="lang-en">The digital collaboration agreement</span><span class="lang-es">El documento de colaboración digital (DocuSign)</span>
+            </li>
+            <li style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem; font-size: 1.1rem;">
+              <span style="color: #ff1200; font-size: 1.5rem;">✓</span> <span class="lang-en">Full breakdown of commission percentages</span><span class="lang-es">Información transparente de los % de comisión</span>
+            </li>
+            <li style="margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem; font-size: 1.1rem;">
+              <span style="color: #ff1200; font-size: 1.5rem;">✓</span> <span class="lang-en">Exclusive webinars and training academy</span><span class="lang-es">Webinars exclusivos y academia de formación</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="reveal">
+          <div class="webinar-form-card" style="background: white; color: #111827; padding: 2.5rem; text-align: left; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border-top: 6px solid #ff1200; border-radius: 1rem;">
+            <form id="partner-registration-form" action="dashboard.html" method="GET">
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="firstName"><span class="lang-en">First Name</span><span class="lang-es">Nombre</span> *</label>
+                  <input type="text" id="firstName" name="firstName" required>
+                </div>
+                <div class="form-group">
+                  <label for="lastName"><span class="lang-en">Last Name</span><span class="lang-es">Apellido</span> *</label>
+                  <input type="text" id="lastName" name="lastName" required>
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="agencyName"><span class="lang-en">Real Estate Agency</span><span class="lang-es">Nombre de la Agencia</span> *</label>
+                  <input type="text" id="agencyName" name="agencyName" required>
+                </div>
+                <div class="form-group">
+                  <label for="email"><span class="lang-en">Work Email</span><span class="lang-es">Email de Trabajo</span> *</label>
+                  <input type="email" id="email" name="email" required>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="country"><span class="lang-en">Where are your clients mainly from?</span><span class="lang-es">¿De dónde son principalmente tus clientes?</span> *</label>
+                <select id="country" name="country" required>
+                  <option value=""><span class="lang-en">Select Country...</span><span class="lang-es">Selecciona el país...</span></option>
+                  <option value="US">United States</option>
+                  <option value="UK">United Kingdom</option>
+                  <option value="CA">Canada</option>
+                  <option value="OTHER">Other / Otro</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-top: 1.5rem;">
+                <label style="margin-bottom: 0.5rem; display: block;">
+                  <span class="lang-en">How many clients are currently interested in Spain?</span>
+                  <span class="lang-es">¿Cuántos clientes tienes interesados en España ahora?</span>
+                </label>
+                <div class="radio-group" style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                  <label><input type="radio" name="leadCount" value="1-3"> 1 - 3</label>
+                  <label><input type="radio" name="leadCount" value="4-10"> 4 - 10</label>
+                  <label><input type="radio" name="leadCount" value="10+"> 10+</label>
+                </div>
+              </div>
+
+              <div class="checkbox-group">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">
+                  <span class="lang-en">I agree to the Terms of Service and Privacy Policy. I understand that my application will be reviewed by the Partner Success Team.</span>
+                  <span class="lang-es">Acepto los Términos de Servicio y la Política de Privacidad. Entiendo que mi solicitud será revisada por el equipo de Partners.</span>
+                </label>
+              </div>
+              <button type="button" class="btn btn-blue" id="partner-submit-btn" onclick="registerPartner()" style="width: 100%; padding: 1.2rem; font-size: 1.2rem; margin-top: 1.5rem;">
+                <span class="lang-en">Submit Application 🚀</span>
+                <span class="lang-es">Enviar Solicitud 🚀</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer" id="footer" style="padding-top: 2rem;">
+    <div class="container">
+      <div class="footer-grid" style="align-items: center;">
+        <div class="footer-brand">
+          <img src="Logo negro sin fondo .png" alt="REMAX Grupo Inmomás" class="footer-logo">
+          <p>
+            <span class="lang-en">Partner Network. Sell Spain globally.</span>
+            <span class="lang-es">Red de Partners. Vende España a nivel global.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

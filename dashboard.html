@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Partner Dashboard | REMAX Inmomás</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" type="image/png" href="Globo_CMYK.png">
+  <style>
+    /* Dashboard specific minimal styles to ensure structure works before full CSS update */
+    body {
+      background-color: #f3f4f6;
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+    }
+    .dashboard-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+    .dashboard-sidebar {
+      width: 250px;
+      background: #ffffff;
+      border-right: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+    }
+    .dashboard-logo {
+      padding: 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .dashboard-logo img {
+      width: 100%;
+      max-width: 150px;
+    }
+    .sidebar-nav {
+      padding: 1rem 0;
+      flex-grow: 1;
+    }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      color: #4b5563;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .sidebar-link:hover, .sidebar-link.active {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border-right: 3px solid #1d4ed8;
+    }
+    .sidebar-link span.icon {
+      margin-right: 10px;
+    }
+    .sidebar-footer {
+      padding: 1.5rem;
+      border-top: 1px solid #e5e7eb;
+    }
+    
+    .dashboard-main {
+      flex-grow: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .stat-title {
+      color: #6b7280;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    .stat-value {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: #111827;
+    }
+    
+    .dashboard-section {
+      background: #ffffff;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .dashboard-section h2 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+      color: #111827;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 0.5rem;
+    }
+    
+    /* Link Generator */
+    .link-generator {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .link-generator input {
+      flex-grow: 1;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      background: #f9fafb;
+      color: #4b5563;
+    }
+    
+    /* Data Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table th, .data-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .data-table th {
+      background: #f9fafb;
+      font-weight: 600;
+      color: #374151;
+    }
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .status-new { background: #dbeafe; color: #1e40af; }
+    .status-vip { background: #fef08a; color: #854d0e; }
+    .status-closed { background: #dcfce3; color: #166534; }
+    
+  </style>
+</head>
+<body class="lang-en">
+
+  <div class="dashboard-layout">
+    
+    <!-- SIDEBAR -->
+    <aside class="dashboard-sidebar">
+      <div class="dashboard-logo">
+        <a href="index.html">
+          <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás">
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-link active">
+          <span class="icon">📊</span>
+          <span class="lang-en">Dashboard</span>
+          <span class="lang-es">Panel</span>
+        </a>
+        <a href="#" class="sidebar-link">
+          <span class="icon">👥</span>
+          <span class="lang-en">My Clients</span>
+          <span class="lang-es">Mis Clientes</span>
+        </a>
+        <a href="#" class="sidebar-link">
+          <span class="icon">🔗</span>
+          <span class="lang-en">Marketing Tools</span>
+          <span class="lang-es">Herramientas</span>
+        </a>
+        <a href="#" class="sidebar-link">
+          <span class="icon">⚙️</span>
+          <span class="lang-en">Settings</span>
+          <span class="lang-es">Ajustes</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="lang-toggle" id="lang-toggle" aria-label="Switch language" style="width:100%; justify-content:center; margin-bottom: 1rem;">
+          <span class="lang-label">ES</span>
+        </button>
+        <a href="professionals.html" class="btn btn-outline btn-sm" style="width: 100%; text-align: center;">
+          <span class="lang-en">Log Out</span>
+          <span class="lang-es">Cerrar Sesión</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="dashboard-main">
+      
+      <header class="dashboard-header">
+        <div>
+          <h1 style="margin: 0; font-size: 1.875rem; color: #111827;">
+            <span class="lang-en">Welcome back, <span id="partner-name">Partner</span></span>
+            <span class="lang-es">Bienvenido de nuevo, <span id="partner-name-es">Partner</span></span>
+          </h1>
+          <p style="margin: 0; color: #6b7280;">Agency: <strong id="partner-agency">Global Realty NYC</strong></p>
+        </div>
+        <div class="user-profile">
+          <div id="partner-initials" style="width: 40px; height: 40px; background: #dc2626; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+            GR
+          </div>
+        </div>
+      </header>
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title"><span class="lang-en">Total Referrals</span><span class="lang-es">Total Referidos</span></div>
+          <div class="stat-value">12</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title"><span class="lang-en">Active VIP Trips</span><span class="lang-es">Viajes VIP Activos</span></div>
+          <div class="stat-value">3</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title"><span class="lang-en">Completed Sales</span><span class="lang-es">Ventas Completadas</span></div>
+          <div class="stat-value">2</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title"><span class="lang-en">Commissions Earned</span><span class="lang-es">Comisiones Generadas</span></div>
+          <div class="stat-value">€18,500</div>
+        </div>
+      </div>
+
+      <!-- REFERRAL LINK -->
+      <section class="dashboard-section">
+        <h2>
+          <span class="lang-en">Your Unique Referral Link</span>
+          <span class="lang-es">Tu Enlace de Referido Único</span>
+        </h2>
+        <p style="color: #4b5563; margin-bottom: 1rem;">
+          <span class="lang-en">Share this link with your clients. Anyone who registers for a webinar or VIP trip through this link is permanently attributed to your agency.</span>
+          <span class="lang-es">Comparte este enlace con tus clientes. Cualquiera que se registre a un webinar o viaje VIP a través de este enlace será atribuido permanentemente a tu agencia.</span>
+        </p>
+        <div class="link-generator">
+          <input type="text" id="ref-link" value="https://remaxinmomas.com/ref/global-realty-nyc" readonly>
+          <button class="btn btn-primary" id="copy-btn" onclick="copyLink()" style="background-color: #dc2626; border-color: #dc2626;">
+            <span class="lang-en">Copy Link</span>
+            <span class="lang-es">Copiar Enlace</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- CLIENT PIPELINE -->
+      <section class="dashboard-section">
+        <h2>
+          <span class="lang-en">Client Pipeline</span>
+          <span class="lang-es">Pipeline de Clientes</span>
+        </h2>
+        <div style="overflow-x: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th><span class="lang-en">Client Name</span><span class="lang-es">Nombre del Cliente</span></th>
+                <th><span class="lang-en">Interest</span><span class="lang-es">Interés</span></th>
+                <th><span class="lang-en">Registration Date</span><span class="lang-es">Fecha de Registro</span></th>
+                <th>Status / Estado</th>
+                <th><span class="lang-en">Next Step</span><span class="lang-es">Próximo Paso</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Sarah Jenkins</strong><br><span style="font-size: 0.8rem; color: #6b7280;">sarah.j@example.com</span></td>
+                <td>Investment (€400K)</td>
+                <td>Oct 12, 2026</td>
+                <td><span class="status-badge status-new">Webinar Registered</span></td>
+                <td>Attending Webinar (Oct 15)</td>
+              </tr>
+              <tr>
+                <td><strong>Michael & Lisa Wong</strong><br><span style="font-size: 0.8rem; color: #6b7280;">wong.family@example.com</span></td>
+                <td>Second Home (€800K)</td>
+                <td>Sep 28, 2026</td>
+                <td><span class="status-badge status-vip">VIP Trip Booked</span></td>
+                <td>Arriving Nov 2 (Jávea)</td>
+              </tr>
+              <tr>
+                <td><strong>David Torres</strong><br><span style="font-size: 0.8rem; color: #6b7280;">dtorres@example.com</span></td>
+                <td>Relocation (€300K)</td>
+                <td>Aug 14, 2026</td>
+                <td><span class="status-badge status-closed">Closed (Completed)</span></td>
+                <td>Commission Paid (Sep 30)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Initialize Dashboard with LocalStorage Data
+    document.addEventListener('DOMContentLoaded', () => {
+      loadPartnerDashboard();
+      
+      // Additional specific dashboard updates
+      const user = JSON.parse(localStorage.getItem('remax_current_user'));
+      if(user) {
+        document.getElementById('partner-name-es').innerText = user.firstName + ' ' + user.lastName;
+        document.getElementById('partner-initials').innerText = user.firstName.charAt(0).toUpperCase();
+        
+        const slug = user.agencyName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        document.getElementById('ref-link').value = 'https://inmomas.es/ref/' + slug;
+      }
+    });
+
+    function copyLink() {
+      var copyText = document.getElementById("ref-link");
+      copyText.select();
+      copyText.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(copyText.value);
+      
+      var btn = document.getElementById("copy-btn");
+      var originalText = btn.innerHTML;
+      btn.innerHTML = '<span class="lang-en">Copied!</span><span class="lang-es">¡Copiado!</span>';
+      setTimeout(function() {
+        btn.innerHTML = originalText;
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

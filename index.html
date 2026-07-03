@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RE/MAX Inmomás — International Advisory Division</title>
+  <meta name="description" content="Expert advisory for Americans buying property in Spain. 30+ years on the Costa Blanca. Legal, tax, residency & real estate — one trusted team.">
+  <meta property="og:title" content="REMAX Inmomás — International Advisory Division">
+  <meta property="og:description" content="Your trusted team for buying property on Spain's Costa Blanca. Legal, tax & real estate advisory for international buyers.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" type="image/png" href="Globo_CMYK.png">
+</head>
+<body class="lang-en">
+
+  <!-- ===================== MAIN NAVIGATION ===================== -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="#home" class="nav-logo">
+        <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás" class="nav-logo-img">
+      </a>
+
+      <!-- Public Nav Links -->
+      <div class="nav-links" id="public-nav">
+        <a href="#home">
+          <span class="lang-en">Home</span>
+          <span class="lang-es">Inicio</span>
+        </a>
+        <a href="#about-spain">
+          <span class="lang-en">About Spain</span>
+          <span class="lang-es">Sobre España</span>
+        </a>
+        <a href="#for-realtors">
+          <span class="lang-en">For Realtors</span>
+          <span class="lang-es">Para Agentes</span>
+        </a>
+        <a href="#login" class="btn btn-outline btn-sm nav-cta" id="nav-login-btn">
+          <span class="lang-en">Partner Login</span>
+          <span class="lang-es">Acceso Partners</span>
+        </a>
+        <a href="#register" class="btn btn-primary btn-sm nav-cta" id="nav-register-btn">
+          <span class="lang-en">Join as Partner</span>
+          <span class="lang-es">Únete como Partner</span>
+        </a>
+      </div>
+
+      <!-- Dashboard Nav (shown when logged in) -->
+      <div class="nav-links" id="dashboard-nav" style="display: none;">
+        <span class="nav-user-greeting" id="nav-user-greeting"></span>
+        <button class="btn btn-outline btn-sm" id="nav-logout-btn" onclick="App.auth.logout().then(() => App.router.navigateTo('home'))">
+          <span class="lang-en">Logout</span>
+          <span class="lang-es">Cerrar Sesión</span>
+        </button>
+      </div>
+
+      <div class="nav-right">
+        <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">
+          <span class="lang-label">ES</span>
+        </button>
+        <button class="sidebar-toggle" id="sidebar-toggle-btn" aria-label="Toggle sidebar" style="display:none;">
+          <span></span><span></span><span></span>
+        </button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===================== DASHBOARD SIDEBAR ===================== -->
+  <aside class="dashboard-sidebar" id="dashboard-sidebar">
+    <div class="sidebar-header">
+      <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás" class="sidebar-logo">
+      <span class="sidebar-title">Partner Portal</span>
+    </div>
+
+    <!-- Admin Sidebar Nav -->
+    <nav class="sidebar-nav-group" id="sidebar-admin" style="display:none;">
+      <div class="sidebar-section-label">Administration</div>
+      <a href="#admin/dashboard" class="sidebar-link"><span class="sidebar-icon">📊</span> Dashboard</a>
+      <a href="#admin/users" class="sidebar-link"><span class="sidebar-icon">👥</span> Manage Users</a>
+    </nav>
+
+    <!-- Broker Sidebar Nav -->
+    <nav class="sidebar-nav-group" id="sidebar-broker" style="display:none;">
+      <div class="sidebar-section-label">Broker Portal</div>
+      <a href="#broker/dashboard" class="sidebar-link"><span class="sidebar-icon">📊</span> Dashboard</a>
+      <a href="#broker/team" class="sidebar-link"><span class="sidebar-icon">👥</span> My Team</a>
+      <a href="#broker/clients" class="sidebar-link"><span class="sidebar-icon">🤝</span> Clients</a>
+      <a href="#broker/documents" class="sidebar-link"><span class="sidebar-icon">📄</span> Documents</a>
+      <a href="#broker/finances" class="sidebar-link"><span class="sidebar-icon">💰</span> Finances</a>
+    </nav>
+
+    <!-- Realtor Sidebar Nav -->
+    <nav class="sidebar-nav-group" id="sidebar-realtor" style="display:none;">
+      <div class="sidebar-section-label">Realtor Portal</div>
+      <a href="#realtor/dashboard" class="sidebar-link"><span class="sidebar-icon">📊</span> Dashboard</a>
+      <a href="#realtor/clients" class="sidebar-link"><span class="sidebar-icon">🤝</span> My Clients</a>
+      <a href="#realtor/referral" class="sidebar-link"><span class="sidebar-icon">🔗</span> Referral Tools</a>
+      <a href="#realtor/documents" class="sidebar-link"><span class="sidebar-icon">📄</span> Documents</a>
+      <a href="#realtor/finances" class="sidebar-link"><span class="sidebar-icon">💰</span> Finances</a>
+    </nav>
+
+    <!-- Sidebar User Info -->
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar" id="sidebar-user-avatar"></div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="sidebar-user-name">—</div>
+        <div class="sidebar-user-role" id="sidebar-user-role">—</div>
+      </div>
+      <button class="sidebar-logout-btn" onclick="App.auth.logout().then(() => App.router.navigateTo('home'))" title="Logout">⏻</button>
+    </div>
+  </aside>
+
+  <!-- Sidebar backdrop for mobile -->
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <!-- ===================== MAIN CONTENT AREA ===================== -->
+  <main class="app-main" id="app-main">
+
+
+    <!-- ==================== VIEW: HOME ==================== -->
+    <div id="view-home" class="app-view">
+
+      <!-- HERO -->
+      <section class="hero" id="hero">
+        <div class="hero-bg">
+          <img src="images/hero-alicante.png" alt="Costa Blanca, Spain">
+        </div>
+        <div class="container">
+          <div class="hero-content">
+            <div class="hero-badge">
+              <span class="lang-en">International Advisory Division · Costa Blanca</span>
+              <span class="lang-es">División de Asesoría Internacional · Costa Blanca</span>
+            </div>
+            <h1 class="hero-title">
+              <span class="lang-en">Thinking About Buying<br>Property in Spain?</span>
+              <span class="lang-es">¿Estás Pensando en Comprar<br>una Propiedad en España?</span>
+            </h1>
+            <p class="hero-subtitle">
+              <span class="lang-en">We know it feels overwhelming. The legal questions, the tax implications, the distance. That's exactly why we exist — to guide you through every step, so you can make the right decision with total confidence.</span>
+              <span class="lang-es">Sabemos que puede parecer abrumador. Las preguntas legales, las implicaciones fiscales, la distancia. Por eso existimos — para guiarte en cada paso, para que tomes la decisión correcta con total confianza.</span>
+            </p>
+            <div class="hero-ctas">
+              <a href="#about-spain" class="btn btn-primary" id="hero-cta-webinar">
+                <span class="lang-en">Discover Spain</span>
+                <span class="lang-es">Descubre España</span>
+              </a>
+              <a href="#for-realtors" class="btn btn-outline" id="hero-cta-realtors">
+                <span class="lang-en">I'm a Realtor</span>
+                <span class="lang-es">Soy Agente Inmobiliario</span>
+              </a>
+            </div>
+            <div class="hero-stats">
+              <div class="hero-stat">
+                <div class="hero-stat-value"><span class="counter" data-target="30">0</span>+</div>
+                <div class="hero-stat-label">
+                  <span class="lang-en">Years of Experience</span>
+                  <span class="lang-es">Años de Experiencia</span>
+                </div>
+              </div>
+              <div class="hero-stat">
+                <div class="hero-stat-value"><span class="counter" data-target="115">0</span>+</div>
+                <div class="hero-stat-label">
+                  <span class="lang-en">Active Agents</span>
+                  <span class="lang-es">Agentes Activos</span>
+                </div>
+              </div>
+              <div class="hero-stat">
+                <div class="hero-stat-value"><span class="counter" data-target="4">0</span></div>
+                <div class="hero-stat-label">
+                  <span class="lang-en">Offices</span>
+                  <span class="lang-es">Oficinas</span>
+                </div>
+              </div>
+              <div class="hero-stat">
+                <div class="hero-stat-value">#<span class="counter" data-target="1">0</span></div>
+                <div class="hero-stat-label">REMAX Global</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TRUST BAR -->
+      <div class="trust-bar">
+        <div class="container">
+          <div class="trust-logos">
+            <div class="trust-item">
+              <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás">
+            </div>
+            <div class="trust-divider"></div>
+            <div class="trust-item">
+              <span class="trust-partner-name">Fuster & Associates</span>
+              <span class="trust-partner-role">
+                <span class="lang-en">International Law Firm</span>
+                <span class="lang-es">Bufete Internacional</span>
+              </span>
+            </div>
+            <div class="trust-divider"></div>
+            <div class="trust-item">
+              <span class="trust-partner-name">Banco UCI</span>
+              <span class="trust-partner-role">
+                <span class="lang-en">Mortgage Specialists</span>
+                <span class="lang-es">Especialistas Hipotecarios</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK INTRO -->
+      <section class="section" style="padding: 64px 0;">
+        <div class="container text-center">
+          <h2 class="section-title">
+            <span class="lang-en">Your <span class="text-accent">Gateway</span> to Spain</span>
+            <span class="lang-es">Tu <span class="text-accent">Puerta</span> a España</span>
+          </h2>
+          <p class="section-subtitle" style="max-width: 700px; margin: 0 auto;">
+            <span class="lang-en">Whether you're a buyer exploring Spain or a Realtor growing your international network — we're your trusted team on the Costa Blanca.</span>
+            <span class="lang-es">Ya seas un comprador explorando España o un agente inmobiliario ampliando tu red internacional — somos tu equipo de confianza en la Costa Blanca.</span>
+          </p>
+          <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 32px;">
+            <a href="#about-spain" class="btn btn-primary">
+              <span class="lang-en">Living in Spain Guide</span>
+              <span class="lang-es">Guía para Vivir en España</span>
+            </a>
+            <a href="#for-realtors" class="btn btn-outline">
+              <span class="lang-en">Partner with Us</span>
+              <span class="lang-es">Asóciate con Nosotros</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- TEAM SUMMARY -->
+      <section class="section team" id="team">
+        <div class="container">
+          <div class="text-center reveal">
+            <span class="section-label">
+              <span class="lang-en">Your Trusted Team</span>
+              <span class="lang-es">Tu Equipo de Confianza</span>
+            </span>
+            <h2 class="section-title">
+              <span class="lang-en">Four Partners. <span class="text-accent">One Mission.</span></span>
+              <span class="lang-es">Cuatro Socios. <span class="text-accent">Una Misión.</span></span>
+            </h2>
+          </div>
+          <div class="team-grid">
+            <div class="card team-card remax reveal">
+              <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás" class="team-logo">
+              <h3>REMAX Inmomás</h3>
+              <p class="team-tagline">International Advisory Division</p>
+              <div class="team-stats">
+                <span><strong>30+</strong> <span class="lang-en">years</span><span class="lang-es">años</span></span>
+                <span><strong>115+</strong> <span class="lang-en">agents</span><span class="lang-es">agentes</span></span>
+                <span><strong>4</strong> <span class="lang-en">offices</span><span class="lang-es">oficinas</span></span>
+              </div>
+            </div>
+            <div class="card team-card fuster reveal">
+              <div class="team-logo-text">Fuster & Associates</div>
+              <h3><span class="lang-en">International Law Firm</span><span class="lang-es">Bufete Internacional</span></h3>
+              <p class="team-tagline"><span class="lang-en">Legal · Tax · Residency</span><span class="lang-es">Legal · Fiscal · Residencia</span></p>
+              <div class="team-stats">
+                <span><strong>10</strong> <span class="lang-en">lawyers</span><span class="lang-es">abogados</span></span>
+                <span><strong>7</strong> <span class="lang-en">languages</span><span class="lang-es">idiomas</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER (Home) -->
+      <footer class="footer">
+        <div class="container">
+          <div class="footer-grid">
+            <div class="footer-brand">
+              <img src="Logo negro sin fondo .png" alt="REMAX Grupo Inmomás" class="footer-logo">
+              <p>
+                <span class="lang-en">International Advisory Division — Costa Blanca, Spain.</span>
+                <span class="lang-es">División de Asesoría Internacional — Costa Blanca, España.</span>
+              </p>
+            </div>
+            <div>
+              <h4><span class="lang-en">Platform</span><span class="lang-es">Plataforma</span></h4>
+              <div class="footer-links">
+                <a href="#about-spain"><span class="lang-en">About Spain</span><span class="lang-es">Sobre España</span></a>
+                <a href="#for-realtors"><span class="lang-en">For Realtors</span><span class="lang-es">Para Agentes</span></a>
+                <a href="#login"><span class="lang-en">Partner Login</span><span class="lang-es">Acceso Partners</span></a>
+              </div>
+            </div>
+            <div>
+              <h4><span class="lang-en">Markets</span><span class="lang-es">Mercados</span></h4>
+              <div class="footer-links">
+                <a href="#about-spain">Elche</a>
+                <a href="#about-spain">Alicante</a>
+                <a href="#about-spain">Benidorm</a>
+                <a href="#about-spain">Jávea</a>
+              </div>
+            </div>
+            <div>
+              <h4><span class="lang-en">Contact</span><span class="lang-es">Contacto</span></h4>
+              <div class="footer-links">
+                <a href="mailto:jose.martinez@remax.es">jose.martinez@remax.es</a>
+                <a href="https://remaxinmomas.com" target="_blank">remaxinmomas.com</a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-bottom">
+            <p>© 2026 REMAX Inmomás · International Advisory Division</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+
+    <!-- ==================== VIEW: ABOUT SPAIN ==================== -->
+    <div id="view-about-spain" class="app-view">
+
+      <!-- Why Spain -->
+      <section class="section why-spain" id="why-spain" style="padding-top: 120px;">
+        <div class="container">
+          <div class="text-center reveal">
+            <span class="section-label">
+              <span class="lang-en">The Opportunity</span>
+              <span class="lang-es">La Oportunidad</span>
+            </span>
+            <h2 class="section-title">
+              <span class="lang-en">Why Americans Are <span class="text-accent">Choosing Spain</span></span>
+              <span class="lang-es">Por Qué los Americanos <span class="text-accent">Eligen España</span></span>
+            </h2>
+            <p class="section-subtitle">
+              <span class="lang-en">+45 million Americans have considered living abroad. 73% prefer Europe. Spain is their #1 destination.</span>
+              <span class="lang-es">+45 millones de americanos han considerado vivir en el extranjero. El 73% prefiere Europa. España es su destino #1.</span>
+            </p>
+          </div>
+          <div class="reasons-grid">
+            <div class="card reason-card reveal">
+              <div class="card-icon">☀️</div>
+              <h3><span class="lang-en">Climate & Lifestyle</span><span class="lang-es">Clima y Estilo de Vida</span></h3>
+              <p><span class="lang-en">Mediterranean living at its finest. World-class gastronomy, pristine beaches, and vibrant culture.</span><span class="lang-es">Lo mejor de la vida mediterránea. Gastronomía de clase mundial, playas vírgenes y cultura vibrante.</span></p>
+              <span class="stat-badge"><span class="lang-en">300+ days of sunshine/year</span><span class="lang-es">300+ días de sol/año</span></span>
+            </div>
+            <div class="card reason-card reveal">
+              <div class="card-icon">💰</div>
+              <h3><span class="lang-en">Cost of Living</span><span class="lang-es">Coste de Vida</span></h3>
+              <p><span class="lang-en">Your money goes dramatically further in Spain. Premium quality of life at a fraction of what you pay in the US.</span><span class="lang-es">Tu dinero rinde mucho más en España. Calidad de vida premium a una fracción del coste en EE.UU.</span></p>
+              <span class="stat-badge"><span class="lang-en">40–60% lower than US cities</span><span class="lang-es">40–60% menor que ciudades de EE.UU.</span></span>
+            </div>
+            <div class="card reason-card reveal">
+              <div class="card-icon">🏥</div>
+              <h3><span class="lang-en">World-Class Healthcare</span><span class="lang-es">Sanidad de Clase Mundial</span></h3>
+              <p><span class="lang-en">Bloomberg ranked Spain the #1 healthiest country in the world. Top-tier public and private healthcare.</span><span class="lang-es">Bloomberg clasificó a España como el país más saludable del mundo. Sanidad pública y privada de primer nivel.</span></p>
+              <span class="stat-badge"><span class="lang-en">Private insurance from €80/mo</span><span class="lang-es">Seguro privado desde €80/mes</span></span>
+            </div>
+            <div class="card reason-card reveal">
+              <div class="card-icon">🌐</div>
+              <h3><span class="lang-en">Gateway to Europe</span><span class="lang-es">Puerta a Europa</span></h3>
+              <p><span class="lang-en">Schengen access to 27 countries. Your property in Spain becomes your base to explore all of Europe.</span><span class="lang-es">Acceso Schengen a 27 países. Tu propiedad en España se convierte en tu base para explorar toda Europa.</span></p>
+              <span class="stat-badge"><span class="lang-en">EU legal security</span><span class="lang-es">Seguridad jurídica UE</span></span>
+            </div>
+            <div class="card reason-card reveal">
+              <div class="card-icon">📈</div>
+              <h3><span class="lang-en">Investment Returns</span><span class="lang-es">Rentabilidad</span></h3>
+              <p><span class="lang-en">Tourist rental demand on the Costa Blanca is booming. Strong yields combined with capital appreciation.</span><span class="lang-es">La demanda de alquiler turístico en la Costa Blanca está en auge. Altos rendimientos con revalorización del capital.</span></p>
+              <span class="stat-badge"><span class="lang-en">5–8% average annual yields</span><span class="lang-es">5–8% rendimiento medio anual</span></span>
+            </div>
+            <div class="card reason-card reveal">
+              <div class="card-icon">🔒</div>
+              <h3><span class="lang-en">Legal Security</span><span class="lang-es">Seguridad Legal</span></h3>
+              <p><span class="lang-en">Transparent property registry and established EU legal framework. US/Spain double taxation treaty protection.</span><span class="lang-es">Registro de propiedad transparente y marco legal europeo. Tratado de doble imposición EE.UU./España.</span></p>
+              <span class="stat-badge"><span class="lang-en">No restrictions for foreign buyers</span><span class="lang-es">Sin restricciones para extranjeros</span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cost Comparison -->
+      <section class="section cost-comparison">
+        <div class="container">
+          <div class="text-center reveal">
+            <span class="section-label"><span class="lang-en">Your Money, Further</span><span class="lang-es">Tu Dinero, Más Lejos</span></span>
+            <h2 class="section-title"><span class="lang-en">Spain vs. <span class="text-accent">United States</span></span><span class="lang-es">España vs. <span class="text-accent">Estados Unidos</span></span></h2>
+          </div>
+          <div class="comparison-table reveal">
+            <div class="comparison-row header">
+              <div class="label"><span class="lang-en">Expense</span><span class="lang-es">Gasto</span></div>
+              <div class="spain-val">🇪🇸 <span class="lang-en">Spain</span><span class="lang-es">España</span></div>
+              <div class="usa-val">🇺🇸 <span class="lang-en">United States</span><span class="lang-es">Estados Unidos</span></div>
+            </div>
+            <div class="comparison-row"><div class="label"><span class="lang-en">Dinner for Two</span><span class="lang-es">Cena para Dos</span></div><div class="spain-val">€25 – €40</div><div class="usa-val">$80 – $150</div></div>
+            <div class="comparison-row"><div class="label"><span class="lang-en">Monthly Rent (2BR)</span><span class="lang-es">Alquiler Mensual (2 Hab.)</span></div><div class="spain-val">€700 – €1,200</div><div class="usa-val">$3,500 – $6,000</div></div>
+            <div class="comparison-row"><div class="label"><span class="lang-en">Health Insurance</span><span class="lang-es">Seguro Médico</span></div><div class="spain-val">€80 – €150/mo</div><div class="usa-val">$500 – $1,500/mo</div></div>
+            <div class="comparison-row"><div class="label"><span class="lang-en">Quality 3BR Home</span><span class="lang-es">Casa 3 Hab. de Calidad</span></div><div class="spain-val"><span class="lang-en">from</span><span class="lang-es">desde</span> €250,000</div><div class="usa-val">$900,000+</div></div>
+          </div>
+          <div class="text-center reveal" style="margin-top: 36px;">
+            <span class="savings-tag"><span class="lang-en">Save 40–60% on your cost of living while upgrading your lifestyle</span><span class="lang-es">Ahorra un 40–60% en tu coste de vida mientras mejoras tu estilo de vida</span></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Properties -->
+      <section class="section properties">
+        <div class="container">
+          <div class="text-center reveal">
+            <span class="section-label"><span class="lang-en">Real Opportunities</span><span class="lang-es">Oportunidades Reales</span></span>
+            <h2 class="section-title"><span class="lang-en">Featured <span class="text-accent">Properties</span></span><span class="lang-es"><span class="text-accent">Propiedades</span> Destacadas</span></h2>
+          </div>
+          <div class="properties-grid">
+            <div class="property-card reveal">
+              <div class="property-image"><img src="images/investment.png" alt="Benidorm Apartment"><span class="property-tag investment"><span class="lang-en">Investment</span><span class="lang-es">Inversión</span></span><span class="property-yield">6.8%</span></div>
+              <div class="property-info">
+                <div class="property-location">📍 Benidorm, Costa Blanca</div>
+                <h3 class="property-name"><span class="lang-en">Sea View Apartment · Communal Pool</span><span class="lang-es">Apartamento con Vistas al Mar · Piscina</span></h3>
+                <div class="property-features"><span>🛏 2 Bed</span><span>🚿 2 Bath</span><span>📐 68m²</span></div>
+                <div class="property-price-row"><div class="property-price">€195,000</div><div class="property-income"><span class="lang-en">Rental</span><span class="lang-es">Renta</span> <strong>€15,600/<span class="lang-en">yr</span><span class="lang-es">año</span></strong></div></div>
+              </div>
+            </div>
+            <div class="property-card reveal">
+              <div class="property-image"><img src="images/lifestyle-mediterranean.png" alt="Alicante Home"><span class="property-tag lifestyle">Lifestyle</span><span class="property-yield">~5%</span></div>
+              <div class="property-info">
+                <div class="property-location">📍 Alicante, Costa Blanca</div>
+                <h3 class="property-name"><span class="lang-en">Modern Home · Terrace & Garage</span><span class="lang-es">Casa Moderna · Terraza y Garaje</span></h3>
+                <div class="property-features"><span>🛏 3 Bed</span><span>🚿 2 Bath</span><span>📐 95m²</span></div>
+                <div class="property-price-row"><div class="property-price">€285,000</div><div class="property-income"><span class="lang-en">Rental</span><span class="lang-es">Renta</span> <strong>€12–16K/<span class="lang-en">yr</span><span class="lang-es">año</span></strong></div></div>
+              </div>
+            </div>
+            <div class="property-card reveal">
+              <div class="property-image"><img src="images/villa-luxury.png" alt="Jávea Villa"><span class="property-tag luxury">Luxury</span><span class="property-yield">+25–35%</span></div>
+              <div class="property-info">
+                <div class="property-location">📍 Jávea, Costa Blanca</div>
+                <h3 class="property-name"><span class="lang-en">Private Pool Villa · Sea Views · 800m² Plot</span><span class="lang-es">Villa con Piscina Privada · Vistas al Mar · 800m²</span></h3>
+                <div class="property-features"><span>🛏 4 Bed</span><span>🚿 3 Bath</span><span>📐 220m²</span></div>
+                <div class="property-price-row"><div class="property-price">€850,000</div><div class="property-income"><span class="lang-en">Premium</span><span class="lang-es">Premium</span> <strong>€60–80K/<span class="lang-en">yr</span><span class="lang-es">año</span></strong></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Visa Options -->
+      <section class="section visas">
+        <div class="container">
+          <div class="text-center reveal">
+            <span class="section-label"><span class="lang-en">Live in Spain Legally</span><span class="lang-es">Vive en España Legalmente</span></span>
+            <h2 class="section-title"><span class="lang-en">Visa & <span class="text-accent">Residency</span> Options</span><span class="lang-es">Opciones de <span class="text-accent">Visado</span> y Residencia</span></h2>
+          </div>
+          <div class="visa-grid">
+            <div class="card visa-card reveal"><h3>Golden Visa</h3><p class="visa-for"><span class="lang-en">For property investors</span><span class="lang-es">Para inversores</span></p><p><span class="lang-en">Residency for you and your family with Schengen access.</span><span class="lang-es">Residencia para ti y tu familia con acceso Schengen.</span></p><span class="visa-req"><span class="lang-en">Min. €500K property</span><span class="lang-es">Compra mín. €500K</span></span></div>
+            <div class="card visa-card reveal"><h3>Digital Nomad Visa</h3><p class="visa-for"><span class="lang-en">For remote workers</span><span class="lang-es">Para trabajadores remotos</span></p><p><span class="lang-en">Beckham Law — flat 24% income tax for 6 years.</span><span class="lang-es">Ley Beckham — 24% fijo de IRPF durante 6 años.</span></p><span class="visa-req"><span class="lang-en">Min. €2,646/month</span><span class="lang-es">Ingresos mín. €2.646/mes</span></span></div>
+            <div class="card visa-card reveal"><h3><span class="lang-en">Non-Lucrative Visa</span><span class="lang-es">Visa No Lucrativa</span></h3><p class="visa-for"><span class="lang-en">For retirees</span><span class="lang-es">Para jubilados</span></p><p><span class="lang-en">Live in Spain without working locally.</span><span class="lang-es">Vive en España sin trabajar localmente.</span></p><span class="visa-req"><span class="lang-en">Min. €2,259/month</span><span class="lang-es">Ingresos mín. €2.259/mes</span></span></div>
+            <div class="card visa-card reveal"><h3><span class="lang-en">Student Visa</span><span class="lang-es">Visa de Estudiante</span></h3><p class="visa-for"><span class="lang-en">For students & families</span><span class="lang-es">Para estudiantes y familias</span></p><p><span class="lang-en">Pathway to longer-term residency.</span><span class="lang-es">Vía hacia la residencia a largo plazo.</span></p><span class="visa-req"><span class="lang-en">Accredited program</span><span class="lang-es">Programa acreditado</span></span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Buying Process -->
+      <section class="section process">
+        <div class="container">
+          <div class="text-center reveal">
+            <span class="section-label"><span class="lang-en">Step by Step</span><span class="lang-es">Paso a Paso</span></span>
+            <h2 class="section-title"><span class="lang-en">The Buying <span class="text-accent">Process</span></span><span class="lang-es">El <span class="text-accent">Proceso</span> de Compra</span></h2>
+          </div>
+          <div class="process-timeline">
+            <div class="process-step reveal"><div class="step-num">1</div><h4><span class="lang-en">Get Your NIE</span><span class="lang-es">Obtener NIE</span></h4><p><span class="lang-en">Spanish tax ID. 1–2 weeks.</span><span class="lang-es">Número fiscal español. 1–2 semanas.</span></p></div>
+            <div class="process-step reveal"><div class="step-num">2</div><h4><span class="lang-en">Open Bank Account</span><span class="lang-es">Abrir Cuenta</span></h4><p><span class="lang-en">Spanish bank account.</span><span class="lang-es">Cuenta bancaria española.</span></p></div>
+            <div class="process-step reveal"><div class="step-num">3</div><h4><span class="lang-en">Define Strategy</span><span class="lang-es">Definir Estrategia</span></h4><p><span class="lang-en">Investment? Holiday? Residency?</span><span class="lang-es">¿Inversión? ¿Vacaciones? ¿Residencia?</span></p></div>
+            <div class="process-step reveal"><div class="step-num">4</div><h4><span class="lang-en">Property Selection</span><span class="lang-es">Selección</span></h4><p><span class="lang-en">Pre-selected for your profile.</span><span class="lang-es">Pre-seleccionadas para tu perfil.</span></p></div>
+            <div class="process-step reveal"><div class="step-num">5</div><h4>Due Diligence</h4><p><span class="lang-en">Legal checks by Fuster.</span><span class="lang-es">Revisión legal por Fuster.</span></p></div>
+            <div class="process-step reveal"><div class="step-num">6</div><h4><span class="lang-en">Reservation</span><span class="lang-es">Reserva</span></h4><p>€3,000–€10,000</p></div>
+            <div class="process-step reveal"><div class="step-num">7</div><h4><span class="lang-en">Contract</span><span class="lang-es">Contrato</span></h4><p><span class="lang-en">10% deposit.</span><span class="lang-es">10% depósito.</span></p></div>
+            <div class="process-step reveal"><div class="step-num">8</div><h4><span class="lang-en">Completion</span><span class="lang-es">Escritura</span></h4><p><span class="lang-en">Notary or remote via POA.</span><span class="lang-es">Notaría o remotamente vía poder.</span></p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="section faq">
+        <div class="container">
+          <div class="text-center reveal">
+            <h2 class="section-title"><span class="lang-en">Frequently Asked <span class="text-accent">Questions</span></span><span class="lang-es">Preguntas <span class="text-accent">Frecuentes</span></span></h2>
+          </div>
+          <div class="faq-list">
+            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">Can Americans buy property in Spain?</span><span class="lang-es">¿Pueden los americanos comprar propiedad en España?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">Yes, absolutely. No restrictions for non-EU citizens. You only need a NIE, which our team obtains in 1–2 weeks.</span><span class="lang-es">Sí, por supuesto. Sin restricciones para ciudadanos no comunitarios. Solo necesitas un NIE, que nuestro equipo obtiene en 1–2 semanas.</span></div></div></div>
+            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">Will I be taxed twice?</span><span class="lang-es">¿Me cobrarán impuestos dos veces?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">No. The US-Spain Double Taxation Treaty protects you.</span><span class="lang-es">No. El Tratado de Doble Imposición EE.UU.-España te protege.</span></div></div></div>
+            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">Can I buy without traveling to Spain?</span><span class="lang-es">¿Puedo comprar sin viajar a España?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">Yes. With Power of Attorney, 100% remotely. We recommend our VIP Trip though.</span><span class="lang-es">Sí. Con Poder Notarial, 100% remotamente. Recomendamos nuestro Viaje VIP.</span></div></div></div>
+            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">What rental returns can I expect?</span><span class="lang-es">¿Qué rentabilidad puedo esperar?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">5–8% annually in tourist areas. Premium properties generate €60K–80K+/year.</span><span class="lang-es">5–8% anual en zonas turísticas. Propiedades premium generan €60K–80K+/año.</span></div></div></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ==================== VIEW: FOR REALTORS (B2B) ==================== -->
+    <div id="view-for-realtors" class="app-view">
+      <section class="hero hero-split" style="padding-top: 100px;">
+        <div class="container">
+          <div class="hero-content">
+            <div class="hero-badge">
+              <span class="lang-en">International Referral Program</span>
+              <span class="lang-es">Programa Internacional de Referidos</span>
+            </div>
+            <h1 class="hero-title">
+              <span class="lang-en">Your Clients Buy in Spain.<br><span class="text-accent">You Earn the Commission.</span></span>
+              <span class="lang-es">Tus Clientes Compran en España.<br><span class="text-accent">Tú Ganas la Comisión.</span></span>
+            </h1>
+            <p class="hero-subtitle">
+              <span class="lang-en">Join RE/MAX Inmomás' International Referral Network. Refer your clients interested in Costa Blanca properties and earn 25% of the buyer-side commission — fully automated, fully transparent.</span>
+              <span class="lang-es">Únete a la Red Internacional de Referidos de RE/MAX Inmomás. Refiere a tus clientes interesados en propiedades en la Costa Blanca y gana el 25% de la comisión del lado comprador — totalmente automatizado, totalmente transparente.</span>
+            </p>
+            <div class="hero-ctas">
+              <a href="#register" class="btn btn-primary"><span class="lang-en">Apply as Partner</span><span class="lang-es">Aplicar como Partner</span></a>
+              <a href="#login" class="btn btn-outline"><span class="lang-en">Partner Login</span><span class="lang-es">Acceso Partners</span></a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats -->
+      <section class="section" style="padding: 48px 0;">
+        <div class="container">
+          <div class="hero-stats" style="justify-content: center;">
+            <div class="hero-stat"><div class="hero-stat-value">13%</div><div class="hero-stat-label"><span class="lang-en">YoY Market Growth</span><span class="lang-es">Crecimiento Anual</span></div></div>
+            <div class="hero-stat"><div class="hero-stat-value">#1</div><div class="hero-stat-label"><span class="lang-en">EU Destination for US Buyers</span><span class="lang-es">Destino UE para Compradores de EE.UU.</span></div></div>
+            <div class="hero-stat"><div class="hero-stat-value">6-8%</div><div class="hero-stat-label"><span class="lang-en">Average ROI</span><span class="lang-es">ROI Medio</span></div></div>
+            <div class="hero-stat"><div class="hero-stat-value">25%</div><div class="hero-stat-label"><span class="lang-en">Your Commission Share</span><span class="lang-es">Tu Parte de Comisión</span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- How It Works -->
+      <section class="section">
+        <div class="container">
+          <div class="text-center reveal">
+            <h2 class="section-title"><span class="lang-en">How It <span class="text-accent">Works</span></span><span class="lang-es">Cómo <span class="text-accent">Funciona</span></span></h2>
+          </div>
+          <div class="process-timeline" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="process-step reveal">
+              <div class="step-num">1</div>
+              <h4><span class="lang-en">Get Your Partner ID</span><span class="lang-es">Obtén tu ID de Partner</span></h4>
+              <p><span class="lang-en">Register below. Once approved, receive your unique referral link and partner dashboard access.</span><span class="lang-es">Regístrate abajo. Una vez aprobado, recibe tu enlace de referido único y acceso al dashboard de partner.</span></p>
+            </div>
+            <div class="process-step reveal">
+              <div class="step-num">2</div>
+              <h4><span class="lang-en">Refer Your Clients</span><span class="lang-es">Refiere a Tus Clientes</span></h4>
+              <p><span class="lang-en">Share your referral link. Every client who registers through it is tracked in your CRM dashboard with full traceability.</span><span class="lang-es">Comparte tu enlace de referido. Cada cliente que se registre a través de él se rastrea en tu dashboard con trazabilidad completa.</span></p>
+            </div>
+            <div class="process-step reveal">
+              <div class="step-num">3</div>
+              <h4><span class="lang-en">Earn Commissions</span><span class="lang-es">Gana Comisiones</span></h4>
+              <p><span class="lang-en">When your referral closes a property purchase, you receive 25% of the buyer-side commission. Automated, transparent, guaranteed.</span><span class="lang-es">Cuando tu referido cierra una compra, recibes el 25% de la comisión del lado comprador. Automatizado, transparente, garantizado.</span></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Alliance / Team -->
+      <section class="section" style="background: var(--bg-secondary);">
+        <div class="container">
+          <div class="text-center reveal">
+            <h2 class="section-title"><span class="lang-en">The <span class="text-accent">4-Pillar Alliance</span></span><span class="lang-es">La <span class="text-accent">Alianza de 4 Pilares</span></span></h2>
+            <p class="section-subtitle"><span class="lang-en">Your clients are protected by Spain's most comprehensive buyer support ecosystem.</span><span class="lang-es">Tus clientes están protegidos por el ecosistema de soporte al comprador más completo de España.</span></p>
+          </div>
+          <div class="visa-grid">
+            <div class="card visa-card reveal"><h3>RE/MAX Inmomás</h3><p class="visa-for"><span class="lang-en">Real Estate</span><span class="lang-es">Inmobiliaria</span></p><p><span class="lang-en">30+ years, 115+ agents, 4 offices on the Costa Blanca. Full property selection, VIP tours, rental management.</span><span class="lang-es">30+ años, 115+ agentes, 4 oficinas en la Costa Blanca. Selección de propiedades, tours VIP, gestión de alquileres.</span></p></div>
+            <div class="card visa-card reveal"><h3>Fuster & Associates</h3><p class="visa-for"><span class="lang-en">Legal & Tax</span><span class="lang-es">Legal y Fiscal</span></p><p><span class="lang-en">International law firm. Due diligence, contracts, visas, tax optimization, POA for remote purchase.</span><span class="lang-es">Bufete internacional. Due diligence, contratos, visados, optimización fiscal, poder notarial para compra remota.</span></p></div>
+            <div class="card visa-card reveal"><h3>Banco UCI</h3><p class="visa-for"><span class="lang-en">Mortgage</span><span class="lang-es">Hipoteca</span></p><p><span class="lang-en">Non-resident financing up to 75% LTV. Pre-approval in 48h. Specialists in international mortgages.</span><span class="lang-es">Financiación no residente hasta 75% LTV. Pre-aprobación en 48h. Especialistas en hipotecas internacionales.</span></p></div>
+            <div class="card visa-card reveal"><h3>Inmomás Holidays</h3><p class="visa-for"><span class="lang-en">Rental Management</span><span class="lang-es">Gestión de Alquileres</span></p><p><span class="lang-en">Full vacation rental management. Marketing, guest management, maintenance — maximize ROI from abroad.</span><span class="lang-es">Gestión completa de alquileres vacacionales. Marketing, gestión de huéspedes, mantenimiento — maximiza tu ROI desde el extranjero.</span></p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="section final-cta">
+        <div class="container">
+          <div class="final-cta-content text-center">
+            <h2 class="section-title"><span class="lang-en">Ready to <span class="text-accent">Grow Your Business</span> Internationally?</span><span class="lang-es">¿Listo para <span class="text-accent">Crecer Tu Negocio</span> Internacionalmente?</span></h2>
+            <p class="section-subtitle"><span class="lang-en">Join 50+ international agents already referring clients to Spain's Costa Blanca. Apply in 2 minutes.</span><span class="lang-es">Únete a más de 50 agentes internacionales que ya refieren clientes a la Costa Blanca. Aplica en 2 minutos.</span></p>
+            <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:32px;">
+              <a href="#register" class="btn btn-primary"><span class="lang-en">Apply Now</span><span class="lang-es">Aplicar Ahora</span></a>
+              <a href="#login" class="btn btn-outline"><span class="lang-en">I Already Have an Account</span><span class="lang-es">Ya Tengo Cuenta</span></a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ==================== VIEW: LOGIN ==================== -->
+    <div id="view-login" class="app-view">
+      <section class="auth-section">
+        <div class="auth-card">
+          <div class="auth-header">
+            <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás" class="auth-logo">
+            <h2><span class="lang-en">Partner Login</span><span class="lang-es">Acceso de Partners</span></h2>
+            <p><span class="lang-en">Access your dashboard</span><span class="lang-es">Accede a tu panel de control</span></p>
+          </div>
+          <form id="login-form" onsubmit="return false;">
+            <div class="form-group">
+              <label for="login-email"><span class="lang-en">Email</span><span class="lang-es">Correo Electrónico</span></label>
+              <input type="email" id="login-email" placeholder="you@agency.com" required>
+            </div>
+            <div class="form-group">
+              <label for="login-password"><span class="lang-en">Password</span><span class="lang-es">Contraseña</span></label>
+              <input type="password" id="login-password" placeholder="••••••••" required>
+            </div>
+            <div id="login-error" class="form-error" style="display:none;"></div>
+            <button type="submit" class="btn btn-primary" style="width:100%;" id="login-submit-btn">
+              <span class="lang-en">Sign In</span>
+              <span class="lang-es">Iniciar Sesión</span>
+            </button>
+          </form>
+          <div class="auth-footer">
+            <p><span class="lang-en">Don't have an account?</span><span class="lang-es">¿No tienes cuenta?</span> <a href="#register"><span class="lang-en">Register here</span><span class="lang-es">Regístrate aquí</span></a></p>
+            <p class="demo-hint" style="margin-top:12px;padding:12px;background:var(--bg-secondary);border-radius:var(--radius-sm);font-size:0.85rem;color:var(--text-secondary);">
+              <strong>Demo Accounts:</strong><br>
+              Admin: admin@remax-inmomas.com / admin123<br>
+              Broker: john.broker@remaxusa.com / broker123<br>
+              Realtor: mike.agent@remaxusa.com / realtor123
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ==================== VIEW: REGISTER ==================== -->
+    <div id="view-register" class="app-view">
+      <section class="auth-section">
+        <div class="auth-card auth-card--wide">
+          <div class="auth-header">
+            <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás" class="auth-logo">
+            <h2><span class="lang-en">Join Our Network</span><span class="lang-es">Únete a Nuestra Red</span></h2>
+            <p><span class="lang-en">Apply as a Broker or Realtor partner</span><span class="lang-es">Aplica como partner Broker o Agente</span></p>
+          </div>
+          <form id="register-form" onsubmit="return false;">
+            <!-- Role Selection -->
+            <div class="form-group">
+              <label><span class="lang-en">I am a...</span><span class="lang-es">Soy...</span></label>
+              <div class="role-selector">
+                <label class="role-card">
+                  <input type="radio" name="register-role" value="broker" id="register-role-broker">
+                  <div class="role-card__content">
+                    <span class="role-card__icon">🏢</span>
+                    <span class="role-card__title">Broker</span>
+                    <span class="role-card__desc"><span class="lang-en">I manage a team of agents</span><span class="lang-es">Gestiono un equipo de agentes</span></span>
+                  </div>
+                </label>
+                <label class="role-card">
+                  <input type="radio" name="register-role" value="realtor" id="register-role-realtor" checked>
+                  <div class="role-card__content">
+                    <span class="role-card__icon">👤</span>
+                    <span class="role-card__title">Realtor</span>
+                    <span class="role-card__desc"><span class="lang-en">I'm an individual agent</span><span class="lang-es">Soy un agente individual</span></span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label for="register-firstName"><span class="lang-en">First Name</span><span class="lang-es">Nombre</span> *</label><input type="text" id="register-firstName" required></div>
+              <div class="form-group"><label for="register-lastName"><span class="lang-en">Last Name</span><span class="lang-es">Apellido</span> *</label><input type="text" id="register-lastName" required></div>
+            </div>
+            <div class="form-group"><label for="register-agencyName"><span class="lang-en">Agency / Brokerage Name</span><span class="lang-es">Nombre de la Agencia</span></label><input type="text" id="register-agencyName"></div>
+            <div class="form-row">
+              <div class="form-group"><label for="register-email"><span class="lang-en">Email</span><span class="lang-es">Correo Electrónico</span> *</label><input type="email" id="register-email" required></div>
+              <div class="form-group"><label for="register-phone"><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></label><input type="tel" id="register-phone"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label for="register-password"><span class="lang-en">Password</span><span class="lang-es">Contraseña</span> *</label><input type="password" id="register-password" placeholder="Min. 6 characters" required></div>
+              <div class="form-group"><label for="register-country"><span class="lang-en">Country</span><span class="lang-es">País</span></label>
+                <select id="register-country">
+                  <option value="United States">United States</option>
+                  <option value="Canada">Canada</option>
+                  <option value="United Kingdom">United Kingdom</option>
+                  <option value="Germany">Germany</option>
+                  <option value="France">France</option>
+                  <option value="Netherlands">Netherlands</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <!-- Broker selection (for Realtors) -->
+            <div class="form-group" id="broker-select-group">
+              <label for="register-broker"><span class="lang-en">Your Broker (optional)</span><span class="lang-es">Tu Broker (opcional)</span></label>
+              <select id="register-broker">
+                <option value=""><span class="lang-en">Independent / No broker</span></option>
+              </select>
+              <small style="color:var(--text-muted);"><span class="lang-en">Select if you work under a specific broker in our network</span><span class="lang-es">Selecciona si trabajas bajo un broker de nuestra red</span></small>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="register-terms" required>
+                <span><span class="lang-en">I agree to the terms and conditions of the RE/MAX Inmomás International Referral Program</span><span class="lang-es">Acepto los términos y condiciones del Programa Internacional de Referidos de RE/MAX Inmomás</span></span>
+              </label>
+            </div>
+            <div id="register-error" class="form-error" style="display:none;"></div>
+            <button type="submit" class="btn btn-primary" style="width:100%;" id="register-submit-btn">
+              <span class="lang-en">Submit Application</span>
+              <span class="lang-es">Enviar Solicitud</span>
+            </button>
+          </form>
+          <div class="auth-footer">
+            <p><span class="lang-en">Already have an account?</span><span class="lang-es">¿Ya tienes cuenta?</span> <a href="#login"><span class="lang-en">Sign in</span><span class="lang-es">Inicia sesión</span></a></p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ==================== VIEW: PENDING APPROVAL ==================== -->
+    <div id="view-pending" class="app-view">
+      <section class="auth-section">
+        <div class="auth-card text-center">
+          <div class="pending-icon">⏳</div>
+          <h2><span class="lang-en">Application Received</span><span class="lang-es">Solicitud Recibida</span></h2>
+          <p style="color:var(--text-secondary);margin-top:12px;">
+            <span class="lang-en">Thank you for your interest in joining the RE/MAX Inmomás International Referral Network. Your application is being reviewed and you'll receive an email once it's approved.</span>
+            <span class="lang-es">Gracias por tu interés en unirte a la Red Internacional de Referidos de RE/MAX Inmomás. Tu solicitud está siendo revisada y recibirás un email una vez sea aprobada.</span>
+          </p>
+          <a href="#home" class="btn btn-outline" style="margin-top:24px;">
+            <span class="lang-en">Return to Home</span>
+            <span class="lang-es">Volver al Inicio</span>
+          </a>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ==================== VIEW: ADMIN DASHBOARD ==================== -->
+    <div id="view-admin-dashboard" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1><span class="lang-en">Admin Dashboard</span><span class="lang-es">Panel de Administración</span></h1>
+          <p class="dashboard-subtitle"><span class="lang-en">Manage the RE/MAX Inmomás International Platform</span><span class="lang-es">Gestiona la Plataforma Internacional de RE/MAX Inmomás</span></p>
+        </div>
+        <div class="stat-cards-grid">
+          <div class="stat-card stat-card--warning"><div class="stat-card__icon">⏳</div><div class="stat-card__info"><div class="stat-card__value" id="admin-stat-pending">0</div><div class="stat-card__label"><span class="lang-en">Pending Approvals</span><span class="lang-es">Pendientes</span></div></div></div>
+          <div class="stat-card stat-card--broker"><div class="stat-card__icon">🏢</div><div class="stat-card__info"><div class="stat-card__value" id="admin-stat-brokers">0</div><div class="stat-card__label"><span class="lang-en">Active Brokers</span><span class="lang-es">Brokers Activos</span></div></div></div>
+          <div class="stat-card stat-card--realtor"><div class="stat-card__icon">👤</div><div class="stat-card__info"><div class="stat-card__value" id="admin-stat-realtors">0</div><div class="stat-card__label"><span class="lang-en">Active Realtors</span><span class="lang-es">Realtors Activos</span></div></div></div>
+          <div class="stat-card stat-card--info"><div class="stat-card__icon">🤝</div><div class="stat-card__info"><div class="stat-card__value" id="admin-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Total Clients</span><span class="lang-es">Clientes Totales</span></div></div></div>
+        </div>
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Pending Applications</span><span class="lang-es">Solicitudes Pendientes</span></h2>
+          <div id="admin-pending-list" class="card-list"></div>
+        </div>
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Recent Activity</span><span class="lang-es">Actividad Reciente</span></h2>
+          <div id="admin-recent-activity"></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==================== VIEW: ADMIN USERS ==================== -->
+    <div id="view-admin-users" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1><span class="lang-en">Manage Users</span><span class="lang-es">Gestionar Usuarios</span></h1>
+        </div>
+        <div class="dashboard-filters">
+          <div class="form-group" style="margin-bottom:0;">
+            <input type="text" id="admin-search-input" placeholder="Search by name or email..." class="form-input">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <select id="admin-filter-role" class="form-select">
+              <option value="">All Roles</option>
+              <option value="broker">Brokers</option>
+              <option value="realtor">Realtors</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <select id="admin-filter-status" class="form-select">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+        </div>
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead><tr><th><span class="lang-en">User</span><span class="lang-es">Usuario</span></th><th>Email</th><th><span class="lang-en">Agency</span><span class="lang-es">Agencia</span></th><th><span class="lang-en">Role</span><span class="lang-es">Rol</span></th><th>Status</th><th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th><th><span class="lang-en">Actions</span><span class="lang-es">Acciones</span></th></tr></thead>
+            <tbody id="admin-users-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==================== VIEW: BROKER DASHBOARD ==================== -->
+    <div id="view-broker-dashboard" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1><span class="lang-en">Broker Dashboard</span><span class="lang-es">Panel de Broker</span></h1>
+          <p class="dashboard-subtitle" id="broker-welcome"></p>
+        </div>
+        <div class="stat-cards-grid">
+          <div class="stat-card stat-card--realtor"><div class="stat-card__icon">👥</div><div class="stat-card__info"><div class="stat-card__value" id="broker-stat-realtors">0</div><div class="stat-card__label"><span class="lang-en">My Realtors</span><span class="lang-es">Mis Agentes</span></div></div></div>
+          <div class="stat-card stat-card--info"><div class="stat-card__icon">🤝</div><div class="stat-card__info"><div class="stat-card__value" id="broker-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Total Clients</span><span class="lang-es">Clientes Totales</span></div></div></div>
+          <div class="stat-card stat-card--success"><div class="stat-card__icon">🏠</div><div class="stat-card__info"><div class="stat-card__value" id="broker-stat-sales">0</div><div class="stat-card__label"><span class="lang-en">Completed Sales</span><span class="lang-es">Ventas Completadas</span></div></div></div>
+          <div class="stat-card stat-card--broker"><div class="stat-card__icon">💰</div><div class="stat-card__info"><div class="stat-card__value" id="broker-stat-commissions">€0</div><div class="stat-card__label"><span class="lang-en">Total Commissions</span><span class="lang-es">Comisiones Totales</span></div></div></div>
+        </div>
+        <div class="dashboard-grid-2col">
+          <div class="dashboard-section">
+            <h2><span class="lang-en">Team Overview</span><span class="lang-es">Resumen del Equipo</span></h2>
+            <div id="broker-team-overview"></div>
+          </div>
+          <div class="dashboard-section">
+            <h2><span class="lang-en">Recent Clients</span><span class="lang-es">Clientes Recientes</span></h2>
+            <div id="broker-recent-clients"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==================== VIEW: BROKER TEAM ==================== -->
+    <div id="view-broker-team" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">My Team</span><span class="lang-es">Mi Equipo</span></h1></div>
+        <div id="broker-team-grid" class="team-cards-grid"></div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW: BROKER CLIENTS ==================== -->
+    <div id="view-broker-clients" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">All Clients</span><span class="lang-es">Todos los Clientes</span></h1></div>
+        <div class="dashboard-filters">
+          <select id="broker-client-filter-status" class="form-select"><option value="">All Status</option><option value="registered">Registered</option><option value="webinar_attended">Webinar</option><option value="vip_trip_completed">VIP Trip</option><option value="property_search">Property Search</option><option value="offer_made">Offer</option><option value="closing">Closing</option><option value="completed">Completed</option></select>
+        </div>
+        <div class="data-table-container">
+          <table class="data-table"><thead><tr><th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th><th>Email</th><th><span class="lang-en">Referred By</span><span class="lang-es">Referido Por</span></th><th>Status</th><th><span class="lang-en">Area</span><span class="lang-es">Zona</span></th><th><span class="lang-en">Budget</span><span class="lang-es">Presupuesto</span></th><th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th></tr></thead>
+          <tbody id="broker-clients-table-body"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW: BROKER DOCUMENTS ==================== -->
+    <div id="view-broker-documents" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">Documents</span><span class="lang-es">Documentos</span></h1></div>
+        <div id="broker-documents-content"></div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW: BROKER FINANCES ==================== -->
+    <div id="view-broker-finances" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">Financial Overview</span><span class="lang-es">Resumen Financiero</span></h1></div>
+        <div class="stat-cards-grid" style="grid-template-columns:repeat(4,1fr);">
+          <div class="stat-card stat-card--broker"><div class="stat-card__icon">💰</div><div class="stat-card__info"><div class="stat-card__value" id="broker-fin-total">€0</div><div class="stat-card__label">Total</div></div></div>
+          <div class="stat-card stat-card--success"><div class="stat-card__icon">✓</div><div class="stat-card__info"><div class="stat-card__value" id="broker-fin-paid">€0</div><div class="stat-card__label">Paid</div></div></div>
+          <div class="stat-card stat-card--warning"><div class="stat-card__icon">⏳</div><div class="stat-card__info"><div class="stat-card__value" id="broker-fin-pending">€0</div><div class="stat-card__label">Pending</div></div></div>
+          <div class="stat-card stat-card--info"><div class="stat-card__icon">📈</div><div class="stat-card__info"><div class="stat-card__value" id="broker-fin-projected">€0</div><div class="stat-card__label">Projected</div></div></div>
+        </div>
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Commission Breakdown</span><span class="lang-es">Desglose de Comisiones</span></h2>
+          <div class="data-table-container">
+            <table class="data-table"><thead><tr><th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th><th><span class="lang-en">Property</span><span class="lang-es">Propiedad</span></th><th><span class="lang-en">Sale Price</span><span class="lang-es">Precio</span></th><th><span class="lang-en">Total Commission</span><span class="lang-es">Comisión Total</span></th><th><span class="lang-en">Your Share</span><span class="lang-es">Tu Parte</span></th><th><span class="lang-en">Amount</span><span class="lang-es">Importe</span></th><th>Status</th></tr></thead>
+            <tbody id="broker-commission-table-body"></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==================== VIEW: REALTOR DASHBOARD ==================== -->
+    <div id="view-realtor-dashboard" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1><span class="lang-en">My Dashboard</span><span class="lang-es">Mi Panel</span></h1>
+          <p class="dashboard-subtitle" id="realtor-welcome"></p>
+        </div>
+        <div class="stat-cards-grid">
+          <div class="stat-card stat-card--info"><div class="stat-card__icon">🤝</div><div class="stat-card__info"><div class="stat-card__value" id="realtor-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Referred Clients</span><span class="lang-es">Clientes Referidos</span></div></div></div>
+          <div class="stat-card stat-card--realtor"><div class="stat-card__icon">🔄</div><div class="stat-card__info"><div class="stat-card__value" id="realtor-stat-active">0</div><div class="stat-card__label"><span class="lang-en">Active Pipeline</span><span class="lang-es">Pipeline Activo</span></div></div></div>
+          <div class="stat-card stat-card--success"><div class="stat-card__icon">🏠</div><div class="stat-card__info"><div class="stat-card__value" id="realtor-stat-sales">0</div><div class="stat-card__label"><span class="lang-en">Completed Sales</span><span class="lang-es">Ventas Completadas</span></div></div></div>
+          <div class="stat-card stat-card--broker"><div class="stat-card__icon">💰</div><div class="stat-card__info"><div class="stat-card__value" id="realtor-stat-commissions">€0</div><div class="stat-card__label"><span class="lang-en">Commissions Earned</span><span class="lang-es">Comisiones Ganadas</span></div></div></div>
+        </div>
+        <!-- Referral Link Quick Access -->
+        <div class="dashboard-section referral-quick">
+          <h2>🔗 <span class="lang-en">Your Referral Link</span><span class="lang-es">Tu Enlace de Referido</span></h2>
+          <div class="referral-link-row">
+            <input type="text" readonly id="realtor-dash-referral-link" class="referral-link-display" value="">
+            <button class="btn btn-primary btn-sm" id="realtor-dash-copy-link"><span class="lang-en">Copy</span><span class="lang-es">Copiar</span></button>
+          </div>
+        </div>
+        <div class="dashboard-grid-2col">
+          <div class="dashboard-section">
+            <h2><span class="lang-en">Pipeline Summary</span><span class="lang-es">Resumen del Pipeline</span></h2>
+            <div id="realtor-dash-pipeline"></div>
+          </div>
+          <div class="dashboard-section">
+            <h2><span class="lang-en">Recent Clients</span><span class="lang-es">Clientes Recientes</span></h2>
+            <div id="realtor-dash-recent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==================== VIEW: REALTOR CLIENTS (PIPELINE) ==================== -->
+    <div id="view-realtor-clients" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">Client Pipeline</span><span class="lang-es">Pipeline de Clientes</span></h1></div>
+        <div id="realtor-pipeline-board" class="pipeline-board"></div>
+      </div>
+    </div>
+
+
+    <!-- ==================== VIEW: REALTOR REFERRAL ==================== -->
+    <div id="view-realtor-referral" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">Referral Tools</span><span class="lang-es">Herramientas de Referidos</span></h1></div>
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Your Unique Referral Link</span><span class="lang-es">Tu Enlace de Referido Único</span></h2>
+          <div class="referral-card">
+            <div class="referral-link-row">
+              <input type="text" readonly id="realtor-referral-link-display" class="referral-link-display" value="">
+              <button class="btn btn-primary" id="realtor-copy-referral-btn"><span class="lang-en">Copy Link</span><span class="lang-es">Copiar Enlace</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="stat-cards-grid" style="grid-template-columns:repeat(4,1fr);">
+          <div class="stat-card"><div class="stat-card__icon">👥</div><div class="stat-card__info"><div class="stat-card__value" id="referral-stat-total">0</div><div class="stat-card__label"><span class="lang-en">Total Referred</span><span class="lang-es">Total Referidos</span></div></div></div>
+          <div class="stat-card"><div class="stat-card__icon">🔄</div><div class="stat-card__info"><div class="stat-card__value" id="referral-stat-active">0</div><div class="stat-card__label"><span class="lang-en">In Pipeline</span><span class="lang-es">En Pipeline</span></div></div></div>
+          <div class="stat-card"><div class="stat-card__icon">✅</div><div class="stat-card__info"><div class="stat-card__value" id="referral-stat-converted">0</div><div class="stat-card__label"><span class="lang-en">Converted</span><span class="lang-es">Convertidos</span></div></div></div>
+          <div class="stat-card"><div class="stat-card__icon">📊</div><div class="stat-card__info"><div class="stat-card__value" id="referral-stat-conversion">0%</div><div class="stat-card__label"><span class="lang-en">Conversion Rate</span><span class="lang-es">Tasa de Conversión</span></div></div></div>
+        </div>
+        <div class="dashboard-section">
+          <h2><span class="lang-en">QR Code</span><span class="lang-es">Código QR</span></h2>
+          <div id="referral-qr-code" class="qr-placeholder"></div>
+        </div>
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Tips for Sharing</span><span class="lang-es">Consejos para Compartir</span></h2>
+          <div class="tips-grid">
+            <div class="tip-card"><span class="tip-icon">📧</span><h4>Email Signature</h4><p><span class="lang-en">Add your referral link to your email signature for passive lead generation.</span><span class="lang-es">Añade tu enlace de referido a tu firma de email para generación pasiva de leads.</span></p></div>
+            <div class="tip-card"><span class="tip-icon">📱</span><h4>Social Media</h4><p><span class="lang-en">Share Spain lifestyle content with your referral link on Instagram, LinkedIn, and Facebook.</span><span class="lang-es">Comparte contenido sobre el estilo de vida en España con tu enlace en Instagram, LinkedIn y Facebook.</span></p></div>
+            <div class="tip-card"><span class="tip-icon">🎯</span><h4><span class="lang-en">Direct Outreach</span><span class="lang-es">Contacto Directo</span></h4><p><span class="lang-en">Identify clients who've mentioned retirement or international investment goals.</span><span class="lang-es">Identifica clientes que hayan mencionado jubilación o metas de inversión internacional.</span></p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==================== VIEW: REALTOR DOCUMENTS ==================== -->
+    <div id="view-realtor-documents" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">Documents & Agreements</span><span class="lang-es">Documentos y Acuerdos</span></h1></div>
+        <!-- Collaboration Agreement -->
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Collaboration Agreement</span><span class="lang-es">Acuerdo de Colaboración</span></h2>
+          <div id="agreement-section"></div>
+        </div>
+        <!-- Document Upload -->
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Upload Documents</span><span class="lang-es">Subir Documentos</span></h2>
+          <div class="upload-zone" id="doc-upload-zone">
+            <span class="upload-icon">📤</span>
+            <p><span class="lang-en">Drag & drop files here or click to browse</span><span class="lang-es">Arrastra archivos aquí o haz clic para seleccionar</span></p>
+            <input type="file" id="doc-file-input" multiple style="display:none;">
+          </div>
+          <div id="uploaded-docs-list" class="doc-list"></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==================== VIEW: REALTOR FINANCES ==================== -->
+    <div id="view-realtor-finances" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">My Finances</span><span class="lang-es">Mis Finanzas</span></h1></div>
+        <div class="stat-cards-grid" style="grid-template-columns:repeat(4,1fr);">
+          <div class="stat-card stat-card--broker"><div class="stat-card__icon">💰</div><div class="stat-card__info"><div class="stat-card__value" id="realtor-fin-total">€0</div><div class="stat-card__label">Total</div></div></div>
+          <div class="stat-card stat-card--success"><div class="stat-card__icon">✓</div><div class="stat-card__info"><div class="stat-card__value" id="realtor-fin-paid">€0</div><div class="stat-card__label">Paid</div></div></div>
+          <div class="stat-card stat-card--info"><div class="stat-card__icon">📈</div><div class="stat-card__info"><div class="stat-card__value" id="realtor-fin-projected">€0</div><div class="stat-card__label">Projected</div></div></div>
+          <div class="stat-card stat-card--warning"><div class="stat-card__icon">📊</div><div class="stat-card__info"><div class="stat-card__value" id="realtor-fin-avg">€0</div><div class="stat-card__label"><span class="lang-en">Avg per Sale</span><span class="lang-es">Media por Venta</span></div></div></div>
+        </div>
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Commission History</span><span class="lang-es">Historial de Comisiones</span></h2>
+          <div class="data-table-container">
+            <table class="data-table"><thead><tr><th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th><th><span class="lang-en">Property</span><span class="lang-es">Propiedad</span></th><th><span class="lang-en">Sale Price</span><span class="lang-es">Precio</span></th><th><span class="lang-en">Total Commission</span><span class="lang-es">Comisión Total</span></th><th><span class="lang-en">Your Share</span><span class="lang-es">Tu Parte</span></th><th><span class="lang-en">Amount</span><span class="lang-es">Importe</span></th><th>Status</th></tr></thead>
+            <tbody id="realtor-commission-table-body"></tbody></table>
+          </div>
+        </div>
+        <!-- Projections -->
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Earnings Projection</span><span class="lang-es">Proyección de Ganancias</span></h2>
+          <div id="realtor-projection"></div>
+        </div>
+      </div>
+    </div>
+
+
+  </main>
+
+  <!-- ===================== TOAST CONTAINER ===================== -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ===================== MODAL OVERLAY ===================== -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div id="modal" class="modal"></div>
+  </div>
+
+  <!-- ===================== SCRIPTS ===================== -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth-service.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/views/admin-views.js"></script>
+  <script src="js/views/broker-views.js"></script>
+  <script src="js/views/realtor-views.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

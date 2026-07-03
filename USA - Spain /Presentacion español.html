@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan Estratégico Internacional — REMAX Inmomás</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Montserrat','Segoe UI',sans-serif;background:#000;overflow:hidden;width:100vw;height:100vh;}
+.slide{display:none;width:100vw;height:100vh;position:absolute;top:0;left:0;padding:48px 72px 74px;flex-direction:column;justify-content:center;overflow:hidden;background:#0A1628;}
+.slide.active{display:flex;}
+.slide-inner{position:relative;z-index:2;width:100%;height:100%;}
+.bg-cover{background:linear-gradient(140deg,#05080f 0%,#0A1628 45%,#1a0608 100%);}
+.bg-phase{background:linear-gradient(140deg,#080d1a 0%,#0A1628 100%);}
+.bg-fuster{background:linear-gradient(140deg,#060b1a 0%,#0E1A42 60%,#0a1230 100%);}
+.bg-close{background:linear-gradient(140deg,#0A1628 0%,#1a0008 100%);}
+.slide::before{content:'';position:absolute;top:-60px;right:-60px;width:350px;height:350px;background:radial-gradient(circle,rgba(200,16,46,.18) 0%,transparent 70%);pointer-events:none;z-index:1;}
+.slide::after{content:'';position:absolute;bottom:-60px;left:-60px;width:250px;height:250px;background:radial-gradient(circle,rgba(0,48,135,.2) 0%,transparent 70%);pointer-events:none;z-index:1;}
+.stripe{position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#C8102E 0%,#003087 50%,#C8102E 100%);z-index:10;}
+.phase-badge{display:inline-block;background:#C8102E;color:#fff;font-size:.6rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;padding:4px 14px;border-radius:2px;margin-bottom:14px;}
+.phase-badge.blue{background:#003087;}
+.phase-badge.gold{background:#B8972A;}
+.phase-badge.green{background:#0E1A42;border:1px solid rgba(42,90,173,.35);}
+.slide-title{font-size:2.6rem;font-weight:900;color:#fff;line-height:1.12;margin-bottom:6px;letter-spacing:-.5px;}
+.slide-title span{color:#C8102E;}
+.slide-title span.gold{color:#D4AF37;}
+.slide-sub{font-size:.85rem;font-weight:400;color:rgba(255,255,255,.55);letter-spacing:2px;text-transform:uppercase;margin-bottom:22px;}
+.divider{width:50px;height:3px;background:#C8102E;margin-bottom:22px;border-radius:2px;}
+.divider.gold{background:#D4AF37;}
+.cover-eyebrow{display:inline-block;border:1px solid rgba(200,16,46,.5);color:rgba(200,16,46,.9);font-size:.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:6px 18px;border-radius:30px;margin-bottom:22px;}
+.cover-title{font-size:3.8rem;font-weight:900;color:#fff;line-height:1.08;margin-bottom:10px;}
+.cover-title span{color:#C8102E;}
+.cover-subtitle{font-size:1.3rem;font-weight:300;color:rgba(255,255,255,.75);margin-bottom:14px;}
+.cover-tagline{font-size:.85rem;color:#D4AF37;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;}
+.logo-pill{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.95);border-radius:8px;padding:8px 20px;font-weight:900;font-size:.95rem;}
+.logo-r{color:#C8102E;}
+.logo-f{color:#0E1A42;display:inline-flex;align-items:center;gap:6px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:20px 18px;}
+.card.red{background:rgba(200,16,46,.1);border-color:rgba(200,16,46,.3);}
+.card.blue{background:rgba(0,48,135,.15);border-color:rgba(0,48,135,.35);}
+.card.gold{background:rgba(212,175,55,.1);border-color:rgba(212,175,55,.3);}
+.card.green{background:rgba(14,26,66,.35);border-color:rgba(42,90,173,.35);}
+.card-icon{font-size:1.6rem;margin-bottom:8px;display:block;}
+.card-title{font-size:.8rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.card-text{font-size:.75rem;color:rgba(255,255,255,.7);line-height:1.55;}
+.stats-row{display:flex;gap:18px;margin-bottom:24px;}
+.stat{flex:1;text-align:center;background:rgba(200,16,46,.1);border:1px solid rgba(200,16,46,.3);border-radius:12px;padding:18px 10px;}
+.stat-num{font-size:2.4rem;font-weight:900;color:#C8102E;display:block;line-height:1;}
+.stat-lbl{font-size:.68rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;margin-top:5px;display:block;}
+.blist{list-style:none;}
+.blist li{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:.85rem;color:rgba(255,255,255,.85);border-bottom:1px solid rgba(255,255,255,.06);}
+.blist li::before{content:'▸';color:#C8102E;font-size:.75rem;margin-top:3px;flex-shrink:0;}
+.funnel{display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;}
+.fun-item{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.82rem;letter-spacing:1.5px;text-transform:uppercase;border-radius:6px;height:48px;width:100%;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start;}
+.profile-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:22px 18px;border-top:3px solid #C8102E;}
+.profile-name{font-size:.88rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+.profile-row{display:flex;gap:8px;margin-bottom:5px;align-items:flex-start;}
+.pk{font-size:.68rem;font-weight:700;color:#C8102E;text-transform:uppercase;letter-spacing:.5px;min-width:68px;flex-shrink:0;}
+.pv{font-size:.74rem;color:rgba(255,255,255,.8);}
+.eco-wrap{position:relative;width:100%;height:260px;display:flex;align-items:center;justify-content:center;}
+.eco-center{position:absolute;width:150px;height:150px;background:linear-gradient(135deg,#C8102E,#003087);border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;font-weight:800;font-size:.72rem;z-index:2;padding:14px;line-height:1.35;}
+.eco-node{position:absolute;border-radius:10px;padding:11px 14px;text-align:center;font-size:.7rem;color:#fff;font-weight:700;line-height:1.4;}
+.impact-table{width:100%;border-collapse:collapse;}
+.impact-table th{background:#C8102E;color:#fff;padding:11px 18px;font-size:.75rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:left;}
+.impact-table td{padding:11px 18px;font-size:.85rem;color:rgba(255,255,255,.88);border-bottom:1px solid rgba(255,255,255,.07);}
+.impact-table tr:nth-child(even) td{background:rgba(255,255,255,.04);}
+.impact-table .tag-green{color:#7BAEE8;font-weight:700;}
+.bbar-wrap{margin-bottom:12px;}
+.bbar-top{display:flex;justify-content:space-between;font-size:.78rem;color:rgba(255,255,255,.8);margin-bottom:4px;}
+.bbar-track{height:10px;background:rgba(255,255,255,.08);border-radius:5px;overflow:hidden;}
+.bbar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#C8102E,#003087);}
+.timeline{display:flex;gap:18px;}
+.tl-phase{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:20px 16px;border-top:3px solid;}
+.tl-phase.r{border-top-color:#C8102E;}.tl-phase.b{border-top-color:#003087;}.tl-phase.g{border-top-color:#D4AF37;}
+.tl-period{font-size:.68rem;font-weight:700;color:#C8102E;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.tl-title{font-size:.95rem;font-weight:800;color:#fff;margin-bottom:12px;}
+.tag{display:inline-block;background:rgba(255,255,255,.1);border-radius:4px;padding:4px 8px;font-size:.68rem;color:rgba(255,255,255,.8);margin:3px 3px 0 0;}
+.big-quote{font-size:2rem;font-weight:800;color:#fff;line-height:1.35;text-align:center;}
+.big-quote em{color:#C8102E;font-style:normal;}
+.g-box{background:#fff;border-radius:10px;padding:16px 18px;max-width:460px;}
+.g-bar{background:#f1f1f1;border:1px solid #ddd;border-radius:20px;padding:7px 14px;font-size:.75rem;color:#333;margin-bottom:12px;}
+.g-result{padding:7px 0;border-bottom:1px solid #eee;}
+.g-url{font-size:.65rem;color:#006621;display:block;}
+.g-title{font-size:.8rem;color:#1a0dab;font-weight:500;}
+.g-desc{font-size:.68rem;color:#545454;}
+.topic-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;}
+.topic-num{width:28px;height:28px;background:#C8102E;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:#fff;flex-shrink:0;}
+.topic-title{font-size:.82rem;font-weight:700;color:#fff;margin-bottom:3px;}
+.topic-sub{font-size:.7rem;color:rgba(255,255,255,.6);}
+.j-num{width:36px;height:36px;background:#C8102E;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:#fff;flex-shrink:0;}
+.j-text{font-size:.72rem;color:rgba(255,255,255,.8);font-weight:600;line-height:1.35;}
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
+.kpi-box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:18px 12px;text-align:center;}
+.kpi-icon-lrg{font-size:1.5rem;margin-bottom:6px;display:block;}
+.kpi-lbl{font-size:.68rem;font-weight:700;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:.5px;}
+.closing-info{display:flex;flex-direction:column;gap:10px;margin-top:12px;}
+.closing-row{display:flex;align-items:center;gap:12px;font-size:.85rem;color:rgba(255,255,255,.8);}
+.closing-icon{font-size:1.1rem;width:28px;text-align:center;}
+
+/* ── REMAX LOGO FIXED ── */
+.remax-logo-fixed{position:fixed;top:18px;left:22px;z-index:500;display:flex;align-items:center;gap:10px;pointer-events:none;}
+.remax-logo-text{display:flex;flex-direction:column;line-height:1.2;}
+.remax-logo-brand{font-size:1rem;font-weight:900;color:#fff;letter-spacing:.5px;font-family:'Montserrat',sans-serif;}
+.remax-logo-brand em{color:#C8102E;font-style:normal;}
+.remax-logo-sub{font-size:.52rem;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;font-family:'Montserrat',sans-serif;}
+
+.nav-bar{position:fixed;bottom:0;left:0;right:0;height:54px;background:rgba(4,8,18,.96);border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:1000;backdrop-filter:blur(12px);}
+.nav-btn{background:rgba(200,16,46,.12);color:#fff;border:1px solid rgba(200,16,46,.35);padding:7px 22px;border-radius:6px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;transition:.2s;}
+.nav-btn:hover{background:#C8102E;border-color:#C8102E;}
+.nav-center{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.slide-counter{font-size:.72rem;color:rgba(255,255,255,.5);letter-spacing:1px;}
+.progress-wrap{width:180px;height:3px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:#C8102E;border-radius:3px;transition:width .3s ease;}
+.slide-name{font-size:.6rem;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1 — PORTADA -->
+<div class="slide bg-cover active" data-name="Portada">
+  <div class="stripe"></div>
+  <div class="slide-inner" style="display:flex;flex-direction:column;justify-content:center;">
+    <div class="cover-eyebrow">REMAX Inmomás · Costa Blanca · España</div>
+    <div class="cover-title">Plan Estratégico<br><span>Internacional</span></div>
+    <div class="cover-subtitle">Captación de Compradores Norteamericanos para España</div>
+    <div class="cover-tagline">Residencia · Inversión · Lifestyle Mediterráneo</div>
+    <div style="display:flex;align-items:center;gap:16px;margin-top:30px;">
+      <div class="logo-pill"><span class="logo-r">RE/MAX</span>&nbsp;<span style="color:#555">Inmomás</span></div>
+      <div style="color:rgba(255,255,255,.25);font-size:1.2rem;">+</div>
+      <div class="logo-pill"><span class="logo-f">Fuster &amp; Associates</span></div>
+    </div>
+    <div style="margin-top:22px;font-size:.72rem;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;">2026 · International Advisory Division</div>
+  </div>
+</div>
+
+<!-- SLIDE 2 — QUIÉNES SOMOS -->
+<div class="slide bg-phase" data-name="Quiénes Somos">
+  <div class="stripe"></div>
+  <div class="slide-inner">
+    <div class="phase-badge">Fase 1 · Visión</div>
+    <div class="slide-title">Quiénes <span>Somos</span></div>
+    <div class="divider"></div>
+    <div class="stats-row">
+      <div class="stat"><span class="stat-num">30+</span><span class="stat-lbl">Años de experiencia</span></div>
+      <div class="stat"><span class="stat-num">4</span><span class="stat-lbl">Oficinas Costa Blanca</span></div>
+      <div class="stat"><span class="stat-num">115+</span><span class="stat-lbl">Agentes en activo</span></div>
+      <div class="stat"><span class="stat-num">1ª</span><span class="stat-lbl">Red mundial REMAX</span></div>
+    </div>
+    <div class="grid-3">
+      <div class="card red">
+        <span class="card-icon">🌍</span>
+        <div class="card-title">Liderazgo Internacional</div>
+        <div class="card-text">Especialistas en comprador extranjero en la Costa Blanca desde hace más de tres décadas. Elche · Alicante · Benidorm · Jávea.</div>
+      </div>
+      <div class="card blue">
+        <span class="card-icon">🔗</span>
+        <div class="card-title">Red REMAX Global</div>
+        <div class="card-text">Conectados a la mayor red inmobiliaria del mundo con presencia activa en Norteamérica, Europa y América Latina.</div>
+      </div>
+      <div class="card gold">
+        <span class="card-icon">🛡️</span>
+        <div class="card-title">Servicio Integral</div>
+        <div class="card-text">Fiscalidad · Residencia · Financiación · Gestión de alquiler · Asesoramiento jurídico. Todo bajo un mismo techo.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3 — LA GRAN OPORTUNIDAD -->
+<div class="slide bg-phase" data-name="La Gran Oportunidad">
+  <div class="stripe"></div>
+  <div class="slide-inner">
+    <div class="phase-badge">Fase 1 · Oportunidad</div>
+    <div class="slide-title">¿Por qué Norteamérica<br>está mirando a <span>España</span>?</div>
+    <div class="divider"></div>
+    <div class="grid-4">
+      <div class="card"><span class="card-icon">☀️</span><div class="card-title">Clima &amp; Calidad de vida</div><div class="card-text">300 días de sol al año. Gastronomía, cultura y naturaleza mediterránea inigualables.</div></div>
+      <div class="card red"><span class="card-icon">📈</span><div class="card-title">Rentabilidad</div><div class="card-text">Retorno medio del alquiler turístico: 5–8% anual. Mercado en revalorización constante.</div></div>
+      <div class="card blue"><span class="card-icon">🏥</span><div class="card-title">Sistema Sanitario</div><div class="card-text">Sanidad pública universal de alto nivel. Referencia mundial en calidad asistencial.</div></div>
+      <div class="card gold"><span class="card-icon">🌐</span><div class="card-title">Puerta a Europa</div><div class="card-text">Acceso al mercado europeo, libre circulación Schengen y hub logístico estratégico.</div></div>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:14px;">
+      <div class="card" style="flex:1;"><div class="card-title">💰 Coste de vida vs USA</div><div class="card-text">El coste de vida en España es entre un 40–60% inferior al de Miami, Nueva York o California manteniendo una calidad de vida superior.</div></div>
+      <div class="card red" style="flex:1;"><div class="card-title">🔒 Seguridad Jurídica</div><div class="card-text">Marco legal europeo sólido. Registro de la propiedad transparente. Protección garantizada del comprador internacional.</div></div>
+      <div class="card blue" style="flex:1;"><div class="card-title">📋 Visados y Residencia</div><div class="card-text">Golden Visa · Digital Nomad Visa · Non-lucrative Visa. Vías legales claras y accesibles para el perfil norteamericano.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4 — PERFIL DEL COMPRADOR -->
+<div class="slide bg-phase" data-name="Perfil del Comprador">
+  <div class="stripe"></div>
+  <div class="slide-inner">
+    <div class="phase-badge">Fase 1 · Audiencia</div>
+    <div class="slide-title">Perfil del <span>Comprador</span> Norteamericano</div>
+    <div class="divider"></div>
+    <div class="grid-3">
+      <div class="profile-card">
+        <div class="profile-name">💼 Inversor Patrimonial</div>
+        <div class="profile-row"><span class="pk">Edad</span><span class="pv">45–65 años</span></div>
+        <div class="profile-row"><span class="pk">Capacidad</span><span class="pv">500K – 2M€</span></div>
+        <div class="profile-row"><span class="pk">Objetivo</span><span class="pv">Rentabilidad y diversificación del patrimonio</span></div>
+        <div class="profile-row"><span class="pk">Motivación</span><span class="pv">ROI, protección ante inflación USD, activo europeo</span></div>
+      </div>
+      <div class="profile-card" style="border-top-color:#003087;">
+        <div class="profile-name">🌅 Lifestyle Buyer</div>
+        <div class="profile-row"><span class="pk">Edad</span><span class="pv">55–75 años</span></div>
+        <div class="profile-row"><span class="pk">Capacidad</span><span class="pv">300K – 1.2M€</span></div>
+        <div class="profile-row"><span class="pk">Objetivo</span><span class="pv">Segunda residencia o retiro en el Mediterráneo</span></div>
+        <div class="profile-row"><span class="pk">Motivación</span><span class="pv">Clima, sanidad, coste de vida, comunidad expat</span></div>
+      </div>
+      <div class="profile-card" style="border-top-color:#D4AF37;">
+        <div class="profile-name">🚀 Empresario / Relocation</div>
+        <div class="profile-row"><span class="pk">Edad</span><span class="pv">35–55 años</span></div>
+        <div class="profile-row"><span class="pk">Capacidad</span><span class="pv">400K – 3M€</span></div>
+        <div class="profile-row"><span class="pk">Objetivo</span><span class="pv">Base europea, Digital Nomad Visa, expansión</span></div>
+        <div class="profile-row"><span class="pk">Motivación</span><span class="pv">Fiscalidad óptima, acceso a mercado UE, familia</span></div>
+      </div>
+    </div>
+    <div style="margin-top:16px;" class="card red"><div class="card-text" style="font-size:.82rem;text-align:center;font-weight:600;">🎯 &nbsp; El comprador norteamericano no busca solo una vivienda. Busca <strong style="color:#fff;">seguridad, rentabilidad y un proyecto de vida</strong> en España.</div></div>
+  </div>
+</div>
+
+<!-- SLIDE 5 — NUESTRA DIFERENCIACIÓN -->
+<div class="slide bg-phase" data-name="Nuestra Diferenciación">
+  <div class="stripe"></div>
+  <div class="slide-inner">
+    <div class="phase-badge">Fase 1 · Posicionamiento</div>
+    <div class="slide-title">No somos una agencia<br>inmobiliaria <span>tradicional</span></div>
+    <div class="divider"></div>
+    <div style="text-align:center;margin-bottom:22px;padding:16px;background:rgba(200,16,46,.1);border:1px solid rgba(200,16,46,.3);border-radius:12px;">
+      <div style="font-size:1.4rem;font-weight:800;color:#fff;line-height:1.3;">"Somos una compañía internacional de <span style="color:#C8102E;">asesoramiento integral</span>"</div>
+    </div>
+    <div class="grid-3">
+      <div class="card"><span class="card-icon">⚖️</span><div class="card-title">Fiscalidad</div><div class="card-text">Optimización fiscal para no residentes. Doble imposición USA/España. Estructuración del patrimonio.</div></div>
+      <div class="card red"><span class="card-icon">🏠</span><div class="card-title">Inversión Inmobiliaria</div><div class="card-text">Selección estratégica de activos. Análisis de rentabilidad. Property tours personalizados.</div></div>
+      <div class="card blue"><span class="card-icon">📋</span><div class="card-title">Residencia &amp; Visados</div><div class="card-text">Golden Visa. Digital Nomad Visa. NIE. Gestión completa del proceso de residencia.</div></div>
+      <div class="card gold"><span class="card-icon">🔑</span><div class="card-title">Gestión de Alquiler</div><div class="card-text">Rentabilización del activo. Gestión turística. Mantenimiento y administración integral.</div></div>
+      <div class="card green"><span class="card-icon">🏦</span><div class="card-title">Financiación</div><div class="card-text">Hipotecas para no residentes. Conexión con entidades financieras internacionales.</div></div>
+      <div class="card"><span class="card-icon">🤝</span><div class="card-title">Acompañamiento 360°</div><div class="card-text">Desde la búsqueda hasta la postventa. Un equipo multilingüe siempre disponible.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6 — EL EMBUDO INTERNACIONAL -->
+<div class="slide bg-phase" data-name="El Embudo Internacional">
+  <div class="stripe"></div>
+  <div class="slide-inner">
+    <div class="phase-badge blue">Fase 2 · Captación</div>
+    <div class="slide-title">El Embudo <span>Internacional</span></div>
+    <div class="divider"></div>
+    <div class="two-col" style="align-items:center;">
+      <div class="funnel">
+        <div class="fun-item" style="background:rgba(200,16,46,.7);width:95%;">🌐 &nbsp; ATRACCIÓN — Digital &amp; Contenido</div>
+        <div class="fun-item" style="background:rgba(200,16,46,.55);width:82%;">📩 &nbsp; CAPTACIÓN — Lead Magnet</div>
+        <div class="fun-item" style="background:rgba(200,16,46,.42);width:70%;">📺 &nbsp; NUTRICIÓN — Webinar</div>
+        <div class="fun-item" style="background:rgba(200,16,46,.3);width:57%;">💬 &nbsp; CONVERSIÓN — Zoom + Tour</div>
+        <div class="fun-item" style="background:rgba(200,16,46,.18);width:44%;font-size:.78rem;">⭐ &nbsp; FIDELIZACIÓN — Referidos</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card" style="border-left:3px solid #C8102E;"><div class="card-title">Canales de Atracción</div><div class="card-text">LinkedIn · Instagram · Facebook Ads · YouTube · Google Ads · SEO · Webinars internacionales</div></div>
+        <div class="card" style="border-left:3px solid #003087;"><div class="card-title">Lead Magnets</div><div class="card-text">Ebook gratuito · Guía fiscal · Webinar gratuito · ROI Calculator · Guía de residencia</div></div>
+        <div class="card" style="border-left:3px solid #D4AF37;"><div class="card-title">CRM &amp; Automatización</div><div class="card-text">HubSpot · GoHighLevel · ActiveCampaign — flujos automatizados desde el primer contacto</div></div>
+        <div class="card red"><div class="card-title">Retargeting</div><div class="card-text">Facebook Pixel · YouTube · Google Remarketing — múltiples impactos para generar confianza</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7 — MERCADOS OBJETIVO -->
+<div class="slide bg-phase" data-name="Mercados Objetivo">
+  <div class="stripe"></div>
+  <div class="slide-inner">
+    <div class="phase-badge blue">Fase 2 · Mercados</div>
+    <div class="slide-title">Mercados <span>Objetivo</span></div>
+    <div class="divider"></div>
+    <div class="grid-3" style="margin-bottom:16px;">
+      <div class="card red"><span class="card-icon">🇺🇸</span><div class="card-title">Estados Unidos</div><div class="card-text"><strong style="color:#fff;">Miami</strong> · Nueva York · California · Texas · Florida<br><br>Mayor mercado de compradores internacionales. Alto poder adquisitivo y alta propensión a invertir en Europa.</div></div>
+      <div class="card blue"><span class="card-icon">🇨🇦</span><div class="card-title">Canadá</div><div class="card-text"><strong style="color:#fff;">Toronto</strong> · Vancouver · Montreal · Calgary<br><br>Comprador muy afín al estilo de vida europeo. Gran comunidad hispanohablante. Interés creciente en retiro en España.</div></div>
+      <div class="card gold"><span class="card-icon">🇲🇽</span><div class="card-title">México</div><div class="card-text"><strong style="color:#fff;">Ciudad de México</strong> · Guadalajara · Monterrey<br><br>Alta capacidad inversora. Vínculos culturales con España. Fuerte demanda de activos en Europa para diversificación.</div></div>
+    </div>
+    <div class="card" style="background:rgba(255,255,255,.04);">
+      <div style="display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;">
+        <div style="text-align:center;"><div style="font-size:1.5rem;font-weight:900;color:#C8102E;">+45M</div><div style="font-size:.68rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;">estadounidenses interesados en vivir en el extranjero</div></div>
+        <div style="width:1px;height:40px;background:rgba(255,255,255,.1);"></div>
+        <div style="text-align:center;"><div style="font-size:1.5rem;font-weight:900;color:#003087;">73%</div><div style="font-size:.68rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;">prefiere Europa como destino de inversión</div></div>
+        <div style="width:1px;height:40px;background:rgba(255,255,255,.1);"></div>
+        <div style="text-align:center;"><div style="font-size:1.5rem;font-weight:900;color:#D4AF37;">España #1</div><div style="font-size:.68rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;">destino preferido para retiro de norteamericanos</div></div>
+        <div style="width:1px;height:40px;background:rgba(255,255,255,.1);"></div>
+        <div style="text-align:center;"><div style="font-size:1.5rem;font-weight:900;color:#C8102E;">Costa Blanca</div><div style="font-size:.68rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;">zona nº 1 en compras internacionales en España</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 8 — ALIANZA FUSTER -->
+<div class="slide bg-fuster" data-name="Alianza Estratégica · Fuster & Associates">
+  <div class="stripe" style="background:linear-gradient(90deg,#003087,#1a6b3a,#003087);"></div>
+  <div class="slide-inner">
+    <div class="phase-badge green">Alianza Estratégica Internacional</div>
+    <div class="slide-title">Strategic Legal &amp; Tax <span style="color:#7BAEE8;">Partnership</span></div>
+    <div class="divider" style="background:#7BAEE8;"></div>
+    <div class="two-col">
+      <div>
+        <div style="display:flex;gap:14px;margin-bottom:16px;align-items:center;">
+          <div class="logo-pill"><span class="logo-r">RE/MAX</span>&nbsp;<span style="color:#555">Inmomás</span></div>
+          <div style="color:rgba(255,255,255,.5);font-size:1.4rem;">+</div>
+          <div class="logo-pill"><span class="logo-f">Fuster &amp; Associates</span></div>
+        </div>
+        <div class="card green" style="margin-bottom:12px;">
+          <div class="card-title">¿Qué aporta Fuster &amp; Associates?</div>
+          <ul class="blist" style="margin-top:6px;">
+            <li>Asesoramiento legal internacional para compradores extranjeros</li>
+            <li>Fiscalidad España / Norteamérica — tratados de doble imposición</li>
+            <li>Residencia y visados: Golden Visa · Digital Nomad · NIE</li>
+            <li>Due diligence inmobiliario y compliance fiscal</li>
+            <li>Power of Attorney y gestión a distancia</li>
+            <li>Protección patrimonial y planificación hereditaria</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="border-color:rgba(42,90,173,.3);margin-bottom:12px;">
+          <div class="card-title" style="color:#7BAEE8;">Por qué esta alianza cambia todo</div>
+          <div class="card-text" style="font-size:.82rem;margin-bottom:12px;">El comprador norteamericano no teme comprar. <strong style="color:#fff;">Teme comprar incorrectamente.</strong></div>
+          <div class="card-text">Cuando ve una estructura profesional conjunta — inmobiliaria internacional + despacho jurídico + fiscalistas — la <strong style="color:#fff;">conversión sube drásticamente</strong> y las objeciones caen.</div>
+        </div>
+        <div class="card blue">
+          <div class="card-title">Lo que nosotros construimos</div>
+          <div class="card-text">REMAX Inmomás aporta la <strong style="color:#fff;">máquina comercial internacional</strong>: captación, contenido, webinars, property tours y conversión. Fuster aporta la <strong style="color:#fff;">arquitectura legal y fiscal</strong>. Juntos, ofrecemos algo único en el mercado.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 9 — MODELO DE SERVICIO INTEGRAL -->
+<div class="slide bg-fuster" data-name="Modelo de Servicio Integral">
+  <div class="stripe" style="background:linear-gradient(90deg,#003087,#1a6b3a,#003087);"></div>
+  <div class="slide-inner">
+    <div class="phase-badge green">Ecosistema de Valor</div>
+    <div class="slide-title">Modelo de Servicio <span style="color:#7BAEE8;">Integral</span></div>
+    <div class="divider" style="background:#7BAEE8;"></div>
+    <div class="eco-wrap">
+      <div class="eco-center">International<br>Buyer<br>Experience</div>
+      <div class="eco-node" style="top:10px;left:60px;background:rgba(200,16,46,.15);border:1px solid rgba(200,16,46,.35);">🏠 <strong>REMAX Inmomás</strong><br>Captación · Inversión<br>Property Tours · Compra</div>
+      <div class="eco-node" style="top:10px;right:60px;background:rgba(0,48,135,.2);border:1px solid rgba(0,48,135,.4);">⚖️ <strong>Fuster &amp; Associates</strong><br>Legal · Fiscal<br>Residencia · Compliance</div>
+      <div class="eco-node" style="bottom:10px;left:60px;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.3);">🏦 Broker Financiero<br>Hipotecas no residentes<br>Financiación internacional</div>
+      <div class="eco-node" style="bottom:10px;right:60px;background:rgba(42,90,173,.1);border:1px solid rgba(42,90,173,.2);">🔑 Gestión Integral<br>Alquiler · Reforma<br>Mantenimiento · Renta</div>
+    </div>
+    <div class="card" style="background:rgba(42,90,173,.08);border-color:rgba(42,90,173,.25);margin-top:6px;">
+      <div style="text-align:center;font-size:.88rem;color:rgba(255,255,255,.9);font-weight:600;">"No solo ayudamos a comprar propiedades. <strong style="color:#7BAEE8;">Ayudamos a construir un proyecto de vida e inversión en España.</strong>"</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 10 — WEBINARS INTERNACIONALES -->
+<div class="slide bg-phase" data-name="Webinars Internacionales">
+  <div class="stripe"></div>
+  <div class="slide-inner">
+    <div class="phase-badge">Fase 3 · Webinars</div>
+    <div class="slide-title">El Poder del <span>Webinar</span> Internacional</div>
+    <div class="divider"></div>
+    <div class="two-col">
+      <div>
+        <div style="margin-bottom:14px;padding:14px 18px;background:rgba(200,16,46,.1);border:1px solid rgba(200,16,46,.3);border-radius:10px;font-size:.88rem;color:#fff;font-weight:600;line-height:1.5;">"La herramienta más potente de<br>conversión internacional"</div>
+        <div class="grid-2" style="margin-bottom:14px;">
+          <div class="card"><span class="card-icon">🎓</span><div class="card-title">Autoridad</div><div class="card-text">Posicionas a REMAX Inmomás como experto referente en inversión española.</div></div>
+          <div class="card red"><span class="card-icon">🤝</span><div class="card-title">Confianza</div><div class="card-text">El comprador te conoce, te escucha y empieza a confiar antes de comprar.</div></div>
+          <div class="card blue"><span class="card-icon">🎯</span><div class="card-title">Filtrado</div><div class="card-text">Solo avanzan los leads cualificados con intención real de compra.</div></div>
+          <div class="card gold"><span class="card-icon">📊</span><div class="card-title">Escala</div><div class="card-text">Un webinar llega a 100+ potenciales compradores simultáneamente.</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="card-title" style="color:rgba(255,255,255,.6);font-size:.68rem;letter-spacing:1.5px;margin-bottom:10px;">TOPICS — REMAX INMOMÁS + FUSTER &amp; ASSOCIATES</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="topic-card"><div class="topic-num">1</div><div><div class="topic-title">How Americans Can Safely Buy Property in Spain</div><div class="topic-sub">Mercado · Zonas · Rentabilidad + Proceso legal · NIE · Impuestos</div></div></div>
+          <div class="topic-card"><div class="topic-num">2</div><div><div class="topic-title">Move to Spain Legally &amp; Tax Efficiently</div><div class="topic-sub">Para jubilados, empresarios y teletrabajadores</div></div></div>
+          <div class="topic-card"><div class="topic-num">3</div><div><div class="topic-title">Digital Nomad Visa + Spanish Real Estate</div><div class="topic-sub">La tendencia más potente del momento</div></div></div>
+          <div class="topic-card"><div class="topic-num">4</div><div><div class="topic-title">How to Avoid Tax Mistakes When Buying in Spain</div><div class="topic-sub">Tema sensible · Alta conversión · Doble imposición</div></div></div>
+          <div class="topic-card"><div class="topic-num">5</div><div><div class="topic-title">Passive Income from Spanish Real Estate</div><div class="topic-sub">ROI · Alquiler turístico · Gestión desde EE.UU.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 11 — CUSTOMER JOURNEY -->
+<div class="slide bg-phase" data-name="Customer Journey">
+  <div class="stripe"></div>
+  <div class="slide-inner">
+    <div class="phase-badge">Fase 4 · Conversión</div>
+    <div class="slide-title">Customer <span>Journey</span></div>
+    <div class="divider"></div>
+    <div style="margin-bottom:18px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;"><div class="j-num">1</div><div class="j-text">Lead Digital</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;"><div class="j-num" style="background:#003087;">2</div><div class="j-text">Webinar Internacional</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;"><div class="j-num">3</div><div class="j-text">Zoom Estratégico</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;"><div class="j-num" style="background:#003087;">4</div><div class="j-text">Estudio Fiscal / Legal</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;"><div class="j-num">5</div><div class="j-text">Selección Propiedades</div></div>
+    </div>
+    <div style="margin-bottom:18px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;"><div class="j-num" style="background:#D4AF37;">6</div><div class="j-text">Property Tour VIP en España</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;"><div class="j-num" style="background:#D4AF37;">7</div><div class="j-text">Reserva &amp; Firma</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;"><div class="j-num" style="background:#D4AF37;">8</div><div class="j-text">Compra Segura</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;"><div class="j-num" style="background:#1a6b3a;">9</div><div class="j-text">Gestión Integral del Alquiler</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;"><div class="j-num" style="background:#1a6b3a;">10</div><div class="j-text">Referidos Internacionales</div></div>
+    </div>
+    <div class="card red"><div style="text-align:center;font-size:.85rem;color:rgba(255,255,255,.9);font-weight:600;">El cliente norteamericano compra <strong style="color:#fff;">SEGURIDAD</strong>, no propiedades. &nbsp;|&nbsp; La experiencia emocional en el Property Tour VIP <strong style="color:#fff;">cierra la venta</strong>.</div></div>
+  </div>
+</div>
+
+<!-- SLIDE 12 — PROPERTY TOURS VIP -->
+<div class="slide bg-phase" data-name="Property Tours VIP">
+  <div class="stripe"></div>
+  <div class="slide-inner">
+    <div class="phase-badge gold">Fase 4 · Experiencia VIP</div>
+    <div class="slide-title">Spain Investment <span class="gold">Discovery Trip</span></div>
+    <div class="divider gold"></div>
+    <div class="two-col">
+      <div>
+        <div class="card gold" style="margin-bottom:14px;"><div style="font-size:1.1rem;font-weight:800;color:#D4AF37;margin-bottom:8px;">Experiencia VIP Completa</div><div class="card-text" style="font-size:.82rem;">Un viaje organizado de alto impacto diseñado para convertir leads cualificados en compradores comprometidos.</div></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="card"><span class="card-icon">🏨</span><div class="card-title">Alojamiento Premium</div><div class="card-text">Hotel de lujo en la Costa Blanca. Experiencia de vida del destino desde el primer momento.</div></div>
+          <div class="card red"><span class="card-icon">🏠</span><div class="card-title">Recorrido de Propiedades</div><div class="card-text">Selección exclusiva de activos preseleccionados según el perfil inversor de cada cliente.</div></div>
+          <div class="card blue"><span class="card-icon">⚖️</span><div class="card-title">Reunión Legal &amp; Fiscal</div><div class="card-text">Sesión con Fuster &amp; Associates. Fiscalidad, residencia y due diligence en persona.</div></div>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="card gold"><span class="card-icon">🍷</span><div class="card-title">Experiencia Lifestyle</div><div class="card-text">Gastronomía mediterránea · Golf · Puertos deportivos · Playas · Cultura local. El cliente no solo ve propiedades, <strong style="color:#fff;">vive el destino</strong>.</div></div>
+          <div class="card green"><span class="card-icon">🌐</span><div class="card-title">Networking VIP</div><div class="card-text">Conexión con otros inversores norteamericanos. Comunidad expat establecida. Referencias directas.</div></div>
+          <div class="card" style="border-color:rgba(212,175,55,.4);"><span class="card-icon">📊</span><div class="card-title">Resultado Esperado</div><div class="card-text">El comprador norteamericano <strong style="color:#fff;">compra muchísimo cuando vive la experiencia emocional</strong>. El tour VIP convierte a una ratio muy superior al digital.</div></div>
+          <div class="card red"><span class="card-icon">🔁</span><div class="card-title">Generador de Referidos</div><div class="card-text">Cada cliente satisfecho regresa con amigos, familia y contactos. El boca-a-boca norteamericano es un canal brutal.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 13 — ESTRATEGIA DIGITAL -->
+<div class="slide bg-phase" data-name="Estrategia Digital">
+  <div class="stripe"></div>
+  <div class="slide-inner">
+    <div class="phase-badge blue">Fase 2 · Digital</div>
+    <div class="slide-title">Estrategia <span>Digital</span> Internacional</div>
+    <div class="divider"></div>
+    <div class="grid-4">
+      <div class="card"><span class="card-icon">💼</span><div class="card-title">LinkedIn</div><div class="card-text">Autoridad profesional. Inversión · Fiscalidad · Lifestyle · Casos reales.<br><br><strong style="color:#C8102E;">4 publicaciones / semana</strong></div></div>
+      <div class="card red"><span class="card-icon">▶️</span><div class="card-title">YouTube</div><div class="card-text">Property tours · Entrevistas · Lifestyle · Webinars · ROI · Residencia.<br><br><strong style="color:#fff;">2 vídeos / semana</strong></div></div>
+      <div class="card blue"><span class="card-icon">📘</span><div class="card-title">Facebook &amp; Instagram</div><div class="card-text">Segmentación: inversores · retirados · high income · Europe lovers.<br><br><strong style="color:#fff;">Objetivo: webinar</strong></div></div>
+      <div class="card gold"><span class="card-icon">🔍</span><div class="card-title">Google Ads</div><div class="card-text">Buy Property in Spain · Invest in Spain · Move to Spain · Costa Blanca Property.<br><br><strong style="color:#D4AF37;">Captura intención</strong></div></div>
+    </div>
+    <div style="margin-top:14px;">
+      <div class="g-box">
+        <div class="g-bar">🔍 &nbsp; Buy property in Spain Americans</div>
+        <div class="g-result"><span class="g-url">📢 Anuncio · remaxinmomas.com</span><span class="g-title">How to Buy Property in Spain as an American — Free Guide</span><span class="g-desc">Safe, legal and tax-efficient. Join our free webinar. 30+ years experience. Fuster & Associates legal partner.</span></div>
+        <div class="g-result"><span class="g-url">📢 Anuncio · remaxinmomas.com/invest</span><span class="g-title">Invest in Costa Blanca Spain — International Advisory</span><span class="g-desc">5–8% rental yield. Golden Visa. Full legal support. Book your free strategy call today.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 14 — CRM & AUTOMATIZACIÓN -->
+<div class="slide bg-phase" data-name="CRM & Automatización">
+  <div class="stripe"></div>
+  <div class="slide-inner">
+    <div class="phase-badge blue">Fase 2 · Tecnología</div>
+    <div class="slide-title">CRM &amp; <span>Automatización</span></div>
+    <div class="divider"></div>
+    <div class="two-col">
+      <div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;">
+          <div style="text-align:center;background:rgba(200,16,46,.15);border:1px solid rgba(200,16,46,.3);border-radius:8px;padding:10px;font-size:.8rem;color:#fff;font-weight:700;">📥 Lead entra vía Ads / SEO / Webinar</div>
+          <div style="text-align:center;color:#C8102E;font-size:1.1rem;">↓</div>
+          <div style="text-align:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;font-size:.8rem;color:#fff;font-weight:600;">📧 Email de bienvenida automático + Lead Magnet</div>
+          <div style="text-align:center;color:#C8102E;font-size:1.1rem;">↓</div>
+          <div style="text-align:center;background:rgba(0,48,135,.15);border:1px solid rgba(0,48,135,.3);border-radius:8px;padding:10px;font-size:.8rem;color:#fff;font-weight:600;">📺 Invitación al Webinar (secuencia 3 emails)</div>
+          <div style="text-align:center;color:#C8102E;font-size:1.1rem;">↓</div>
+          <div style="text-align:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;font-size:.8rem;color:#fff;font-weight:600;">💬 Asistente Webinar → CTA Zoom personal</div>
+          <div style="text-align:center;color:#C8102E;font-size:1.1rem;">↓</div>
+          <div style="text-align:center;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.3);border-radius:8px;padding:10px;font-size:.8rem;color:#fff;font-weight:600;">🏠 Property Tour VIP</div>
+          <div style="text-align:center;color:#C8102E;font-size:1.1rem;">↓</div>
+          <div style="text-align:center;background:rgba(200,16,46,.15);border:1px solid rgba(200,16,46,.3);border-radius:8px;padding:10px;font-size:.8rem;color:#fff;font-weight:700;">✅ Compra → Postventa → Referidos</div>
+        </div>
+      </div>
+      <div>
+        <div class="card-title" style="color:rgba(255,255,255,.6);font-size:.68rem;letter-spacing:1.5px;margin-bottom:12px;">HERRAMIENTAS</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="card blue"><div class="card-title">🔵 HubSpot</div><div class="card-text">CRM central. Pipeline internacional. Automatizaciones de email. Scoring de leads. Reportes.</div></div>
+          <div class="card red"><div class="card-title">🔴 GoHighLevel</div><div class="card-text">Funnels. Landing pages. Seguimiento automatizado. Integración WhatsApp y SMS internacionales.</div></div>
+          <div class="card gold"><div class="card-title">🟡 ActiveCampaign</div><div class="card-text">Email marketing avanzado. Segmentación por mercado (USA/CA/MX). Nurturing largo plazo.</div></div>
+          <div class="card green"><div class="card-title">📊 Retargeting</div><div class="card-text">Facebook Pixel + YouTube + Google Remarketing. Múltiples impactos antes de confiar.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 15 — MÉTRICAS CLAVE -->
+<div class="slide bg-phase" data-name="Métricas Clave">
+  <div class="stripe"></div>
+  <div class="slide-inner">
+    <div class="phase-badge">Fase 4 · Métricas</div>
+    <div class="slide-title">Métricas <span>Clave</span> del Plan</div>
+    <div class="divider"></div>
+    <div class="kpi-row" style="margin-bottom:16px;">
+      <div class="kpi-box"><span class="kpi-icon-lrg">📊</span><div class="kpi-lbl">ROI Campañas</div></div>
+      <div class="kpi-box"><span class="kpi-icon-lrg">💶</span><div class="kpi-lbl">CPL (Coste por Lead)</div></div>
+      <div class="kpi-box"><span class="kpi-icon-lrg">🔄</span><div class="kpi-lbl">Conversión Lead→Compra</div></div>
+      <div class="kpi-box"><span class="kpi-icon-lrg">🏠</span><div class="kpi-lbl">Ticket Medio</div></div>
+      <div class="kpi-box"><span class="kpi-icon-lrg">💰</span><div class="kpi-lbl">Comisión Media</div></div>
+    </div>
+    <table class="impact-table">
+      <thead><tr><th>Métrica</th><th>Objetivo Año 1</th><th>Objetivo Año 2</th><th>Objetivo Año 3</th></tr></thead>
+      <tbody>
+        <tr><td>Leads cualificados / mes</td><td>50–100</td><td>150–300</td><td class="tag-green">500+</td></tr>
+        <tr><td>Asistentes webinar / mes</td><td>30–60</td><td>100–200</td><td class="tag-green">300+</td></tr>
+        <tr><td>Zooms estratégicos / mes</td><td>8–15</td><td>25–50</td><td class="tag-green">80+</td></tr>
+        <tr><td>Operaciones cerradas / año</td><td>6–12</td><td>18–35</td><td class="tag-green">50+</td></tr>
+        <tr><td>Ticket medio comprador</td><td>350K €</td><td>400K €</td><td class="tag-green">500K+ €</td></tr>
+        <tr><td>Facturación comisiones</td><td>180K–420K €</td><td>500K–1.2M €</td><td class="tag-green">1.5M+ €</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SLIDE 16 — ROADMAP -->
+<div class="slide bg-phase" data-name="Roadmap de Implementación">
+  <div class="stripe"></div>
+  <div class="slide-inner">
+    <div class="phase-badge">Fase 5 · Implementación</div>
+    <div class="slide-title">Roadmap de <span>Implementación</span></div>
+    <div class="divider"></div>
+    <div class="timeline" style="margin-bottom:18px;">
+      <div class="tl-phase r">
+        <div class="tl-period">Días 1–30</div>
+        <div class="tl-title">🚀 Fase 1 — Preparación</div>
+        <span class="tag">Branding internacional</span>
+        <span class="tag">CRM configurado</span>
+        <span class="tag">Landing pages</span>
+        <span class="tag">Presentación</span>
+        <span class="tag">Automatización base</span>
+        <span class="tag">Acuerdo Fuster</span>
+      </div>
+      <div class="tl-phase b">
+        <div class="tl-period">Días 31–90</div>
+        <div class="tl-title">📡 Fase 2 — Posicionamiento</div>
+        <span class="tag">LinkedIn activo</span>
+        <span class="tag">YouTube en marcha</span>
+        <span class="tag">1er Webinar conjunto</span>
+        <span class="tag">Ads lanzados</span>
+        <span class="tag">Primeros leads</span>
+        <span class="tag">Primeros Zooms</span>
+      </div>
+      <div class="tl-phase g">
+        <div class="tl-period">Días 91–180+</div>
+        <div class="tl-title">📈 Fase 3 — Escalado</div>
+        <span class="tag">1er Property Tour VIP</span>
+        <span class="tag">Automatizaciones avanzadas</span>
+        <span class="tag">Partnerships activos</span>
+        <span class="tag">Casos de éxito</span>
+        <span class="tag">Primeras ventas cerradas</span>
+        <span class="tag">Sistema de referidos</span>
+      </div>
+    </div>
+    <div class="card gold" style="text-align:center;"><div style="font-size:.88rem;color:rgba(255,255,255,.9);font-weight:600;">🎯 &nbsp; <strong style="color:#D4AF37;">Visión a 3 años:</strong> &nbsp; Marca internacional consolidada · División International Advisory operativa · 50+ operaciones / año · Red de referidos global</div></div>
+  </div>
+</div>
+
+<!-- SLIDE 18 — IMPACTO DE LA ALIANZA -->
+<div class="slide bg-fuster" data-name="Impacto de la Alianza">
+  <div class="stripe" style="background:linear-gradient(90deg,#003087,#1a6b3a,#003087);"></div>
+  <div class="slide-inner">
+    <div class="phase-badge green">Resultado Estratégico</div>
+    <div class="slide-title">Impacto de la <span style="color:#7BAEE8;">Alianza</span></div>
+    <div class="divider" style="background:#7BAEE8;"></div>
+    <div class="two-col">
+      <div>
+        <table class="impact-table">
+          <thead><tr><th>Beneficio</th><th>Resultado</th></tr></thead>
+          <tbody>
+            <tr><td>Mayor confianza</td><td class="tag-green">Más conversiones</td></tr>
+            <tr><td>Más seguridad percibida</td><td class="tag-green">Menos objeciones</td></tr>
+            <tr><td>Mayor autoridad</td><td class="tag-green">Cliente premium</td></tr>
+            <tr><td>Servicio integral</td><td class="tag-green">Mayor ticket medio</td></tr>
+            <tr><td>Diferenciación clara</td><td class="tag-green">Ventaja competitiva</td></tr>
+            <tr><td>Partner legal sólido</td><td class="tag-green">Credibilidad internacional</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="card green" style="margin-bottom:12px;"><div style="font-size:1rem;font-weight:800;color:#7BAEE8;margin-bottom:10px;">"La confianza es la verdadera moneda del comprador internacional."</div><div class="card-text">Cuando el cliente ve una estructura profesional conjunta — inmobiliaria + despacho jurídico + fiscalistas — <strong style="color:#fff;">la percepción cambia completamente</strong>.</div></div>
+        <div class="card blue" style="margin-bottom:12px;"><div class="card-title">Posicionamiento Real</div><div class="card-text">Ya no sois "una agencia inmobiliaria española". Sois una <strong style="color:#fff;">plataforma internacional de advisory inmobiliario y patrimonial</strong>.</div></div>
+        <div class="card red"><div class="card-title">El cliente ideal que atraes</div><div class="card-text">Más preparado · Mayor capacidad económica · Menos tiempo perdido · Mayor ticket · Generador de referidos internacionales.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 19 — MENSAJE FINAL -->
+<div class="slide bg-close" data-name="Mensaje Final">
+  <div class="stripe"></div>
+  <div class="slide-inner" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
+    <div class="phase-badge" style="margin-bottom:24px;">Visión Estratégica</div>
+    <div class="big-quote" style="max-width:760px;margin-bottom:28px;">"España no solo es un destino.<br>Es una <em>oportunidad de vida e inversión</em>."</div>
+    <div style="width:60px;height:2px;background:rgba(255,255,255,.2);margin:0 auto 28px;"></div>
+    <div style="font-size:1rem;font-weight:600;color:rgba(255,255,255,.65);max-width:680px;margin-bottom:28px;line-height:1.6;">"Invertir en otro país requiere algo más que una inmobiliaria.<br><span style="color:rgba(200,16,46,.9);">Requiere un equipo de confianza que te acompañe en todo el proceso.</span>"</div>
+    <div style="display:flex;gap:16px;align-items:center;">
+      <div class="logo-pill" style="padding:10px 24px;font-size:1rem;"><span class="logo-r">RE/MAX</span>&nbsp;<span style="color:#555">Inmomás</span></div>
+      <div style="color:rgba(255,255,255,.3);font-size:1.4rem;">+</div>
+      <div class="logo-pill" style="padding:10px 24px;font-size:1rem;"><span class="logo-f">Fuster &amp; Associates</span></div>
+    </div>
+    <div style="margin-top:20px;font-size:.72rem;color:rgba(255,255,255,.25);letter-spacing:2px;text-transform:uppercase;">International Advisory Division · Costa Blanca · España</div>
+  </div>
+</div>
+
+<!-- SLIDE 20 — CIERRE -->
+<div class="slide bg-close" data-name="Contacto & Cierre">
+  <div class="stripe"></div>
+  <div class="slide-inner" style="display:flex;flex-direction:column;justify-content:center;">
+    <div class="phase-badge blue" style="margin-bottom:18px;">Hablemos</div>
+    <div class="slide-title" style="margin-bottom:6px;">¿Empezamos a <span>construir</span><br>tu División Internacional?</div>
+    <div class="divider"></div>
+    <div class="two-col" style="width:100%;">
+      <div>
+        <div class="card red" style="margin-bottom:12px;">
+          <div class="card-title">🏠 REMAX Inmomás</div>
+          <div class="closing-info">
+            <div class="closing-row"><span class="closing-icon">🌐</span><span>remaxinmomas.com</span></div>
+            <div class="closing-row"><span class="closing-icon">📧</span><span>jose.martinez@remax.es</span></div>
+            <div class="closing-row"><span class="closing-icon">📍</span><span>Elche · Alicante · Benidorm · Jávea</span></div>
+            <div class="closing-row"><span class="closing-icon">📱</span><span>LinkedIn · Instagram · YouTube</span></div>
+          </div>
+        </div>
+        <div class="card blue">
+          <div class="card-title">⚖️ Fuster &amp; Associates</div>
+          <div class="closing-info">
+            <div class="closing-row"><span class="closing-icon">🌐</span><span>fuster-associates.com</span></div>
+            <div class="closing-row"><span class="closing-icon">📋</span><span>Legal · Fiscal · Residencia · Golden Visa</span></div>
+            <div class="closing-row"><span class="closing-icon">🌍</span><span>International buyers specialists</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;">
+        <div style="width:160px;height:160px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <div style="font-size:3rem;">📲</div>
+          <div style="font-size:.65rem;color:rgba(255,255,255,.5);text-align:center;letter-spacing:1px;text-transform:uppercase;">QR Webinar<br>Internacional</div>
+        </div>
+        <div class="card gold" style="width:100%;text-align:center;">
+          <div style="font-size:.8rem;font-weight:700;color:#D4AF37;margin-bottom:4px;">Próximo paso</div>
+          <div style="font-size:.75rem;color:rgba(255,255,255,.8);">Agenda tu Zoom estratégico gratuito y diseñamos tu plan de captación internacional a medida.</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px;text-align:center;font-size:.65rem;color:rgba(255,255,255,.2);letter-spacing:2px;text-transform:uppercase;">Plan Estratégico Internacional · REMAX Inmomás · 2026</div>
+  </div>
+</div>
+
+<!-- ── REMAX LOGO — visible en todas las diapositivas ── -->
+<div class="remax-logo-fixed">
+  <!-- Balloon / pin con colores RE/MAX -->
+  <svg viewBox="0 0 60 72" width="38" height="46" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <clipPath id="pinclip">
+        <path d="M30 2 C14 2 2 14 2 30 C2 48 30 70 30 70 C30 70 58 48 58 30 C58 14 46 2 30 2Z"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#pinclip)">
+      <!-- Rojo RE/MAX arriba -->
+      <rect x="0" y="0" width="60" height="23" fill="#C8102E"/>
+      <!-- Blanco centro -->
+      <rect x="0" y="23" width="60" height="14" fill="#F2F2F2"/>
+      <!-- Azul RE/MAX abajo -->
+      <rect x="0" y="37" width="60" height="35" fill="#003087"/>
+      <!-- Reflejo azul claro derecha -->
+      <rect x="30" y="37" width="30" height="35" fill="#2563C4" opacity="0.55"/>
+      <!-- Separador vertical suave -->
+      <line x1="30" y1="0" x2="30" y2="72" stroke="rgba(0,0,0,0.13)" stroke-width="1.5"/>
+    </g>
+    <!-- Contorno blanco -->
+    <path d="M30 2 C14 2 2 14 2 30 C2 48 30 70 30 70 C30 70 58 48 58 30 C58 14 46 2 30 2Z" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2"/>
+  </svg>
+  <div class="remax-logo-text">
+    <span class="remax-logo-brand"><em>RE/MAX</em> Inmomás</span>
+    <span class="remax-logo-sub">Costa Blanca · España</span>
+  </div>
+</div>
+
+<!-- NAVIGATION -->
+<div class="nav-bar">
+  <button class="nav-btn" onclick="changeSlide(-1)">◀ Anterior</button>
+  <div class="nav-center">
+    <span class="slide-counter" id="counter">1 / 20</span>
+    <div class="progress-wrap"><div class="progress-fill" id="progress" style="width:5%;"></div></div>
+    <span class="slide-name" id="slidename">Portada</span>
+  </div>
+  <button class="nav-btn" onclick="changeSlide(1)">Siguiente ▶</button>
+</div>
+
+<script>
+const slides=document.querySelectorAll('.slide');
+let current=0;
+const total=slides.length;
+function showSlide(n){slides[current].classList.remove('active');current=(n+total)%total;slides[current].classList.add('active');document.getElementById('counter').textContent=(current+1)+' / '+total;document.getElementById('progress').style.width=((current+1)/total*100)+'%';document.getElementById('slidename').textContent=slides[current].dataset.name||'';}
+function changeSlide(dir){showSlide(current+dir);}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){e.preventDefault();changeSlide(1);}if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();changeSlide(-1);}if(e.key==='Home')showSlide(0);if(e.key==='End')showSlide(total-1);});
+let touchX=0;
+document.addEventListener('touchstart',e=>touchX=e.touches[0].clientX);
+document.addEventListener('touchend',e=>{const diff=touchX-e.changedTouches[0].clientX;if(Math.abs(diff)>50)changeSlide(diff>0?1:-1);});
+</script>
+</body>
+</html>
