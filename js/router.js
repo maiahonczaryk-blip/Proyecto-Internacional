@@ -198,8 +198,14 @@ App.router = (function() {
         const avatarEl = document.getElementById('sidebar-user-avatar');
         
         if (nameEl) nameEl.textContent = `${user.firstName} ${user.lastName}`;
-        if (roleEl) roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+        if (roleEl) {
+          roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+          roleEl.className = `sidebar-user__role sidebar-user__role--${user.role}`;
+        }
         if (avatarEl) avatarEl.innerHTML = App.utils.getInitials(user.firstName, user.lastName);
+        
+        sidebar.classList.remove('sidebar--admin', 'sidebar--broker', 'sidebar--realtor');
+        sidebar.classList.add(`sidebar--${user.role}`);
       }
     } else {
       sidebar.classList.remove('active');

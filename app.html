@@ -45,46 +45,46 @@
 
   <!-- ===================== DASHBOARD SIDEBAR ===================== -->
   <aside class="dashboard-sidebar" id="dashboard-sidebar">
-    <div class="sidebar-header">
-      <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás" class="sidebar-logo">
-      <span class="sidebar-title">Partner Portal</span>
+    <div class="sidebar-logo">
+      <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás">
+      <span>Partner Portal</span>
     </div>
 
     <!-- Admin Sidebar Nav -->
-    <nav class="sidebar-nav-group" id="sidebar-admin" style="display:none;">
-      <div class="sidebar-section-label">Administration</div>
-      <a href="#admin/dashboard" class="sidebar-link"><span class="sidebar-icon">📊</span> Dashboard</a>
-      <a href="#admin/users" class="sidebar-link"><span class="sidebar-icon">👥</span> Manage Users</a>
+    <nav class="sidebar-nav" id="sidebar-admin" style="display:none;">
+      <div class="sidebar-nav__title">Administration</div>
+      <a href="#admin/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
+      <a href="#admin/users" class="sidebar-link"><span class="sidebar-link__icon">👥</span> Manage Users</a>
     </nav>
 
     <!-- Broker Sidebar Nav -->
-    <nav class="sidebar-nav-group" id="sidebar-broker" style="display:none;">
-      <div class="sidebar-section-label">Broker Portal</div>
-      <a href="#broker/dashboard" class="sidebar-link"><span class="sidebar-icon">📊</span> Dashboard</a>
-      <a href="#broker/team" class="sidebar-link"><span class="sidebar-icon">👥</span> My Team</a>
-      <a href="#broker/clients" class="sidebar-link"><span class="sidebar-icon">🤝</span> Clients</a>
-      <a href="#broker/documents" class="sidebar-link"><span class="sidebar-icon">📄</span> Documents</a>
-      <a href="#broker/finances" class="sidebar-link"><span class="sidebar-icon">💰</span> Finances</a>
+    <nav class="sidebar-nav" id="sidebar-broker" style="display:none;">
+      <div class="sidebar-nav__title">Broker Portal</div>
+      <a href="#broker/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
+      <a href="#broker/team" class="sidebar-link"><span class="sidebar-link__icon">👥</span> My Team</a>
+      <a href="#broker/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> Clients</a>
+      <a href="#broker/documents" class="sidebar-link"><span class="sidebar-link__icon">📄</span> Documents</a>
+      <a href="#broker/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> Finances</a>
     </nav>
 
     <!-- Realtor Sidebar Nav -->
-    <nav class="sidebar-nav-group" id="sidebar-realtor" style="display:none;">
-      <div class="sidebar-section-label">Realtor Portal</div>
-      <a href="#realtor/dashboard" class="sidebar-link"><span class="sidebar-icon">📊</span> Dashboard</a>
-      <a href="#realtor/clients" class="sidebar-link"><span class="sidebar-icon">🤝</span> My Clients</a>
-      <a href="#realtor/referral" class="sidebar-link"><span class="sidebar-icon">🔗</span> Referral Tools</a>
-      <a href="#realtor/documents" class="sidebar-link"><span class="sidebar-icon">📄</span> Documents</a>
-      <a href="#realtor/finances" class="sidebar-link"><span class="sidebar-icon">💰</span> Finances</a>
+    <nav class="sidebar-nav" id="sidebar-realtor" style="display:none;">
+      <div class="sidebar-nav__title">Realtor Portal</div>
+      <a href="#realtor/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
+      <a href="#realtor/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> My Clients</a>
+      <a href="#realtor/referral" class="sidebar-link"><span class="sidebar-link__icon">🔗</span> Referral Tools</a>
+      <a href="#realtor/documents" class="sidebar-link"><span class="sidebar-link__icon">📄</span> Documents</a>
+      <a href="#realtor/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> Finances</a>
     </nav>
 
     <!-- Sidebar User Info -->
     <div class="sidebar-user">
-      <div class="sidebar-user-avatar" id="sidebar-user-avatar"></div>
-      <div class="sidebar-user-info">
-        <div class="sidebar-user-name" id="sidebar-user-name">—</div>
-        <div class="sidebar-user-role" id="sidebar-user-role">—</div>
+      <div class="sidebar-user__avatar" id="sidebar-user-avatar"></div>
+      <div class="sidebar-user__info">
+        <div class="sidebar-user__name" id="sidebar-user-name">—</div>
+        <div class="sidebar-user__role" id="sidebar-user-role">—</div>
       </div>
-      <button class="sidebar-logout-btn" onclick="App.auth.logout().then(() => App.router.navigateTo('home'))" title="Logout">⏻</button>
+      <button class="sidebar-logout-btn" onclick="App.auth.logout().then(() => window.location.href='index.html#home')" title="Logout">⏻</button>
     </div>
   </aside>
 
