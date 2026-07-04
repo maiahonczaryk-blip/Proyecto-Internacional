@@ -310,6 +310,21 @@ App.auth = (function() {
         note
       });
       client.updatedAt = new Date().toISOString();
+
+      // Sync commission status
+      const comm = App.demoData.commissions.find(c => c.clientId === clientId);
+      if (comm) {
+        if (newStatus === 'closed') {
+          comm.status = 'paid';
+          comm.closingDate = new Date().toISOString();
+        } else if (newStatus === 'notary_pending' || newStatus === 'offer_made') {
+          comm.status = 'pending_payment';
+          comm.closingDate = null;
+        } else {
+          comm.status = 'projected';
+          comm.closingDate = null;
+        }
+      }
       return true;
     } else {
       const clientRef = App.db.collection('clients').doc(clientId);
@@ -322,6 +337,119 @@ App.auth = (function() {
         }),
         updatedAt: new Date().toISOString()
       });
+
+      // Sync commission status in Firestore
+      const commQuery = await App.db.collection('commissions').where('clientId', '==', clientId).get();
+      if (!commQuery.empty) {
+        let commStatus = 'projected';
+        if (newStatus === 'closed') commStatus = 'paid';
+        else if (newStatus === 'notary_pending' || newStatus === 'offer_made') commStatus = 'pending_payment';
+        
+        await commQuery.docs[0].ref.update({
+          status: commStatus,
+          closingDate: newStatus === 'closed' ? new Date().toISOString() : null
+        });
+      }
+      return true;
+    }
+  }
+
+  async function saveClientFinancials(clientId, salePrice, agencyFeePct, referralSharePct) {
+    const sPrice = parseFloat(salePrice) || 0;
+    const feePct = parseFloat(agencyFeePct) || 0;
+    const refPct = parseFloat(referralSharePct) || 0;
+    
+    const totalCommission = sPrice * (feePct / 100);
+    const realtorAmount = totalCommission * (refPct / 100);
+    const agentAmount = totalCommission * ((100 - refPct) / 100);
+    const brokerAmount = totalCommission * 0.10; // referring broker standard share (10%)
+
+    if (App.demoMode) {
+      const client = App.demoData.clients.find(c => c.id === clientId);
+      if (!client) throw new Error('Client not found.');
+      
+      client.salePrice = sPrice;
+      client.agencyFeePct = feePct;
+      client.referralSharePct = refPct;
+
+      let comm = App.demoData.commissions.find(c => c.clientId === clientId);
+      if (!comm) {
+        comm = {
+          id: 'comm-' + Math.random().toString(36).substr(2, 9),
+          clientId: clientId,
+          clientName: `${client.firstName} ${client.lastName}`,
+          realtorId: client.referredBy,
+          brokerId: client.brokerId,
+          createdAt: new Date().toISOString()
+        };
+        App.demoData.commissions.push(comm);
+      }
+
+      comm.agentId = client.localAgentId;
+      comm.salePrice = sPrice;
+      comm.totalCommission = totalCommission;
+      comm.realtorSharePct = refPct;
+      comm.realtorAmount = realtorAmount;
+      comm.agentSharePct = 100 - refPct;
+      comm.agentAmount = agentAmount;
+      comm.brokerSharePct = 10;
+      comm.brokerAmount = brokerAmount;
+      comm.propertyAddress = client.interestArea || 'Spain Deal';
+
+      if (client.status === 'closed') {
+        comm.status = 'paid';
+        comm.closingDate = new Date().toISOString();
+      } else if (client.status === 'notary_pending' || client.status === 'offer_made') {
+        comm.status = 'pending_payment';
+        comm.closingDate = null;
+      } else {
+        comm.status = 'projected';
+        comm.closingDate = null;
+      }
+      return true;
+    } else {
+      const clientRef = App.db.collection('clients').doc(clientId);
+      const doc = await clientRef.get();
+      if (!doc.exists) throw new Error('Client not found.');
+      const client = doc.data();
+
+      await clientRef.update({
+        salePrice: sPrice,
+        agencyFeePct: feePct,
+        referralSharePct: refPct
+      });
+
+      const commQuery = await App.db.collection('commissions').where('clientId', '==', clientId).get();
+      let commRef;
+      if (commQuery.empty) {
+        commRef = App.db.collection('commissions').doc();
+      } else {
+        commRef = commQuery.docs[0].ref;
+      }
+
+      let commStatus = 'projected';
+      if (client.status === 'closed') commStatus = 'paid';
+      else if (client.status === 'notary_pending' || client.status === 'offer_made') commStatus = 'pending_payment';
+
+      await commRef.set({
+        clientId: clientId,
+        clientName: `${client.firstName} ${client.lastName}`,
+        realtorId: client.referredBy,
+        brokerId: client.brokerId,
+        agentId: client.localAgentId,
+        salePrice: sPrice,
+        totalCommission,
+        realtorSharePct: refPct,
+        realtorAmount,
+        agentSharePct: 100 - refPct,
+        agentAmount,
+        brokerSharePct: 10,
+        brokerAmount,
+        propertyAddress: client.interestArea || 'Spain Deal',
+        status: commStatus,
+        createdAt: new Date().toISOString()
+      }, { merge: true });
+
       return true;
     }
   }
@@ -403,6 +531,7 @@ App.auth = (function() {
     getClients,
     updateClientStatus,
     assignLocalAgent,
+    saveClientFinancials,
     getCommissions,
     onAuthChange,
     resetPassword

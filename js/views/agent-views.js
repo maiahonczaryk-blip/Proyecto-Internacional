@@ -213,6 +213,29 @@
             <h3 style="margin: 0 0 0.25rem;">${App.utils.escapeHtml(client.firstName)} ${App.utils.escapeHtml(client.lastName)}</h3>
             <div style="margin-bottom: 0.5rem;">${statusBadge}</div>
           </div>
+
+          <!-- Financial Settings -->
+          <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.15); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <h4 style="margin: 0 0 12px; font-size: 0.9rem; color: #059669; text-transform: uppercase; font-weight: 600;">💰 Financial Settings (Configuración Financiera)</h4>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px;">
+              <div>
+                <label style="font-size: 0.75rem; color: #374151; font-weight: 600; display: block; margin-bottom: 4px;">Sale Price (€)</label>
+                <input type="number" id="financial-sale-price" class="form-input" style="margin-bottom: 0; padding: 6px 8px; font-size: 0.85rem;" value="${client.salePrice || 0}">
+              </div>
+              <div>
+                <label style="font-size: 0.75rem; color: #374151; font-weight: 600; display: block; margin-bottom: 4px;">Agency Fee %</label>
+                <input type="number" id="financial-fee-pct" class="form-input" style="margin-bottom: 0; padding: 6px 8px; font-size: 0.85rem;" value="${client.agencyFeePct || 5}">
+              </div>
+              <div>
+                <label style="font-size: 0.75rem; color: #374151; font-weight: 600; display: block; margin-bottom: 4px;">Referral Share %</label>
+                <input type="number" id="financial-referral-pct" class="form-input" style="margin-bottom: 0; padding: 6px 8px; font-size: 0.85rem;" value="${client.referralSharePct || 25}">
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="App.views.agentInmomas.handleSaveFinancials('${client.id}')" style="background: #059669; border-color: #059669; width: 100%;">
+              Save Financials (Guardar Ajustes Financieros)
+            </button>
+          </div>
+
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.875rem; margin-bottom: 1.5rem;">
             <div>
               <div style="font-weight: 600; color: #374151;">Email</div>
@@ -249,6 +272,22 @@
     } catch (err) {
       console.error('[Agent] showClientDetail error:', err);
       App.utils.showToast('Error loading details.', 'error');
+    }
+  }
+
+  async function handleSaveFinancials(clientId) {
+    try {
+      const salePrice = document.getElementById('financial-sale-price').value;
+      const agencyFeePct = document.getElementById('financial-fee-pct').value;
+      const referralSharePct = document.getElementById('financial-referral-pct').value;
+      
+      await App.auth.saveClientFinancials(clientId, salePrice, agencyFeePct, referralSharePct);
+      App.utils.showToast('Financial settings saved successfully!', 'success');
+      App.utils.closeModal();
+      initClients(); // reload
+    } catch (err) {
+      console.error(err);
+      App.utils.showToast(err.message, 'error');
     }
   }
 
@@ -306,8 +345,8 @@
     tbody.innerHTML = commissions.map(c => {
       const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(c.status)}">${App.utils.getStatusLabel(c.status)}</span>`;
 
-      // Spain share is the remaining commission (usually 65%, which is 100% - realtor 25% - broker 10%)
-      const spainCommAmount = c.totalCommission - (c.realtorAmount || 0) - (c.brokerAmount || 0);
+      // Spain share is the remaining commission (usually 75%)
+      const spainCommAmount = c.totalCommission - (c.realtorAmount || 0);
 
       return `
         <tr>
@@ -315,7 +354,7 @@
           <td style="font-size: 0.85rem;">${App.utils.escapeHtml(c.propertyAddress || '—')}</td>
           <td>${App.utils.formatCurrency(c.salePrice)}</td>
           <td>${App.utils.formatCurrency(spainCommAmount)}</td>
-          <td style="text-align: center;">${c.agentSharePct || 30}%</td>
+          <td style="text-align: center;">${c.agentSharePct || 75}%</td>
           <td style="font-weight: 600; color: #10b981;">${App.utils.formatCurrency(c.agentAmount)}</td>
           <td>${statusBadge}</td>
         </tr>
@@ -337,7 +376,8 @@
     initClients,
     initFinances,
     showClientDetail,
-    handleClientDrop
+    handleClientDrop,
+    handleSaveFinancials
   };
 
 })();
