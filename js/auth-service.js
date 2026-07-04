@@ -79,7 +79,8 @@ App.auth = (function() {
         email: email.toLowerCase(),
         password,
         role,
-        status: 'pending',
+        status: role === 'realtor' ? 'active' : 'pending',
+        brokerStatus: role === 'realtor' && brokerId ? 'pending' : null,
         firstName,
         lastName,
         agencyName: agencyName || '',
@@ -94,6 +95,14 @@ App.auth = (function() {
       };
 
       App.demoData.users.push(newUser);
+      
+      if (newUser.status === 'active') {
+        currentUser = { ...newUser };
+        delete currentUser.password;
+        localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
+        notifyAuthChange();
+      }
+      
       return { success: true, user: newUser };
     } else {
       // Firebase registration
@@ -103,7 +112,8 @@ App.auth = (function() {
       const userData = {
         email: email.toLowerCase(),
         role,
-        status: 'pending',
+        status: role === 'realtor' ? 'active' : 'pending',
+        brokerStatus: role === 'realtor' && brokerId ? 'pending' : null,
         firstName,
         lastName,
         agencyName: agencyName || '',

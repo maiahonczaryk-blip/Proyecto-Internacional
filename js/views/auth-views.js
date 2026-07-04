@@ -41,6 +41,78 @@ App.views.auth = {
 
   initRegister: function(params) {
     const form = document.getElementById('register-form');
-    // Implement logic if needed
+    
+    if (form) {
+      const newForm = form.cloneNode(true);
+      form.parentNode.replaceChild(newForm, form);
+      
+      // Populate brokers
+      const brokerSelect = newForm.querySelector('#register-broker');
+      if (brokerSelect) {
+        brokerSelect.innerHTML = '<option value="">Independent / No broker</option>';
+        const brokers = App.demoData.users.filter(u => u.role === 'broker' && u.status === 'active');
+        brokers.forEach(b => {
+          const opt = document.createElement('option');
+          opt.value = b.id;
+          opt.textContent = `${b.firstName} ${b.lastName} - ${b.agencyName || 'Independent'}`;
+          brokerSelect.appendChild(opt);
+        });
+      }
+      
+      // Toggle fields based on role
+      const roleRadios = newForm.querySelectorAll('input[name="register-role"]');
+      const brokerSelectGroup = newForm.querySelector('#broker-select-group');
+      const agencyNameInput = newForm.querySelector('#register-agencyName');
+      const agencyNameGroup = agencyNameInput ? agencyNameInput.parentNode : null;
+      
+      // Initial state
+      if (brokerSelectGroup) brokerSelectGroup.style.display = 'block';
+      if (agencyNameGroup) agencyNameGroup.style.display = 'none';
+      
+      roleRadios.forEach(r => {
+        r.addEventListener('change', (e) => {
+          if (e.target.value === 'broker') {
+            if (brokerSelectGroup) brokerSelectGroup.style.display = 'none';
+            if (agencyNameGroup) agencyNameGroup.style.display = 'block';
+          } else {
+            if (brokerSelectGroup) brokerSelectGroup.style.display = 'block';
+            if (agencyNameGroup) agencyNameGroup.style.display = 'none';
+          }
+        });
+      });
+      
+      newForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const termsChecked = newForm.querySelector('#register-terms').checked;
+        if (!termsChecked) return alert('Please agree to the terms.');
+
+        const data = {
+          role: newForm.querySelector('input[name="register-role"]:checked').value,
+          firstName: newForm.querySelector('#register-firstName').value,
+          lastName: newForm.querySelector('#register-lastName').value,
+          email: newForm.querySelector('#register-email').value,
+          phone: newForm.querySelector('#register-phone').value,
+          password: newForm.querySelector('#register-password').value,
+          country: newForm.querySelector('#register-country').value,
+          agencyName: agencyNameInput ? agencyNameInput.value : '',
+          brokerId: brokerSelect ? brokerSelect.value : '',
+        };
+        
+        try {
+          const res = await App.auth.register(data);
+          if (res && res.success) {
+            if (res.user.status === 'active') {
+              window.location.href = 'app.html#' + res.user.role + '/dashboard';
+            } else {
+              alert("Registration successful! Please wait for admin approval before logging in.");
+              App.router.navigateTo('login');
+            }
+          }
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+    }
   }
 };
