@@ -266,8 +266,12 @@
       teamRealtors  = await App.auth.getAllUsers({ brokerId: currentUser.id, role: 'realtor' });
       brokerClients = await App.auth.getClients({ brokerId: currentUser.id });
 
-      renderClientsTable(brokerClients);
-      bindClientStatusFilter();
+      const getRealtorName = (realtorId) => {
+        const realtor = teamRealtors.find(r => r.id === realtorId);
+        return realtor ? `${realtor.firstName} ${realtor.lastName}` : 'Unknown';
+      };
+
+      App.utils.renderKanbanBoard('broker-pipeline-board', brokerClients, 'App.views.broker.showClientDetail', getRealtorName);
 
     } catch (err) {
       console.error('[Broker] initClients error:', err);
@@ -275,55 +279,7 @@
     }
   }
 
-  /* ── Clients Table ── */
-  function renderClientsTable(clients) {
-    const tbody = document.getElementById('broker-clients-table-body');
-    if (!tbody) return;
 
-    if (clients.length === 0) {
-      tbody.innerHTML = `
-        <tr><td colspan="7" style="text-align: center; padding: 2rem;">
-          <div class="empty-state">
-            <div class="empty-state__icon">📋</div>
-            <p class="empty-state__text">No clients found.</p>
-          </div>
-        </td></tr>
-      `;
-      return;
-    }
-
-    tbody.innerHTML = clients.map(c => {
-      const realtor = teamRealtors.find(r => r.id === c.referredBy);
-      const realtorName = realtor ? `${realtor.firstName} ${realtor.lastName}` : '—';
-      const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(c.status)}">${App.utils.getStatusLabel(c.status)}</span>`;
-
-      return `
-        <tr style="cursor: pointer;" onclick="App.views.broker.showClientDetail('${c.id}')">
-          <td style="font-weight: 500;">${App.utils.escapeHtml(c.firstName)} ${App.utils.escapeHtml(c.lastName)}</td>
-          <td style="font-size: 0.85rem;">${App.utils.escapeHtml(c.email)}</td>
-          <td style="font-size: 0.85rem; color: #6b7280;">${App.utils.escapeHtml(realtorName)}</td>
-          <td>${statusBadge}</td>
-          <td style="font-size: 0.85rem;">${App.utils.escapeHtml(c.interestArea || '—')}</td>
-          <td style="font-size: 0.85rem;">${App.utils.escapeHtml(c.budget || '—')}</td>
-          <td style="font-size: 0.85rem; color: #6b7280;">${App.utils.formatDate(c.createdAt)}</td>
-        </tr>
-      `;
-    }).join('');
-  }
-
-  /* ── Client Status Filter ── */
-  function bindClientStatusFilter() {
-    const select = document.getElementById('broker-client-filter-status');
-    if (!select) return;
-
-    select.addEventListener('change', () => {
-      const status = select.value;
-      const filtered = status
-        ? brokerClients.filter(c => c.status === status)
-        : brokerClients;
-      renderClientsTable(filtered);
-    });
-  }
 
   /* ── Client Detail Modal ── */
   async function showClientDetail(clientId) {
@@ -414,30 +370,53 @@
         return;
       }
 
+      teamRealtors  = await App.auth.getAllUsers({ brokerId: currentUser.id, role: 'realtor' });
+
       const agreementStatus = currentUser.agreementSigned
         ? `<div style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: #d1fae5; border-radius: 0.5rem; margin-bottom: 1.5rem;">
              <span style="font-size: 1.5rem;">✅</span>
              <div>
-               <div style="font-weight: 600; color: #065f46;">Collaboration Agreement Signed</div>
+               <div style="font-weight: 600; color: #065f46;">Broker Agreement Signed</div>
                <div style="font-size: 0.85rem; color: #047857;">Signed on ${App.utils.formatDate(currentUser.agreementSignedAt)}</div>
              </div>
            </div>`
         : `<div style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: #fef3c7; border-radius: 0.5rem; margin-bottom: 1.5rem;">
              <span style="font-size: 1.5rem;">⚠️</span>
              <div>
-               <div style="font-weight: 600; color: #92400e;">Agreement Pending</div>
-               <div style="font-size: 0.85rem; color: #b45309;">Please sign the collaboration agreement to enable full access.</div>
+               <div style="font-weight: 600; color: #92400e;">Broker Agreement Pending</div>
+               <div style="font-size: 0.85rem; color: #b45309;">Please sign the broker agreement.</div>
              </div>
+           </div>`;
+
+      const teamDocsHtml = teamRealtors.length === 0 
+        ? `<div class="empty-state"><div class="empty-state__icon">👥</div><p class="empty-state__text">No team members yet.</p></div>`
+        : `<div class="team-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
+             ${teamRealtors.map(r => `
+               <div class="glass-card" style="padding: 1.25rem;">
+                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                   <div>
+                     <div style="font-weight: 600; font-size: 1rem;">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}</div>
+                     <div style="font-size: 0.8rem; color: #6b7280;">Realtor</div>
+                   </div>
+                   ${r.agreementSigned 
+                     ? '<span class="badge badge--approved">Signed</span>' 
+                     : '<span class="badge badge--pending">Pending</span>'}
+                 </div>
+                 <div style="font-size: 0.85rem; color: #374151;">
+                   <p style="margin: 0 0 0.5rem;"><strong>Agreement:</strong> Collaboration Agreement (Standard 25%)</p>
+                   ${r.agreementSigned 
+                     ? `<p style="margin: 0; color: #10b981;">Signed on: ${App.utils.formatDate(r.agreementSignedAt)}</p>` 
+                     : `<p style="margin: 0; color: #f59e0b;">Waiting for signature</p>`}
+                 </div>
+               </div>
+             `).join('')}
            </div>`;
 
       container.innerHTML = `
         ${agreementStatus}
         <div class="dashboard-section">
-          <h2>Team Documents</h2>
-          <div class="empty-state">
-            <div class="empty-state__icon">📄</div>
-            <p class="empty-state__text">No documents uploaded yet. Team documents will appear here as they are added.</p>
-          </div>
+          <h2>Team Realtors Collaboration Agreements</h2>
+          ${teamDocsHtml}
         </div>
       `;
 

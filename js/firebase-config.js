@@ -190,15 +190,15 @@ App.demoData = {
       phone: '+1 415 555 7001',
       referredBy: 'realtor-001',
       brokerId: 'broker-001',
-      status: 'vip_trip_completed',
+      status: 'properties_visited',
       budget: '€200,000 - €350,000',
       interestArea: 'Alicante City',
       notes: 'Interested in 2-bed apartment near the beach. Planning retirement.',
       statusHistory: [
-        { status: 'registered', date: '2025-04-01T10:00:00Z', note: 'Registered via referral link' },
-        { status: 'webinar_attended', date: '2025-04-15T18:00:00Z', note: 'Attended April webinar' },
-        { status: 'vip_trip_booked', date: '2025-05-01T12:00:00Z', note: 'Booked VIP trip for May' },
-        { status: 'vip_trip_completed', date: '2025-05-15T16:00:00Z', note: 'Visited 8 properties' }
+        { status: 'contacted', date: '2025-04-01T10:00:00Z', note: 'Registered via referral link' },
+        { status: 'options_sent', date: '2025-04-15T18:00:00Z', note: 'Attended April webinar' },
+        { status: 'properties_visited', date: '2025-05-01T12:00:00Z', note: 'Booked VIP trip for May' },
+        { status: 'properties_visited', date: '2025-05-15T16:00:00Z', note: 'Visited 8 properties' }
       ],
       createdAt: '2025-04-01T10:00:00Z'
     },
@@ -210,16 +210,16 @@ App.demoData = {
       phone: '+1 212 555 8001',
       referredBy: 'realtor-001',
       brokerId: 'broker-001',
-      status: 'closing',
+      status: 'notary_pending',
       budget: '€400,000 - €600,000',
       interestArea: 'Jávea',
       notes: 'Looking for a villa with sea views. Digital nomad, needs good internet.',
       statusHistory: [
-        { status: 'registered', date: '2025-03-10T08:00:00Z', note: 'Registered via referral link' },
-        { status: 'webinar_attended', date: '2025-03-20T18:00:00Z', note: 'Attended March webinar' },
-        { status: 'vip_trip_completed', date: '2025-04-10T16:00:00Z', note: 'Loved Villa Amanecer' },
+        { status: 'contacted', date: '2025-03-10T08:00:00Z', note: 'Registered via referral link' },
+        { status: 'options_sent', date: '2025-03-20T18:00:00Z', note: 'Attended March webinar' },
+        { status: 'properties_visited', date: '2025-04-10T16:00:00Z', note: 'Loved Villa Amanecer' },
         { status: 'offer_made', date: '2025-04-25T14:00:00Z', note: 'Offer €485,000 on Villa Amanecer' },
-        { status: 'closing', date: '2025-05-20T11:00:00Z', note: 'Fuster handling contracts' }
+        { status: 'notary_pending', date: '2025-05-20T11:00:00Z', note: 'Fuster handling contracts' }
       ],
       createdAt: '2025-03-10T08:00:00Z'
     },
@@ -231,17 +231,17 @@ App.demoData = {
       phone: '+1 713 555 9001',
       referredBy: 'realtor-002',
       brokerId: 'broker-001',
-      status: 'completed',
+      status: 'closed',
       budget: '€150,000 - €250,000',
       interestArea: 'Elche',
       notes: 'Investment property. Bought 2-bed apartment in Elche center.',
       statusHistory: [
-        { status: 'registered', date: '2025-02-01T09:00:00Z', note: 'Registered via referral link' },
-        { status: 'webinar_attended', date: '2025-02-15T18:00:00Z', note: '' },
-        { status: 'vip_trip_completed', date: '2025-03-05T16:00:00Z', note: '' },
+        { status: 'contacted', date: '2025-02-01T09:00:00Z', note: 'Registered via referral link' },
+        { status: 'options_sent', date: '2025-02-15T18:00:00Z', note: '' },
+        { status: 'properties_visited', date: '2025-03-05T16:00:00Z', note: '' },
         { status: 'offer_made', date: '2025-03-15T10:00:00Z', note: 'Offer €195,000' },
-        { status: 'closing', date: '2025-03-28T14:00:00Z', note: '' },
-        { status: 'completed', date: '2025-04-20T12:00:00Z', note: 'Sale completed. Keys handed over.' }
+        { status: 'notary_pending', date: '2025-03-28T14:00:00Z', note: '' },
+        { status: 'closed', date: '2025-04-20T12:00:00Z', note: 'Sale completed. Keys handed over.' }
       ],
       createdAt: '2025-02-01T09:00:00Z'
     },
@@ -253,13 +253,13 @@ App.demoData = {
       phone: '+1 469 555 4001',
       referredBy: 'realtor-003',
       brokerId: 'broker-002',
-      status: 'webinar_attended',
+      status: 'options_sent',
       budget: '€300,000 - €500,000',
       interestArea: 'Benidorm',
       notes: 'Looking for holiday home with rental potential.',
       statusHistory: [
-        { status: 'registered', date: '2025-05-20T14:00:00Z', note: 'Registered via referral link' },
-        { status: 'webinar_attended', date: '2025-06-01T18:00:00Z', note: 'Very interested in Benidorm area' }
+        { status: 'contacted', date: '2025-05-20T14:00:00Z', note: 'Registered via referral link' },
+        { status: 'options_sent', date: '2025-06-01T18:00:00Z', note: 'Very interested in Benidorm area' }
       ],
       createdAt: '2025-05-20T14:00:00Z'
     },
@@ -271,12 +271,12 @@ App.demoData = {
       phone: '+1 818 555 5001',
       referredBy: 'realtor-001',
       brokerId: 'broker-001',
-      status: 'registered',
+      status: 'contacted',
       budget: '€250,000 - €400,000',
       interestArea: 'Alicante / Costa Blanca',
       notes: 'Just exploring options. Early stage.',
       statusHistory: [
-        { status: 'registered', date: '2025-06-20T10:00:00Z', note: 'Registered via referral link' }
+        { status: 'contacted', date: '2025-06-20T10:00:00Z', note: 'Registered via referral link' }
       ],
       createdAt: '2025-06-20T10:00:00Z'
     },
@@ -288,15 +288,15 @@ App.demoData = {
       phone: '+1 503 555 6001',
       referredBy: 'realtor-003',
       brokerId: 'broker-002',
-      status: 'property_search',
+      status: 'properties_visited',
       budget: '€500,000 - €800,000',
       interestArea: 'Jávea / Moraira',
       notes: 'Premium property. Pre-approved for UCI mortgage.',
       statusHistory: [
-        { status: 'registered', date: '2025-04-05T11:00:00Z', note: '' },
-        { status: 'webinar_attended', date: '2025-04-18T18:00:00Z', note: '' },
-        { status: 'vip_trip_completed', date: '2025-05-08T16:00:00Z', note: 'Visited 10 properties' },
-        { status: 'property_search', date: '2025-05-25T09:00:00Z', note: 'Narrowed to 3 options in Moraira' }
+        { status: 'contacted', date: '2025-04-05T11:00:00Z', note: '' },
+        { status: 'options_sent', date: '2025-04-18T18:00:00Z', note: '' },
+        { status: 'properties_visited', date: '2025-05-08T16:00:00Z', note: 'Visited 10 properties' },
+        { status: 'properties_visited', date: '2025-05-25T09:00:00Z', note: 'Narrowed to 3 options in Moraira' }
       ],
       createdAt: '2025-04-05T11:00:00Z'
     }

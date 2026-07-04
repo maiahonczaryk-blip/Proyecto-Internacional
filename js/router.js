@@ -54,9 +54,31 @@ App.router = (function() {
         if (routes[hash]) {
           e.preventDefault();
           navigateTo(hash);
+          
+          // On mobile, close sidebar after navigation
+          if (window.innerWidth < 992) {
+            document.getElementById('dashboard-sidebar')?.classList.remove('active');
+            document.getElementById('sidebar-backdrop')?.classList.remove('active');
+          }
         }
       }
     });
+
+    // Mobile sidebar toggle
+    const sidebarToggle = document.getElementById('sidebar-toggle-btn');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+    if (sidebarToggle) {
+      sidebarToggle.addEventListener('click', () => {
+        document.getElementById('dashboard-sidebar')?.classList.toggle('active');
+        sidebarBackdrop?.classList.toggle('active');
+      });
+    }
+    if (sidebarBackdrop) {
+      sidebarBackdrop.addEventListener('click', () => {
+        document.getElementById('dashboard-sidebar')?.classList.remove('active');
+        sidebarBackdrop.classList.remove('active');
+      });
+    }
 
     // Handle initial route
     handleRouteChange();
@@ -64,6 +86,18 @@ App.router = (function() {
 
   /* ---- Navigate To Route ---- */
   function navigateTo(route, replace = false) {
+    const isPublic = !routes[route].role;
+    const isCurrentPublic = window.location.pathname.includes('index.html') || window.location.pathname.endsWith('/') || window.location.pathname === '';
+    
+    // Cross-page navigation
+    if (isPublic && !isCurrentPublic) {
+      window.location.href = 'index.html#' + route;
+      return;
+    } else if (!isPublic && isCurrentPublic) {
+      window.location.href = 'app.html#' + route;
+      return;
+    }
+
     if (replace) {
       window.location.replace('#' + route);
     } else {
@@ -91,7 +125,7 @@ App.router = (function() {
     if (route.role) {
       const user = App.auth.getCurrentUser();
       if (!user) {
-        navigateTo('login', true);
+        window.location.href = 'index.html#login';
         return;
       }
       if (user.role !== route.role) {
@@ -104,7 +138,7 @@ App.router = (function() {
     // If user is logged in and trying to access login/register, redirect to dashboard
     if ((routeKey === 'login' || routeKey === 'register') && App.auth.isAuthenticated()) {
       const user = App.auth.getCurrentUser();
-      navigateTo(user.role + '/dashboard', true);
+      window.location.href = 'app.html#' + user.role + '/dashboard';
       return;
     }
 
@@ -177,9 +211,11 @@ App.router = (function() {
   function updateNavbar(sidebarType) {
     const publicNav = document.getElementById('public-nav');
     const dashNav = document.getElementById('dashboard-nav');
+    const sidebarToggle = document.getElementById('sidebar-toggle-btn');
 
     if (publicNav) publicNav.style.display = sidebarType ? 'none' : '';
     if (dashNav) dashNav.style.display = sidebarType ? 'flex' : 'none';
+    if (sidebarToggle) sidebarToggle.style.display = sidebarType ? 'block' : 'none';
   }
 
   /* ---- Update Active Sidebar Link ---- */

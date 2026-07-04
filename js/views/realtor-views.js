@@ -18,16 +18,7 @@
   let realtorClients = [];
   let realtorCommissions = [];
 
-  /* ── Pipeline column definitions ── */
-  const PIPELINE_COLUMNS = [
-    { key: 'registered',   label: 'Registered',       statuses: ['registered'] },
-    { key: 'webinar',      label: 'Webinar',          statuses: ['webinar_scheduled', 'webinar_attended'] },
-    { key: 'vip_trip',     label: 'VIP Trip',         statuses: ['vip_trip_booked', 'vip_trip_completed'] },
-    { key: 'property',     label: 'Property Search',  statuses: ['property_search'] },
-    { key: 'offer',        label: 'Offer',            statuses: ['offer_made'] },
-    { key: 'closing',      label: 'Closing',          statuses: ['closing'] },
-    { key: 'completed',    label: 'Completed',        statuses: ['completed'] }
-  ];
+
 
   /* ============================================
      initDashboard()
@@ -87,22 +78,19 @@
 
     const total = clients.length || 1; // avoid division by zero
 
-    const bars = PIPELINE_COLUMNS.map(col => {
+    const bars = App.utils.PIPELINE_COLUMNS.map(col => {
       const count = clients.filter(c => col.statuses.includes(c.status)).length;
       const pct = Math.round((count / total) * 100);
-      const colors = {
-        registered: '#6b7280', webinar: '#3b82f6', vip_trip: '#f59e0b',
-        property: '#8b5cf6', offer: '#ef4444', closing: '#ec4899', completed: '#10b981'
-      };
+      const color = App.utils.columnColors[col.key];
 
       return `
         <div style="flex: 1; min-width: 0;">
           <div style="display: flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 0.25rem;">
             <span style="color: #374151; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${col.label}</span>
-            <span style="font-weight: 600; color: ${colors[col.key]};">${count}</span>
+            <span style="font-weight: 600; color: ${color};">${count}</span>
           </div>
           <div style="height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden;">
-            <div style="height: 100%; width: ${pct}%; background: ${colors[col.key]}; border-radius: 4px; transition: width 0.5s;"></div>
+            <div style="height: 100%; width: ${pct}%; background: ${color}; border-radius: 4px; transition: width 0.5s;"></div>
           </div>
         </div>
       `;
@@ -160,62 +148,7 @@
 
   /* ── Kanban Pipeline Board ── */
   function renderPipelineBoard(clients) {
-    const container = document.getElementById('realtor-pipeline-board');
-    if (!container) return;
-
-    const columns = PIPELINE_COLUMNS.map(col => {
-      const colClients = clients.filter(c => col.statuses.includes(c.status));
-
-      const cards = colClients.map(c => {
-        // Get the most recent status history entry for "last update"
-        const lastUpdate = (c.statusHistory && c.statusHistory.length > 0)
-          ? c.statusHistory[c.statusHistory.length - 1].date
-          : c.createdAt;
-
-        return `
-          <div class="pipeline-card" style="cursor: pointer; margin-bottom: 0.75rem;"
-               onclick="App.views.realtor.showClientDetail('${c.id}')">
-            <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem;">
-              ${App.utils.escapeHtml(c.firstName)} ${App.utils.escapeHtml(c.lastName)}
-            </div>
-            <div style="font-size: 0.8rem; color: #6b7280; margin-bottom: 0.25rem;">
-              📍 ${App.utils.escapeHtml(c.interestArea || '—')}
-            </div>
-            <div style="font-size: 0.8rem; color: #6b7280; margin-bottom: 0.25rem;">
-              💰 ${App.utils.escapeHtml(c.budget || '—')}
-            </div>
-            <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.5rem;">
-              Updated: ${App.utils.formatDateRelative(lastUpdate)}
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      const columnColors = {
-        registered: '#6b7280', webinar: '#3b82f6', vip_trip: '#f59e0b',
-        property: '#8b5cf6', offer: '#ef4444', closing: '#ec4899', completed: '#10b981'
-      };
-
-      return `
-        <div class="pipeline-column" style="min-width: 220px; flex: 1;">
-          <div class="pipeline-column__header" style="border-top: 3px solid ${columnColors[col.key]};">
-            <span style="font-weight: 600;">${col.label}</span>
-            <span class="badge" style="background: ${columnColors[col.key]}20; color: ${columnColors[col.key]}; font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 9999px;">
-              ${colClients.length}
-            </span>
-          </div>
-          <div style="padding: 0.75rem; min-height: 100px;">
-            ${cards || '<div style="color: #9ca3af; font-size: 0.8rem; text-align: center; padding: 1rem;">No clients</div>'}
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    container.innerHTML = `
-      <div class="pipeline-board" style="display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 1rem;">
-        ${columns}
-      </div>
-    `;
+    App.utils.renderKanbanBoard('realtor-pipeline-board', clients, 'App.views.realtor.showClientDetail', null);
   }
 
   /* ── Client Detail Modal (with timeline) ── */

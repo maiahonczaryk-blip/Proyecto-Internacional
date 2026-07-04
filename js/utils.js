@@ -141,21 +141,17 @@ App.utils.generateReferralLink = function(referralCode) {
 
 /* ---- Status Helpers ---- */
 App.utils.clientStatusLabels = {
-  'registered': 'Registered',
-  'webinar_scheduled': 'Webinar Scheduled',
-  'webinar_attended': 'Webinar Attended',
-  'vip_trip_booked': 'VIP Trip Booked',
-  'vip_trip_completed': 'VIP Trip Done',
-  'property_search': 'Property Search',
-  'offer_made': 'Offer Made',
-  'closing': 'Closing',
-  'completed': 'Completed'
+  'contacted': 'Contactado',
+  'options_sent': 'Enviadas Opciones',
+  'properties_visited': 'Visitado Propiedades',
+  'offer_made': 'Oferta Hecha',
+  'notary_pending': 'Notaría Pendiente',
+  'closed': 'Cerrado'
 };
 
 App.utils.clientStatusOrder = [
-  'registered', 'webinar_scheduled', 'webinar_attended',
-  'vip_trip_booked', 'vip_trip_completed', 'property_search',
-  'offer_made', 'closing', 'completed'
+  'contacted', 'options_sent', 'properties_visited',
+  'offer_made', 'notary_pending', 'closed'
 ];
 
 App.utils.getStatusLabel = function(status) {
@@ -164,15 +160,12 @@ App.utils.getStatusLabel = function(status) {
 
 App.utils.getStatusBadgeClass = function(status) {
   const map = {
-    'registered': 'badge--pending',
-    'webinar_scheduled': 'badge--info',
-    'webinar_attended': 'badge--info',
-    'vip_trip_booked': 'badge--active',
-    'vip_trip_completed': 'badge--active',
-    'property_search': 'badge--warning',
+    'contacted': 'badge--info',
+    'options_sent': 'badge--info',
+    'properties_visited': 'badge--active',
     'offer_made': 'badge--warning',
-    'closing': 'badge--closing',
-    'completed': 'badge--completed',
+    'notary_pending': 'badge--closing',
+    'closed': 'badge--completed',
     'pending': 'badge--pending',
     'approved': 'badge--approved',
     'rejected': 'badge--rejected',
@@ -265,4 +258,77 @@ App.utils.toggleLanguage = function() {
   } else {
     body.classList.replace('lang-es', 'lang-en');
   }
+};
+
+/* ---- Kanban Board Rendering ---- */
+App.utils.PIPELINE_COLUMNS = [
+  { key: 'contacted',           label: 'Contactado',           statuses: ['contacted'] },
+  { key: 'options_sent',        label: 'Enviadas Opciones',    statuses: ['options_sent'] },
+  { key: 'properties_visited',  label: 'Visitado Propiedades', statuses: ['properties_visited'] },
+  { key: 'offer_made',          label: 'Oferta Hecha',         statuses: ['offer_made'] },
+  { key: 'notary_pending',      label: 'Notaría Pendiente',    statuses: ['notary_pending'] },
+  { key: 'closed',              label: 'Cerrado',              statuses: ['closed'] }
+];
+
+App.utils.columnColors = {
+  contacted: '#6b7280', options_sent: '#3b82f6', properties_visited: '#f59e0b',
+  offer_made: '#ef4444', notary_pending: '#ec4899', closed: '#10b981'
+};
+
+App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFnName, getRealtorNameFn = null) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const columns = App.utils.PIPELINE_COLUMNS.map(col => {
+    const colClients = clients.filter(c => col.statuses.includes(c.status));
+
+    const cards = colClients.map(c => {
+      const lastUpdate = (c.statusHistory && c.statusHistory.length > 0)
+        ? c.statusHistory[c.statusHistory.length - 1].date
+        : c.createdAt;
+        
+      const realtorLabel = getRealtorNameFn ? `<div style="font-size: 0.75rem; color: #4f46e5; margin-bottom: 0.25rem; font-weight: 600;">👤 ${App.utils.escapeHtml(getRealtorNameFn(c.referredBy))}</div>` : '';
+
+      return `
+        <div class="pipeline-card" style="cursor: pointer; margin-bottom: 0.75rem;"
+             onclick="${onCardClickGlobalFnName}('${c.id}')">
+          ${realtorLabel}
+          <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem;">
+            ${App.utils.escapeHtml(c.firstName)} ${App.utils.escapeHtml(c.lastName)}
+          </div>
+          <div style="font-size: 0.8rem; color: #6b7280; margin-bottom: 0.25rem;">
+            📍 ${App.utils.escapeHtml(c.interestArea || '—')}
+          </div>
+          <div style="font-size: 0.8rem; color: #6b7280; margin-bottom: 0.25rem;">
+            💰 ${App.utils.escapeHtml(c.budget || '—')}
+          </div>
+          <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.5rem;">
+            Updated: ${App.utils.formatDateRelative(lastUpdate)}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const color = App.utils.columnColors[col.key];
+
+    return `
+      <div class="pipeline-column" style="min-width: 220px; flex: 1;">
+        <div class="pipeline-column__header" style="border-top: 3px solid ${color};">
+          <span style="font-weight: 600;">${col.label}</span>
+          <span class="badge" style="background: ${color}20; color: ${color}; font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 9999px;">
+            ${colClients.length}
+          </span>
+        </div>
+        <div style="padding: 0.75rem; min-height: 100px;">
+          ${cards || '<div style="color: #9ca3af; font-size: 0.8rem; text-align: center; padding: 1rem;">No clients</div>'}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="pipeline-board" style="display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 1rem;">
+      ${columns}
+    </div>
+  `;
 };

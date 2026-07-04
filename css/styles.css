@@ -2287,6 +2287,13 @@ body.lang-es .lang-en { display: none; }
 
 .app-main {
   flex: 1;
+  transition: padding-left var(--transition-smooth);
+}
+
+@media (min-width: 992px) {
+  .app-main.has-sidebar {
+    padding-left: var(--sidebar-width);
+  }
 }
 
 /* ------------------------------------------
@@ -2659,13 +2666,24 @@ body.lang-es .lang-en { display: none; }
   top: 0;
   left: 0;
   bottom: 0;
-  z-index: 100;
+  z-index: 1000;
   overflow-y: auto;
   overflow-x: hidden;
   transition: transform var(--transition-smooth);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-right: 1px solid rgba(255, 255, 255, 0.06);
+  transform: translateX(-100%);
+}
+
+.dashboard-sidebar.active {
+  transform: translateX(0);
+}
+
+@media (min-width: 992px) {
+  .dashboard-sidebar.active {
+    transform: translateX(0);
+  }
 }
 
 .sidebar-logo {
@@ -4420,5 +4438,48 @@ body.lang-es .lang-en { display: none; }
   .user-card__actions {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* ---- Sidebar Backdrop (Mobile) ---- */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 990;
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity var(--transition-smooth);
+}
+.sidebar-backdrop.active {
+  display: block;
+  opacity: 1;
+}
+@media (min-width: 992px) {
+  .sidebar-backdrop, .sidebar-backdrop.active {
+    display: none !important;
+  }
+}
+
+/* Sidebar Toggle Button icon styling */
+.sidebar-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sidebar-toggle span {
+  width: 24px;
+  height: 2px;
+  background-color: var(--text-primary);
+  border-radius: 2px;
+}
+@media (min-width: 992px) {
+  .sidebar-toggle {
+    display: none !important;
   }
 }

@@ -385,7 +385,6 @@
                 </div>
               </div>
               
-              <div class="form-row">
                 <div class="form-group">
                   <label for="agencyName"><span class="lang-en">Real Estate Agency</span><span class="lang-es">Nombre de la Agencia</span> *</label>
                   <input type="text" id="agencyName" name="agencyName" required>
@@ -393,6 +392,21 @@
                 <div class="form-group">
                   <label for="email"><span class="lang-en">Work Email</span><span class="lang-es">Email de Trabajo</span> *</label>
                   <input type="email" id="email" name="email" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="password"><span class="lang-en">Password</span><span class="lang-es">Contraseña</span> *</label>
+                  <input type="password" id="password" name="password" required style="width: 100%; padding: 0.75rem; border-radius: 0.375rem; border: 1px solid #d1d5db; background: #f9fafb;">
+                </div>
+                <div class="form-group">
+                  <label for="role"><span class="lang-en">I am a...</span><span class="lang-es">Soy...</span> *</label>
+                  <select id="role" name="role" required>
+                    <option value=""><span class="lang-en">Select Role...</span><span class="lang-es">Selecciona Rol...</span></option>
+                    <option value="realtor">Realtor / Agent</option>
+                    <option value="broker">Broker / Agency Owner</option>
+                  </select>
                 </div>
               </div>
               
@@ -452,7 +466,39 @@
     </div>
   </footer>
 
+  <script src="js/firebase-config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth-service.js"></script>
   <script src="js/main.js"></script>
-  <script src="js/auth.js"></script>
+  <script>
+    App.auth.init();
+    async function registerPartner() {
+      const btn = document.getElementById('partner-submit-btn');
+      try {
+        const data = {
+          firstName: document.getElementById('firstName').value,
+          lastName: document.getElementById('lastName').value,
+          agencyName: document.getElementById('agencyName').value,
+          email: document.getElementById('email').value,
+          password: document.getElementById('password').value,
+          country: document.getElementById('country').value,
+          role: document.getElementById('role').value
+        };
+        const terms = document.getElementById('terms').checked;
+        if (!terms) {
+          App.utils.showToast('Please accept the terms.', 'error');
+          return;
+        }
+        btn.disabled = true;
+        btn.innerHTML = 'Registering...';
+        await App.auth.register(data);
+        window.location.href = 'landing.html#pending';
+      } catch (e) {
+        App.utils.showToast(e.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<span class="lang-en">Submit Application 🚀</span><span class="lang-es">Enviar Solicitud 🚀</span>';
+      }
+    }
+  </script>
 </body>
 </html>
