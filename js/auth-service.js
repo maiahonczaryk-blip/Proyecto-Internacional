@@ -23,7 +23,7 @@ App.auth = (function() {
           currentUser = JSON.parse(saved);
           // Verify user still exists in demo data
           const exists = App.demoData.users.find(u => u.id === currentUser.id);
-          if (!exists || exists.status !== 'approved') {
+          if (!exists || exists.status !== 'active') {
             currentUser = null;
             localStorage.removeItem(SESSION_KEY);
           }
