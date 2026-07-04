@@ -29,8 +29,8 @@
 
       // 2. Count users by status and role
       const pendingUsers  = allUsers.filter(u => u.status === 'pending');
-      const approvedBrokers  = allUsers.filter(u => u.status === 'approved' && u.role === 'broker');
-      const approvedRealtors = allUsers.filter(u => u.status === 'approved' && u.role === 'realtor');
+      const approvedBrokers  = allUsers.filter(u => u.status === 'active' && u.role === 'broker');
+      const approvedRealtors = allUsers.filter(u => u.status === 'active' && u.role === 'realtor');
 
       // 3. Update stat cards
       setTextById('admin-stat-pending',  pendingUsers.length);
@@ -43,7 +43,7 @@
 
       // 5. Render recent activity (latest 5 non-pending users, sorted newest first)
       const recentActivity = allUsers
-        .filter(u => u.status === 'approved' || u.status === 'rejected')
+        .filter(u => u.status === 'active' || u.status === 'rejected')
         .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
         .slice(0, 5);
       renderRecentActivity(recentActivity);
@@ -114,7 +114,7 @@
         ${users.map(user => {
           const statusBadge = App.utils.getUserStatusBadge(user.status);
           const dateStr = App.utils.formatDateRelative(user.updatedAt || user.createdAt);
-          const icon = user.status === 'approved' ? '✅' : '❌';
+          const icon = user.status === 'active' ? '✅' : '❌';
 
           return `
             <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">
@@ -197,7 +197,7 @@
             ✕
           </button>
         `;
-      } else if (user.status === 'approved' && user.role !== 'admin') {
+      } else if (user.status === 'active' && user.role !== 'admin') {
         actions += `
           <button class="btn btn-danger btn-sm" onclick="App.views.admin.handleReject('${user.id}')" title="Reject" style="margin-left: 0.25rem;">
             ✕
@@ -299,7 +299,7 @@
      ============================================ */
   async function handleApprove(userId) {
     try {
-      await App.auth.updateUserStatus(userId, 'approved');
+      await App.auth.updateUserStatus(userId, 'active');
       App.utils.showToast('User approved successfully!', 'success');
 
       // Refresh whichever view is active

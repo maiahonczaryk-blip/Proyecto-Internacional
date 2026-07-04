@@ -34,7 +34,7 @@
       brokerCommissions = await App.auth.getCommissions({ brokerId: currentUser.id });
 
       // Count metrics
-      const approvedRealtors = teamRealtors.filter(r => r.status === 'approved');
+      const approvedRealtors = teamRealtors.filter(r => r.status === 'active');
       const completedSales   = brokerCommissions.filter(c => c.status === 'paid' || c.status === 'pending_payment');
       const totalBrokerComm  = brokerCommissions.reduce((sum, c) => sum + (c.brokerAmount || 0), 0);
 
