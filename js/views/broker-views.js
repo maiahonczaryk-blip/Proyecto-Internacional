@@ -159,35 +159,98 @@
       return;
     }
 
-    container.innerHTML = realtors.map(r => {
-      const avatar = App.utils.generateAvatar(r.firstName, r.lastName);
-      const clientCount = brokerClients.filter(c => c.referredBy === r.id).length;
-      const realtorComms = brokerCommissions.filter(c => c.realtorId === r.id);
-      const commTotal = realtorComms.reduce((sum, c) => sum + (c.realtorAmount || 0), 0);
-      const agreementBadge = r.agreementSigned
-        ? '<span class="badge badge--approved">Signed</span>'
-        : '<span class="badge badge--pending">Unsigned</span>';
+    const pending = realtors.filter(r => r.status === 'pending_broker');
+    const active = realtors.filter(r => r.status === 'active');
 
-      return `
-        <div class="pipeline-card" style="cursor: pointer; padding: 1.5rem;" onclick="App.views.broker.showRealtorDetail('${r.id}')">
-          <div style="text-align: center; margin-bottom: 1rem;">
-            ${avatar}
-            <h4 style="margin: 0.75rem 0 0.25rem;">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}</h4>
-            <p style="font-size: 0.8rem; color: #6b7280; margin: 0;">${App.utils.escapeHtml(r.agencyName || '—')}</p>
-          </div>
-          <div style="font-size: 0.85rem; color: #374151; margin-bottom: 0.25rem;">
-            ✉️ ${App.utils.escapeHtml(r.email)}
-          </div>
-          <div style="display: flex; justify-content: space-between; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb; font-size: 0.85rem;">
-            <span>👥 ${clientCount} clients</span>
-            <span>💰 ${App.utils.formatCurrency(commTotal)}</span>
-          </div>
-          <div style="margin-top: 0.75rem; text-align: center;">
-            Agreement: ${agreementBadge}
+    let html = '';
+
+    if (pending.length > 0) {
+      html += `
+        <div style="margin-bottom: 32px;">
+          <h2 style="font-size: 1.25rem; margin-bottom: 16px; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+            <span class="badge badge--warning">${pending.length}</span> Pending Approvals
+          </h2>
+          <div class="team-cards-grid">
+            ${pending.map(r => renderRealtorCard(r, true)).join('')}
           </div>
         </div>
       `;
-    }).join('');
+    }
+
+    if (active.length > 0) {
+      html += `
+        <div>
+          <h2 style="font-size: 1.25rem; margin-bottom: 16px; color: var(--text-primary);">Active Team</h2>
+          <div class="team-cards-grid">
+            ${active.map(r => renderRealtorCard(r, false)).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    container.innerHTML = html;
+  }
+
+  function renderRealtorCard(r, isPending) {
+    const avatar = App.utils.generateAvatar(r.firstName, r.lastName);
+    const clientCount = brokerClients.filter(c => c.referredBy === r.id).length;
+    const realtorComms = brokerCommissions.filter(c => c.realtorId === r.id);
+    const commTotal = realtorComms.reduce((sum, c) => sum + (c.realtorAmount || 0), 0);
+    const agreementBadge = r.agreementSigned
+      ? '<span class="badge badge--approved">Signed</span>'
+      : '<span class="badge badge--pending">Unsigned</span>';
+
+    const actionButtons = isPending ? `
+      <div style="display: flex; gap: 8px; margin-top: 16px;">
+        <button class="btn btn-primary" style="flex: 1;" onclick="App.views.broker.approveRealtor('${r.id}')">Approve</button>
+        <button class="btn btn-outline" style="flex: 1; border-color: #ef4444; color: #ef4444;" onclick="App.views.broker.rejectRealtor('${r.id}')">Reject</button>
+      </div>
+    ` : '';
+
+    return `
+      <div class="stat-card" style="flex-direction: column; cursor: ${isPending ? 'default' : 'pointer'}; padding: 1.5rem;" ${!isPending ? `onclick="App.views.broker.showRealtorDetail('${r.id}')"` : ''}>
+        <div style="text-align: center; margin-bottom: 1rem;">
+          <div style="display: inline-block; box-shadow: var(--shadow-sm); border-radius: 50%;">${avatar}</div>
+          <h4 style="margin: 0.75rem 0 0.25rem; color: var(--text-primary); font-size: 1.1rem;">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}</h4>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">${App.utils.escapeHtml(r.agencyName || '—')}</p>
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; text-align: center;">
+          ✉️ ${App.utils.escapeHtml(r.email)}
+        </div>
+        ${!isPending ? `
+        <div style="display: flex; justify-content: space-between; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-subtle); font-size: 0.85rem; color: var(--text-primary);">
+          <span>👥 ${clientCount} clients</span>
+          <span style="font-family: 'JetBrains Mono', monospace;">💰 ${App.utils.formatCurrency(commTotal)}</span>
+        </div>
+        <div style="margin-top: 0.75rem; text-align: center;">
+          Agreement: ${agreementBadge}
+        </div>
+        ` : ''}
+        ${actionButtons}
+      </div>
+    `;
+  }
+
+  async function approveRealtor(id) {
+    if (!confirm('Approve this Realtor?')) return;
+    try {
+      await App.auth.updateUserStatus(id, 'active');
+      App.utils.showToast('Realtor approved!', 'success');
+      initTeam(); // refresh
+    } catch (err) {
+      App.utils.showToast(err.message, 'error');
+    }
+  }
+
+  async function rejectRealtor(id) {
+    if (!confirm('Reject this Realtor?')) return;
+    try {
+      await App.auth.updateUserStatus(id, 'rejected');
+      App.utils.showToast('Realtor rejected.', 'success');
+      initTeam(); // refresh
+    } catch (err) {
+      App.utils.showToast(err.message, 'error');
+    }
   }
 
   /* ── Realtor Detail Modal ── */
@@ -510,7 +573,9 @@
     initDocuments,
     initFinances,
     showRealtorDetail,
-    showClientDetail
+    closeRealtorDetail,
+    approveRealtor,
+    rejectRealtor
   };
 
 })();

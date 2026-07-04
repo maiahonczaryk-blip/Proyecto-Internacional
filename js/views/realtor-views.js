@@ -158,7 +158,17 @@
 
   /* ── Kanban Pipeline Board ── */
   function renderPipelineBoard(clients) {
-    App.utils.renderKanbanBoard('realtor-pipeline-board', clients, 'App.views.realtor.showClientDetail', null);
+    App.utils.renderKanbanBoard('realtor-pipeline-board', clients, 'App.views.realtor.showClientDetail', null, 'App.views.realtor.handleClientDrop');
+  }
+
+  async function handleClientDrop(clientId, newStatus) {
+    try {
+      await App.auth.updateClientStatus(clientId, newStatus, 'Moved in Kanban Board');
+      initClients(); // Refresh board
+    } catch (err) {
+      console.error('Drop error:', err);
+      App.utils.showToast(err.message, 'error');
+    }
   }
 
   /* ── Client Detail Modal (with timeline) ── */
@@ -756,7 +766,8 @@
     initReferral,
     initDocuments,
     initFinances,
-    showClientDetail
+    showClientDetail,
+    handleClientDrop
   };
 
 })();

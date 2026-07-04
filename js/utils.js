@@ -275,7 +275,34 @@ App.utils.columnColors = {
   offer_made: '#ef4444', notary_pending: '#ec4899', closed: '#10b981'
 };
 
-App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFnName, getRealtorNameFn = null) {
+App.utils.handleDragStart = function(event, clientId) {
+  event.dataTransfer.setData('text/plain', clientId);
+  event.dataTransfer.effectAllowed = 'move';
+  event.target.style.opacity = '0.5';
+};
+
+App.utils.handleDragEnd = function(event) {
+  event.target.style.opacity = '1';
+};
+
+App.utils.handleDragOver = function(event) {
+  event.preventDefault(); // Necessary to allow dropping
+  event.dataTransfer.dropEffect = 'move';
+};
+
+App.utils.handleDrop = function(event, newStatus, callbackFnName) {
+  event.preventDefault();
+  const clientId = event.dataTransfer.getData('text/plain');
+  if (clientId && callbackFnName) {
+    // Dynamically call the global function
+    const fn = eval(callbackFnName);
+    if (typeof fn === 'function') {
+      fn(clientId, newStatus);
+    }
+  }
+};
+
+App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFnName, getRealtorNameFn = null, onDropCallbackGlobalFnName = null) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
@@ -290,10 +317,13 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
       const realtorLabel = getRealtorNameFn ? `<div style="font-size: 0.75rem; color: #4f46e5; margin-bottom: 0.25rem; font-weight: 600;">👤 ${App.utils.escapeHtml(getRealtorNameFn(c.referredBy))}</div>` : '';
 
       return `
-        <div class="pipeline-card" style="cursor: pointer; margin-bottom: 0.75rem;"
+        <div class="pipeline-card" style="cursor: grab; margin-bottom: 0.75rem; background: var(--bg-card); border-radius: var(--radius-sm); padding: 12px; box-shadow: var(--shadow-sm); border-top: 3px solid ${App.utils.columnColors[col.key]}; transition: transform 0.2s;"
+             draggable="true"
+             ondragstart="App.utils.handleDragStart(event, '${c.id}')"
+             ondragend="App.utils.handleDragEnd(event)"
              onclick="${onCardClickGlobalFnName}('${c.id}')">
           ${realtorLabel}
-          <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem;">
+          <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-primary);">
             ${App.utils.escapeHtml(c.firstName)} ${App.utils.escapeHtml(c.lastName)}
           </div>
           <div style="font-size: 0.8rem; color: #6b7280; margin-bottom: 0.25rem;">
@@ -312,22 +342,24 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
     const color = App.utils.columnColors[col.key];
 
     return `
-      <div class="pipeline-column" style="min-width: 220px; flex: 1;">
-        <div class="pipeline-column__header" style="border-top: 3px solid ${color};">
-          <span style="font-weight: 600;">${col.label}</span>
-          <span class="badge" style="background: ${color}20; color: ${color}; font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 9999px;">
+      <div class="pipeline-column" style="min-width: 280px; max-width: 300px; flex: 1; background: var(--bg-secondary); border-radius: var(--radius-md); display: flex; flex-direction: column;"
+           ondragover="App.utils.handleDragOver(event)"
+           ondrop="App.utils.handleDrop(event, '${col.statuses[0]}', '${onDropCallbackGlobalFnName || ''}')">
+        <div class="pipeline-column__header" style="border-top: 4px solid ${color}; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-radius: var(--radius-md) var(--radius-md) 0 0; background: var(--bg-card); border-bottom: 1px solid var(--border-subtle);">
+          <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">${col.label}</span>
+          <span class="badge" style="background: ${color}20; color: ${color}; font-size: 0.75rem; padding: 2px 8px; border-radius: 9999px; font-weight: 700;">
             ${colClients.length}
           </span>
         </div>
-        <div style="padding: 0.75rem; min-height: 100px;">
-          ${cards || '<div style="color: #9ca3af; font-size: 0.8rem; text-align: center; padding: 1rem;">No clients</div>'}
+        <div style="padding: 12px; flex: 1; min-height: 200px;">
+          ${cards || `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 2rem 1rem; border: 2px dashed rgba(0,0,0,0.05); border-radius: 8px;">Arrastra clientes aquí</div>`}
         </div>
       </div>
     `;
   }).join('');
 
   container.innerHTML = `
-    <div class="pipeline-board" style="display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 1rem;">
+    <div class="pipeline-board" style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 1rem; align-items: flex-start; min-height: 400px; padding: 8px;">
       ${columns}
     </div>
   `;
