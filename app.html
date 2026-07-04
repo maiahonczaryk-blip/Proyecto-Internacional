@@ -375,5 +375,12 @@
   <script src="js/views/broker-views.js"></script>
   <script src="js/views/realtor-views.js"></script>
   <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (App && App.router) {
+        App.router.init();
+      }
+    });
+  </script>
 </body>
 </html>
