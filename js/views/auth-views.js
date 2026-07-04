@@ -58,9 +58,9 @@ App.views.auth = {
     if (agencyEl) agencyEl.textContent = user.agencyName || '—';
     if (statusEl) statusEl.innerHTML = App.utils.getUserStatusBadge(user.status);
     if (joinedEl) joinedEl.textContent = App.utils.formatDate(user.createdAt);
-  }
+  },
 
-  function initRegister(params) {
+  initRegister: function(params) {
     const form = document.getElementById('register-form');
     
     if (form) {

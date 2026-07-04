@@ -1,0 +1,11 @@
+--- js/views/auth-views.js
++++ js/views/auth-views.js
+@@ -62,7 +62,7 @@
+     if (joinedEl) joinedEl.textContent = App.utils.formatDate(user.createdAt);
+   },
+ 
+-  function initRegister(params) {
++  initRegister: function(params) {
+     const form = document.getElementById('register-form');
+     
+     if (form) {
