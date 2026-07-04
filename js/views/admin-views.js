@@ -427,6 +427,151 @@
     }
   }
 
+  /* ── Broker Inmomás Client Kanban Board & Assignment ── */
+  async function initClients() {
+    try {
+      allUsers = await App.auth.getAllUsers();
+      allClients = await App.auth.getClients();
+      
+      const getRealtorName = (realtorId) => {
+        const realtor = allUsers.find(u => u.id === realtorId);
+        return realtor ? `${realtor.firstName} ${realtor.lastName}` : 'Unknown';
+      };
+      
+      App.utils.renderKanbanBoard(
+        'admin-clients-board',
+        allClients,
+        'App.views.admin.showClientDetail',
+        getRealtorName,
+        'App.views.admin.handleClientDrop'
+      );
+    } catch (err) {
+      console.error('[Admin] initClients error:', err);
+      App.utils.showToast('Error loading clients.', 'error');
+    }
+  }
+
+  async function handleClientDrop(clientId, newStatus) {
+    try {
+      await App.auth.updateClientStatus(clientId, newStatus, 'Moved by Broker Inmomás (Admin)');
+      initClients();
+    } catch (err) {
+      console.error(err);
+      App.utils.showToast(err.message, 'error');
+    }
+  }
+
+  async function showClientDetail(clientId) {
+    try {
+      const client = allClients.find(c => c.id === clientId);
+      if (!client) return;
+
+      const realtor = allUsers.find(u => u.id === client.referredBy);
+      const realtorName = realtor ? `${realtor.firstName} ${realtor.lastName}` : '—';
+      
+      // Get all active local agents
+      const localAgents = allUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
+      
+      const dropdownOptions = `
+        <option value="">-- Select Local Agent --</option>
+        ${localAgents.map(a => `
+          <option value="${a.id}" ${client.localAgentId === a.id ? 'selected' : ''}>
+            ${a.firstName} ${a.lastName} (Inmomás)
+          </option>
+        `).join('')}
+      `;
+
+      const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(client.status)}">${App.utils.getStatusLabel(client.status)}</span>`;
+
+      const timeline = (client.statusHistory || []).map(entry => `
+        <div style="display: flex; gap: 0.75rem; padding: 0.5rem 0; border-left: 2px solid #0043ff; padding-left: 1rem; margin-left: 0.5rem;">
+          <div>
+            <div style="font-weight: 500; font-size: 0.85rem;">
+              <span class="badge ${App.utils.getStatusBadgeClass(entry.status)}">${App.utils.getStatusLabel(entry.status)}</span>
+            </div>
+            <div style="font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem;">
+              ${App.utils.formatDate(entry.date)}${entry.note ? ' — ' + App.utils.escapeHtml(entry.note) : ''}
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      App.utils.showModal({
+        title: 'Client Details & Assignment',
+        body: `
+          <div style="margin-bottom: 1.5rem;">
+            <h3 style="margin: 0 0 0.25rem;">${App.utils.escapeHtml(client.firstName)} ${App.utils.escapeHtml(client.lastName)}</h3>
+            <div style="margin-bottom: 0.5rem;">${statusBadge}</div>
+          </div>
+          
+          <div style="background: rgba(180, 83, 9, 0.05); border: 1px solid rgba(180, 83, 9, 0.15); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <label for="assign-agent-select" style="font-weight: 600; font-size: 0.85rem; color: #b45309; text-transform: uppercase;">Assign Local Agent (Agente Inmomás)</label>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <select id="assign-agent-select" class="form-select" style="flex: 1; margin-bottom: 0;">
+                ${dropdownOptions}
+              </select>
+              <button class="btn btn-primary" onclick="App.views.admin.handleAssignAgent('${client.id}')" style="background: #b45309; border-color: #b45309;">Assign</button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.875rem; margin-bottom: 1.5rem;">
+            <div>
+              <div style="font-weight: 600; color: #374151;">Email</div>
+              <div style="color: #6b7280;">${App.utils.escapeHtml(client.email)}</div>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #374151;">Phone</div>
+              <div style="color: #6b7280;">${App.utils.escapeHtml(client.phone || '—')}</div>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #374151;">Referred By</div>
+              <div style="color: #6b7280;">${App.utils.escapeHtml(realtorName)}</div>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #374151;">Interest Area</div>
+              <div style="color: #6b7280;">${App.utils.escapeHtml(client.interestArea || '—')}</div>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #374151;">Budget</div>
+              <div style="color: #6b7280;">${App.utils.escapeHtml(client.budget || '—')}</div>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #374151;">Registered</div>
+              <div style="color: #6b7280;">${App.utils.formatDate(client.createdAt)}</div>
+            </div>
+          </div>
+          ${client.notes ? `<div style="background: #f9fafb; padding: 0.75rem; border-radius: 0.375rem; font-size: 0.85rem; color: #374151; margin-bottom: 1.5rem;">📝 ${App.utils.escapeHtml(client.notes)}</div>` : ''}
+          <h4 style="margin: 0 0 0.75rem; font-size: 0.9rem; color: #374151;">Status Timeline</h4>
+          ${timeline || '<p style="color: #6b7280;">No history available.</p>'}
+        `,
+        footer: `<button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Close</button>`
+      });
+    } catch (err) {
+      console.error(err);
+      App.utils.showToast('Error loading details.', 'error');
+    }
+  }
+
+  async function handleAssignAgent(clientId) {
+    try {
+      const select = document.getElementById('assign-agent-select');
+      const agentId = select.value;
+      let agentName = '';
+      if (agentId) {
+        const agent = allUsers.find(u => u.id === agentId);
+        if (agent) agentName = `${agent.firstName} ${agent.lastName}`;
+      }
+      
+      await App.auth.assignLocalAgent(clientId, agentId || null, agentName || null);
+      App.utils.showToast('Local agent assigned successfully!', 'success');
+      App.utils.closeModal();
+      initClients(); // reload
+    } catch (err) {
+      console.error(err);
+      App.utils.showToast(err.message, 'error');
+    }
+  }
+
   /* ── Utility: safely set text content ── */
   function setTextById(id, text) {
     const el = document.getElementById(id);
@@ -439,9 +584,13 @@
   App.views.admin = {
     initDashboard,
     initUsers,
+    initClients,
     handleApprove,
     handleReject,
-    viewUser
+    viewUser,
+    showClientDetail,
+    handleClientDrop,
+    handleAssignAgent
   };
 
 })();

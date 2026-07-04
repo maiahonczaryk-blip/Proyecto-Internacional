@@ -284,12 +284,14 @@ App.auth = (function() {
       let clients = [...App.demoData.clients];
       if (filters.referredBy) clients = clients.filter(c => c.referredBy === filters.referredBy);
       if (filters.brokerId) clients = clients.filter(c => c.brokerId === filters.brokerId);
+      if (filters.localAgentId) clients = clients.filter(c => c.localAgentId === filters.localAgentId);
       if (filters.status) clients = clients.filter(c => c.status === filters.status);
       return clients;
     } else {
       let query = App.db.collection('clients');
       if (filters.referredBy) query = query.where('referredBy', '==', filters.referredBy);
       if (filters.brokerId) query = query.where('brokerId', '==', filters.brokerId);
+      if (filters.localAgentId) query = query.where('localAgentId', '==', filters.localAgentId);
       if (filters.status) query = query.where('status', '==', filters.status);
       
       const snapshot = await query.get();
@@ -330,11 +332,13 @@ App.auth = (function() {
       let comms = [...App.demoData.commissions];
       if (filters.realtorId) comms = comms.filter(c => c.realtorId === filters.realtorId);
       if (filters.brokerId) comms = comms.filter(c => c.brokerId === filters.brokerId);
+      if (filters.agentId) comms = comms.filter(c => c.agentId === filters.agentId);
       return comms;
     } else {
       let query = App.db.collection('commissions');
       if (filters.realtorId) query = query.where('realtorId', '==', filters.realtorId);
       if (filters.brokerId) query = query.where('brokerId', '==', filters.brokerId);
+      if (filters.agentId) query = query.where('agentId', '==', filters.agentId);
       
       const snapshot = await query.get();
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -350,6 +354,26 @@ App.auth = (function() {
     authChangeCallbacks.forEach(cb => {
       try { cb(currentUser); } catch(e) { console.error('[Auth] Callback error:', e); }
     });
+  }
+
+  /* ---- Assign Local Agent ---- */
+  async function assignLocalAgent(clientId, agentId, agentName) {
+    if (App.demoMode) {
+      const client = App.demoData.clients.find(c => c.id === clientId);
+      if (!client) throw new Error('Client not found.');
+      client.localAgentId = agentId;
+      client.localAgentName = agentName;
+      client.updatedAt = new Date().toISOString();
+      return true;
+    } else {
+      const clientRef = App.db.collection('clients').doc(clientId);
+      await clientRef.update({
+        localAgentId: agentId,
+        localAgentName: agentName,
+        updatedAt: new Date().toISOString()
+      });
+      return true;
+    }
   }
 
   /* ---- Password Reset ---- */
@@ -378,6 +402,7 @@ App.auth = (function() {
     getUser,
     getClients,
     updateClientStatus,
+    assignLocalAgent,
     getCommissions,
     onAuthChange,
     resetPassword

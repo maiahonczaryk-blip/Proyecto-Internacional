@@ -2247,6 +2247,8 @@ body.lang-es .lang-en { display: none; }
   --broker-gradient: linear-gradient(135deg, #0043ff, #002dae);
   --realtor-color: #10B981;
   --realtor-gradient: linear-gradient(135deg, #10B981, #059669);
+  --agent-color: #F59E0B;
+  --agent-gradient: linear-gradient(135deg, #F59E0B, #D97706);
 
   /* Semantic Colors */
   --success: #10B981;
@@ -2770,6 +2772,11 @@ body.lang-es .lang-en { display: none; }
 .sidebar--realtor .sidebar-link.active {
   border-left-color: var(--realtor-color);
   background: rgba(16, 185, 129, 0.1);
+}
+
+.sidebar--agent_inmomas .sidebar-link.active {
+  border-left-color: var(--agent-color);
+  background: rgba(245, 158, 11, 0.1);
 }
 
 .sidebar-link__icon {

@@ -25,11 +25,20 @@
       <span>Partner Portal</span>
     </div>
 
-    <!-- Admin Sidebar Nav -->
+    <!-- Admin Sidebar Nav (Broker Inmomás) -->
     <nav class="sidebar-nav" id="sidebar-admin" style="display:none;">
-      <div class="sidebar-nav__title">Administration</div>
+      <div class="sidebar-nav__title">Broker Inmomás</div>
       <a href="#admin/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
       <a href="#admin/users" class="sidebar-link"><span class="sidebar-link__icon">👥</span> Manage Users</a>
+      <a href="#admin/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> Clients</a>
+    </nav>
+
+    <!-- Agente Inmomás Sidebar Nav -->
+    <nav class="sidebar-nav" id="sidebar-agent_inmomas" style="display:none;">
+      <div class="sidebar-nav__title">Agente Inmomás</div>
+      <a href="#agent_inmomas/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
+      <a href="#agent_inmomas/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> Clients</a>
+      <a href="#agent_inmomas/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> Finances</a>
     </nav>
 
     <!-- Broker Sidebar Nav -->
@@ -133,6 +142,18 @@
             <tbody id="admin-users-table-body"></tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+
+    <!-- ==================== VIEW: ADMIN CLIENTS ==================== -->
+    <div id="view-admin-clients" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1><span class="lang-en">Client Pipeline</span><span class="lang-es">Pipeline de Clientes</span></h1>
+          <p class="dashboard-subtitle"><span class="lang-en">Broker Inmomás CRM Overview — Assign local agents and monitor status</span><span class="lang-es">Control del CRM de Broker Inmomás — Asigna agentes locales y monitoriza el estado</span></p>
+        </div>
+        <div id="admin-clients-board" class="pipeline-board"></div>
       </div>
     </div>
 
@@ -342,6 +363,72 @@
     </div>
 
 
+    <!-- ==================== VIEW: AGENT DASHBOARD ==================== -->
+    <div id="view-agent-dashboard" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1><span class="lang-en">My Dashboard</span><span class="lang-es">Mi Panel</span></h1>
+          <p class="dashboard-subtitle" id="agent-welcome"></p>
+        </div>
+        <div class="stat-cards-grid">
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🤝</div><div class="stat-card__body"><div class="stat-card__value" id="agent-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Assigned Clients</span><span class="lang-es">Clientes Asignados</span></div></div></div>
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🔄</div><div class="stat-card__body"><div class="stat-card__value" id="agent-stat-active">0</div><div class="stat-card__label"><span class="lang-en">Active Funnel</span><span class="lang-es">Embudo Activo</span></div></div></div>
+          <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">🏠</div><div class="stat-card__body"><div class="stat-card__value" id="agent-stat-sales">0</div><div class="stat-card__label"><span class="lang-en">Closed Sales</span><span class="lang-es">Ventas Cerradas</span></div></div></div>
+          <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">💰</div><div class="stat-card__body"><div class="stat-card__value" id="agent-stat-commissions">€0</div><div class="stat-card__label"><span class="lang-en">My Commission (Spain)</span><span class="lang-es">Mi Comisión (España)</span></div></div></div>
+        </div>
+        <div class="dashboard-grid-2col">
+          <div class="dashboard-section">
+            <h2><span class="lang-en">Funnel Summary</span><span class="lang-es">Resumen del Embudo</span></h2>
+            <div id="agent-dash-pipeline"></div>
+          </div>
+          <div class="dashboard-section">
+            <h2><span class="lang-en">Recent Activity</span><span class="lang-es">Actividad Reciente</span></h2>
+            <div id="agent-dash-recent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW: AGENT CLIENTS (interactive Kanban) ==================== -->
+    <div id="view-agent-clients" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">My Clients</span><span class="lang-es">Mis Clientes</span></h1></div>
+        <div id="agent-pipeline-board" class="pipeline-board"></div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW: AGENT FINANCES ==================== -->
+    <div id="view-agent-finances" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">Commission Overview</span><span class="lang-es">Resumen de Comisiones</span></h1></div>
+        <div class="stat-cards-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">💰</div><div class="stat-card__body"><div class="stat-card__value" id="agent-fin-total">€0</div><div class="stat-card__label">Total Earned</div></div></div>
+          <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">✓</div><div class="stat-card__body"><div class="stat-card__value" id="agent-fin-paid">€0</div><div class="stat-card__label">Paid</div></div></div>
+          <div class="stat-card stat-card--amber"><div class="stat-card__icon stat-card__icon--amber">⏳</div><div class="stat-card__body"><div class="stat-card__value" id="agent-fin-pending">€0</div><div class="stat-card__label">Pending Payment</div></div></div>
+        </div>
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Detailed History</span><span class="lang-es">Historial Detallado</span></h2>
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th>
+                  <th><span class="lang-en">Property</span><span class="lang-es">Propiedad</span></th>
+                  <th><span class="lang-en">Sale Price</span><span class="lang-es">Precio</span></th>
+                  <th><span class="lang-en">Spain Commission</span><span class="lang-es">Comisión España</span></th>
+                  <th>Your Share</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="agent-commission-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     <!-- ==================== VIEW: MY PROFILE ==================== -->
     <div id="view-profile" class="app-view">
       <div class="dashboard-content" style="max-width: 800px; margin: 0 auto;">
@@ -407,6 +494,7 @@
   <script src="js/views/admin-views.js"></script>
   <script src="js/views/broker-views.js"></script>
   <script src="js/views/realtor-views.js"></script>
+  <script src="js/views/agent-views.js"></script>
   <script src="js/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {

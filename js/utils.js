@@ -306,6 +306,8 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
   const container = document.getElementById(containerId);
   if (!container) return;
 
+  const isInteractive = !!onDropCallbackGlobalFnName;
+
   const columns = App.utils.PIPELINE_COLUMNS.map(col => {
     const colClients = clients.filter(c => col.statuses.includes(c.status));
 
@@ -315,14 +317,17 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
         : c.createdAt;
         
       const realtorLabel = getRealtorNameFn ? `<div style="font-size: 0.75rem; color: #4f46e5; margin-bottom: 0.25rem; font-weight: 600;">👤 ${App.utils.escapeHtml(getRealtorNameFn(c.referredBy))}</div>` : '';
+      
+      const localAgentName = c.localAgentName || 'Sin asignar / Unassigned';
+      const agentLabel = `<div style="font-size: 0.75rem; color: #b45309; margin-bottom: 0.25rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">🇪🇸 ${App.utils.escapeHtml(localAgentName)}</div>`;
 
       return `
-        <div class="pipeline-card" style="cursor: grab; margin-bottom: 0.75rem; background: var(--bg-card); border-radius: var(--radius-sm); padding: 12px; box-shadow: var(--shadow-sm); border-top: 3px solid ${App.utils.columnColors[col.key]}; transition: transform 0.2s;"
-             draggable="true"
-             ondragstart="App.utils.handleDragStart(event, '${c.id}')"
-             ondragend="App.utils.handleDragEnd(event)"
+        <div class="pipeline-card" style="cursor: ${isInteractive ? 'grab' : 'pointer'}; margin-bottom: 0.75rem; background: var(--bg-card); border-radius: var(--radius-sm); padding: 12px; box-shadow: var(--shadow-sm); border-top: 3px solid ${App.utils.columnColors[col.key]}; transition: transform 0.2s;"
+             draggable="${isInteractive ? 'true' : 'false'}"
+             ${isInteractive ? `ondragstart="App.utils.handleDragStart(event, '${c.id}')" ondragend="App.utils.handleDragEnd(event)"` : ''}
              onclick="${onCardClickGlobalFnName}('${c.id}')">
           ${realtorLabel}
+          ${agentLabel}
           <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-primary);">
             ${App.utils.escapeHtml(c.firstName)} ${App.utils.escapeHtml(c.lastName)}
           </div>

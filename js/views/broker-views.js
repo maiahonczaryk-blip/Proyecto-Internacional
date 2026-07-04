@@ -403,6 +403,10 @@
               <div style="font-weight: 600; color: #374151;">Registered</div>
               <div style="color: #6b7280;">${App.utils.formatDate(client.createdAt)}</div>
             </div>
+            <div style="grid-column: span 2;">
+              <div style="font-weight: 600; color: #374151;">Agente Inmomás (España)</div>
+              <div style="color: #b45309; font-weight: 600;">🇪🇸 ${App.utils.escapeHtml(client.localAgentName || 'Sin asignar / Unassigned')}</div>
+            </div>
           </div>
           ${client.notes ? `<div style="background: #f9fafb; padding: 0.75rem; border-radius: 0.375rem; font-size: 0.85rem; color: #374151; margin-bottom: 1.5rem;">${App.utils.escapeHtml(client.notes)}</div>` : ''}
           <h4 style="margin: 0 0 0.75rem; font-size: 0.9rem; color: #374151;">Status Timeline</h4>

@@ -1,0 +1,343 @@
+/* ============================================
+   RE/MAX Inmomás — Agente Inmomás View Module
+   ============================================
+   Handles all local Spanish Agent dashboard views:
+   dashboard overview, interactive Kanban client funnel,
+   and finances. Registered on App.views.agentInmomas.
+   ============================================ */
+
+;(function() {
+  'use strict';
+
+  window.App = window.App || {};
+  App.views = App.views || {};
+
+  /* ── Cached data ── */
+  let currentUser = null;
+  let agentClients = [];
+  let agentCommissions = [];
+  let allUsers = [];
+
+  /* ============================================
+     initDashboard()
+     Populates #view-agent-dashboard with stats,
+     mini pipeline summary, and recent client activity.
+     ============================================ */
+  async function initDashboard() {
+    try {
+      currentUser = App.auth.getCurrentUser();
+      if (!currentUser) return;
+
+      // Welcome text
+      const welcome = document.getElementById('agent-welcome');
+      if (welcome) {
+        welcome.innerHTML = `<span class="lang-en">Welcome back, <strong>${currentUser.firstName}</strong>. Here is your Spain pipeline.</span>
+                             <span class="lang-es">Bienvenido de nuevo, <strong>${currentUser.firstName}</strong>. Aquí está tu embudo local.</span>`;
+      }
+
+      // Load data scoped to this local agent
+      agentClients = await App.auth.getClients({ localAgentId: currentUser.id });
+      agentCommissions = await App.auth.getCommissions({ agentId: currentUser.id });
+      allUsers = await App.auth.getAllUsers();
+
+      // Calculate metrics
+      const activeCount = agentClients.filter(c => c.status !== 'closed').length;
+      const closedCount = agentClients.filter(c => c.status === 'closed').length;
+      const totalEarned = agentCommissions.reduce((sum, c) => sum + (c.agentAmount || 0), 0);
+
+      // Update stat cards
+      setTextById('agent-stat-clients', agentClients.length);
+      setTextById('agent-stat-active', activeCount);
+      setTextById('agent-stat-sales', closedCount);
+      setTextById('agent-stat-commissions', App.utils.formatCurrency(totalEarned));
+
+      // Funnel summary (mini pipeline)
+      renderMiniPipeline(agentClients);
+
+      // Recent activity (last 5 clients, sorted by updatedAt/createdAt)
+      renderRecentClients(agentClients);
+
+    } catch (err) {
+      console.error('[Agent] initDashboard error:', err);
+      App.utils.showToast('Error loading dashboard.', 'error');
+    }
+  }
+
+  /* ── Mini Pipeline Summary ── */
+  function renderMiniPipeline(clients) {
+    const container = document.getElementById('agent-dash-pipeline');
+    if (!container) return;
+
+    const total = clients.length || 1;
+
+    const bars = App.utils.PIPELINE_COLUMNS.map(col => {
+      const count = clients.filter(c => col.statuses.includes(c.status)).length;
+      const pct = Math.round((count / total) * 100);
+      const color = App.utils.columnColors[col.key];
+
+      return `
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.25rem;">
+            <span style="color: var(--text-secondary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${col.label}</span>
+            <span style="font-weight: 600; color: ${color};">${count}</span>
+          </div>
+          <div style="height: 8px; background: var(--border-subtle); border-radius: 4px; overflow: hidden;">
+            <div style="height: 100%; width: ${pct}%; background: ${color}; border-radius: 4px;"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.innerHTML = `<div style="display: flex; gap: 0.75rem; flex-direction: column;">${bars}</div>`;
+  }
+
+  /* ── Recent Clients Activity ── */
+  function renderRecentClients(clients) {
+    const container = document.getElementById('agent-dash-recent');
+    if (!container) return;
+
+    const recent = [...clients]
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 5);
+
+    if (recent.length === 0) {
+      App.utils.showEmptyState('agent-dash-recent', 'No clients assigned to you yet.', '🤝');
+      return;
+    }
+
+    container.innerHTML = recent.map(c => {
+      const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(c.status)}">${App.utils.getStatusLabel(c.status)}</span>`;
+      return `
+        <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid var(--border-subtle); transition: background 0.2s; cursor: pointer;" onclick="App.views.agentInmomas.showClientDetail('${c.id}')">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--blue); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1rem; flex-shrink: 0;">
+            ${c.firstName.charAt(0)}${c.lastName.charAt(0)}
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 2px;">${App.utils.escapeHtml(c.firstName)} ${App.utils.escapeHtml(c.lastName)}</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">
+              📍 ${App.utils.escapeHtml(c.interestArea || '—')} · Budget: ${App.utils.escapeHtml(c.budget || '—')}
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+            ${statusBadge}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  /* ============================================
+     initClients()
+     Populates #view-agent-clients with an
+     interactive, draggable Kanban pipeline board.
+     ============================================ */
+  async function initClients() {
+    try {
+      currentUser = App.auth.getCurrentUser();
+      if (!currentUser) return;
+
+      agentClients = await App.auth.getClients({ localAgentId: currentUser.id });
+      allUsers = await App.auth.getAllUsers();
+
+      const getRealtorName = (realtorId) => {
+        const realtor = allUsers.find(u => u.id === realtorId);
+        return realtor ? `${realtor.firstName} ${realtor.lastName}` : 'Unknown';
+      };
+
+      App.utils.renderKanbanBoard(
+        'agent-pipeline-board',
+        agentClients,
+        'App.views.agentInmomas.showClientDetail',
+        getRealtorName,
+        'App.views.agentInmomas.handleClientDrop'
+      );
+
+    } catch (err) {
+      console.error('[Agent] initClients error:', err);
+      App.utils.showToast('Error loading client pipeline.', 'error');
+    }
+  }
+
+  async function handleClientDrop(clientId, newStatus) {
+    try {
+      await App.auth.updateClientStatus(clientId, newStatus, 'Moved by Agente Inmomás');
+      initClients(); // Refresh board
+      App.utils.showToast(`Client moved to ${App.utils.getStatusLabel(newStatus)}`, 'success');
+    } catch (err) {
+      console.error('Drop error:', err);
+      App.utils.showToast(err.message, 'error');
+    }
+  }
+
+  /* ── Client Detail Modal ── */
+  async function showClientDetail(clientId) {
+    try {
+      // Find client in either list
+      let client = agentClients.find(c => c.id === clientId);
+      if (!client) {
+        // Fallback fetch
+        const allC = await App.auth.getClients();
+        client = allC.find(c => c.id === clientId);
+      }
+
+      if (!client) {
+        App.utils.showToast('Client not found.', 'error');
+        return;
+      }
+
+      // Find referring realtor
+      const realtor = allUsers.find(u => u.id === client.referredBy);
+      const realtorName = realtor ? `${realtor.firstName} ${realtor.lastName}` : '—';
+      const realtorAgency = realtor ? (realtor.agencyName || '—') : '—';
+
+      const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(client.status)}">${App.utils.getStatusLabel(client.status)}</span>`;
+
+      // Status history timeline
+      const timeline = (client.statusHistory || []).map(entry => `
+        <div style="display: flex; gap: 0.75rem; padding: 0.5rem 0; border-left: 2px solid #0043ff; padding-left: 1rem; margin-left: 0.5rem;">
+          <div>
+            <div style="font-weight: 500; font-size: 0.85rem;">
+              <span class="badge ${App.utils.getStatusBadgeClass(entry.status)}">${App.utils.getStatusLabel(entry.status)}</span>
+            </div>
+            <div style="font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem;">
+              ${App.utils.formatDate(entry.date)}${entry.note ? ' — ' + App.utils.escapeHtml(entry.note) : ''}
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      App.utils.showModal({
+        title: 'Client Details (Assigned to you)',
+        body: `
+          <div style="margin-bottom: 1.5rem;">
+            <h3 style="margin: 0 0 0.25rem;">${App.utils.escapeHtml(client.firstName)} ${App.utils.escapeHtml(client.lastName)}</h3>
+            <div style="margin-bottom: 0.5rem;">${statusBadge}</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.875rem; margin-bottom: 1.5rem;">
+            <div>
+              <div style="font-weight: 600; color: #374151;">Email</div>
+              <div style="color: #6b7280;">${App.utils.escapeHtml(client.email)}</div>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #374151;">Phone</div>
+              <div style="color: #6b7280;">${App.utils.escapeHtml(client.phone || '—')}</div>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #374151;">Referred By (Foreign Realtor)</div>
+              <div style="color: #6b7280;">${App.utils.escapeHtml(realtorName)} (${App.utils.escapeHtml(realtorAgency)})</div>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #374151;">Interest Area</div>
+              <div style="color: #6b7280;">${App.utils.escapeHtml(client.interestArea || '—')}</div>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #374151;">Budget</div>
+              <div style="color: #6b7280;">${App.utils.escapeHtml(client.budget || '—')}</div>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #374151;">Registered</div>
+              <div style="color: #6b7280;">${App.utils.formatDate(client.createdAt)}</div>
+            </div>
+          </div>
+          ${client.notes ? `<div style="background: #f9fafb; padding: 0.75rem; border-radius: 0.375rem; font-size: 0.85rem; color: #374151; margin-bottom: 1.5rem;">📝 ${App.utils.escapeHtml(client.notes)}</div>` : ''}
+          <h4 style="margin: 0 0 0.75rem; font-size: 0.9rem; color: #374151;">Status Timeline</h4>
+          ${timeline || '<p style="color: #6b7280;">No history available.</p>'}
+        `,
+        footer: `<button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Close</button>`
+      });
+
+    } catch (err) {
+      console.error('[Agent] showClientDetail error:', err);
+      App.utils.showToast('Error loading details.', 'error');
+    }
+  }
+
+  /* ============================================
+     initFinances()
+     Populates #view-agent-finances with metrics
+     and detailed commission history.
+     ============================================ */
+  async function initFinances() {
+    try {
+      currentUser = App.auth.getCurrentUser();
+      if (!currentUser) return;
+
+      agentCommissions = await App.auth.getCommissions({ agentId: currentUser.id });
+
+      // Calculate summary metrics
+      const totalEarned = agentCommissions.reduce((sum, c) => sum + (c.agentAmount || 0), 0);
+      const paidEarned = agentCommissions.filter(c => c.status === 'paid').reduce((sum, c) => sum + (c.agentAmount || 0), 0);
+      const pendingEarned = agentCommissions.filter(c => c.status === 'pending_payment' || c.status === 'projected')
+                                            .reduce((sum, c) => sum + (c.agentAmount || 0), 0);
+
+      // Update summary cards
+      setTextById('agent-fin-total', App.utils.formatCurrency(totalEarned));
+      setTextById('agent-fin-paid', App.utils.formatCurrency(paidEarned));
+      setTextById('agent-fin-pending', App.utils.formatCurrency(pendingEarned));
+
+      // Render commission history table
+      renderCommissionTable(agentCommissions);
+
+    } catch (err) {
+      console.error('[Agent] initFinances error:', err);
+      App.utils.showToast('Error loading finances.', 'error');
+    }
+  }
+
+  /* ── Detailed Commission History Table ── */
+  function renderCommissionTable(commissions) {
+    const tbody = document.getElementById('agent-commission-table-body');
+    if (!tbody) return;
+
+    if (commissions.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 2rem;">
+            <div class="empty-state">
+              <div class="empty-state__icon">💰</div>
+              <p class="empty-state__text">No commissions recorded yet.</p>
+            </div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = commissions.map(c => {
+      const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(c.status)}">${App.utils.getStatusLabel(c.status)}</span>`;
+
+      // Spain share is the remaining commission (usually 65%, which is 100% - realtor 25% - broker 10%)
+      const spainCommAmount = c.totalCommission - (c.realtorAmount || 0) - (c.brokerAmount || 0);
+
+      return `
+        <tr>
+          <td style="font-weight: 500;">${App.utils.escapeHtml(c.clientName)}</td>
+          <td style="font-size: 0.85rem;">${App.utils.escapeHtml(c.propertyAddress || '—')}</td>
+          <td>${App.utils.formatCurrency(c.salePrice)}</td>
+          <td>${App.utils.formatCurrency(spainCommAmount)}</td>
+          <td style="text-align: center;">${c.agentSharePct || 30}%</td>
+          <td style="font-weight: 600; color: #10b981;">${App.utils.formatCurrency(c.agentAmount)}</td>
+          <td>${statusBadge}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  /* ── Utility ── */
+  function setTextById(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+
+  /* ============================================
+     Public API — register on App.views.agentInmomas
+     ============================================ */
+  App.views.agentInmomas = {
+    initDashboard,
+    initClients,
+    initFinances,
+    showClientDetail,
+    handleClientDrop
+  };
+
+})();

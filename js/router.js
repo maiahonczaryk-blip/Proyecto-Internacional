@@ -27,6 +27,7 @@ App.router = (function() {
     // Admin routes
     'admin/dashboard': { view: 'view-admin-dashboard', role: 'admin',  sidebar: 'admin', title: 'Admin Dashboard' },
     'admin/users':     { view: 'view-admin-users',     role: 'admin',  sidebar: 'admin', title: 'Manage Users' },
+    'admin/clients':   { view: 'view-admin-clients',   role: 'admin',  sidebar: 'admin', title: 'Clients' },
 
     // Broker routes
     'broker/dashboard': { view: 'view-broker-dashboard', role: 'broker', sidebar: 'broker', title: 'Broker Dashboard' },
@@ -40,7 +41,12 @@ App.router = (function() {
     'realtor/clients':   { view: 'view-realtor-clients',   role: 'realtor', sidebar: 'realtor', title: 'My Clients' },
     'realtor/referral':  { view: 'view-realtor-referral',  role: 'realtor', sidebar: 'realtor', title: 'Referral Tools' },
     'realtor/documents': { view: 'view-realtor-documents', role: 'realtor', sidebar: 'realtor', title: 'Documents' },
-    'realtor/finances':  { view: 'view-realtor-finances',  role: 'realtor', sidebar: 'realtor', title: 'Finances' }
+    'realtor/finances':  { view: 'view-realtor-finances',  role: 'realtor', sidebar: 'realtor', title: 'Finances' },
+
+    // Agente Inmomás routes
+    'agent_inmomas/dashboard': { view: 'view-agent-dashboard', role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Dashboard' },
+    'agent_inmomas/clients':   { view: 'view-agent-clients',   role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Clients' },
+    'agent_inmomas/finances':  { view: 'view-agent-finances',  role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Finances' }
   };
 
   let currentRoute = null;
@@ -216,7 +222,7 @@ App.router = (function() {
         }
         if (avatarEl) avatarEl.innerHTML = App.utils.getInitials(user.firstName, user.lastName);
         
-        sidebar.classList.remove('sidebar--admin', 'sidebar--broker', 'sidebar--realtor');
+        sidebar.classList.remove('sidebar--admin', 'sidebar--broker', 'sidebar--realtor', 'sidebar--agent_inmomas');
         sidebar.classList.add(`sidebar--${user.role}`);
       }
     } else {
@@ -269,6 +275,7 @@ App.router = (function() {
       'intake':            () => App.views.public && App.views.public.initIntake(),
       'admin/dashboard':   () => App.views.admin && App.views.admin.initDashboard(),
       'admin/users':       () => App.views.admin && App.views.admin.initUsers(),
+      'admin/clients':     () => App.views.admin && App.views.admin.initClients(),
       'broker/dashboard':  () => App.views.broker && App.views.broker.initDashboard(),
       'broker/team':       () => App.views.broker && App.views.broker.initTeam(),
       'broker/clients':    () => App.views.broker && App.views.broker.initClients(),
@@ -279,6 +286,9 @@ App.router = (function() {
       'realtor/referral':  () => App.views.realtor && App.views.realtor.initReferral(),
       'realtor/documents': () => App.views.realtor && App.views.realtor.initDocuments(),
       'realtor/finances':  () => App.views.realtor && App.views.realtor.initFinances(),
+      'agent_inmomas/dashboard': () => App.views.agentInmomas && App.views.agentInmomas.initDashboard(),
+      'agent_inmomas/clients':   () => App.views.agentInmomas && App.views.agentInmomas.initClients(),
+      'agent_inmomas/finances':  () => App.views.agentInmomas && App.views.agentInmomas.initFinances(),
       'profile':           () => App.views.auth && App.views.auth.initProfile()
     };
 
