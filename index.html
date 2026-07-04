@@ -695,12 +695,16 @@
   <script src="js/utils.js"></script>
   <script src="js/auth-service.js"></script>
   <script src="js/router.js"></script>
+  <script src="js/views/auth-views.js"></script>
   <script src="js/views/admin-views.js"></script>
   <script src="js/views/broker-views.js"></script>
   <script src="js/views/realtor-views.js"></script>
   <script src="js/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      if (App && App.auth) {
+        App.auth.init();
+      }
       if (App && App.router) {
         App.router.init();
       }

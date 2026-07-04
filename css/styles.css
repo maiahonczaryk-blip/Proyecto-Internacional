@@ -2299,13 +2299,13 @@ body.lang-es .lang-en { display: none; }
 /* ------------------------------------------
    SECTION 3: Auth Pages (Login / Register)
    ------------------------------------------ */
-.auth-page {
+.auth-section {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--bg-secondary);
-  padding: 24px;
+  padding: 100px 24px 40px;
 }
 
 .auth-card {
