@@ -1,0 +1,46 @@
+    <!-- ==================== VIEW: MY PROFILE ==================== -->
+    <div id="view-profile" class="app-view">
+      <div class="dashboard-content" style="max-width: 800px; margin: 0 auto;">
+        <div class="dashboard-header"><h1><span class="lang-en">My Profile</span><span class="lang-es">Mi Perfil</span></h1></div>
+        
+        <div class="dashboard-section" style="background: var(--bg-card); border-radius: var(--radius-md); padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.05); margin-top: 24px;">
+          <div style="display: flex; gap: 32px; align-items: flex-start;">
+            
+            <div style="flex-shrink: 0; text-align: center;">
+              <div id="profile-avatar" style="width: 120px; height: 120px; border-radius: 50%; background: var(--blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; margin-bottom: 16px; box-shadow: var(--shadow-sm);"></div>
+              <span id="profile-role-badge" class="badge badge--blue" style="font-size: 0.8rem;"></span>
+            </div>
+
+            <div style="flex: 1;">
+              <h2 id="profile-name" style="font-size: 1.8rem; margin-bottom: 4px; color: var(--text-primary);"></h2>
+              <p id="profile-email" style="color: var(--text-secondary); margin-bottom: 24px; font-size: 1rem;"></p>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                  <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Agency</label>
+                  <p id="profile-agency" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                </div>
+                <div>
+                  <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Status</label>
+                  <div style="margin-top: 4px;" id="profile-status"></div>
+                </div>
+                <div>
+                  <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Joined Date</label>
+                  <p id="profile-joined" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                </div>
+                <div>
+                  <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Broker</label>
+                  <p id="profile-broker" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                </div>
+              </div>
+
+              <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-subtle);">
+                <button class="btn btn-outline" onclick="alert('Password reset link sent to your email.')"><span class="lang-en">Reset Password</span><span class="lang-es">Restablecer Contraseña</span></button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+

@@ -37,27 +37,6 @@ App.views.auth = {
         }
       });
     }
-  },
-
-  initProfile: async function() {
-    const user = await App.auth.getCurrentUser();
-    if (!user) return;
-
-    const avatarEl = document.getElementById('profile-avatar');
-    const nameEl = document.getElementById('profile-name');
-    const emailEl = document.getElementById('profile-email');
-    const roleBadgeEl = document.getElementById('profile-role-badge');
-    const agencyEl = document.getElementById('profile-agency');
-    const statusEl = document.getElementById('profile-status');
-    const joinedEl = document.getElementById('profile-joined');
-
-    if (avatarEl) avatarEl.innerHTML = user.firstName.charAt(0) + user.lastName.charAt(0);
-    if (nameEl) nameEl.textContent = `${user.firstName} ${user.lastName}`;
-    if (emailEl) emailEl.textContent = user.email;
-    if (roleBadgeEl) roleBadgeEl.textContent = user.role.toUpperCase();
-    if (agencyEl) agencyEl.textContent = user.agencyName || '—';
-    if (statusEl) statusEl.innerHTML = App.utils.getUserStatusBadge(user.status);
-    if (joinedEl) joinedEl.textContent = App.utils.formatDate(user.createdAt);
   }
 
   function initRegister(params) {

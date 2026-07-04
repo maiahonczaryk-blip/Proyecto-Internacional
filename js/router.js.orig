@@ -21,9 +21,6 @@ App.router = (function() {
     'pending':        { view: 'view-pending',        role: null,      sidebar: false, title: 'Application Pending' },
     'intake':         { view: 'view-intake',         role: null,      sidebar: false, title: 'VIP Client Intake' },
 
-    // Profile route
-    'profile':        { view: 'view-profile',        role: null,      sidebar: null,  title: 'My Profile' },
-
     // Admin routes
     'admin/dashboard': { view: 'view-admin-dashboard', role: 'admin',  sidebar: 'admin', title: 'Admin Dashboard' },
     'admin/users':     { view: 'view-admin-users',     role: 'admin',  sidebar: 'admin', title: 'Manage Users' },
@@ -77,7 +74,7 @@ App.router = (function() {
     });
 
     // Mobile sidebar toggle
-    const sidebarToggle = document.getElementById('mobile-sidebar-toggle') || document.getElementById('sidebar-toggle-btn');
+    const sidebarToggle = document.getElementById('sidebar-toggle-btn');
     const sidebarBackdrop = document.getElementById('sidebar-backdrop');
     if (sidebarToggle) {
       sidebarToggle.addEventListener('click', () => {
@@ -229,7 +226,7 @@ App.router = (function() {
   function updateNavbar(sidebarType) {
     const publicNav = document.getElementById('public-nav');
     const dashNav = document.getElementById('dashboard-nav');
-    const sidebarToggle = document.getElementById('mobile-sidebar-toggle');
+    const sidebarToggle = document.getElementById('sidebar-toggle-btn');
 
     if (publicNav) publicNav.style.display = sidebarType ? 'none' : '';
     if (dashNav) dashNav.style.display = sidebarType ? 'flex' : 'none';
@@ -278,8 +275,7 @@ App.router = (function() {
       'realtor/clients':   () => App.views.realtor && App.views.realtor.initClients(),
       'realtor/referral':  () => App.views.realtor && App.views.realtor.initReferral(),
       'realtor/documents': () => App.views.realtor && App.views.realtor.initDocuments(),
-      'realtor/finances':  () => App.views.realtor && App.views.realtor.initFinances(),
-      'profile':           () => App.views.auth && App.views.auth.initProfile()
+      'realtor/finances':  () => App.views.realtor && App.views.realtor.initFinances()
     };
 
     const initFn = viewInits[routeKey];

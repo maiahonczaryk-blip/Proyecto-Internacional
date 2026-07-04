@@ -13,35 +13,10 @@
 </head>
 <body class="lang-en">
 
-  <!-- ===================== MAIN NAVIGATION ===================== -->
-  <nav class="navbar" id="navbar">
-    <div class="container">
-      <a href="#home" class="nav-logo">
-        <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás" class="nav-logo-img">
-      </a>
-
-      <!-- Dashboard Nav (shown when logged in) -->
-      <div class="nav-links" id="dashboard-nav" style="display: none;">
-        <span class="nav-user-greeting" id="nav-user-greeting"></span>
-        <button class="btn btn-outline btn-sm" id="nav-logout-btn" onclick="App.auth.logout().then(() => App.router.navigateTo('home'))">
-          <span class="lang-en">Logout</span>
-          <span class="lang-es">Cerrar Sesión</span>
-        </button>
-      </div>
-
-      <div class="nav-right">
-        <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">
-          <span class="lang-label">ES</span>
-        </button>
-        <button class="sidebar-toggle" id="sidebar-toggle-btn" aria-label="Toggle sidebar" style="display:none;">
-          <span></span><span></span><span></span>
-        </button>
-        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </div>
-  </nav>
+  <!-- ===================== MOBILE SIDEBAR TOGGLE ===================== -->
+  <button class="mobile-floating-toggle" id="mobile-sidebar-toggle" aria-label="Toggle Menu" style="position: fixed; top: 16px; left: 16px; z-index: 100; background: var(--blue); color: white; border: none; border-radius: 8px; width: 40px; height: 40px; display: none; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-sm);">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+  </button>
 
   <!-- ===================== DASHBOARD SIDEBAR ===================== -->
   <aside class="dashboard-sidebar" id="dashboard-sidebar">
@@ -84,7 +59,13 @@
         <div class="sidebar-user__name" id="sidebar-user-name">—</div>
         <div class="sidebar-user__role" id="sidebar-user-role">—</div>
       </div>
-      <button class="sidebar-logout-btn" onclick="App.auth.logout().then(() => window.location.href='index.html#home')" title="Logout">⏻</button>
+      <div style="display: flex; gap: 8px;">
+        <button class="lang-toggle" id="sidebar-lang-toggle" aria-label="Switch language" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer;">
+          <span class="lang-label">ES</span>
+        </button>
+        <button class="sidebar-logout-btn" onclick="App.auth.logout().then(() => window.location.href='index.html#home')" title="Logout">⏻</button>
+      </div>
+      <a href="#profile" style="color: rgba(255,255,255,0.7); font-size: 0.8rem; text-decoration: none; margin-top: 8px; display: inline-block; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s;"><span class="lang-en">👤 My Profile</span><span class="lang-es">👤 Mi Perfil</span></a>
     </div>
   </aside>
 
@@ -244,9 +225,12 @@
         <!-- Referral Link Quick Access -->
         <div class="dashboard-section referral-quick">
           <h2>🔗 <span class="lang-en">Your Referral Link</span><span class="lang-es">Tu Enlace de Referido</span></h2>
-          <div class="referral-link-row">
-            <input type="text" readonly id="realtor-dash-referral-link" class="referral-link-display" value="">
-            <button class="btn btn-primary btn-sm" id="realtor-dash-copy-link"><span class="lang-en">Copy</span><span class="lang-es">Copiar</span></button>
+          <div style="display: flex; align-items: center; background: rgba(0, 67, 255, 0.04); border: 1px solid rgba(0, 67, 255, 0.15); border-radius: 12px; padding: 8px; gap: 12px; margin-top: 12px;">
+            <div style="background: white; border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <span style="font-size: 1.2rem;">✨</span>
+            </div>
+            <input type="text" readonly id="realtor-dash-referral-link" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--text-primary); outline: none; padding: 0; min-width: 0;">
+            <button class="btn btn-primary" id="realtor-dash-copy-link" style="border-radius: 8px; padding: 10px 20px; white-space: nowrap;"><span class="lang-en">Copy Link</span><span class="lang-es">Copiar Enlace</span></button>
           </div>
         </div>
         <div class="dashboard-grid-2col">
@@ -277,12 +261,14 @@
       <div class="dashboard-content">
         <div class="dashboard-header"><h1><span class="lang-en">Referral Tools</span><span class="lang-es">Herramientas de Referidos</span></h1></div>
         <div class="dashboard-section">
-          <h2><span class="lang-en">Your Unique Referral Link</span><span class="lang-es">Tu Enlace de Referido Único</span></h2>
-          <div class="referral-card">
-            <div class="referral-link-row">
-              <input type="text" readonly id="realtor-referral-link-display" class="referral-link-display" value="">
-              <button class="btn btn-primary" id="realtor-copy-referral-btn"><span class="lang-en">Copy Link</span><span class="lang-es">Copiar Enlace</span></button>
+          <h2>🔗 <span class="lang-en">Your Referral Link</span><span class="lang-es">Tu Enlace de Referido</span></h2>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">Share this link to capture new clients.</p>
+          <div style="display: flex; align-items: center; background: rgba(0, 67, 255, 0.04); border: 1px solid rgba(0, 67, 255, 0.15); border-radius: 12px; padding: 8px; gap: 12px;">
+            <div style="background: white; border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <span style="font-size: 1.2rem;">✨</span>
             </div>
+            <input type="text" readonly id="realtor-referral-link-display" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--text-primary); outline: none; padding: 0; min-width: 0;">
+            <button class="btn btn-primary" id="realtor-copy-referral-btn" style="border-radius: 8px; padding: 10px 20px; white-space: nowrap;"><span class="lang-en">Copy Link</span><span class="lang-es">Copiar Enlace</span></button>
           </div>
         </div>
         <div class="stat-cards-grid" style="grid-template-columns:repeat(4,1fr);">
@@ -356,6 +342,52 @@
     </div>
 
 
+    <!-- ==================== VIEW: MY PROFILE ==================== -->
+    <div id="view-profile" class="app-view">
+      <div class="dashboard-content" style="max-width: 800px; margin: 0 auto;">
+        <div class="dashboard-header"><h1><span class="lang-en">My Profile</span><span class="lang-es">Mi Perfil</span></h1></div>
+        
+        <div class="dashboard-section" style="background: var(--bg-card); border-radius: var(--radius-md); padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.05); margin-top: 24px;">
+          <div style="display: flex; gap: 32px; align-items: flex-start;">
+            
+            <div style="flex-shrink: 0; text-align: center;">
+              <div id="profile-avatar" style="width: 120px; height: 120px; border-radius: 50%; background: var(--blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; margin-bottom: 16px; box-shadow: var(--shadow-sm);"></div>
+              <span id="profile-role-badge" class="badge badge--blue" style="font-size: 0.8rem;"></span>
+            </div>
+
+            <div style="flex: 1;">
+              <h2 id="profile-name" style="font-size: 1.8rem; margin-bottom: 4px; color: var(--text-primary);"></h2>
+              <p id="profile-email" style="color: var(--text-secondary); margin-bottom: 24px; font-size: 1rem;"></p>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                  <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Agency</label>
+                  <p id="profile-agency" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                </div>
+                <div>
+                  <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Status</label>
+                  <div style="margin-top: 4px;" id="profile-status"></div>
+                </div>
+                <div>
+                  <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Joined Date</label>
+                  <p id="profile-joined" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                </div>
+                <div>
+                  <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Broker</label>
+                  <p id="profile-broker" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                </div>
+              </div>
+
+              <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-subtle);">
+                <button class="btn btn-outline" onclick="alert('Password reset link sent to your email.')"><span class="lang-en">Reset Password</span><span class="lang-es">Restablecer Contraseña</span></button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- ===================== TOAST CONTAINER ===================== -->
@@ -386,5 +418,6 @@
       }
     });
   </script>
+</body>
 </body>
 </html>

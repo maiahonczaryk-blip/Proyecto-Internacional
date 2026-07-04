@@ -1,0 +1,30 @@
+--- js/main.js
++++ js/main.js
+@@ -7,22 +7,25 @@
+ 
+   // ── Language Toggle ──
+-  const langToggle = document.getElementById('lang-toggle');
++  const langToggles = document.querySelectorAll('.lang-toggle');
+   const body = document.body;
+   let currentLang = 'en';
+ 
+-  if (langToggle) {
+-    langToggle.addEventListener('click', () => {
++  langToggles.forEach(toggle => {
++    toggle.addEventListener('click', () => {
+       if (currentLang === 'en') {
+         currentLang = 'es';
+         body.classList.remove('lang-en');
+         body.classList.add('lang-es');
+-        langToggle.querySelector('.lang-label').textContent = 'EN';
++        langToggles.forEach(t => t.querySelector('.lang-label').textContent = 'EN');
+       } else {
+         currentLang = 'en';
+         body.classList.remove('lang-es');
+         body.classList.add('lang-en');
+-        langToggle.querySelector('.lang-label').textContent = 'ES';
++        langToggles.forEach(t => t.querySelector('.lang-label').textContent = 'ES');
+       }
+     });
+-  }
++  });

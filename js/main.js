@@ -6,24 +6,28 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   // ── Language Toggle ──
-  const langToggle = document.getElementById('lang-toggle');
+  const langToggles = document.querySelectorAll('.lang-toggle');
   const body = document.body;
   let currentLang = 'en';
 
-  if (langToggle) {
-    langToggle.addEventListener('click', () => {
+  langToggles.forEach(toggle => {
+    toggle.addEventListener('click', () => {
       currentLang = currentLang === 'en' ? 'es' : 'en';
       body.classList.remove('lang-en', 'lang-es');
       body.classList.add('lang-' + currentLang);
-      langToggle.querySelector('.lang-label').textContent = currentLang === 'en' ? 'ES' : 'EN';
       
+      langToggles.forEach(t => {
+        const label = t.querySelector('.lang-label');
+        if (label) label.textContent = currentLang === 'en' ? 'ES' : 'EN';
+      });
+
       // Update html lang attribute
       document.documentElement.lang = currentLang;
       
       // Update form placeholders
       updateFormPlaceholders(currentLang);
     });
-  }
+  });
 
   function updateFormPlaceholders(lang) {
     const placeholders = {

@@ -1,0 +1,20 @@
+--- js/router.js
++++ js/router.js
+@@ -75,7 +75,7 @@
+     });
+ 
+     // Mobile sidebar toggle
+-    const sidebarToggle = document.getElementById('sidebar-toggle-btn');
++    const sidebarToggle = document.getElementById('mobile-sidebar-toggle') || document.getElementById('sidebar-toggle-btn');
+     const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+     if (sidebarToggle) {
+       sidebarToggle.addEventListener('click', () => {
+@@ -226,7 +226,7 @@
+   function updateNavbar(sidebarType) {
+     const publicNav = document.getElementById('public-nav');
+     const dashNav = document.getElementById('dashboard-nav');
+-    const sidebarToggle = document.getElementById('sidebar-toggle-btn');
++    const sidebarToggle = document.getElementById('mobile-sidebar-toggle');
+ 
+     if (publicNav) publicNav.style.display = sidebarType ? 'none' : '';
+     if (dashNav) dashNav.style.display = sidebarType ? 'flex' : 'none';

@@ -116,12 +116,22 @@
     container.innerHTML = recent.map(c => {
       const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(c.status)}">${App.utils.getStatusLabel(c.status)}</span>`;
       return `
-        <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">
-          <div style="flex: 1; min-width: 0;">
-            <div style="font-weight: 600; font-size: 0.9rem;">${App.utils.escapeHtml(c.firstName)} ${App.utils.escapeHtml(c.lastName)}</div>
-            <div style="font-size: 0.8rem; color: #6b7280;">${App.utils.formatDate(c.createdAt)}</div>
+        <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid var(--border-subtle); transition: background 0.2s; cursor: pointer;" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--blue); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1rem; flex-shrink: 0;">
+            ${c.firstName.charAt(0)}${c.lastName.charAt(0)}
           </div>
-          ${statusBadge}
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 2px;">${App.utils.escapeHtml(c.firstName)} ${App.utils.escapeHtml(c.lastName)}</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; gap: 8px; align-items: center;">
+              <span>🗓 ${App.utils.formatDate(c.createdAt)}</span>
+              <span>•</span>
+              <span style="text-transform: capitalize;">${App.utils.escapeHtml(c.country || 'Unknown')}</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+            ${statusBadge}
+            <button class="btn" style="padding: 4px 8px; font-size: 0.75rem; background: transparent; border: 1px solid var(--border-subtle); color: var(--text-secondary);">View Details</button>
+          </div>
         </div>
       `;
     }).join('');
