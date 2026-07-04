@@ -1,0 +1,22 @@
+--- css/styles.css
++++ css/styles.css
+@@ -285,7 +285,8 @@
+   cursor: pointer;
+ }
+ 
+-.role-card input[type="radio"] {
++.role-card input[type="radio"],
++.role-card input[type="checkbox"] {
+   position: absolute;
+   opacity: 0;
+   width: 0;
+@@ -304,7 +305,8 @@
+   border-color: var(--border-light);
+ }
+ 
+-.role-card input[type="radio"]:checked + .role-card__content {
++.role-card input[type="radio"]:checked + .role-card__content,
++.role-card input[type="checkbox"]:checked + .role-card__content {
+   border-color: var(--blue);
+   background: rgba(0, 67, 255, 0.04);
+   box-shadow: 0 0 0 4px rgba(0, 67, 255, 0.08);

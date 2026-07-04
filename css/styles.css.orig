@@ -2436,8 +2436,7 @@ body.lang-es .lang-en { display: none; }
   cursor: pointer;
 }
 
-.role-card input[type="radio"],
-.role-card input[type="checkbox"] {
+.role-card input[type="radio"] {
   position: absolute;
   opacity: 0;
   width: 0;
@@ -2462,8 +2461,7 @@ body.lang-es .lang-en { display: none; }
   border-color: var(--border-light);
 }
 
-.role-card input[type="radio"]:checked + .role-card__content,
-.role-card input[type="checkbox"]:checked + .role-card__content {
+.role-card input[type="radio"]:checked + .role-card__content {
   border-color: var(--blue);
   background: rgba(0, 67, 255, 0.04);
   box-shadow: 0 0 0 4px rgba(0, 67, 255, 0.08);
