@@ -15,7 +15,7 @@ App.router = (function() {
     // Public routes (no auth required)
     'home':           { view: 'view-home',           role: null,      sidebar: false, title: 'Home' },
     'about-spain':    { view: 'view-about-spain',    role: null,      sidebar: false, title: 'About Spain' },
-    'for-realtors':   { view: 'view-for-realtors',   role: null,      sidebar: false, title: 'For Realtors' },
+    'professionals':  { view: 'view-for-realtors',   role: null,      sidebar: false, title: 'For Professionals' },
     'login':          { view: 'view-login',          role: null,      sidebar: false, title: 'Login' },
     'register':       { view: 'view-register',       role: null,      sidebar: false, title: 'Register' },
     'pending':        { view: 'view-pending',        role: null,      sidebar: false, title: 'Application Pending' },
