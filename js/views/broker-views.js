@@ -573,7 +573,7 @@
     initDocuments,
     initFinances,
     showRealtorDetail,
-    closeRealtorDetail,
+    showClientDetail,
     approveRealtor,
     rejectRealtor
   };
