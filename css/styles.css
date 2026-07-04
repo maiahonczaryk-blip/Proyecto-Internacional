@@ -2803,7 +2803,7 @@ body.lang-es .lang-en { display: none; }
   padding: 16px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 12px;
   flex-shrink: 0;
 }
@@ -2858,6 +2858,11 @@ body.lang-es .lang-en { display: none; }
 .sidebar-user__role--realtor {
   background: rgba(16, 185, 129, 0.15);
   color: #34D399;
+}
+
+.sidebar-user__role--agent_inmomas {
+  background: rgba(245, 158, 11, 0.15);
+  color: #FBBF24;
 }
 
 /* Dashboard Main Area */

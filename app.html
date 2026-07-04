@@ -62,19 +62,27 @@
     </nav>
 
     <!-- Sidebar User Info -->
-    <div class="sidebar-user">
-      <div class="sidebar-user__avatar" id="sidebar-user-avatar"></div>
-      <div class="sidebar-user__info">
-        <div class="sidebar-user__name" id="sidebar-user-name">—</div>
-        <div class="sidebar-user__role" id="sidebar-user-role">—</div>
+    <div class="sidebar-user" style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-top: 1px solid rgba(255, 255, 255, 0.06); width: 100%; box-sizing: border-box;">
+      <!-- Row 1: Profile Info & Actions -->
+      <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
+        <div class="sidebar-user__avatar" id="sidebar-user-avatar"></div>
+        <div class="sidebar-user__info" style="flex: 1; min-width: 0;">
+          <div class="sidebar-user__name" id="sidebar-user-name" style="font-size: 0.85rem; font-weight: 600; color: var(--sidebar-text-active); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">—</div>
+          <div class="sidebar-user__role" id="sidebar-user-role">—</div>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
+          <button class="lang-toggle" id="sidebar-lang-toggle" aria-label="Switch language" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 4px; padding: 4px 6px; font-size: 0.7rem; cursor: pointer; transition: all 0.2s;">
+            <span class="lang-label">ES</span>
+          </button>
+          <button class="sidebar-logout-btn" onclick="App.auth.logout().then(() => window.location.href='index.html#home')" title="Logout" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-size: 1.1rem; cursor: pointer; padding: 4px; line-height: 1; transition: color 0.2s;">⏻</button>
+        </div>
       </div>
-      <div style="display: flex; gap: 8px;">
-        <button class="lang-toggle" id="sidebar-lang-toggle" aria-label="Switch language" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer;">
-          <span class="lang-label">ES</span>
-        </button>
-        <button class="sidebar-logout-btn" onclick="App.auth.logout().then(() => window.location.href='index.html#home')" title="Logout">⏻</button>
-      </div>
-      <a href="#profile" style="color: rgba(255,255,255,0.7); font-size: 0.8rem; text-decoration: none; margin-top: 8px; display: inline-block; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s;"><span class="lang-en">👤 My Profile</span><span class="lang-es">👤 Mi Perfil</span></a>
+      
+      <!-- Row 2: Profile Button -->
+      <a href="#profile" style="color: rgba(255,255,255,0.8); font-size: 0.8rem; text-decoration: none; text-align: center; display: block; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.03); transition: all 0.2s; width: 100%; box-sizing: border-box;" onmouseover="this.style.background='rgba(255,255,255,0.08)'; this.style.borderColor='rgba(255,255,255,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.15)';">
+        <span class="lang-en">👤 My Profile</span>
+        <span class="lang-es">👤 Mi Perfil</span>
+      </a>
     </div>
   </aside>
 
