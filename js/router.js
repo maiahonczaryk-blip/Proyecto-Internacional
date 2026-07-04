@@ -19,6 +19,7 @@ App.router = (function() {
     'login':          { view: 'view-login',          role: null,      sidebar: false, title: 'Login' },
     'register':       { view: 'view-register',       role: null,      sidebar: false, title: 'Register' },
     'pending':        { view: 'view-pending',        role: null,      sidebar: false, title: 'Application Pending' },
+    'intake':         { view: 'view-intake',         role: null,      sidebar: false, title: 'VIP Client Intake' },
 
     // Admin routes
     'admin/dashboard': { view: 'view-admin-dashboard', role: 'admin',  sidebar: 'admin', title: 'Admin Dashboard' },
@@ -44,6 +45,14 @@ App.router = (function() {
 
   /* ---- Initialize Router ---- */
   function init() {
+    // Intercept ?ref= code from URL
+    const searchParams = new URLSearchParams(window.location.search);
+    const refCode = searchParams.get('ref');
+    if (refCode) {
+      sessionStorage.setItem('referralCode', refCode);
+      window.history.replaceState({}, document.title, window.location.pathname + '#intake');
+    }
+
     window.addEventListener('hashchange', handleRouteChange);
     
     // Intercept link clicks for SPA navigation
@@ -254,6 +263,7 @@ App.router = (function() {
       'login':             () => App.views.auth && App.views.auth.initLogin(),
       'register':          () => App.views.auth && App.views.auth.initRegister(params),
       'pending':           () => {},
+      'intake':            () => App.views.public && App.views.public.initIntake(),
       'admin/dashboard':   () => App.views.admin && App.views.admin.initDashboard(),
       'admin/users':       () => App.views.admin && App.views.admin.initUsers(),
       'broker/dashboard':  () => App.views.broker && App.views.broker.initDashboard(),

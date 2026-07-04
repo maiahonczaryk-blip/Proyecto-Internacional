@@ -1,0 +1,61 @@
+    <!-- ==================== VIEW: INTAKE (CLIENT PORTAL) ==================== -->
+    <div id="view-intake" class="app-view">
+      <section class="auth-section" style="padding: 100px 24px; min-height: 100vh;">
+        <div class="auth-card auth-card--wide" style="max-width: 600px;">
+          <div class="auth-header">
+            <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás" class="auth-logo">
+            <h2><span class="lang-en">VIP Client Portal</span><span class="lang-es">Portal VIP de Cliente</span></h2>
+            <p id="intake-welcome-msg" style="color: var(--primary);">
+              <span class="lang-en">Welcome! Please fill out the form below to get started.</span>
+              <span class="lang-es">¡Bienvenido! Por favor completa el formulario para comenzar.</span>
+            </p>
+          </div>
+          <form id="intake-form" onsubmit="return false;">
+            <div class="form-row">
+              <div class="form-group"><label><span class="lang-en">First Name</span><span class="lang-es">Nombre</span> *</label><input type="text" id="intake-firstName" required></div>
+              <div class="form-group"><label><span class="lang-en">Last Name</span><span class="lang-es">Apellido</span> *</label><input type="text" id="intake-lastName" required></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label><span class="lang-en">Email</span><span class="lang-es">Correo Electrónico</span> *</label><input type="email" id="intake-email" required></div>
+              <div class="form-group"><label><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></label><input type="tel" id="intake-phone"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label><span class="lang-en">Current Location (City/Country)</span><span class="lang-es">Ubicación Actual (Ciudad/País)</span> *</label><input type="text" id="intake-currentLocation" required></div>
+              <div class="form-group"><label><span class="lang-en">Desired Location in Spain</span><span class="lang-es">Ubicación Deseada en España</span></label>
+                <select id="intake-targetLocation">
+                  <option value="Costa Blanca (Alicante/Benidorm)">Costa Blanca (Alicante/Benidorm)</option>
+                  <option value="Costa del Sol (Malaga/Marbella)">Costa del Sol (Malaga/Marbella)</option>
+                  <option value="Valencia">Valencia</option>
+                  <option value="Madrid">Madrid</option>
+                  <option value="Barcelona">Barcelona</option>
+                  <option value="Undecided">Undecided / Anywhere</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label><span class="lang-en">Services Needed (Select all that apply)</span><span class="lang-es">Servicios Requeridos</span></label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
+                <label class="checkbox-label" style="background: var(--bg-primary); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                  <input type="checkbox" value="Real Estate Purchase" class="intake-service"> <span style="font-size: 0.9rem;">Real Estate Purchase</span>
+                </label>
+                <label class="checkbox-label" style="background: var(--bg-primary); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                  <input type="checkbox" value="Golden Visa / Immigration" class="intake-service"> <span style="font-size: 0.9rem;">Golden Visa / Immigration</span>
+                </label>
+                <label class="checkbox-label" style="background: var(--bg-primary); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                  <input type="checkbox" value="Legal & Taxes" class="intake-service"> <span style="font-size: 0.9rem;">Legal & Taxes</span>
+                </label>
+                <label class="checkbox-label" style="background: var(--bg-primary); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                  <input type="checkbox" value="Financing / Mortgages" class="intake-service"> <span style="font-size: 0.9rem;">Financing / Mortgages</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group" style="margin-top: 24px;">
+              <button type="submit" class="btn btn-primary" style="width: 100%;" id="intake-submit-btn">
+                <span class="lang-en">Submit VIP Profile</span>
+                <span class="lang-es">Enviar Perfil VIP</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
