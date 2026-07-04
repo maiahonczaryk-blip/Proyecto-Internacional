@@ -24,9 +24,9 @@ App.views.auth = {
         submitBtn.disabled = true;
 
         try {
-          const res = await App.auth.login(email, pass);
-          if (res && res.success) {
-            window.location.href = 'app.html#' + res.user.role + '/dashboard';
+          const user = await App.auth.login(email, pass);
+          if (user) {
+            window.location.href = 'app.html#' + user.role + '/dashboard';
           }
         } catch (error) {
           err.textContent = error.message;
