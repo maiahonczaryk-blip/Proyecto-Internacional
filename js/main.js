@@ -220,4 +220,200 @@ document.addEventListener('DOMContentLoaded', () => {
   `;
   document.head.appendChild(style);
 
+  // ── Alicante Carousel ──
+  const carouselContainer = document.querySelector('.carousel-container');
+  const slides = document.querySelectorAll('.carousel-slide');
+  const prevBtn = document.querySelector('.carousel-prev');
+  const nextBtn = document.querySelector('.carousel-next');
+  const dots = document.querySelectorAll('.carousel-dots .dot');
+  
+  if (carouselContainer && slides.length > 0) {
+    let currentIdx = 0;
+    const totalSlides = slides.length;
+    let autoPlayTimer = null;
+    
+    function updateCarousel() {
+      carouselContainer.style.transform = `translateX(-${(currentIdx * 100) / totalSlides}%)`;
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === currentIdx);
+      });
+    }
+    
+    function nextSlide() {
+      currentIdx = (currentIdx + 1) % totalSlides;
+      updateCarousel();
+    }
+    
+    function prevSlide() {
+      currentIdx = (currentIdx - 1 + totalSlides) % totalSlides;
+      updateCarousel();
+    }
+    
+    function startAutoPlay() {
+      stopAutoPlay();
+      autoPlayTimer = setInterval(nextSlide, 5000);
+    }
+    
+    function stopAutoPlay() {
+      if (autoPlayTimer) {
+        clearInterval(autoPlayTimer);
+        autoPlayTimer = null;
+      }
+    }
+    
+    nextBtn?.addEventListener('click', () => {
+      nextSlide();
+      startAutoPlay();
+    });
+    
+    prevBtn?.addEventListener('click', () => {
+      prevSlide();
+      startAutoPlay();
+    });
+    
+    dots.forEach((dot, idx) => {
+      dot.addEventListener('click', () => {
+        currentIdx = idx;
+        updateCarousel();
+        startAutoPlay();
+      });
+    });
+    
+    // Adjust container width for dynamic sizing
+    carouselContainer.style.width = `${totalSlides * 100}%`;
+    
+    startAutoPlay();
+  }
+
+  // ── Buying Process Details Interactivity ──
+  const processSteps = document.querySelectorAll('.process-step');
+  const detailsTitle = document.getElementById('process-details-title');
+  const detailsDesc = document.getElementById('process-details-desc');
+  
+  if (processSteps.length > 0 && detailsTitle && detailsDesc) {
+    let currentStep = 1;
+    
+    const stepDetails = {
+      1: {
+        en: {
+          title: "1. Get Your NIE",
+          desc: "The NIE (Foreigner Identity Number) is essential for buying property, opening bank accounts, or contracting utility services in Spain. Our partner law firm handles the entire application process with the immigration office or consulate, saving you any travel."
+        },
+        es: {
+          title: "1. Obtener NIE",
+          desc: "El NIE (Número de Identidad de Extranjero) es imprescindible para comprar cualquier propiedad, abrir cuentas bancarias o contratar servicios en España. Nuestro despacho asociado se encarga de toda la gestión ante la oficina de extranjería o consulado correspondiente, evitándote desplazamientos."
+        }
+      },
+      2: {
+        en: {
+          title: "2. Open Bank Account",
+          desc: "You will need a Spanish bank account to transfer purchase funds and set up direct debits for future utility bills and taxes. We assist you in opening the account quickly and remotely through our mortgage and banking partners."
+        },
+        es: {
+          title: "2. Abrir Cuenta Bancaria",
+          desc: "Necesitarás una cuenta en un banco español para transferir los fondos de la compra y domiciliar los futuros recibos e impuestos. Te ayudamos a abrir la cuenta de forma rápida y remota a través de nuestro partner hipotecario o bancario."
+        }
+      },
+      3: {
+        en: {
+          title: "3. Define Strategy",
+          desc: "We analyze your goals: whether you want a high-yield investment or a holiday home. We design a plan tailored to your financial and personal profile to optimize tax efficiency and returns."
+        },
+        es: {
+          title: "3. Definir Estrategia",
+          desc: "Analizamos tus objetivos: si buscas una inversión de alta rentabilidad o una residencia vacacional. Diseñamos un plan adaptado a tu perfil financiero y personal para optimizar el retorno y los impuestos."
+        }
+      },
+      4: {
+        en: {
+          title: "4. Property Selection",
+          desc: "We filter the best properties on the Costa Blanca based on your criteria. We access the complete RE/MAX database and off-market listings to ensure you only visit highly qualified options."
+        },
+        es: {
+          title: "4. Selección de Propiedades",
+          desc: "Filtramos las mejores propiedades en la Costa Blanca según tus criterios. Accedemos a la base de datos completa de RE/MAX y a propiedades fuera del mercado (off-market) para garantizar que solo visites opciones altamente cualificadas."
+        }
+      },
+      5: {
+        en: {
+          title: "5. Due Diligence",
+          desc: "A crucial step for a safe purchase. Fuster & Associates performs an exhaustive study of the property's registry status, liens, debts, urban legality, and licenses so you buy with total peace of mind and zero risks."
+        },
+        es: {
+          title: "5. Due Diligence (Estudio Legal)",
+          desc: "Paso crucial para una compra segura. Fuster & Associates realiza un estudio exhaustivo del estado registral de la propiedad, cargas, deudas, legalidad urbanística y licencias para que compres con total tranquilidad y cero riesgos."
+        }
+      },
+      6: {
+        en: {
+          title: "6. Reservation",
+          desc: "Reservation deposit to remove the property from the market and freeze the agreed price. This amount is safely held in escrow and will be deducted from the final purchase price upon signing the deeds."
+        },
+        es: {
+          title: "6. Reserva",
+          desc: "Depósito de reserva para retirar la propiedad del mercado y congelar el precio acordado. Este importe queda custodiado de forma segura y se descontará del precio final de compra en la firma de las escrituras."
+        }
+      },
+      7: {
+        en: {
+          title: "7. Contract",
+          desc: "Signing the Arras Contract (Purchase Agreement) which details all the conditions of the sale and requires a 10% deposit. This contract legally binds both parties and establishes guarantees and completion dates."
+        },
+        es: {
+          title: "7. Contrato de Arras",
+          desc: "Firma del Contrato de Arras (Purchase Contract) donde se detallan todas las condiciones de la compraventa y se abona el 10% del precio total. Este contrato vincula legalmente a ambas partes y establece las garantías y plazos de entrega."
+        }
+      },
+      8: {
+        en: {
+          title: "8. Completion",
+          desc: "The final signing before a Public Notary where the title is transferred and the remaining payment is made. If you cannot travel to Spain, you can grant a Power of Attorney (POA) to our law firm to sign 100% remotely."
+        },
+        es: {
+          title: "8. Escritura Pública",
+          desc: "La firma final ante Notario Público donde se transmite la propiedad y se entrega el resto del pago. Si no puedes viajar a España, puedes delegar un Poder Notarial (POA) a nuestro despacho jurídico para firmar 100% de forma remota."
+        }
+      }
+    };
+    
+    function showDetails(stepNum) {
+      currentStep = stepNum;
+      const lang = document.body.classList.contains('lang-es') ? 'es' : 'en';
+      const details = stepDetails[stepNum][lang];
+      
+      // Update contents
+      detailsTitle.textContent = details.title;
+      detailsDesc.textContent = details.desc;
+      
+      // Add active styling to selected step
+      processSteps.forEach(step => {
+        const stepId = parseInt(step.getAttribute('data-step'));
+        step.classList.toggle('active', stepId === stepNum);
+      });
+    }
+    
+    // Add event listeners to steps
+    processSteps.forEach(step => {
+      const stepNum = parseInt(step.getAttribute('data-step'));
+      step.style.cursor = 'pointer';
+      step.addEventListener('click', () => {
+        showDetails(stepNum);
+      });
+    });
+    
+    // Listen for language changes to refresh details text
+    const langToggles = document.querySelectorAll('.lang-toggle');
+    langToggles.forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        // Use a short delay so body language class gets updated first
+        setTimeout(() => {
+          showDetails(currentStep);
+        }, 50);
+      });
+    });
+    
+    // Initialize step 1 details
+    showDetails(1);
+  }
+
 });
