@@ -41,7 +41,7 @@ for v in files:
     style_match = re.search(r'<style>([\s\S]*?)</style>', content)
     if style_match:
         styles = style_match.group(1)
-        styles = re.sub(r'body\s*{', f"#{v['id']} {{", styles)
+        styles = re.sub(r'body\s*{', f"#{v['id']}.active {{", styles)
         app_html += f"  <style>\n    /* Styles from {v['path']} */\n{styles}\n  </style>\n"
 
 app_html += "</head>\n<body class=\"lang-en\">\n"

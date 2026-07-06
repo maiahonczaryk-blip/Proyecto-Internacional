@@ -39,7 +39,7 @@ for (const view of files) {
   if (styleMatch) {
     let styles = styleMatch[1];
     // Simple scoping: replace body with the view ID, except for dashboard which sets specific fonts etc.
-    styles = styles.replace(/body\s*{/g, `#${view.id} {`);
+    styles = styles.replace(/body\s*{/g, `#${view.id}.active {`);
     appHtml += `  <style>\n    /* Styles from ${view.path} */\n${styles}\n  </style>\n`;
   }
 }
