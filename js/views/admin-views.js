@@ -327,19 +327,69 @@
      ============================================ */
   async function handleApprove(userId) {
     try {
-      await App.auth.updateUserStatus(userId, 'active');
-      App.utils.showToast('User approved successfully!', 'success');
+      // Find the user to approve
+      const user = allUsers.find(u => u.id === userId);
+      if (!user) return;
 
-      // Refresh whichever view is active
-      const route = App.router.getCurrentRoute();
-      if (route === 'admin/dashboard') {
-        await initDashboard();
-      } else if (route === 'admin/users') {
-        await initUsers();
+      App.utils.showModal({
+        title: 'Approve User',
+        body: `
+          <div style="margin-bottom: 1rem;">
+            <p style="margin: 0 0 0.5rem;">Approve <strong>${App.utils.escapeHtml(user.firstName)} ${App.utils.escapeHtml(user.lastName)}</strong> (${App.utils.escapeHtml(user.email)})?</p>
+            <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">Select the user's role before approving.</p>
+          </div>
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="font-weight: 600; font-size: 0.875rem; color: #374151; display: block; margin-bottom: 0.25rem;">User Role</label>
+            <select id="approve-role-select" class="form-control" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background-color: white;">
+              <option value="realtor" ${user.role === 'realtor' ? 'selected' : ''}>Realtor</option>
+              <option value="broker" ${user.role === 'broker' ? 'selected' : ''}>Broker</option>
+            </select>
+          </div>
+        `,
+        footer: `
+          <button class="btn btn-outline btn-sm" id="modal-cancel-btn">Cancel</button>
+          <button class="btn btn-primary btn-sm" id="modal-confirm-approve-btn" style="margin-left: 0.5rem;">Approve & Save</button>
+        `,
+        onClose: () => {}
+      });
+
+      // Bind modal buttons
+      const cancelBtn = document.getElementById('modal-cancel-btn');
+      const confirmBtn = document.getElementById('modal-confirm-approve-btn');
+
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => App.utils.closeModal());
+      }
+
+      if (confirmBtn) {
+        confirmBtn.addEventListener('click', async () => {
+          const selectedRole = document.getElementById('approve-role-select').value;
+          App.utils.closeModal();
+          try {
+            // Update role if changed
+            if (selectedRole !== user.role) {
+              await App.auth.updateUserRole(userId, selectedRole);
+            }
+            // Approve status
+            await App.auth.updateUserStatus(userId, 'active');
+            App.utils.showToast('User approved successfully!', 'success');
+
+            // Refresh view
+            const route = App.router.getCurrentRoute();
+            if (route === 'admin/dashboard') {
+              await initDashboard();
+            } else if (route === 'admin/users') {
+              await initUsers();
+            }
+          } catch (err) {
+            console.error('[Admin] handleApprove error:', err);
+            App.utils.showToast('Error approving user: ' + err.message, 'error');
+          }
+        });
       }
     } catch (err) {
       console.error('[Admin] handleApprove error:', err);
-      App.utils.showToast('Error approving user: ' + err.message, 'error');
+      App.utils.showToast('Error loading approval window.', 'error');
     }
   }
 
@@ -445,9 +495,46 @@
               <div style="color: #6b7280;">${user.agreementSigned ? '✅ Signed' : '❌ Not signed'}</div>
             </div>
           </div>
+          
+          ${user.role !== 'admin' ? `
+          <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1.5rem;">
+            <label style="font-weight: 600; font-size: 0.875rem; color: #374151; display: block; margin-bottom: 0.5rem;">Modify User Role</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <select id="user-role-select" class="form-control" style="flex: 1; padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; background-color: white;">
+                <option value="realtor" ${user.role === 'realtor' ? 'selected' : ''}>Realtor</option>
+                <option value="broker" ${user.role === 'broker' ? 'selected' : ''}>Broker</option>
+              </select>
+              <button class="btn btn-primary btn-sm" id="save-user-role-btn">Update Role</button>
+            </div>
+          </div>
+          ` : ''}
         `,
-        footer: `<button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Close</button>`
+        footer: `<button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Close</button>`,
+        onClose: () => {}
       });
+
+      const saveRoleBtn = document.getElementById('save-user-role-btn');
+      if (saveRoleBtn) {
+        saveRoleBtn.addEventListener('click', async () => {
+          const selectedRole = document.getElementById('user-role-select').value;
+          App.utils.closeModal();
+          try {
+            await App.auth.updateUserRole(userId, selectedRole);
+            App.utils.showToast('User role updated successfully!', 'success');
+            
+            // Refresh
+            const route = App.router.getCurrentRoute();
+            if (route === 'admin/dashboard') {
+              await initDashboard();
+            } else if (route === 'admin/users') {
+              await initUsers();
+            }
+          } catch (err) {
+            console.error('[Admin] Error updating user role:', err);
+            App.utils.showToast('Error updating role: ' + err.message, 'error');
+          }
+        });
+      }
 
     } catch (err) {
       console.error('[Admin] viewUser error:', err);

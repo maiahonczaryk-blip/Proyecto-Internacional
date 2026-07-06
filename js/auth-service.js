@@ -417,6 +417,23 @@ App.auth = (function() {
     }
   }
 
+  async function updateUserRole(userId, newRole) {
+    if (App.demoMode) {
+      const user = App.demoData.users.find(u => u.id === userId);
+      if (!user) throw new Error('User not found.');
+      user.role = newRole;
+      user.updatedAt = new Date().toISOString();
+      saveDemoData();
+      return true;
+    } else {
+      await App.db.collection('users').doc(userId).update({
+        role: newRole,
+        updatedAt: new Date().toISOString()
+      });
+      return true;
+    }
+  }
+
   async function updateProfile(data) {
     const user = currentUser;
     if (!user) throw new Error('No user is currently logged in.');
@@ -778,6 +795,7 @@ App.auth = (function() {
     hasRole,
     requireAuth,
     updateUserStatus,
+    updateUserRole,
     updateProfile,
     getAllUsers,
     getUser,
