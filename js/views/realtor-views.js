@@ -47,16 +47,37 @@
       setTextById('realtor-stat-commissions', App.utils.formatCurrency(totalRealtorComm));
 
       // Referral link
-      const referralLink = App.utils.generateReferralLink(currentUser.referralCode || 'REA-DEFAULT');
+      const isPending = currentUser.status === 'pending';
+      const referralLink = isPending ? '' : App.utils.generateReferralLink(currentUser.referralCode || 'REA-DEFAULT');
       const linkInput = document.getElementById('realtor-dash-referral-link');
       if (linkInput) {
-        linkInput.value = referralLink;
+        if (isPending) {
+          linkInput.value = 'Enlace pendiente de aprobación por el Administrador';
+          linkInput.disabled = true;
+          linkInput.style.color = '#9ca3af';
+          linkInput.style.fontStyle = 'italic';
+        } else {
+          linkInput.value = referralLink;
+          linkInput.disabled = false;
+          linkInput.style.color = '';
+          linkInput.style.fontStyle = '';
+        }
       }
 
       // Copy button handler
       const copyBtn = document.getElementById('realtor-dash-copy-link');
       if (copyBtn) {
-        copyBtn.onclick = () => App.utils.copyToClipboard(referralLink);
+        if (isPending) {
+          copyBtn.disabled = true;
+          copyBtn.style.opacity = '0.5';
+          copyBtn.style.cursor = 'not-allowed';
+          copyBtn.onclick = null;
+        } else {
+          copyBtn.disabled = false;
+          copyBtn.style.opacity = '';
+          copyBtn.style.cursor = '';
+          copyBtn.onclick = () => App.utils.copyToClipboard(referralLink);
+        }
       }
 
       // Mini pipeline summary
@@ -259,18 +280,39 @@
 
       realtorClients = await App.auth.getClients({ referredBy: currentUser.id });
 
-      const referralLink = App.utils.generateReferralLink(currentUser.referralCode || 'REA-DEFAULT');
+      const isPending = currentUser.status === 'pending';
+      const referralLink = isPending ? '' : App.utils.generateReferralLink(currentUser.referralCode || 'REA-DEFAULT');
 
       // Display referral link
       const linkDisplay = document.getElementById('realtor-referral-link-display');
       if (linkDisplay) {
-        linkDisplay.value = referralLink;
+        if (isPending) {
+          linkDisplay.value = 'Enlace pendiente de aprobación por el Administrador';
+          linkDisplay.disabled = true;
+          linkDisplay.style.color = '#9ca3af';
+          linkDisplay.style.fontStyle = 'italic';
+        } else {
+          linkDisplay.value = referralLink;
+          linkDisplay.disabled = false;
+          linkDisplay.style.color = '';
+          linkDisplay.style.fontStyle = '';
+        }
       }
 
       // Copy button
       const copyBtn = document.getElementById('realtor-copy-referral-btn');
       if (copyBtn) {
-        copyBtn.onclick = () => App.utils.copyToClipboard(referralLink);
+        if (isPending) {
+          copyBtn.disabled = true;
+          copyBtn.style.opacity = '0.5';
+          copyBtn.style.cursor = 'not-allowed';
+          copyBtn.onclick = null;
+        } else {
+          copyBtn.disabled = false;
+          copyBtn.style.opacity = '';
+          copyBtn.style.cursor = '';
+          copyBtn.onclick = () => App.utils.copyToClipboard(referralLink);
+        }
       }
 
       // Referral stats
@@ -287,18 +329,30 @@
       // QR Code placeholder
       const qrContainer = document.getElementById('referral-qr-code');
       if (qrContainer) {
-        qrContainer.innerHTML = `
-          <div style="border: 2px dashed #d1d5db; border-radius: 0.75rem; padding: 2rem; text-align: center; background: #f9fafb;">
-            <div style="font-size: 3rem; margin-bottom: 0.75rem;">📱</div>
-            <div style="font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">QR Code</div>
-            <div style="font-size: 0.75rem; color: #6b7280; word-break: break-all; padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 0.375rem;">
-              ${App.utils.escapeHtml(referralLink)}
+        if (isPending) {
+          qrContainer.innerHTML = `
+            <div style="border: 2px dashed #e5e7eb; border-radius: 0.75rem; padding: 2rem; text-align: center; background: #f9fafb; opacity: 0.6;">
+              <div style="font-size: 3rem; margin-bottom: 0.75rem; filter: grayscale(1);">📱</div>
+              <div style="font-size: 0.85rem; font-weight: 600; color: #9ca3af; margin-bottom: 0.5rem;">Código QR no disponible</div>
+              <p style="font-size: 0.75rem; color: #9ca3af; margin: 0;">
+                Se generará automáticamente cuando tu cuenta sea aprobada por el Administrador.
+              </p>
             </div>
-            <p style="font-size: 0.75rem; color: #9ca3af; margin: 0.75rem 0 0;">
-              QR code generation can be integrated with a library like <strong>qrcode.js</strong>
-            </p>
-          </div>
-        `;
+          `;
+        } else {
+          qrContainer.innerHTML = `
+            <div style="border: 2px dashed #d1d5db; border-radius: 0.75rem; padding: 2rem; text-align: center; background: #f9fafb;">
+              <div style="font-size: 3rem; margin-bottom: 0.75rem;">📱</div>
+              <div style="font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">QR Code</div>
+              <div style="font-size: 0.75rem; color: #6b7280; word-break: break-all; padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 0.375rem;">
+                ${App.utils.escapeHtml(referralLink)}
+              </div>
+              <p style="font-size: 0.75rem; color: #9ca3af; margin: 0.75rem 0 0;">
+                QR code generation can be integrated with a library like <strong>qrcode.js</strong>
+              </p>
+            </div>
+          `;
+        }
       }
 
       // Marketing tips

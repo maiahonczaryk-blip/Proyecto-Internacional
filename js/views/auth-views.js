@@ -527,12 +527,8 @@ App.views.auth = {
         try {
           const res = await App.auth.register(data);
           if (res && res.success) {
-            if (res.user.status === 'active') {
-              window.location.href = 'app.html#' + res.user.role + '/dashboard';
-            } else {
-              alert("Registration successful! Please wait for admin approval before logging in.");
-              App.router.navigateTo('login');
-            }
+            App.utils.showToast('Registration successful! Redirecting... 🎉', 'success');
+            window.location.href = 'app.html#' + res.user.role + '/dashboard';
           }
         } catch (err) {
           alert(err.message);
@@ -556,10 +552,6 @@ App.views.auth = {
 
           const firstName = newForm.querySelector('#register-firstName').value;
           const lastName = newForm.querySelector('#register-lastName').value;
-          if (!firstName || !lastName) {
-            App.utils.showToast('First name and last name are required.', 'error');
-            return;
-          }
 
           const data = {
             role: roleRadio.value,
@@ -574,13 +566,8 @@ App.views.auth = {
           try {
             const res = await App.auth.registerWithGoogle(data);
             if (res && res.success) {
-              if (res.user.status === 'active') {
-                App.utils.showToast('Registration successful! Logging in... 🎉', 'success');
-                window.location.href = 'app.html#' + res.user.role + '/dashboard';
-              } else {
-                alert("Registration successful! Please wait for approval before logging in.");
-                App.router.navigateTo('login');
-              }
+              App.utils.showToast('Registration successful! Redirecting... 🎉', 'success');
+              window.location.href = 'app.html#' + res.user.role + '/dashboard';
             }
           } catch (err) {
             App.utils.showToast(err.message, 'error');

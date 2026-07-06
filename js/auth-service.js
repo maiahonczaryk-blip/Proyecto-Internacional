@@ -60,7 +60,7 @@ App.auth = (function() {
             currentUser = JSON.parse(saved);
             // Verify user still exists in demo data
             const exists = App.demoData.users.find(u => u.id === currentUser.id);
-            if (!exists || exists.status !== 'active') {
+            if (!exists || exists.status === 'rejected') {
               currentUser = null;
               localStorage.removeItem(SESSION_KEY);
             }
@@ -146,7 +146,7 @@ App.auth = (function() {
       App.demoData.users.push(newUser);
       saveDemoData();
       
-      if (newUser.status === 'active') {
+      if (newUser.status === 'active' || newUser.status === 'pending') {
         currentUser = { ...newUser };
         delete currentUser.password;
         localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
@@ -180,9 +180,9 @@ App.auth = (function() {
 
       await App.db.collection('users').doc(uid).set(userData);
       
-      // Sign out immediately (pending approval)
-      await App.firebaseAuth.signOut();
-      return { success: true, user: { id: uid, ...userData } };
+      currentUser = { id: uid, ...userData };
+      notifyAuthChange();
+      return { success: true, user: currentUser };
     }
   }
 
@@ -199,10 +199,6 @@ App.auth = (function() {
 
       if (!user) {
         throw new Error('Invalid email or password.');
-      }
-
-      if (user.status === 'pending') {
-        throw new Error('PENDING');
       }
 
       if (user.status === 'rejected') {
@@ -225,11 +221,6 @@ App.auth = (function() {
       }
 
       const userData = doc.data();
-
-      if (userData.status === 'pending') {
-        await App.firebaseAuth.signOut();
-        throw new Error('PENDING');
-      }
 
       if (userData.status === 'rejected') {
         await App.firebaseAuth.signOut();
@@ -275,11 +266,6 @@ App.auth = (function() {
 
       const userData = doc.data();
 
-      if (userData.status === 'pending') {
-        await App.firebaseAuth.signOut();
-        throw new Error('PENDING');
-      }
-
       if (userData.status === 'rejected') {
         await App.firebaseAuth.signOut();
         throw new Error('Your application has been rejected. Please contact support.');
@@ -295,8 +281,8 @@ App.auth = (function() {
   async function registerWithGoogle(data) {
     const { role, firstName, lastName, agencyName, phone, country, brokerId } = data;
 
-    if (!role || !firstName || !lastName) {
-      throw new Error('Please fill in all required fields.');
+    if (!role) {
+      throw new Error('Please select a role (Broker or Realtor).');
     }
 
     if (!['broker', 'realtor'].includes(role)) {
@@ -304,20 +290,22 @@ App.auth = (function() {
     }
 
     if (App.demoMode) {
-      const mockEmail = (firstName + '.' + lastName + '@gmail.com').toLowerCase();
+      const mockFirstName = firstName || 'Google';
+      const mockLastName = lastName || 'User';
+      const mockEmail = (mockFirstName + '.' + mockLastName + '@gmail.com').toLowerCase();
       const newUser = {
         id: role.substring(0, 3) + '-' + Date.now(),
         email: mockEmail,
         role,
         status: 'pending',
         brokerStatus: role === 'realtor' && brokerId ? 'pending' : null,
-        firstName,
-        lastName,
+        firstName: mockFirstName,
+        lastName: mockLastName,
         agencyName: agencyName || '',
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
-        referralCode: `${role === 'broker' ? 'BRK' : 'REA'}-${lastName.toUpperCase()}`,
+        referralCode: `${role === 'broker' ? 'BRK' : 'REA'}-${mockLastName.toUpperCase()}`,
         profileImage: null,
         agreementSigned: false,
         agreementSignedAt: null,
@@ -327,11 +315,9 @@ App.auth = (function() {
       App.demoData.users.push(newUser);
       saveDemoData();
 
-      if (newUser.status === 'active') {
-        currentUser = { ...newUser };
-        localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
-        notifyAuthChange();
-      }
+      currentUser = { ...newUser };
+      localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
+      notifyAuthChange();
 
       return { success: true, user: newUser };
     } else {
@@ -345,18 +331,27 @@ App.auth = (function() {
         throw new Error('This Google account is already registered. Please login instead.');
       }
 
+      // If first/last name were not provided in form, extract them from Google display name
+      let finalFirstName = firstName;
+      let finalLastName = lastName;
+      if (!finalFirstName || !finalLastName) {
+        const nameParts = (firebaseUser.displayName || '').split(' ');
+        if (!finalFirstName) finalFirstName = nameParts[0] || '';
+        if (!finalLastName) finalLastName = nameParts.slice(1).join(' ') || '';
+      }
+
       const userData = {
         email: firebaseUser.email.toLowerCase(),
         role,
         status: 'pending',
         brokerStatus: role === 'realtor' && brokerId ? 'pending' : null,
-        firstName,
-        lastName,
+        firstName: finalFirstName,
+        lastName: finalLastName,
         agencyName: agencyName || '',
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
-        referralCode: `${role === 'broker' ? 'BRK' : 'REA'}-${lastName.toUpperCase()}-${uid.substring(0, 4)}`,
+        referralCode: `${role === 'broker' ? 'BRK' : 'REA'}-${(finalLastName || 'USER').toUpperCase()}-${uid.substring(0, 4)}`,
         profileImage: firebaseUser.photoURL || null,
         agreementSigned: false,
         agreementSignedAt: null,
@@ -366,14 +361,10 @@ App.auth = (function() {
 
       await App.db.collection('users').doc(uid).set(userData);
 
-      if (userData.status === 'pending') {
-        await App.firebaseAuth.signOut();
-      } else {
-        currentUser = { id: uid, ...userData };
-        notifyAuthChange();
-      }
+      currentUser = { id: uid, ...userData };
+      notifyAuthChange();
 
-      return { success: true, user: { id: uid, ...userData } };
+      return { success: true, user: currentUser };
     }
   }
 
