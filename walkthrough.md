@@ -9,14 +9,15 @@ He corregido con éxito el bucle de redirección que expulsaba a los usuarios de
 1. **Conflicto de Sesiones**: El nuevo SPA guarda la sesión activa en `remax_session`, mientras que las vistas heredadas (`dashboard.html`) buscaban el usuario en `remax_current_user`.
 2. **Ejecución Global en el SPA**: Al compilarse, el script de carga de `dashboard.html` se inyectaba en `app.html` y corría de forma global en cada carga de página. Al no encontrar la clave heredada `remax_current_user`, ejecutaba una redirección forzada a `partner-login.html`.
 3. **Página de Login Antigua**: Al iniciar sesión en el login antiguo, se redirigía al usuario a `dashboard.html` (estático e independiente), sacándolo de la aplicación SPA unificada.
+4. **Clean URLs en Vercel**: Las rutas en Vercel se sirven sin la extensión `.html` (p. ej. `/app` y `/dashboard` en lugar de `/app.html` y `/dashboard.html`). Esto provocaba que las comprobaciones estrictas de ruta como `.endsWith('.html')` fallaran en producción, impidiendo la redirección y dejando el panel en blanco o bloqueando la carga de scripts de inicio de sesión.
 
 ---
 
 ## Solución Aplicada
 
 ### 1. Aislamiento de Ejecución en `dashboard.html` y `js/auth.js`
-* Se añadió una condición de ruta (`window.location.pathname.endsWith('dashboard.html')`) en la función `loadPartnerDashboard()` y en el listener de inicio `DOMContentLoaded` de `dashboard.html`.
-* De este modo, los scripts de la página estática antigua se apagan automáticamente si se ejecutan dentro del SPA (`app.html` o `index.html`), permitiendo que el router SPA de `router.js` controle y cargue el dashboard correctamente.
+* Se añadió una condición de ruta flexible (`window.location.pathname.includes('dashboard')`) en la función `loadPartnerDashboard()` y en el listener de inicio `DOMContentLoaded` de `dashboard.html`.
+* De este modo, los scripts de la página estática antigua se apagan automáticamente si se ejecutan dentro del SPA (comprobando `!window.location.pathname.includes('app')`), permitiendo que el router SPA de `router.js` controle y cargue el dashboard correctamente, tanto localmente como en Vercel.
 
 ### 2. Redirección Inteligente de Enlaces Antiguos al SPA
 * **partner-login.html**: Si algún usuario o enlace externo intenta acceder a la URL directa del login antiguo, el navegador lo redirige limpiamente al login de la SPA (`index.html#login`).
