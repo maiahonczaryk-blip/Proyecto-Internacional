@@ -22,7 +22,7 @@ App.router = (function() {
     'intake':         { view: 'view-intake',         role: null,      sidebar: false, title: 'VIP Client Intake' },
 
     // Profile route
-    'profile':        { view: 'view-profile',        role: null,      sidebar: null,  title: 'My Profile' },
+    'profile':        { view: 'view-profile',        role: 'authenticated', sidebar: 'user',  title: 'My Profile' },
 
     // Admin routes
     'admin/dashboard': { view: 'view-admin-dashboard', role: 'admin',  sidebar: 'admin', title: 'Admin Dashboard' },
@@ -146,7 +146,7 @@ App.router = (function() {
         window.location.href = 'index.html#login';
         return;
       }
-      if (user.role !== route.role) {
+      if (route.role !== 'authenticated' && user.role !== route.role) {
         // Redirect to appropriate dashboard
         navigateTo(user.role + '/dashboard', true);
         return;
@@ -199,17 +199,22 @@ App.router = (function() {
     
     if (!sidebar || !appMain) return;
 
-    if (sidebarType) {
+    const user = App.auth.getCurrentUser();
+    let resolvedSidebar = sidebarType;
+    if (sidebarType === 'user' && user) {
+      resolvedSidebar = user.role;
+    }
+
+    if (resolvedSidebar) {
       sidebar.classList.add('active');
       appMain.classList.add('has-sidebar');
 
       // Show correct sidebar nav for role
       document.querySelectorAll('.sidebar-nav-group').forEach(g => g.style.display = 'none');
-      const roleNav = document.getElementById(`sidebar-${sidebarType}`);
+      const roleNav = document.getElementById(`sidebar-${resolvedSidebar}`);
       if (roleNav) roleNav.style.display = 'block';
 
       // Update sidebar user info
-      const user = App.auth.getCurrentUser();
       if (user) {
         const nameEl = document.getElementById('sidebar-user-name');
         const roleEl = document.getElementById('sidebar-user-role');
@@ -220,7 +225,17 @@ App.router = (function() {
           roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
           roleEl.className = `sidebar-user__role sidebar-user__role--${user.role}`;
         }
-        if (avatarEl) avatarEl.innerHTML = App.utils.getInitials(user.firstName, user.lastName);
+        if (avatarEl) {
+          if (user.profileImage) {
+            avatarEl.innerHTML = '';
+            avatarEl.style.backgroundImage = `url(${user.profileImage})`;
+            avatarEl.style.backgroundSize = 'cover';
+            avatarEl.style.backgroundPosition = 'center';
+          } else {
+            avatarEl.style.backgroundImage = 'none';
+            avatarEl.innerHTML = App.utils.getInitials(user.firstName, user.lastName);
+          }
+        }
         
         sidebar.classList.remove('sidebar--admin', 'sidebar--broker', 'sidebar--realtor', 'sidebar--agent_inmomas');
         sidebar.classList.add(`sidebar--${user.role}`);
