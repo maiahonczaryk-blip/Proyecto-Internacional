@@ -69,6 +69,17 @@ for v in files:
     app_html += f"\n  </div>\n"
 
 app_html += """
+  <!-- Core Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth-service.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/views/public-views.js"></script>
+  <script src="js/views/auth-views.js"></script>
+  <script src="js/views/admin-views.js"></script>
+  <script src="js/views/broker-views.js"></script>
+  <script src="js/views/realtor-views.js"></script>
+  <script src="js/views/agent-views.js"></script>
   <script src="js/main.js"></script>
   <script>
     // --- SPA Router Logic ---

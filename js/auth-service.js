@@ -13,9 +13,38 @@ App.auth = (function() {
   let currentUser = null;
   let authChangeCallbacks = [];
 
+  /* ---- Helper functions for Demo Mode persistence ---- */
+  function loadDemoData() {
+    if (!App.demoMode) return;
+    const savedUsers = localStorage.getItem('remax_demo_users');
+    if (savedUsers) App.demoData.users = JSON.parse(savedUsers);
+    const savedClients = localStorage.getItem('remax_demo_clients');
+    if (savedClients) App.demoData.clients = JSON.parse(savedClients);
+    const savedCommissions = localStorage.getItem('remax_demo_commissions');
+    if (savedCommissions) App.demoData.commissions = JSON.parse(savedCommissions);
+  }
+
+  function saveDemoData() {
+    if (!App.demoMode) return;
+    localStorage.setItem('remax_demo_users', JSON.stringify(App.demoData.users));
+    localStorage.setItem('remax_demo_clients', JSON.stringify(App.demoData.clients));
+    localStorage.setItem('remax_demo_commissions', JSON.stringify(App.demoData.commissions));
+    if (currentUser) {
+      // Find the updated user in demoData to ensure the session gets the latest fields (e.g. agreementSigned, status)
+      const updatedUser = App.demoData.users.find(u => u.id === currentUser.id);
+      if (updatedUser) {
+        currentUser = { ...updatedUser };
+        delete currentUser.password;
+      }
+      localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
+    }
+  }
+
   /* ---- Initialize ---- */
   function init() {
     if (App.demoMode) {
+      loadDemoData();
+      
       // Restore session from localStorage
       const saved = localStorage.getItem(SESSION_KEY);
       if (saved) {
@@ -95,6 +124,7 @@ App.auth = (function() {
       };
 
       App.demoData.users.push(newUser);
+      saveDemoData();
       
       if (newUser.status === 'active') {
         currentUser = { ...newUser };
@@ -231,6 +261,7 @@ App.auth = (function() {
       if (!user) throw new Error('User not found.');
       user.status = newStatus;
       user.updatedAt = new Date().toISOString();
+      saveDemoData();
       return true;
     } else {
       await App.db.collection('users').doc(userId).update({
@@ -325,6 +356,7 @@ App.auth = (function() {
           comm.closingDate = null;
         }
       }
+      saveDemoData();
       return true;
     } else {
       const clientRef = App.db.collection('clients').doc(clientId);
@@ -406,6 +438,7 @@ App.auth = (function() {
         comm.status = 'projected';
         comm.closingDate = null;
       }
+      saveDemoData();
       return true;
     } else {
       const clientRef = App.db.collection('clients').doc(clientId);
@@ -492,6 +525,7 @@ App.auth = (function() {
       client.localAgentId = agentId;
       client.localAgentName = agentName;
       client.updatedAt = new Date().toISOString();
+      saveDemoData();
       return true;
     } else {
       const clientRef = App.db.collection('clients').doc(clientId);
@@ -534,6 +568,7 @@ App.auth = (function() {
     saveClientFinancials,
     getCommissions,
     onAuthChange,
-    resetPassword
+    resetPassword,
+    saveDemoData
   };
 })();

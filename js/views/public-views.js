@@ -54,6 +54,9 @@ App.views.public = {
         // Save to demoData
         if (!App.demoData.clients) App.demoData.clients = [];
         App.demoData.clients.push(clientData);
+        if (App.auth && typeof App.auth.saveDemoData === 'function') {
+          App.auth.saveDemoData();
+        }
 
         // Success message
         alert("Your profile has been submitted successfully! We will contact you shortly.");

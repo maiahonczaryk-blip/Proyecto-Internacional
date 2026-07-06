@@ -478,6 +478,10 @@
             // Update the cached currentUser too
             currentUser.agreementSigned = true;
             currentUser.agreementSignedAt = new Date().toISOString();
+            
+            if (App.auth && typeof App.auth.saveDemoData === 'function') {
+              App.auth.saveDemoData();
+            }
           } else {
             await App.db.collection('users').doc(currentUser.id).update({
               agreementSigned: true,
