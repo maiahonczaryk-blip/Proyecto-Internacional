@@ -422,163 +422,100 @@ document.addEventListener('DOMContentLoaded', () => {
   const propertyDetails = {
     investment: {
       title: {
-        en: "New Build Apartment · Sea Views & Pool",
-        es: "Apartamento de Obra Nueva · Vistas al Mar y Piscina"
+        en: "Investment Apartment · Guaranteed Yield",
+        es: "Piso de Inversión · Rentabilidad Asegurada"
       },
-      location: "📍 Arenales del Sol, Elche",
-      price: "245.000 €",
-      yield: "7.2%",
+      location: "📍 Carolinas Altas, Alicante",
+      price: "165.000 €",
+      yield: "6.8%",
       income: {
-        en: "Est. Rental Income: <strong>18.000 €/yr</strong>",
-        es: "Renta de Alquiler Est.: <strong>18.000 €/año</strong>"
+        en: "Est. Rental Income: <strong>11.200 €/yr</strong>",
+        es: "Renta de Alquiler Est.: <strong>11.200 €/año</strong>"
       },
       features: {
-        en: ["2 Bed", "2 Bath", "75m²"],
-        es: ["2 Dorm.", "2 Baños", "75m²"]
+        en: ["4 Bed", "2 Bath", "112m²"],
+        es: ["4 Dorm.", "2 Baños", "112m²"]
       },
       image: "images/investment.png",
-      tag: { en: "New Build", es: "Obra Nueva" },
+      tag: { en: "Investment", es: "Inversión" },
       tagClass: "investment",
       description: {
-        en: "Modern and bright apartment located in the sought-after area of Arenales del Sol. Features spectacular panoramic views of the Mediterranean Sea, a large private balcony, access to a communal pool, landscaped gardens, and a private parking space. Ideal for high-yield vacation rental investment.",
-        es: "Moderno y luminoso apartamento ubicado en la codiciada zona de Arenales del Sol. Cuenta con espectaculares vistas panorámicas al mar Mediterráneo, un gran balcón privado, acceso a piscina comunitaria, zonas ajardinadas y plaza de garaje privada. Ideal para inversión en alquiler vacacional de alta rentabilidad."
+        en: "Excellent investment opportunity! Apartment sold rented with guaranteed profitability from day one in Carolinas Altas, Alicante.",
+        es: "¡Excelente Oportunidad de Inversión! Piso alquilado con Rentabilidad Asegurada desde el Primer Día en Carolinas Altas."
       },
       specs: {
-        en: ["Sea Views", "Communal Pool", "Private Parking", "Air Conditioning", "Large Balcony", "Walk to Beach"],
-        es: ["Vistas al Mar", "Piscina Comunitaria", "Garaje Privado", "Aire Acondicionado", "Gran Balcón", "A pie de playa"]
+        en: ["Rented Property", "High Yield", "Renovated Kitchen", "4 Bedrooms", "Excellent Location", "Guaranteed Income"],
+        es: ["Propiedad Alquilada", "Alta Rentabilidad", "Cocina Reformada", "4 Dormitorios", "Excelente Ubicación", "Ingresos Garantizados"]
       },
-      link: "https://www.remaxinmomas.es/propiedades/"
+      link: "https://www.remaxinmomas.es/propiedad/excelente-oportunidad-de-inversion-piso-alquilado-con-rentabilidad-asegurada-desde-el-primer-dia-en-carolinas-altas/"
     },
     lifestyle: {
       title: {
-        en: "Luxury Apartment · Large Terrace",
-        es: "Piso Exclusivo · Gran Terraza"
+        en: "Exclusive Ground Floor · Sea Views",
+        es: "Exclusiva Planta Baja · Vistas al Mar"
       },
-      location: "📍 Alicante Centro",
-      price: "320.000 €",
-      yield: "5.8%",
+      location: "📍 Santa Pola, Costa Blanca",
+      price: "365.000 €",
+      yield: "5.5%",
       income: {
-        en: "Est. Rental Income: <strong>21.000 €/yr</strong>",
-        es: "Renta de Alquiler Est.: <strong>21.000 €/año</strong>"
+        en: "Est. Rental Income: <strong>20.000 €/yr</strong>",
+        es: "Renta de Alquiler Est.: <strong>20.000 €/año</strong>"
       },
       features: {
-        en: ["3 Bed", "2 Bath", "110m²"],
-        es: ["3 Dorm.", "2 Baños", "110m²"]
+        en: ["3 Bed", "2 Bath", "101m²"],
+        es: ["3 Dorm.", "2 Baños", "101m²"]
       },
       image: "images/lifestyle-mediterranean.png",
       tag: { en: "Lifestyle", es: "Estilo de Vida" },
       tagClass: "lifestyle",
       description: {
-        en: "Elegant luxury apartment in the heart of Alicante. Completely renovated with premium finishes, featuring a spectacular 30m² terrace perfect for outdoor dining. Surrounded by high-end shopping, gourmet restaurants, and historic monuments, only a short walk from the marina and Postiguet Beach.",
-        es: "Elegante piso de lujo en el pleno centro de Alicante. Totalmente reformado con acabados de primera calidad, destaca su espectacular terraza de 30m² ideal para cenas al aire libre. Rodeado de tiendas exclusivas, restaurantes gourmet y monumentos históricos, a pocos pasos del puerto deportivo y la playa del Postiguet."
+        en: "Exclusive ground floor apartment with a large terrace and sea views in a luxury residential complex.",
+        es: "¡Exclusiva Planta Baja con Gran Terraza y Vistas al Mar en Residencial de Lujo!"
       },
       specs: {
-        en: ["30m² Terrace", "Premium Refurbishment", "Elevator", "Central Heating", "City Center Location", "Fully Furnished Kitchen"],
-        es: ["Terraza de 30m²", "Reforma de Calidad", "Ascensor", "Calefacción Central", "Ubicación Premium", "Cocina Equipada"]
+        en: ["Large Terrace", "Sea Views", "Luxury Residential Complex", "3 Bedrooms", "Close to Beach", "Bright Spaces"],
+        es: ["Gran Terraza", "Vistas al Mar", "Residencial de Lujo", "3 Dormitorios", "Cerca de la Playa", "Espacios Luminosos"]
       },
-      link: "https://www.remaxinmomas.es/propiedades/"
+      link: "https://www.remaxinmomas.es/propiedad/exclusiva-planta-baja-con-gran-terraza-y-vistas-al-mar-en-residencial-de-lujo/"
     },
     luxury: {
       title: {
-        en: "New Build Villa · Infinity Pool",
-        es: "Chalet Moderno de Obra Nueva · Piscina Infinity"
+        en: "Spectacular Private Villa · Pool & Views",
+        es: "Espectacular Villa Independiente · Piscina y Vistas"
       },
-      location: "📍 Jávea, Costa Blanca",
-      price: "695.000 €",
-      yield: "6.5%",
+      location: "📍 Benidorm, Costa Blanca",
+      price: "1.264.000 €",
+      yield: "6.2%",
       income: {
-        en: "Est. Premium Income: <strong>45.000 €/yr</strong>",
-        es: "Renta Premium Est.: <strong>45.000 €/año</strong>"
+        en: "Est. Premium Income: <strong>78.000 €/yr</strong>",
+        es: "Renta Premium Est.: <strong>78.000 €/año</strong>"
       },
       features: {
-        en: ["3 Bed", "3 Bath", "180m²"],
-        es: ["3 Dorm.", "3 Baños", "180m²"]
+        en: ["4 Bed", "2 Bath", "320m²"],
+        es: ["4 Dorm.", "2 Baños", "320m²"]
       },
       image: "images/villa-luxury.png",
-      tag: { en: "New Build", es: "Obra Nueva" },
+      tag: { en: "Luxury", es: "Lujo" },
       tagClass: "luxury",
       description: {
-        en: "Stunning contemporary villa in one of Jávea's most exclusive residential areas. Designed with passive solar architecture and large floor-to-ceiling glass windows. Features a private infinity pool overlooking the bay, landscaped Mediterranean garden, state-of-the-art kitchen, and full home automation.",
-        es: "Espectacular chalet contemporáneo en una de las zonas residenciales más exclusivas de Jávea. Diseñado con arquitectura solar pasiva y grandes ventanales de cristal. Cuenta con piscina infinity privada con vistas a la bahía, jardín mediterráneo, cocina de última generación y domótica completa."
+        en: "Spectacular detached villa in Benidorm with private pool and mountain views.",
+        es: "¡Espectacular villa independiente en Benidorm con piscina privada y vistas a la montaña!"
       },
       specs: {
-        en: ["Infinity Pool", "Sea & Mountain Views", "Home Automation", "Underfloor Heating", "Energy Efficiency A", "Barbecue Area"],
-        es: ["Piscina Infinity", "Vistas al Mar y Montaña", "Domótica Completa", "Suelo Radiante", "Eficiencia Energética A", "Zona de Barbacoa"]
+        en: ["Private Pool", "Mountain Views", "Detached Villa", "Large Plot", "Premium Finishings", "Quiet Location"],
+        es: ["Piscina Privada", "Vistas a la Montaña", "Villa Independiente", "Gran Parcela", "Acabados de Primera", "Zona Tranquila"]
       },
-      link: "https://www.remaxinmomas.es/propiedades/"
+      link: "https://www.remaxinmomas.es/propiedad/espectacular-villa-independiente-en-benidorm-con-piscina-privada-y-vistas-a-la-montana/"
     }
   };
 
   propertyCards.forEach(card => {
     card.addEventListener('click', (e) => {
-      e.preventDefault();
       const propId = card.getAttribute('data-property');
       const details = propertyDetails[propId];
-      if (!details) return;
-
-      const lang = document.body.classList.contains('lang-es') ? 'es' : 'en';
-
-      const featuresHTML = details.features[lang].map(f => `<span>${f}</span>`).join('');
-      const specsHTML = details.specs[lang].map(s => `<li>${s}</li>`).join('');
-
-      const bodyHTML = `
-        <button class="modal-close" id="property-modal-close-btn" style="position: absolute; top: 16px; right: 16px; z-index: 100;">&times;</button>
-        <div class="property-detail-grid">
-          <div class="property-detail-img-col">
-            <img src="${details.image}" alt="${details.title[lang]}">
-          </div>
-          <div class="property-detail-info-col">
-            <div class="property-detail-tag ${details.tagClass}">${details.tag[lang]}</div>
-            <h2 class="property-detail-title">${details.title[lang]}</h2>
-            <div class="property-detail-location">${details.location}</div>
-            
-            <div class="property-detail-price-row">
-              <div class="property-detail-price">${details.price}</div>
-              <div class="property-detail-yield">Yield: ${details.yield}</div>
-            </div>
-            
-            <div class="property-detail-features-row">
-              ${featuresHTML}
-            </div>
-
-            <div class="property-detail-description">
-              <h4>${lang === 'en' ? 'About this Property' : 'Sobre esta Propiedad'}</h4>
-              <p>${details.description[lang]}</p>
-            </div>
-
-            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 24px; padding: 12px; background: rgba(16, 185, 129, 0.08); border-radius: var(--radius-sm);">
-              ${details.income[lang]}
-            </div>
-
-            <div class="property-detail-specs">
-              <h4>${lang === 'en' ? 'Key Characteristics' : 'Características Clave'}</h4>
-              <ul class="property-detail-specs-list">
-                ${specsHTML}
-              </ul>
-            </div>
-
-            <div class="property-detail-actions">
-              <a href="${details.link}" target="_blank" class="btn btn-blue" style="width: 100%; text-align: center;">
-                <span>${lang === 'en' ? 'View details on REMAX Inmomás' : 'Ver detalles en REMAX Inmomás'}</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      `;
-
-      if (App && App.utils && App.utils.showModal) {
-        const modalInstance = App.utils.showModal({
-          title: '',
-          body: bodyHTML,
-          className: 'modal--property'
-        });
-
-        const customCloseBtn = document.getElementById('property-modal-close-btn');
-        if (customCloseBtn) {
-          customCloseBtn.addEventListener('click', () => {
-            modalInstance.close();
-          });
-        }
+      if (details && details.link) {
+        e.preventDefault();
+        window.open(details.link, '_blank');
       }
     });
   });
