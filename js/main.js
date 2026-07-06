@@ -416,108 +416,101 @@ document.addEventListener('DOMContentLoaded', () => {
     showDetails(1);
   }
 
-  // ── Featured Properties Modal Interactivity ──
-  const propertyCards = document.querySelectorAll('.property-card[data-property]');
+  // ── Properties Carousel Interactivity ──
+  const propTrack = document.querySelector('.properties-track');
+  const propCards = document.querySelectorAll('.properties-track .property-card');
+  const propPrevBtn = document.querySelector('.properties-prev');
+  const propNextBtn = document.querySelector('.properties-next');
+  const propDotsContainer = document.querySelector('.properties-dots');
   
-  const propertyDetails = {
-    investment: {
-      title: {
-        en: "Investment Apartment · Guaranteed Yield",
-        es: "Piso de Inversión · Rentabilidad Asegurada"
-      },
-      location: "📍 Carolinas Altas, Alicante",
-      price: "165.000 €",
-      yield: "6.8%",
-      income: {
-        en: "Est. Rental Income: <strong>11.200 €/yr</strong>",
-        es: "Renta de Alquiler Est.: <strong>11.200 €/año</strong>"
-      },
-      features: {
-        en: ["4 Bed", "2 Bath", "112m²"],
-        es: ["4 Dorm.", "2 Baños", "112m²"]
-      },
-      image: "images/investment.png",
-      tag: { en: "Investment", es: "Inversión" },
-      tagClass: "investment",
-      description: {
-        en: "Excellent investment opportunity! Apartment sold rented with guaranteed profitability from day one in Carolinas Altas, Alicante.",
-        es: "¡Excelente Oportunidad de Inversión! Piso alquilado con Rentabilidad Asegurada desde el Primer Día en Carolinas Altas."
-      },
-      specs: {
-        en: ["Rented Property", "High Yield", "Renovated Kitchen", "4 Bedrooms", "Excellent Location", "Guaranteed Income"],
-        es: ["Propiedad Alquilada", "Alta Rentabilidad", "Cocina Reformada", "4 Dormitorios", "Excelente Ubicación", "Ingresos Garantizados"]
-      },
-      link: "https://www.remaxinmomas.es/propiedad/excelente-oportunidad-de-inversion-piso-alquilado-con-rentabilidad-asegurada-desde-el-primer-dia-en-carolinas-altas/"
-    },
-    lifestyle: {
-      title: {
-        en: "Exclusive Ground Floor · Sea Views",
-        es: "Exclusiva Planta Baja · Vistas al Mar"
-      },
-      location: "📍 Santa Pola, Costa Blanca",
-      price: "365.000 €",
-      yield: "5.5%",
-      income: {
-        en: "Est. Rental Income: <strong>20.000 €/yr</strong>",
-        es: "Renta de Alquiler Est.: <strong>20.000 €/año</strong>"
-      },
-      features: {
-        en: ["3 Bed", "2 Bath", "101m²"],
-        es: ["3 Dorm.", "2 Baños", "101m²"]
-      },
-      image: "images/lifestyle-mediterranean.png",
-      tag: { en: "Lifestyle", es: "Estilo de Vida" },
-      tagClass: "lifestyle",
-      description: {
-        en: "Exclusive ground floor apartment with a large terrace and sea views in a luxury residential complex.",
-        es: "¡Exclusiva Planta Baja con Gran Terraza y Vistas al Mar en Residencial de Lujo!"
-      },
-      specs: {
-        en: ["Large Terrace", "Sea Views", "Luxury Residential Complex", "3 Bedrooms", "Close to Beach", "Bright Spaces"],
-        es: ["Gran Terraza", "Vistas al Mar", "Residencial de Lujo", "3 Dormitorios", "Cerca de la Playa", "Espacios Luminosos"]
-      },
-      link: "https://www.remaxinmomas.es/propiedad/exclusiva-planta-baja-con-gran-terraza-y-vistas-al-mar-en-residencial-de-lujo/"
-    },
-    luxury: {
-      title: {
-        en: "Spectacular Private Villa · Pool & Views",
-        es: "Espectacular Villa Independiente · Piscina y Vistas"
-      },
-      location: "📍 Benidorm, Costa Blanca",
-      price: "1.264.000 €",
-      yield: "6.2%",
-      income: {
-        en: "Est. Premium Income: <strong>78.000 €/yr</strong>",
-        es: "Renta Premium Est.: <strong>78.000 €/año</strong>"
-      },
-      features: {
-        en: ["4 Bed", "2 Bath", "320m²"],
-        es: ["4 Dorm.", "2 Baños", "320m²"]
-      },
-      image: "images/villa-luxury.png",
-      tag: { en: "Luxury", es: "Lujo" },
-      tagClass: "luxury",
-      description: {
-        en: "Spectacular detached villa in Benidorm with private pool and mountain views.",
-        es: "¡Espectacular villa independiente en Benidorm con piscina privada y vistas a la montaña!"
-      },
-      specs: {
-        en: ["Private Pool", "Mountain Views", "Detached Villa", "Large Plot", "Premium Finishings", "Quiet Location"],
-        es: ["Piscina Privada", "Vistas a la Montaña", "Villa Independiente", "Gran Parcela", "Acabados de Primera", "Zona Tranquila"]
-      },
-      link: "https://www.remaxinmomas.es/propiedad/espectacular-villa-independiente-en-benidorm-con-piscina-privada-y-vistas-a-la-montana/"
+  if (propTrack && propCards.length > 0) {
+    let propIdx = 0;
+    const cardGap = 24; // gap between cards in pixels (matches CSS gap: 24px)
+    
+    function getCardsPerView() {
+      const w = window.innerWidth;
+      if (w > 992) return 3;
+      if (w > 768) return 2;
+      return 1;
     }
-  };
-
-  propertyCards.forEach(card => {
-    card.addEventListener('click', (e) => {
-      const propId = card.getAttribute('data-property');
-      const details = propertyDetails[propId];
-      if (details && details.link) {
-        e.preventDefault();
-        window.open(details.link, '_blank');
+    
+    function getTotalSlides() {
+      const cardsPerView = getCardsPerView();
+      return Math.max(1, propCards.length - cardsPerView + 1);
+    }
+    
+    function createDots() {
+      if (!propDotsContainer) return;
+      propDotsContainer.innerHTML = '';
+      const totalSlides = getTotalSlides();
+      
+      if (totalSlides <= 1) {
+        if (propPrevBtn) propPrevBtn.style.display = 'none';
+        if (propNextBtn) propNextBtn.style.display = 'none';
+        return;
+      } else {
+        if (propPrevBtn) propPrevBtn.style.display = 'flex';
+        if (propNextBtn) propNextBtn.style.display = 'flex';
+      }
+      
+      for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('span');
+        dot.className = `prop-dot${i === propIdx ? ' active' : ''}`;
+        dot.setAttribute('data-slide', i);
+        dot.addEventListener('click', () => {
+          propIdx = i;
+          updatePropCarousel();
+        });
+        propDotsContainer.appendChild(dot);
+      }
+    }
+    
+    function updatePropCarousel() {
+      if (propCards.length === 0) return;
+      const cardsPerView = getCardsPerView();
+      const cardWidth = propCards[0].getBoundingClientRect().width;
+      
+      const offset = propIdx * (cardWidth + cardGap);
+      propTrack.style.transform = `translateX(-${offset}px)`;
+      
+      // Update dots active class
+      const dots = propDotsContainer.querySelectorAll('.prop-dot');
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === propIdx);
+      });
+      
+      // Enable/disable navigation buttons
+      if (propPrevBtn) propPrevBtn.disabled = propIdx === 0;
+      if (propNextBtn) propNextBtn.disabled = propIdx >= getTotalSlides() - 1;
+    }
+    
+    propNextBtn?.addEventListener('click', () => {
+      const total = getTotalSlides();
+      if (propIdx < total - 1) {
+        propIdx++;
+        updatePropCarousel();
       }
     });
-  });
+    
+    propPrevBtn?.addEventListener('click', () => {
+      if (propIdx > 0) {
+        propIdx--;
+        updatePropCarousel();
+      }
+    });
+    
+    window.addEventListener('resize', () => {
+      const total = getTotalSlides();
+      if (propIdx >= total) {
+        propIdx = total - 1;
+      }
+      createDots();
+      updatePropCarousel();
+    });
+    
+    // Initial setup
+    createDots();
+    updatePropCarousel();
+  }
 
 });
