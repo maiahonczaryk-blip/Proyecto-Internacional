@@ -443,43 +443,130 @@
         <div class="dashboard-header"><h1><span class="lang-en">My Profile</span><span class="lang-es">Mi Perfil</span></h1></div>
         
         <div class="dashboard-section" style="background: var(--bg-card); border-radius: var(--radius-md); padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.05); margin-top: 24px;">
-          <div style="display: flex; gap: 32px; align-items: flex-start;">
+          <div style="display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap;">
             
-            <div style="flex-shrink: 0; text-align: center;">
-              <div id="profile-avatar" style="width: 120px; height: 120px; border-radius: 50%; background: var(--blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; margin-bottom: 16px; box-shadow: var(--shadow-sm);"></div>
-              <span id="profile-role-badge" class="badge badge--blue" style="font-size: 0.8rem;"></span>
+            <div style="flex-shrink: 0; text-align: center; margin: 0 auto 16px auto;">
+              <div class="avatar-wrapper" id="profile-avatar-trigger" title="Upload Photo">
+                <div id="profile-avatar" style="width: 120px; height: 120px; border-radius: 50%; background: var(--blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; box-shadow: var(--shadow-sm); background-size: cover; background-position: center;"></div>
+                <div class="avatar-overlay">
+                  <span>📸</span>
+                  <span><span class="lang-en">Change Photo</span><span class="lang-es">Cambiar Foto</span></span>
+                </div>
+              </div>
+              <input type="file" id="profile-avatar-input" style="display: none;" accept="image/*">
+              <div style="margin-top: 8px;">
+                <span id="profile-role-badge" class="badge badge--blue" style="font-size: 0.8rem; text-transform: uppercase;"></span>
+              </div>
             </div>
-
-            <div style="flex: 1;">
-              <h2 id="profile-name" style="font-size: 1.8rem; margin-bottom: 4px; color: var(--text-primary);"></h2>
-              <p id="profile-email" style="color: var(--text-secondary); margin-bottom: 24px; font-size: 1rem;"></p>
+ 
+            <div style="flex: 1; min-width: 280px;" id="profile-container">
               
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div>
-                  <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Agency</label>
-                  <p id="profile-agency" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+              <!-- VIEW MODE -->
+              <div class="profile-view-mode">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                  <div>
+                    <h2 id="profile-name" style="font-size: 1.8rem; margin-bottom: 4px; color: var(--text-primary); font-weight: 700;"></h2>
+                    <p id="profile-email" style="color: var(--text-secondary); font-size: 1rem;"></p>
+                  </div>
+                  <button class="btn btn-primary" id="profile-btn-edit">
+                    <span class="lang-en">Edit Profile</span>
+                    <span class="lang-es">Editar Perfil</span>
+                  </button>
                 </div>
-                <div>
-                  <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Status</label>
-                  <div style="margin-top: 4px;" id="profile-status"></div>
-                </div>
-                <div>
-                  <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Joined Date</label>
-                  <p id="profile-joined" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
-                </div>
-                <div>
-                  <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Broker</label>
-                  <p id="profile-broker" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid var(--border-subtle); padding-top: 20px;">
+                  <div>
+                    <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Agency</label>
+                    <p id="profile-agency" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                  </div>
+                  <div>
+                    <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Status</label>
+                    <div style="margin-top: 4px;" id="profile-status"></div>
+                  </div>
+                  <div>
+                    <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Phone</label>
+                    <p id="profile-phone" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                  </div>
+                  <div>
+                    <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Country</label>
+                    <p id="profile-country" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                  </div>
+                  <div>
+                    <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Joined Date</label>
+                    <p id="profile-joined" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                  </div>
+                  <div>
+                    <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Broker</label>
+                    <p id="profile-broker" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                  </div>
                 </div>
               </div>
-
-              <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-subtle);">
-                <button class="btn btn-outline" onclick="alert('Password reset link sent to your email.')"><span class="lang-en">Reset Password</span><span class="lang-es">Restablecer Contraseña</span></button>
+ 
+              <!-- EDIT MODE -->
+              <div class="profile-edit-mode">
+                <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: var(--text-primary); font-weight: 700;">
+                  <span class="lang-en">Edit Profile Settings</span>
+                  <span class="lang-es">Editar Perfil</span>
+                </h3>
+                <form id="profile-edit-form" onsubmit="return false;">
+                  <div class="profile-form-grid">
+                    <div class="profile-form-group">
+                      <label for="edit-firstName"><span class="lang-en">First Name</span><span class="lang-es">Nombre</span></label>
+                      <input type="text" id="edit-firstName" required>
+                    </div>
+                    <div class="profile-form-group">
+                      <label for="edit-lastName"><span class="lang-en">Last Name</span><span class="lang-es">Apellido</span></label>
+                      <input type="text" id="edit-lastName" required>
+                    </div>
+                    <div class="profile-form-group">
+                      <label for="edit-phone"><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></label>
+                      <input type="text" id="edit-phone">
+                    </div>
+                    <div class="profile-form-group">
+                      <label for="edit-agencyName"><span class="lang-en">Agency Name</span><span class="lang-es">Nombre de la Agencia</span></label>
+                      <input type="text" id="edit-agencyName">
+                    </div>
+                    <div class="profile-form-group">
+                      <label for="edit-country"><span class="lang-en">Country</span><span class="lang-es">País</span></label>
+                      <input type="text" id="edit-country">
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 10px; margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-subtle);">
+                    <button type="submit" class="btn btn-primary" id="profile-btn-save">
+                      <span class="lang-en">Save Changes</span>
+                      <span class="lang-es">Guardar Cambios</span>
+                    </button>
+                    <button type="button" class="btn btn-outline" id="profile-btn-cancel">
+                      <span class="lang-en">Cancel</span>
+                      <span class="lang-es">Cancelar</span>
+                    </button>
+                  </div>
+                </form>
               </div>
-
+ 
+              <!-- General Actions (Reset Password) -->
+              <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-subtle);" class="profile-view-mode">
+                <button class="btn btn-outline" id="profile-btn-reset-pw">
+                  <span class="lang-en">Reset Password</span>
+                  <span class="lang-es">Restablecer Contraseña</span>
+                </button>
+              </div>
+ 
             </div>
           </div>
         </div>
+        
+        <!-- PROFILE STATISTICS -->
+        <div class="profile-stats-section" id="profile-stats-section" style="display: none;">
+          <h2 style="font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">
+            <span class="lang-en">Performance Metrics</span>
+            <span class="lang-es">Métricas de Rendimiento</span>
+          </h2>
+          <div class="profile-stats-grid" id="profile-stats-container">
+            <!-- Dynamic stat cards injected here -->
+          </div>
+        </div>
+        
       </div>
     </div>
 

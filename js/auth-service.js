@@ -254,7 +254,6 @@ App.auth = (function() {
     return allowedRoles.includes(currentUser.role);
   }
 
-  /* ---- User Management (Admin functions) ---- */
   async function updateUserStatus(userId, newStatus) {
     if (App.demoMode) {
       const user = App.demoData.users.find(u => u.id === userId);
@@ -269,6 +268,53 @@ App.auth = (function() {
         updatedAt: new Date().toISOString()
       });
       return true;
+    }
+  }
+
+  async function updateProfile(data) {
+    const user = currentUser;
+    if (!user) throw new Error('No user is currently logged in.');
+
+    const { firstName, lastName, phone, agencyName, country, profileImage } = data;
+
+    if (!firstName || !lastName) {
+      throw new Error('First name and last name are required.');
+    }
+
+    if (App.demoMode) {
+      const demoUser = App.demoData.users.find(u => u.id === user.id);
+      if (!demoUser) throw new Error('User not found in demo database.');
+
+      demoUser.firstName = firstName;
+      demoUser.lastName = lastName;
+      demoUser.phone = phone || '';
+      demoUser.agencyName = agencyName || '';
+      demoUser.country = country || '';
+      if (profileImage !== undefined) {
+        demoUser.profileImage = profileImage;
+      }
+      demoUser.updatedAt = new Date().toISOString();
+
+      saveDemoData();
+      notifyAuthChange();
+      return currentUser;
+    } else {
+      const updateData = {
+        firstName,
+        lastName,
+        phone: phone || '',
+        agencyName: agencyName || '',
+        country: country || '',
+        updatedAt: new Date().toISOString()
+      };
+      if (profileImage !== undefined) {
+        updateData.profileImage = profileImage;
+      }
+      await App.db.collection('users').doc(user.id).update(updateData);
+
+      Object.assign(currentUser, updateData);
+      notifyAuthChange();
+      return currentUser;
     }
   }
 
@@ -560,6 +606,7 @@ App.auth = (function() {
     hasRole,
     requireAuth,
     updateUserStatus,
+    updateProfile,
     getAllUsers,
     getUser,
     getClients,
