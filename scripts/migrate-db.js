@@ -38,7 +38,8 @@ console.log('⏳ Extracting default mock data from js/firebase-config.js...');
 try {
   const configCode = fs.readFileSync(configFilePath, 'utf8');
   // Create virtual context mocking browser environment objects
-  const context = { window: {} };
+  const context = {};
+  context.window = context;
   vm.createContext(context);
   vm.runInContext(configCode, context);
   
@@ -61,16 +62,46 @@ async function runMigration(demoData) {
     console.log('\n🚀 Starting Firestore Seeding & Migration...');
 
     // A. Seed Users
-    console.log('\n👥 Seeding Users...');
+    console.log('\n👥 Seeding Users & Synchronizing Authentication Accounts...');
     for (const user of demoData.users) {
       const uCopy = { ...user };
       const uid = uCopy.id;
       delete uCopy.id;
+      const rawPassword = uCopy.password;
       delete uCopy.password; // Clean passwords out of Firestore
       uCopy.updatedAt = uCopy.updatedAt || new Date().toISOString();
       
+      // 1. Write the profile to Cloud Firestore
       await db.collection('users').doc(uid).set(uCopy);
-      console.log(`   - Seeded user profile: ${uCopy.email} (${uCopy.role})`);
+      console.log(`   - Seeded user profile in Firestore: ${uCopy.email} (${uCopy.role})`);
+
+      // 2. Synchronize/Create user in Firebase Authentication using the exact same UID
+      if (rawPassword) {
+        try {
+          await admin.auth().createUser({
+            uid: uid,
+            email: user.email,
+            password: rawPassword,
+            displayName: `${uCopy.firstName} ${uCopy.lastName}`
+          });
+          console.log(`   - Created Auth user: ${user.email} with UID: ${uid}`);
+        } catch (authErr) {
+          if (authErr.code === 'auth/email-already-exists' || authErr.code === 'auth/uid-already-exists') {
+            console.log(`   - Auth user already exists: ${user.email}. Updating password/details...`);
+            try {
+              await admin.auth().updateUser(uid, {
+                password: rawPassword,
+                displayName: `${uCopy.firstName} ${uCopy.lastName}`
+              });
+              console.log(`     (Successfully updated Auth details for UID: ${uid})`);
+            } catch (updateErr) {
+              console.warn(`     ⚠️ Warning updating Auth user: ${updateErr.message}`);
+            }
+          } else {
+            console.error(`   ❌ Failed to sync Auth user for ${user.email}:`, authErr.message);
+          }
+        }
+      }
     }
 
     // B. Seed Clients

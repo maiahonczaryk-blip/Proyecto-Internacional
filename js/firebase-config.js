@@ -15,16 +15,17 @@
 // ---- DEMO MODE ----
 // Set to false once Firebase is configured
 window.App = window.App || {};
-App.demoMode = true;
+App.demoMode = false;
 
 // ---- Firebase Configuration ----
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDbGxO4nw7r63pEZqgyCoH0UyM7h3Bl7lw",
+  authDomain: "proyecto-internacional.firebaseapp.com",
+  projectId: "proyecto-internacional",
+  storageBucket: "proyecto-internacional.firebasestorage.app",
+  messagingSenderId: "742675229560",
+  appId: "1:742675229560:web:b35d82bc92d9cc393cb68d",
+  measurementId: "G-NJHX0T2GZW"
 };
 
 // Initialize Firebase (only if not in demo mode)
