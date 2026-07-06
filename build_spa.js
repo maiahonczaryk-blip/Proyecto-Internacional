@@ -5,7 +5,8 @@ const files = [
   { id: 'view-professionals', path: 'professionals.html', title: 'Partner Program' },
   { id: 'view-pending', path: 'pending.html', title: 'Application Pending' },
   { id: 'view-partner-dashboard', path: 'dashboard.html', title: 'Partner Dashboard' },
-  { id: 'view-admin-dashboard', path: 'admin.html', title: 'Admin Dashboard' }
+  { id: 'view-admin-dashboard', path: 'admin.html', title: 'Admin Dashboard' },
+  { id: '', path: 'dashboards_spa.html', title: 'Dashboards SPA', raw: true }
 ];
 
 let appHtml = `<!DOCTYPE html>
@@ -32,6 +33,7 @@ let scripts = [];
 for (const view of files) {
   const content = fs.readFileSync(view.path, 'utf8');
   
+  if (view.raw) continue;
   // Extract specific styles
   const styleMatch = content.match(/<style>([\s\S]*?)<\/style>/);
   if (styleMatch) {
@@ -62,9 +64,13 @@ for (const view of files) {
     bodyHtml = bodyHtml.replace(match[0], ''); // Remove script from body
   }
   
-  appHtml += `\n  <div id="${view.id}" class="app-view${view.id === 'view-home' ? ' active' : ''}">\n`;
-  appHtml += bodyHtml;
-  appHtml += `\n  </div>\n`;
+  if (view.raw) {
+    appHtml += bodyHtml;
+  } else {
+    appHtml += `\n  <div id="${view.id}" class="app-view${view.id === 'view-home' ? ' active' : ''}">\n`;
+    appHtml += bodyHtml;
+    appHtml += `\n  </div>\n`;
+  }
 }
 
 appHtml += `

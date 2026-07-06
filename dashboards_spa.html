@@ -1,0 +1,455 @@
+<body>
+
+
+<!-- ==================== VIEW-ADMIN-USERS ==================== -->
+<div id="view-admin-users" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1><span class="lang-en">Manage Users</span><span class="lang-es">Gestionar Usuarios</span></h1>
+        </div>
+        <div class="dashboard-filters">
+          <div class="form-group" style="margin-bottom:0;">
+            <input type="text" id="admin-search-input" placeholder="Search by name or email..." class="form-input">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <select id="admin-filter-role" class="form-select">
+              <option value="">All Roles</option>
+              <option value="broker">Brokers</option>
+              <option value="realtor">Realtors</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <select id="admin-filter-status" class="form-select">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+        </div>
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead><tr><th><span class="lang-en">User</span><span class="lang-es">Usuario</span></th><th>Email</th><th><span class="lang-en">Agency</span><span class="lang-es">Agencia</span></th><th><span class="lang-en">Role</span><span class="lang-es">Rol</span></th><th>Status</th><th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th><th><span class="lang-en">Actions</span><span class="lang-es">Acciones</span></th></tr></thead>
+            <tbody id="admin-users-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+<!-- ==================== VIEW-ADMIN-CLIENTS ==================== -->
+<div id="view-admin-clients" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1><span class="lang-en">Client Pipeline</span><span class="lang-es">Pipeline de Clientes</span></h1>
+          <p class="dashboard-subtitle"><span class="lang-en">Broker Inmomás CRM Overview — Assign local agents and monitor status</span><span class="lang-es">Control del CRM de Broker Inmomás — Asigna agentes locales y monitoriza el estado</span></p>
+        </div>
+        <div id="admin-clients-board" class="pipeline-board"></div>
+      </div>
+    </div>
+
+<!-- ==================== VIEW-BROKER-DASHBOARD ==================== -->
+<div id="view-broker-dashboard" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1><span class="lang-en">Broker Dashboard</span><span class="lang-es">Panel de Broker</span></h1>
+          <p class="dashboard-subtitle" id="broker-welcome"></p>
+        </div>
+        <div class="stat-cards-grid">
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">👥</div><div class="stat-card__body"><div class="stat-card__value" id="broker-stat-realtors">0</div><div class="stat-card__label"><span class="lang-en">My Realtors</span><span class="lang-es">Mis Agentes</span></div></div></div>
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🤝</div><div class="stat-card__body"><div class="stat-card__value" id="broker-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Total Clients</span><span class="lang-es">Clientes Totales</span></div></div></div>
+          <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">🏠</div><div class="stat-card__body"><div class="stat-card__value" id="broker-stat-sales">0</div><div class="stat-card__label"><span class="lang-en">Completed Sales</span><span class="lang-es">Ventas Completadas</span></div></div></div>
+          <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">💰</div><div class="stat-card__body"><div class="stat-card__value" id="broker-stat-commissions">€0</div><div class="stat-card__label"><span class="lang-en">Total Commissions</span><span class="lang-es">Comisiones Totales</span></div></div></div>
+        </div>
+        <div class="dashboard-grid-2col">
+          <div class="dashboard-section">
+            <h2><span class="lang-en">Team Overview</span><span class="lang-es">Resumen del Equipo</span></h2>
+            <div id="broker-team-overview"></div>
+          </div>
+          <div class="dashboard-section">
+            <h2><span class="lang-en">Recent Clients</span><span class="lang-es">Clientes Recientes</span></h2>
+            <div id="broker-recent-clients"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- ==================== VIEW-BROKER-TEAM ==================== -->
+<div id="view-broker-team" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">My Team</span><span class="lang-es">Mi Equipo</span></h1></div>
+        <div id="broker-team-grid" class="team-cards-grid"></div>
+      </div>
+    </div>
+
+<!-- ==================== VIEW-BROKER-CLIENTS ==================== -->
+<div id="view-broker-clients" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">All Clients</span><span class="lang-es">Todos los Clientes</span></h1></div>
+        <div id="broker-pipeline-board" class="pipeline-board"></div>
+      </div>
+    </div>
+
+<!-- ==================== VIEW-BROKER-DOCUMENTS ==================== -->
+<div id="view-broker-documents" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">Documents</span><span class="lang-es">Documentos</span></h1></div>
+        <div id="broker-documents-content"></div>
+      </div>
+    </div>
+
+<!-- ==================== VIEW-BROKER-FINANCES ==================== -->
+<div id="view-broker-finances" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">Financial Overview</span><span class="lang-es">Resumen Financiero</span></h1></div>
+        <div class="stat-cards-grid" style="grid-template-columns:repeat(4,1fr);">
+          <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">💰</div><div class="stat-card__body"><div class="stat-card__value" id="broker-fin-total">€0</div><div class="stat-card__label">Total</div></div></div>
+          <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">✓</div><div class="stat-card__body"><div class="stat-card__value" id="broker-fin-paid">€0</div><div class="stat-card__label">Paid</div></div></div>
+          <div class="stat-card stat-card--amber"><div class="stat-card__icon stat-card__icon--amber">⏳</div><div class="stat-card__body"><div class="stat-card__value" id="broker-fin-pending">€0</div><div class="stat-card__label">Pending</div></div></div>
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">📈</div><div class="stat-card__body"><div class="stat-card__value" id="broker-fin-projected">€0</div><div class="stat-card__label">Projected</div></div></div>
+        </div>
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Commission Breakdown</span><span class="lang-es">Desglose de Comisiones</span></h2>
+          <div class="data-table-container">
+            <table class="data-table"><thead><tr><th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th><th><span class="lang-en">Property</span><span class="lang-es">Propiedad</span></th><th><span class="lang-en">Sale Price</span><span class="lang-es">Precio</span></th><th><span class="lang-en">Total Commission</span><span class="lang-es">Comisión Total</span></th><th><span class="lang-en">Your Share</span><span class="lang-es">Tu Parte</span></th><th><span class="lang-en">Amount</span><span class="lang-es">Importe</span></th><th>Status</th></tr></thead>
+            <tbody id="broker-commission-table-body"></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- ==================== VIEW-REALTOR-DASHBOARD ==================== -->
+<div id="view-realtor-dashboard" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1><span class="lang-en">My Dashboard</span><span class="lang-es">Mi Panel</span></h1>
+          <p class="dashboard-subtitle" id="realtor-welcome"></p>
+        </div>
+        <div class="stat-cards-grid">
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🤝</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Referred Clients</span><span class="lang-es">Clientes Referidos</span></div></div></div>
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🔄</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-stat-active">0</div><div class="stat-card__label"><span class="lang-en">Active Pipeline</span><span class="lang-es">Pipeline Activo</span></div></div></div>
+          <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">🏠</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-stat-sales">0</div><div class="stat-card__label"><span class="lang-en">Completed Sales</span><span class="lang-es">Ventas Completadas</span></div></div></div>
+          <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">💰</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-stat-commissions">€0</div><div class="stat-card__label"><span class="lang-en">Commissions Earned</span><span class="lang-es">Comisiones Ganadas</span></div></div></div>
+        </div>
+        <!-- Referral Link Quick Access -->
+        <div class="dashboard-section referral-quick">
+          <h2>🔗 <span class="lang-en">Your Referral Link</span><span class="lang-es">Tu Enlace de Referido</span></h2>
+          <div style="display: flex; align-items: center; background: rgba(0, 67, 255, 0.04); border: 1px solid rgba(0, 67, 255, 0.15); border-radius: 12px; padding: 8px; gap: 12px; margin-top: 12px;">
+            <div style="background: white; border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <span style="font-size: 1.2rem;">✨</span>
+            </div>
+            <input type="text" readonly id="realtor-dash-referral-link" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--text-primary); outline: none; padding: 0; min-width: 0;">
+            <button class="btn btn-primary" id="realtor-dash-copy-link" style="border-radius: 8px; padding: 10px 20px; white-space: nowrap;"><span class="lang-en">Copy Link</span><span class="lang-es">Copiar Enlace</span></button>
+          </div>
+        </div>
+        <div class="dashboard-grid-2col">
+          <div class="dashboard-section">
+            <h2><span class="lang-en">Pipeline Summary</span><span class="lang-es">Resumen del Pipeline</span></h2>
+            <div id="realtor-dash-pipeline"></div>
+          </div>
+          <div class="dashboard-section">
+            <h2><span class="lang-en">Recent Clients</span><span class="lang-es">Clientes Recientes</span></h2>
+            <div id="realtor-dash-recent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- ==================== VIEW-REALTOR-CLIENTS ==================== -->
+<div id="view-realtor-clients" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">Client Pipeline</span><span class="lang-es">Pipeline de Clientes</span></h1></div>
+        <div id="realtor-pipeline-board" class="pipeline-board"></div>
+      </div>
+    </div>
+
+<!-- ==================== VIEW-REALTOR-REFERRAL ==================== -->
+<div id="view-realtor-referral" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">Referral Tools</span><span class="lang-es">Herramientas de Referidos</span></h1></div>
+        <div class="dashboard-section">
+          <h2>🔗 <span class="lang-en">Your Referral Link</span><span class="lang-es">Tu Enlace de Referido</span></h2>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">Share this link to capture new clients.</p>
+          <div style="display: flex; align-items: center; background: rgba(0, 67, 255, 0.04); border: 1px solid rgba(0, 67, 255, 0.15); border-radius: 12px; padding: 8px; gap: 12px;">
+            <div style="background: white; border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <span style="font-size: 1.2rem;">✨</span>
+            </div>
+            <input type="text" readonly id="realtor-referral-link-display" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--text-primary); outline: none; padding: 0; min-width: 0;">
+            <button class="btn btn-primary" id="realtor-copy-referral-btn" style="border-radius: 8px; padding: 10px 20px; white-space: nowrap;"><span class="lang-en">Copy Link</span><span class="lang-es">Copiar Enlace</span></button>
+          </div>
+        </div>
+        <div class="stat-cards-grid" style="grid-template-columns:repeat(4,1fr);">
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">👥</div><div class="stat-card__body"><div class="stat-card__value" id="referral-stat-total">0</div><div class="stat-card__label"><span class="lang-en">Total Referred</span><span class="lang-es">Total Referidos</span></div></div></div>
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🔄</div><div class="stat-card__body"><div class="stat-card__value" id="referral-stat-active">0</div><div class="stat-card__label"><span class="lang-en">In Pipeline</span><span class="lang-es">En Pipeline</span></div></div></div>
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">✅</div><div class="stat-card__body"><div class="stat-card__value" id="referral-stat-converted">0</div><div class="stat-card__label"><span class="lang-en">Converted</span><span class="lang-es">Convertidos</span></div></div></div>
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">📊</div><div class="stat-card__body"><div class="stat-card__value" id="referral-stat-conversion">0%</div><div class="stat-card__label"><span class="lang-en">Conversion Rate</span><span class="lang-es">Tasa de Conversión</span></div></div></div>
+        </div>
+        <div class="dashboard-section">
+          <h2><span class="lang-en">QR Code</span><span class="lang-es">Código QR</span></h2>
+          <div id="referral-qr-code" class="qr-placeholder"></div>
+        </div>
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Tips for Sharing</span><span class="lang-es">Consejos para Compartir</span></h2>
+          <div class="tips-grid">
+            <div class="tip-card"><span class="tip-icon">📧</span><h4>Email Signature</h4><p><span class="lang-en">Add your referral link to your email signature for passive lead generation.</span><span class="lang-es">Añade tu enlace de referido a tu firma de email para generación pasiva de leads.</span></p></div>
+            <div class="tip-card"><span class="tip-icon">📱</span><h4>Social Media</h4><p><span class="lang-en">Share Spain lifestyle content with your referral link on Instagram, LinkedIn, and Facebook.</span><span class="lang-es">Comparte contenido sobre el estilo de vida en España con tu enlace en Instagram, LinkedIn y Facebook.</span></p></div>
+            <div class="tip-card"><span class="tip-icon">🎯</span><h4><span class="lang-en">Direct Outreach</span><span class="lang-es">Contacto Directo</span></h4><p><span class="lang-en">Identify clients who've mentioned retirement or international investment goals.</span><span class="lang-es">Identifica clientes que hayan mencionado jubilación o metas de inversión internacional.</span></p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- ==================== VIEW-REALTOR-DOCUMENTS ==================== -->
+<div id="view-realtor-documents" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">Documents & Agreements</span><span class="lang-es">Documentos y Acuerdos</span></h1></div>
+        <!-- Collaboration Agreement -->
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Collaboration Agreement</span><span class="lang-es">Acuerdo de Colaboración</span></h2>
+          <div id="agreement-section"></div>
+        </div>
+        <!-- Document Upload -->
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Upload Documents</span><span class="lang-es">Subir Documentos</span></h2>
+          <div class="upload-zone" id="doc-upload-zone">
+            <span class="upload-icon">📤</span>
+            <p><span class="lang-en">Drag & drop files here or click to browse</span><span class="lang-es">Arrastra archivos aquí o haz clic para seleccionar</span></p>
+            <input type="file" id="doc-file-input" multiple style="display:none;">
+          </div>
+          <div id="uploaded-docs-list" class="doc-list"></div>
+        </div>
+      </div>
+    </div>
+
+<!-- ==================== VIEW-REALTOR-FINANCES ==================== -->
+<div id="view-realtor-finances" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">My Finances</span><span class="lang-es">Mis Finanzas</span></h1></div>
+        <div class="stat-cards-grid" style="grid-template-columns:repeat(4,1fr);">
+          <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">💰</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-fin-total">€0</div><div class="stat-card__label">Total</div></div></div>
+          <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">✓</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-fin-paid">€0</div><div class="stat-card__label">Paid</div></div></div>
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">📈</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-fin-projected">€0</div><div class="stat-card__label">Projected</div></div></div>
+          <div class="stat-card stat-card--amber"><div class="stat-card__icon stat-card__icon--amber">📊</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-fin-avg">€0</div><div class="stat-card__label"><span class="lang-en">Avg per Sale</span><span class="lang-es">Media por Venta</span></div></div></div>
+        </div>
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Commission History</span><span class="lang-es">Historial de Comisiones</span></h2>
+          <div class="data-table-container">
+            <table class="data-table"><thead><tr><th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th><th><span class="lang-en">Property</span><span class="lang-es">Propiedad</span></th><th><span class="lang-en">Sale Price</span><span class="lang-es">Precio</span></th><th><span class="lang-en">Total Commission</span><span class="lang-es">Comisión Total</span></th><th><span class="lang-en">Your Share</span><span class="lang-es">Tu Parte</span></th><th><span class="lang-en">Amount</span><span class="lang-es">Importe</span></th><th>Status</th></tr></thead>
+            <tbody id="realtor-commission-table-body"></tbody></table>
+          </div>
+        </div>
+        <!-- Projections -->
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Earnings Projection</span><span class="lang-es">Proyección de Ganancias</span></h2>
+          <div id="realtor-projection"></div>
+        </div>
+      </div>
+    </div>
+
+<!-- ==================== VIEW-AGENT-DASHBOARD ==================== -->
+<div id="view-agent-dashboard" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1><span class="lang-en">My Dashboard</span><span class="lang-es">Mi Panel</span></h1>
+          <p class="dashboard-subtitle" id="agent-welcome"></p>
+        </div>
+        <div class="stat-cards-grid">
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🤝</div><div class="stat-card__body"><div class="stat-card__value" id="agent-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Assigned Clients</span><span class="lang-es">Clientes Asignados</span></div></div></div>
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🔄</div><div class="stat-card__body"><div class="stat-card__value" id="agent-stat-active">0</div><div class="stat-card__label"><span class="lang-en">Active Funnel</span><span class="lang-es">Embudo Activo</span></div></div></div>
+          <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">🏠</div><div class="stat-card__body"><div class="stat-card__value" id="agent-stat-sales">0</div><div class="stat-card__label"><span class="lang-en">Closed Sales</span><span class="lang-es">Ventas Cerradas</span></div></div></div>
+          <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">💰</div><div class="stat-card__body"><div class="stat-card__value" id="agent-stat-commissions">€0</div><div class="stat-card__label"><span class="lang-en">My Commission (Spain)</span><span class="lang-es">Mi Comisión (España)</span></div></div></div>
+        </div>
+        <div class="dashboard-grid-2col">
+          <div class="dashboard-section">
+            <h2><span class="lang-en">Funnel Summary</span><span class="lang-es">Resumen del Embudo</span></h2>
+            <div id="agent-dash-pipeline"></div>
+          </div>
+          <div class="dashboard-section">
+            <h2><span class="lang-en">Recent Activity</span><span class="lang-es">Actividad Reciente</span></h2>
+            <div id="agent-dash-recent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- ==================== VIEW-AGENT-CLIENTS ==================== -->
+<div id="view-agent-clients" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">My Clients</span><span class="lang-es">Mis Clientes</span></h1></div>
+        <div id="agent-pipeline-board" class="pipeline-board"></div>
+      </div>
+    </div>
+
+<!-- ==================== VIEW-AGENT-FINANCES ==================== -->
+<div id="view-agent-finances" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header"><h1><span class="lang-en">Commission Overview</span><span class="lang-es">Resumen de Comisiones</span></h1></div>
+        <div class="stat-cards-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">💰</div><div class="stat-card__body"><div class="stat-card__value" id="agent-fin-total">€0</div><div class="stat-card__label">Total Earned</div></div></div>
+          <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">✓</div><div class="stat-card__body"><div class="stat-card__value" id="agent-fin-paid">€0</div><div class="stat-card__label">Paid</div></div></div>
+          <div class="stat-card stat-card--amber"><div class="stat-card__icon stat-card__icon--amber">⏳</div><div class="stat-card__body"><div class="stat-card__value" id="agent-fin-pending">€0</div><div class="stat-card__label">Pending Payment</div></div></div>
+        </div>
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Detailed History</span><span class="lang-es">Historial Detallado</span></h2>
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th>
+                  <th><span class="lang-en">Property</span><span class="lang-es">Propiedad</span></th>
+                  <th><span class="lang-en">Sale Price</span><span class="lang-es">Precio</span></th>
+                  <th><span class="lang-en">Spain Commission</span><span class="lang-es">Comisión España</span></th>
+                  <th>Your Share</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="agent-commission-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- ==================== VIEW-PROFILE ==================== -->
+<div id="view-profile" class="app-view">
+      <div class="dashboard-content" style="max-width: 800px; margin: 0 auto;">
+        <div class="dashboard-header"><h1><span class="lang-en">My Profile</span><span class="lang-es">Mi Perfil</span></h1></div>
+        
+        <div class="dashboard-section" style="background: var(--bg-card); border-radius: var(--radius-md); padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.05); margin-top: 24px;">
+          <div style="display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap;">
+            
+            <div style="flex-shrink: 0; text-align: center; margin: 0 auto 16px auto;">
+              <div class="avatar-wrapper" id="profile-avatar-trigger" title="Upload Photo">
+                <div id="profile-avatar" style="width: 120px; height: 120px; border-radius: 50%; background: var(--blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; box-shadow: var(--shadow-sm); background-size: cover; background-position: center;"></div>
+                <div class="avatar-overlay">
+                  <span>📸</span>
+                  <span><span class="lang-en">Change Photo</span><span class="lang-es">Cambiar Foto</span></span>
+                </div>
+              </div>
+              <input type="file" id="profile-avatar-input" style="display: none;" accept="image/*">
+              <div style="margin-top: 8px;">
+                <span id="profile-role-badge" class="badge badge--blue" style="font-size: 0.8rem; text-transform: uppercase;"></span>
+              </div>
+            </div>
+ 
+            <div style="flex: 1; min-width: 280px;" id="profile-container">
+              
+              <!-- VIEW MODE -->
+              <div class="profile-view-mode">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                  <div>
+                    <h2 id="profile-name" style="font-size: 1.8rem; margin-bottom: 4px; color: var(--text-primary); font-weight: 700;"></h2>
+                    <p id="profile-email" style="color: var(--text-secondary); font-size: 1rem;"></p>
+                  </div>
+                  <button class="btn btn-primary" id="profile-btn-edit">
+                    <span class="lang-en">Edit Profile</span>
+                    <span class="lang-es">Editar Perfil</span>
+                  </button>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid var(--border-subtle); padding-top: 20px;">
+                  <div>
+                    <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Agency</label>
+                    <p id="profile-agency" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                  </div>
+                  <div>
+                    <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Status</label>
+                    <div style="margin-top: 4px;" id="profile-status"></div>
+                  </div>
+                  <div>
+                    <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Phone</label>
+                    <p id="profile-phone" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                  </div>
+                  <div>
+                    <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Country</label>
+                    <p id="profile-country" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                  </div>
+                  <div>
+                    <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Joined Date</label>
+                    <p id="profile-joined" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                  </div>
+                  <div>
+                    <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Broker</label>
+                    <p id="profile-broker" style="font-weight: 500; font-size: 1rem; margin-top: 4px;">—</p>
+                  </div>
+                </div>
+              </div>
+ 
+              <!-- EDIT MODE -->
+              <div class="profile-edit-mode">
+                <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: var(--text-primary); font-weight: 700;">
+                  <span class="lang-en">Edit Profile Settings</span>
+                  <span class="lang-es">Editar Perfil</span>
+                </h3>
+                <form id="profile-edit-form" onsubmit="return false;">
+                  <div class="profile-form-grid">
+                    <div class="profile-form-group">
+                      <label for="edit-firstName"><span class="lang-en">First Name</span><span class="lang-es">Nombre</span></label>
+                      <input type="text" id="edit-firstName" required>
+                    </div>
+                    <div class="profile-form-group">
+                      <label for="edit-lastName"><span class="lang-en">Last Name</span><span class="lang-es">Apellido</span></label>
+                      <input type="text" id="edit-lastName" required>
+                    </div>
+                    <div class="profile-form-group">
+                      <label for="edit-phone"><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></label>
+                      <input type="text" id="edit-phone">
+                    </div>
+                    <div class="profile-form-group">
+                      <label for="edit-agencyName"><span class="lang-en">Agency Name</span><span class="lang-es">Nombre de la Agencia</span></label>
+                      <input type="text" id="edit-agencyName">
+                    </div>
+                    <div class="profile-form-group">
+                      <label for="edit-country"><span class="lang-en">Country</span><span class="lang-es">País</span></label>
+                      <input type="text" id="edit-country">
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 10px; margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-subtle);">
+                    <button type="submit" class="btn btn-primary" id="profile-btn-save">
+                      <span class="lang-en">Save Changes</span>
+                      <span class="lang-es">Guardar Cambios</span>
+                    </button>
+                    <button type="button" class="btn btn-outline" id="profile-btn-cancel">
+                      <span class="lang-en">Cancel</span>
+                      <span class="lang-es">Cancelar</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+ 
+              <!-- General Actions (Reset Password) -->
+              <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-subtle);" class="profile-view-mode">
+                <button class="btn btn-outline" id="profile-btn-reset-pw">
+                  <span class="lang-en">Reset Password</span>
+                  <span class="lang-es">Restablecer Contraseña</span>
+                </button>
+              </div>
+ 
+            </div>
+          </div>
+        </div>
+        
+        <!-- PROFILE STATISTICS -->
+        <div class="profile-stats-section" id="profile-stats-section" style="display: none;">
+          <h2 style="font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">
+            <span class="lang-en">Performance Metrics</span>
+            <span class="lang-es">Métricas de Rendimiento</span>
+          </h2>
+          <div class="profile-stats-grid" id="profile-stats-container">
+            <!-- Dynamic stat cards injected here -->
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ===================== TOAST CONTAINER ===================== -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ===================== MODAL OVERLAY ===================== -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div id="modal" class="modal"></div>
+  </div>
+</body>

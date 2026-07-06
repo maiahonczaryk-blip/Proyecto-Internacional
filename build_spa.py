@@ -6,7 +6,8 @@ files = [
     {'id': 'view-professionals', 'path': 'professionals.html'},
     {'id': 'view-pending', 'path': 'pending.html'},
     {'id': 'view-partner-dashboard', 'path': 'dashboard.html'},
-    {'id': 'view-admin-dashboard', 'path': 'admin.html'}
+    {'id': 'view-admin-dashboard', 'path': 'admin.html'},
+    {'id': '', 'path': 'dashboards_spa.html', 'raw': True}
 ]
 
 app_html = """<!DOCTYPE html>
@@ -35,6 +36,7 @@ for v in files:
     with open(v['path'], 'r', encoding='utf-8') as f:
         content = f.read()
     
+    if v.get('raw'): continue
     # extract style
     style_match = re.search(r'<style>([\s\S]*?)</style>', content)
     if style_match:
@@ -59,10 +61,13 @@ for v in files:
             scripts.append(f"// Script from {v['path']}\n{script_match.group(1)}")
         body_html = body_html.replace(script_match.group(0), '')
     
-    active_class = ' active' if v['id'] == 'view-home' else ''
-    app_html += f"\n  <div id=\"{v['id']}\" class=\"app-view{active_class}\">\n"
-    app_html += body_html
-    app_html += f"\n  </div>\n"
+    if v.get('raw'):
+        app_html += body_html
+    else:
+        active_class = ' active' if v['id'] == 'view-home' else ''
+        app_html += f"\n  <div id=\"{v['id']}\" class=\"app-view{active_class}\">\n"
+        app_html += body_html
+        app_html += f"\n  </div>\n"
 
 app_html += """
   <!-- Core Scripts -->
