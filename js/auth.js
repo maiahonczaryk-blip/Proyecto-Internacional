@@ -60,7 +60,12 @@ function loginPartner(event) {
         window.location.href = 'pending.html';
     } else if (partner.status === 'approved') {
         localStorage.setItem('remax_current_user', JSON.stringify(partner));
-        window.location.href = 'dashboard.html';
+        localStorage.setItem('remax_session', JSON.stringify(partner)); // Sync session key for SPA compatibility
+        if (window.location.pathname.includes('app.html') || window.location.pathname.includes('index.html')) {
+            window.location.href = 'app.html#' + (partner.role || 'realtor') + '/dashboard';
+        } else {
+            window.location.href = 'dashboard.html';
+        }
     } else if (partner.status === 'rejected') {
         alert('Your application has been rejected.');
     }
@@ -165,6 +170,10 @@ function updatePartnerStatus(id, newStatus) {
 
 // 5. Partner Dashboard Logic
 function loadPartnerDashboard() {
+    // Only execute legacy logic on standalone dashboard.html
+    if (!window.location.pathname.endsWith('dashboard.html')) {
+        return;
+    }
     const user = JSON.parse(localStorage.getItem('remax_current_user'));
     if (!user || user.status !== 'approved') {
         window.location.href = 'partner-login.html';

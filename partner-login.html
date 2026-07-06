@@ -73,6 +73,11 @@
     </div>
   </div>
 
+  <script>
+    if (window.location.pathname.endsWith('partner-login.html')) {
+      window.location.href = 'index.html#login';
+    }
+  </script>
   <script src="js/auth.js"></script>
   <script>
     document.getElementById('partner-login-form').addEventListener('submit', loginPartner);

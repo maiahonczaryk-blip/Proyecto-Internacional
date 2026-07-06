@@ -328,15 +328,30 @@
     </main>
   </div>
 
+  <script>
+    if (window.location.pathname.endsWith('dashboard.html')) {
+      const user = JSON.parse(localStorage.getItem('remax_session') || localStorage.getItem('remax_current_user'));
+      if (user && user.role) {
+        window.location.href = 'app.html#' + user.role + '/dashboard';
+      } else {
+        window.location.href = 'index.html#login';
+      }
+    }
+  </script>
   <script src="js/main.js"></script>
   <script src="js/auth.js"></script>
   <script>
     // Initialize Dashboard with LocalStorage Data
     document.addEventListener('DOMContentLoaded', () => {
+      // Only execute this standalone logic if we are directly on dashboard.html
+      if (!window.location.pathname.endsWith('dashboard.html')) {
+        return;
+      }
+      
       loadPartnerDashboard();
       
       // Additional specific dashboard updates
-      const user = JSON.parse(localStorage.getItem('remax_current_user'));
+      const user = JSON.parse(localStorage.getItem('remax_current_user') || localStorage.getItem('remax_session'));
       if(user) {
         document.getElementById('partner-name-es').innerText = user.firstName + ' ' + user.lastName;
         document.getElementById('partner-initials').innerText = user.firstName.charAt(0).toUpperCase();
