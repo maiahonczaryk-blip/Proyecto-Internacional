@@ -153,13 +153,6 @@ App.router = (function() {
       }
     }
 
-    // If user is logged in and trying to access login/register, redirect to dashboard
-    if ((routeKey === 'login' || routeKey === 'register') && App.auth.isAuthenticated()) {
-      const user = App.auth.getCurrentUser();
-      window.location.href = 'app.html#' + user.role + '/dashboard';
-      return;
-    }
-
     currentRoute = routeKey;
 
     // Update document title
