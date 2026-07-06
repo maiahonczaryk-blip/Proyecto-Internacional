@@ -98,10 +98,20 @@
       const dateStr = App.utils.formatDate(user.createdAt);
 
       const isBroker = user.role === 'broker';
-      const brokerBorder = isBroker ? '#3b82f6' : '#e5e7eb';
-      const brokerBg = isBroker ? '#eff6ff' : '#fcfbf7';
-      const realtorBorder = !isBroker ? '#3b82f6' : '#e5e7eb';
-      const realtorBg = !isBroker ? '#eff6ff' : '#fcfbf7';
+      const defaultBorder = '#e5e7eb';
+      const defaultBg = '#ffffff';
+
+      const brokerBookmark = isBroker ? `
+        <div style="position: absolute; top: 0; right: 12px; background: #3b82f6; color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+          Requested
+        </div>
+      ` : '';
+
+      const realtorBookmark = !isBroker ? `
+        <div style="position: absolute; top: 0; right: 12px; background: #3b82f6; color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+          Requested
+        </div>
+      ` : '';
 
       return `
         <div class="pipeline-card" style="margin-bottom: 1rem; padding: 1.25rem;">
@@ -127,22 +137,22 @@
             <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
               <!-- Broker Approval Card -->
               <div onclick="App.views.admin.approveWithRole('${user.id}', 'broker')" 
-                   style="flex: 1; min-width: 180px; border: 2px solid ${brokerBorder}; border-radius: 0.75rem; padding: 1rem; cursor: pointer; text-align: center; background: ${brokerBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                   style="position: relative; flex: 1; min-width: 150px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 1rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
                    onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
-                   onmouseout="this.style.borderColor='${brokerBorder}'; this.style.backgroundColor='${brokerBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
-                <div style="font-size: 2rem; margin-bottom: 0.25rem;">🏢</div>
-                <div style="font-weight: 700; font-size: 0.85rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Broker</div>
-                <div style="font-size: 0.7rem; color: #6b7280; margin-top: 0.25rem; font-weight: 600; text-transform: uppercase; line-height: 1.2;">I manage a team of agents</div>
+                   onmouseout="this.style.borderColor='${defaultBorder}'; this.style.backgroundColor='${defaultBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
+                ${brokerBookmark}
+                <div style="font-size: 2.25rem; margin-bottom: 0.25rem;">🏢</div>
+                <div style="font-weight: 700; font-size: 0.9rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Broker</div>
               </div>
               
               <!-- Realtor Approval Card -->
               <div onclick="App.views.admin.approveWithRole('${user.id}', 'realtor')" 
-                   style="flex: 1; min-width: 180px; border: 2px solid ${realtorBorder}; border-radius: 0.75rem; padding: 1rem; cursor: pointer; text-align: center; background: ${realtorBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                   style="position: relative; flex: 1; min-width: 150px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 1rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
                    onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
-                   onmouseout="this.style.borderColor='${realtorBorder}'; this.style.backgroundColor='${realtorBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
-                <div style="font-size: 2rem; margin-bottom: 0.25rem;">👤</div>
-                <div style="font-weight: 700; font-size: 0.85rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Realtor</div>
-                <div style="font-size: 0.7rem; color: #6b7280; margin-top: 0.25rem; font-weight: 600; text-transform: uppercase; line-height: 1.2;">I'm an individual agent</div>
+                   onmouseout="this.style.borderColor='${defaultBorder}'; this.style.backgroundColor='${defaultBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
+                ${realtorBookmark}
+                <div style="font-size: 2.25rem; margin-bottom: 0.25rem;">👤</div>
+                <div style="font-weight: 700; font-size: 0.9rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Realtor</div>
               </div>
             </div>
             
@@ -390,10 +400,20 @@
       if (!user) return;
 
       const isBroker = user.role === 'broker';
-      const brokerBorder = isBroker ? '#3b82f6' : '#e5e7eb';
-      const brokerBg = isBroker ? '#eff6ff' : '#fcfbf7';
-      const realtorBorder = !isBroker ? '#3b82f6' : '#e5e7eb';
-      const realtorBg = !isBroker ? '#eff6ff' : '#fcfbf7';
+      const defaultBorder = '#e5e7eb';
+      const defaultBg = '#ffffff';
+
+      const brokerBookmark = isBroker ? `
+        <div style="position: absolute; top: 0; right: 12px; background: #3b82f6; color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+          Requested
+        </div>
+      ` : '';
+
+      const realtorBookmark = !isBroker ? `
+        <div style="position: absolute; top: 0; right: 12px; background: #3b82f6; color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+          Requested
+        </div>
+      ` : '';
 
       App.utils.showModal({
         title: 'Approve User',
@@ -406,22 +426,22 @@
           <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
             <!-- Broker Approval Card -->
             <div onclick="App.views.admin.approveWithRole('${user.id}', 'broker')" 
-                 style="flex: 1; min-width: 150px; border: 2px solid ${brokerBorder}; border-radius: 0.75rem; padding: 1.25rem; cursor: pointer; text-align: center; background: ${brokerBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                 style="position: relative; flex: 1; min-width: 150px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 1rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
                  onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
-                 onmouseout="this.style.borderColor='${brokerBorder}'; this.style.backgroundColor='${brokerBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
-              <div style="font-size: 2.25rem; margin-bottom: 0.5rem;">🏢</div>
-              <div style="font-weight: 700; font-size: 0.85rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Broker</div>
-              <div style="font-size: 0.7rem; color: #6b7280; margin-top: 0.25rem; font-weight: 600; text-transform: uppercase; line-height: 1.2;">I manage a team of agents</div>
+                 onmouseout="this.style.borderColor='${defaultBorder}'; this.style.backgroundColor='${defaultBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
+              ${brokerBookmark}
+              <div style="font-size: 2.25rem; margin-bottom: 0.25rem;">🏢</div>
+              <div style="font-weight: 700; font-size: 0.9rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Broker</div>
             </div>
             
             <!-- Realtor Approval Card -->
             <div onclick="App.views.admin.approveWithRole('${user.id}', 'realtor')" 
-                 style="flex: 1; min-width: 150px; border: 2px solid ${realtorBorder}; border-radius: 0.75rem; padding: 1.25rem; cursor: pointer; text-align: center; background: ${realtorBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                 style="position: relative; flex: 1; min-width: 150px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 1rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
                  onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
-                 onmouseout="this.style.borderColor='${realtorBorder}'; this.style.backgroundColor='${realtorBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
-              <div style="font-size: 2.25rem; margin-bottom: 0.5rem;">👤</div>
-              <div style="font-weight: 700; font-size: 0.85rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Realtor</div>
-              <div style="font-size: 0.7rem; color: #6b7280; margin-top: 0.25rem; font-weight: 600; text-transform: uppercase; line-height: 1.2;">I'm an individual agent</div>
+                 onmouseout="this.style.borderColor='${defaultBorder}'; this.style.backgroundColor='${defaultBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
+              ${realtorBookmark}
+              <div style="font-size: 2.25rem; margin-bottom: 0.25rem;">👤</div>
+              <div style="font-weight: 700; font-size: 0.9rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Realtor</div>
             </div>
           </div>
         `,
