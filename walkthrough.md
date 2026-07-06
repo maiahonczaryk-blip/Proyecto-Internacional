@@ -1,47 +1,37 @@
-# Walkthrough: Formulario de Captura de Leads y Seguimiento de Descargas
+# Walkthrough: Resolución de Redirecciones y Sobrescritura de Dashboard
 
-He implementado con éxito la protección de descarga de la guía del comprador y la visualización de los leads correspondientes en los paneles de Administrador y de Broker.
-
----
-
-## Cambios Realizados y Nueva Funcionalidad
-
-### 1. Formulario Modal de Captura de Leads (Web Pública)
-* **Intercepción de Clics**: Todos los enlaces a `dossier.html` (barra de navegación, botón de introducción a España y banner de llamada a la acción inferior) ahora son interceptados por `js/main.js`.
-* **Formulario Bilingüe**: Al hacer clic en descargar, se despliega un formulario modal que solicita:
-  - Nombre (First Name)
-  - Apellidos (Last Name)
-  - Correo Electrónico (Email Address)
-  - Número de Teléfono (Phone Number)
-* **Descarga Automática**: Al enviar el formulario con éxito, el sistema guarda el lead y abre la guía `dossier.html` en una pestaña nueva automáticamente.
-
-### 2. Guardado en Base de Datos (Firebase & Demo Mode)
-* He creado los métodos `saveDossierLead()` y `getDossierLeads()` en `js/auth-service.js` con soporte completo de doble canal:
-  - **Producción**: Guarda en la colección de Firestore `dossier_leads`.
-  - **Demo Mode**: Guarda en el array `App.demoData.dossier_leads` persistido en `localStorage` (bajo la clave `remax_demo_dossier_leads`).
-* He inicializado datos ficticios de leads en `js/firebase-config.js` para que el panel muestre registros de prueba desde el primer inicio.
-
-### 3. Sección de Leads para Administradores
-* **admin.html (Directo)**: Añadida la sección de tabla "Buyer's Guide Downloads (Leads)" para visualizar la fecha, nombre, email, teléfono y origen de cada descarga.
-* **js/views/admin-views.js (SPA)**: Integrado en el cargador del panel de administración general para poblar la tabla con los leads más recientes.
-
-### 4. Sección de Leads para Brokers (Broker Inmomás)
-* **dashboard.html**: Incorporada la sección de leads en el panel del partner (visible únicamente para usuarios con rol `broker`).
-* **js/views/broker-views.js (SPA)**: Programada la lógica para cargar y poblar la tabla con la lista de descargas en tiempo real al ingresar al panel del Broker.
-
-### 5. Corrección de Bug de Sidebar
-* Se añadió el atributo `id="dashboard-sidebar"` a la etiqueta `<aside>` en `dashboard.html`. Esto soluciona la falta de vinculación del sidebar móvil que causaba errores menores al intentar abrir o colapsar el menú en teléfonos y tablets.
+He corregido con éxito el bucle de redirección que expulsaba a los usuarios del SPA (`app.html`) y los mandaba de vuelta al formulario de login heredado (`partner-login.html`).
 
 ---
 
-## Despliegue en Vivo
-Todos los archivos editados fueron recompilados con `build_spa.py` e integrados en `app.html`, y finalmente pusheados a GitHub (`main`), activando la compilación automática de Vercel.
+## Causa del Problema
 
-### Cómo testearlo:
-1. Ve a la página pública de inicio en Vercel.
-2. Haz clic en el botón de descarga del dossier PDF (por ejemplo, en el botón rojo de la sección sobre España).
-3. Rellena el formulario modal que aparece en pantalla y pulsa enviar. Se te redirigirá a `dossier.html` en una pestaña nueva para guardarlo.
-4. Entra al panel de login e inicia sesión con un rol adecuado:
-   - **Administrador**: email `admin@remax-inmomas.com` (o `maia.honczaryk@remax.es`), contraseña `admin123`.
-   - **Broker Inmomás**: email `john.broker@remaxusa.com`, contraseña `broker123`.
-5. Comprueba la nueva sección **Buyer's Guide Downloads (Leads)** al fondo de la página, donde figurará el lead que acabas de registrar junto con los leads de prueba.
+1. **Conflicto de Sesiones**: El nuevo SPA guarda la sesión activa en `remax_session`, mientras que las vistas heredadas (`dashboard.html`) buscaban el usuario en `remax_current_user`.
+2. **Ejecución Global en el SPA**: Al compilarse, el script de carga de `dashboard.html` se inyectaba en `app.html` y corría de forma global en cada carga de página. Al no encontrar la clave heredada `remax_current_user`, ejecutaba una redirección forzada a `partner-login.html`.
+3. **Página de Login Antigua**: Al iniciar sesión en el login antiguo, se redirigía al usuario a `dashboard.html` (estático e independiente), sacándolo de la aplicación SPA unificada.
+
+---
+
+## Solución Aplicada
+
+### 1. Aislamiento de Ejecución en `dashboard.html` y `js/auth.js`
+* Se añadió una condición de ruta (`window.location.pathname.endsWith('dashboard.html')`) en la función `loadPartnerDashboard()` y en el listener de inicio `DOMContentLoaded` de `dashboard.html`.
+* De este modo, los scripts de la página estática antigua se apagan automáticamente si se ejecutan dentro del SPA (`app.html` o `index.html`), permitiendo que el router SPA de `router.js` controle y cargue el dashboard correctamente.
+
+### 2. Redirección Inteligente de Enlaces Antiguos al SPA
+* **partner-login.html**: Si algún usuario o enlace externo intenta acceder a la URL directa del login antiguo, el navegador lo redirige limpiamente al login de la SPA (`index.html#login`).
+* **dashboard.html**: Si se intenta acceder al panel estático heredado, el sistema comprueba la sesión activa y redirige al panel adecuado dentro de la SPA (`app.html#broker/dashboard` o `app.html#realtor/dashboard`). Si no hay sesión, lo envía a iniciar sesión en la SPA.
+
+### 3. Sincronización de Claves de Sesión
+* Se actualizó la función `loginPartner` en `js/auth.js` para escribir tanto en `remax_current_user` como en `remax_session`, logrando plena compatibilidad de sesión cruzada.
+
+---
+
+## Verificación del Flujo
+Los cambios han sido compilados e integrados en `app.html` y subidos a GitHub (`main`), completando la actualización en Vercel.
+
+### Flujo de Prueba:
+1. Visita la página de login de la SPA (por ejemplo, desde `index.html#login`).
+2. Entra con las credenciales demo, como `john.broker@remaxusa.com` (contraseña `broker123`).
+3. El sistema te redirigirá directamente a `app.html#broker/dashboard`.
+4. El panel de la SPA se cargará de inmediato con el sidebar interactivo correcto y el listado de leads de la Guía de Compradores integrado, sin interrumpir con la pantalla de acceso antigua.
