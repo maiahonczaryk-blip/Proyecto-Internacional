@@ -1,28 +1,22 @@
-# Walkthrough: Restablecimiento de Dashboards SPA y Login Unificado de Demostración
+# Walkthrough: Solución de Superposición del Mensaje "Application Received" y Activación del Login Unificado
 
-He corregido la pérdida de los paneles del Broker, Realtor y Agente Inmomás, restableciendo el acceso al dashboard real del Agente en `#agent_inmomas/dashboard` en lugar de la pantalla de solicitud pendiente ("Application Received"). Asimismo, se ha unificado todo el flujo de inicio de sesión bajo la pantalla inicial unificada con sus credenciales demo.
+He solucionado el problema de visibilidad que hacía que el mensaje de "Application Received" (pantalla de solicitud pendiente) se superpusiera por encima de la pantalla de Login y de los dashboards.
 
 ---
 
 ## Causa del Problema
 
-1. **Vistas de Dashboard Borradas**: En commits anteriores del repositorio, las interfaces de Broker, Realtor y Agente Inmomás se habían añadido directamente en el archivo compilado `app.html` pero no en los archivos de origen. Al correr el compilador del SPA (`build_spa.py`), este sobrescribió `app.html` desde las plantillas base, eliminando por accidente el código HTML de todos estos paneles específicos.
-2. **Caída a Pantalla de "Solicitud Recibida"**: Dado que la SPA carecía del div `#view-agent-dashboard` en el HTML, al iniciar sesión como Carlos García (`carlos.agent@remax-inmomas.com`), el enrutador no encontraba el panel, dejando visible la sección activa por defecto en ese momento (`view-pending`), la cual muestra el mensaje de solicitud enviada.
+1. **Especificidad de ID en Estilos Compilados**: El archivo `pending.html` define un estilo en el body (`body { display: flex; ... }`). Durante la compilación con `build_spa.py`, esto se convertía automáticamente en `#view-pending { display: flex; ... }`. 
+2. Debido a las reglas de peso de selectores en CSS, el selector de ID `#view-pending` tiene mayor especificidad que el selector de clase `.app-view { display: none; }`. Esto causaba que la vista pendiente se mostrara con `display: flex` en todo momento, tapando el login y los dashboards.
 
 ---
 
 ## Solución Aplicada
 
-### 1. Extracción y Persistencia de los Paneles
-* He recuperado todas las vistas de dashboard (Realtor, Broker, Agente, etc.) desde la historia del Git (commit `d443f95:app.html`) y las he consolidado de manera limpia y organizada en un nuevo archivo de plantilla persistente: [dashboards_spa.html](file:///Users/maiahonczaryk/Desktop/Proyecto%20Internacional/dashboards_spa.html).
-
-### 2. Integración en el Compilador de la SPA
-* Modifiqué tanto `build_spa.py` como `build_spa.js` para admitir la inyección directa de archivos de bloque completo (`raw`) sin encapsularlos en un div contenedor padre innecesario.
-* Agregué `dashboards_spa.html` a la lista de compilación para que todos los dashboards se reconstruyan en `app.html` de forma permanente y no se vuelvan a perder en futuras compilaciones.
-
-### 3. Restablecimiento del Flujo de Acceso Unificado
-* Confirmé que la pantalla unificada de partners (`view-login` originada de `index.html`) sea la que controle el acceso general de todas las cuentas.
-* Esta pantalla muestra detalladamente todas las cuentas de demostración (Broker Inmomás, Agente Inmomás, Broker Externo e Realtor Externo) con sus respectivas contraseñas para facilitar las pruebas. Al rellenar los datos, el enrutador del SPA de `router.js` redirige a la pestaña correcta y carga el panel real correspondiente.
+### 1. Acoplamiento de Estilos Compilados a la Clase Activa
+* He modificado el compilador en [build_spa.py](file:///Users/maiahonczaryk/Desktop/Proyecto%20Internacional/build_spa.py) y [build_spa.js](file:///Users/maiahonczaryk/Desktop/Proyecto%20Internacional/build_spa.js) para que al traducir los estilos del body de los templates, los asigne a la clase activa:
+  - Reemplaza `body {` por `#{view.id}.active {`.
+* Con este cambio, el estilo `#view-pending.active { display: flex; }` solo se ejecuta si el enrutador del SPA le añade explícitamente la clase `.active`. Si no está activa, la vista se oculta correctamente con `display: none`.
 
 ---
 
@@ -30,8 +24,6 @@ He corregido la pérdida de los paneles del Broker, Realtor y Agente Inmomás, r
 Los cambios ya se encuentran en GitHub y están completamente operativos.
 
 ### Flujo de Prueba:
-1. Accede a `index.html#login` (o en vivo en Vercel).
-2. Introduce los datos del Agente Inmomás:
-   - **Correo**: `carlos.agent@remax-inmomas.com`
-   - **Contraseña**: `agent123`
-3. El sistema te redirigirá instantáneamente a `app.html#agent_inmomas/dashboard` y cargará correctamente la interfaz del agente (con sus contadores de comisiones, embudo interactivo y listado de clientes), eliminando por completo la vista de "Application Received".
+1. Accede a la URL principal.
+2. Al estar deslogueado, ahora se mostrará limpiamente la pantalla unificada de **Partner Login** con el listado de credenciales demo (sin el cartel de solicitud pendiente encima).
+3. Podrás ingresar los datos y el router te dirigirá correctamente al panel del Broker, Realtor o Agente Inmomás según corresponda.
