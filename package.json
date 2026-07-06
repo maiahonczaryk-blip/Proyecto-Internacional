@@ -1,0 +1,13 @@
+{
+  "name": "proyecto-internacional",
+  "version": "1.0.0",
+  "description": "RE/MAX Inmomás International Portal",
+  "main": "js/main.js",
+  "scripts": {
+    "db:migrate": "node scripts/migrate-db.js",
+    "build": "node build_spa.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^10.3.0"
+  }
+}

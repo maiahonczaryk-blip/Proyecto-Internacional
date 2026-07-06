@@ -15,83 +15,6 @@
   let allUsers = [];
   let allClients = [];
 
-  /* ── Firestore Seeding Utility ── */
-  async function checkFirestoreSeeding() {
-    if (App.demoMode) return;
-
-    const banner = document.getElementById('firestore-seed-banner');
-    const button = document.getElementById('btn-seed-firestore');
-    if (!banner || !button) return;
-
-    try {
-      const usersRef = App.db.collection('users');
-      const snapshot = await usersRef.limit(1).get();
-      
-      if (snapshot.empty) {
-        banner.style.display = 'flex';
-        
-        button.onclick = async () => {
-          button.disabled = true;
-          button.textContent = 'Seeding database...';
-          
-          try {
-            // Seed Users
-            const demoUsers = App.demoData.users;
-            for (const user of demoUsers) {
-              const uCopy = { ...user };
-              const uid = uCopy.id;
-              delete uCopy.id;
-              uCopy.updatedAt = uCopy.updatedAt || new Date().toISOString();
-              delete uCopy.password;
-              await App.db.collection('users').doc(uid).set(uCopy);
-            }
-            
-            // Seed Clients
-            const demoClients = App.demoData.clients;
-            for (const client of demoClients) {
-              const cCopy = { ...client };
-              const cid = cCopy.id;
-              delete cCopy.id;
-              await App.db.collection('clients').doc(cid).set(cCopy);
-            }
-            
-            // Seed Commissions
-            const demoComms = App.demoData.commissions;
-            for (const comm of demoComms) {
-              const coCopy = { ...comm };
-              const coid = coCopy.id;
-              delete coCopy.id;
-              await App.db.collection('commissions').doc(coid).set(coCopy);
-            }
-            
-            // Seed Leads
-            const demoLeads = App.demoData.dossier_leads || [];
-            for (const lead of demoLeads) {
-              const lCopy = { ...lead };
-              const lid = lCopy.id;
-              delete lCopy.id;
-              await App.db.collection('dossier_leads').doc(lid).set(lCopy);
-            }
-
-            App.utils.showToast('Firestore initialized successfully! 🎉', 'success');
-            banner.style.display = 'none';
-            
-            initDashboard();
-          } catch (e) {
-            console.error('[Admin] Seeding failed:', e);
-            App.utils.showToast('Seeding failed: ' + e.message, 'error');
-            button.disabled = false;
-            button.textContent = 'Seed Firestore 🚀';
-          }
-        };
-      } else {
-        banner.style.display = 'none';
-      }
-    } catch (err) {
-      console.error('[Admin] Seeding check error:', err);
-    }
-  }
-
   /* ============================================
      initDashboard()
      Populates #view-admin-dashboard with stat
@@ -100,10 +23,7 @@
      ============================================ */
   async function initDashboard() {
     try {
-      // 1. Check if seeding is required
-      await checkFirestoreSeeding();
-
-      // 2. Load all users and clients
+      // 1. Load all users and clients
       allUsers = await App.auth.getAllUsers();
       allClients = await App.auth.getClients();
 

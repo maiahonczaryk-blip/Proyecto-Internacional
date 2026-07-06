@@ -95,15 +95,26 @@ service cloud.firestore {
 
 ---
 
-## Paso 5: Sembrado Automático de Datos (Seeding)
+## Paso 5: Sembrado y Migración de Base de Datos (CLI Migrations)
 
-Una vez que la aplicación está conectada a Firebase, la base de datos estará inicialmente vacía. Para poblarla automáticamente sin tener que agregar los datos a mano:
+Una vez que la aplicación está conectada a Firebase, la base de datos de Firestore estará vacía. Para poblarla automáticamente y migrar la estructura de colecciones mediante la terminal:
 
-1. Abre el portal en tu navegador (ej: `index.html` en local o tu URL en Vercel).
-2. Ve a **Iniciar Sesión** (`#login`) e introduce las credenciales de administrador:
-   - Email: `admin@remax-inmomas.com`
-   - Contraseña: La que creaste en el Paso 2 (ej. `admin123`).
-3. Al entrar al panel de control, el sistema detectará que la base de datos de Firestore está vacía y te mostrará un banner superior azul:
-   **"Inicializar Base de Datos Firebase / Initialize Live Firebase Database"**.
-4. Haz clic en el botón **Sembrar Firestore / Seed Firestore 🚀**.
-5. ¡Listo! El script insertará automáticamente en tu base de datos de Firestore en la nube todos los usuarios de prueba, clientes recomendados e historiales de comisiones iniciales. El banner desaparecerá y verás el dashboard completamente operativo con datos reales.
+1. **Instalar Dependencias**:
+   Instala las librerías necesarias del proyecto ejecutando en tu terminal:
+   ```bash
+   npm install
+   ```
+2. **Descargar Archivo de Cuenta de Servicio**:
+   - Ve a la consola de Firebase -> **Configuración del proyecto** (icono de engranaje) -> **Cuentas de servicio** (Service accounts).
+   - Haz clic en el botón **Generar nueva clave privada**.
+   - Descarga el archivo JSON y guárdalo en la raíz de este proyecto con el nombre:
+     `firebase-service-account.json`
+3. **Ejecutar la Migración**:
+   Ejecuta el script de migración en la terminal:
+   ```bash
+   npm run db:migrate
+   ```
+4. El script leerá el archivo de configuración `js/firebase-config.js` y poblará Cloud Firestore automáticamente con todos los usuarios de prueba, clientes recomendados e historiales de comisiones.
+
+Una vez completado, verás el mensaje de éxito en la consola y podrás iniciar sesión en el portal y utilizar todos los dashboards con datos reales.
+
