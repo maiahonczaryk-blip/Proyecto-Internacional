@@ -4,8 +4,6 @@ import re
 files = [
     {'id': 'view-home', 'path': 'index.html'},
     {'id': 'view-professionals', 'path': 'professionals.html'},
-    {'id': 'view-partner-login', 'path': 'partner-login.html'},
-    {'id': 'view-admin-login', 'path': 'admin-login.html'},
     {'id': 'view-pending', 'path': 'pending.html'},
     {'id': 'view-partner-dashboard', 'path': 'dashboard.html'},
     {'id': 'view-admin-dashboard', 'path': 'admin.html'}
@@ -23,12 +21,10 @@ app_html = """<!DOCTYPE html>
     .app-view { display: none; }
     .app-view.active { display: block; }
     
-    /* View-specific container resets */
-    #view-partner-login { background: var(--bg-secondary); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-    #view-admin-login { background-color: #111827; color: white; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-    #view-pending { background: #f3f4f6; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-    #view-partner-dashboard { background-color: #f3f4f6; min-height: 100vh; }
-    #view-admin-dashboard { background: #f3f4f6; min-height: 100vh; }
+    /* View-specific container resets when active */
+    #view-pending.active { background: #f3f4f6; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    #view-partner-dashboard.active { background-color: #f3f4f6; min-height: 100vh; display: block; }
+    #view-admin-dashboard.active { background: #f3f4f6; min-height: 100vh; display: block; }
   </style>
 """
 
