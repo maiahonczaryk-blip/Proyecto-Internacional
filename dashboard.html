@@ -329,7 +329,7 @@
   </div>
 
   <script>
-    if (window.location.pathname.endsWith('dashboard.html')) {
+    if (window.location.pathname.includes('dashboard') && !window.location.pathname.includes('app')) {
       const user = JSON.parse(localStorage.getItem('remax_session') || localStorage.getItem('remax_current_user'));
       if (user && user.role) {
         window.location.href = 'app.html#' + user.role + '/dashboard';
@@ -344,7 +344,7 @@
     // Initialize Dashboard with LocalStorage Data
     document.addEventListener('DOMContentLoaded', () => {
       // Only execute this standalone logic if we are directly on dashboard.html
-      if (!window.location.pathname.endsWith('dashboard.html')) {
+      if (!window.location.pathname.includes('dashboard') || window.location.pathname.includes('app')) {
         return;
       }
       

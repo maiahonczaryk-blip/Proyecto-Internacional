@@ -61,7 +61,7 @@ function loginPartner(event) {
     } else if (partner.status === 'approved') {
         localStorage.setItem('remax_current_user', JSON.stringify(partner));
         localStorage.setItem('remax_session', JSON.stringify(partner)); // Sync session key for SPA compatibility
-        if (window.location.pathname.includes('app.html') || window.location.pathname.includes('index.html')) {
+        if (!window.location.pathname.includes('dashboard') && !window.location.pathname.includes('partner-login')) {
             window.location.href = 'app.html#' + (partner.role || 'realtor') + '/dashboard';
         } else {
             window.location.href = 'dashboard.html';
@@ -170,8 +170,8 @@ function updatePartnerStatus(id, newStatus) {
 
 // 5. Partner Dashboard Logic
 function loadPartnerDashboard() {
-    // Only execute legacy logic on standalone dashboard.html
-    if (!window.location.pathname.endsWith('dashboard.html')) {
+    // Only execute legacy logic on standalone dashboard.html (not in SPA app.html)
+    if (!window.location.pathname.includes('dashboard') || window.location.pathname.includes('app')) {
         return;
     }
     const user = JSON.parse(localStorage.getItem('remax_current_user'));
