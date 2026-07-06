@@ -598,9 +598,9 @@
   <script src="js/views/agent-views.js"></script>
   <script src="js/main.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       if (App && App.auth) {
-        App.auth.init();
+        await App.auth.init();
       }
       if (App && App.router) {
         App.router.init();
