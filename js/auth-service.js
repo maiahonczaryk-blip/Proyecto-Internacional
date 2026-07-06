@@ -22,6 +22,12 @@ App.auth = (function() {
     if (savedClients) App.demoData.clients = JSON.parse(savedClients);
     const savedCommissions = localStorage.getItem('remax_demo_commissions');
     if (savedCommissions) App.demoData.commissions = JSON.parse(savedCommissions);
+    const savedDossierLeads = localStorage.getItem('remax_demo_dossier_leads');
+    if (savedDossierLeads) {
+      App.demoData.dossier_leads = JSON.parse(savedDossierLeads);
+    } else {
+      App.demoData.dossier_leads = App.demoData.dossier_leads || [];
+    }
   }
 
   function saveDemoData() {
@@ -29,6 +35,7 @@ App.auth = (function() {
     localStorage.setItem('remax_demo_users', JSON.stringify(App.demoData.users));
     localStorage.setItem('remax_demo_clients', JSON.stringify(App.demoData.clients));
     localStorage.setItem('remax_demo_commissions', JSON.stringify(App.demoData.commissions));
+    localStorage.setItem('remax_demo_dossier_leads', JSON.stringify(App.demoData.dossier_leads || []));
     if (currentUser) {
       // Find the updated user in demoData to ensure the session gets the latest fields (e.g. agreementSigned, status)
       const updatedUser = App.demoData.users.find(u => u.id === currentUser.id);
@@ -595,6 +602,32 @@ App.auth = (function() {
     }
   }
 
+  /* ---- Dossier Lead Management ---- */
+  async function saveDossierLead(leadData) {
+    const id = 'lead_' + Date.now();
+    const createdAt = new Date().toISOString();
+    const newLead = { id, ...leadData, createdAt };
+
+    if (App.demoMode) {
+      if (!App.demoData.dossier_leads) App.demoData.dossier_leads = [];
+      App.demoData.dossier_leads.push(newLead);
+      saveDemoData();
+      return newLead;
+    } else {
+      const docRef = await App.db.collection('dossier_leads').add(newLead);
+      return { id: docRef.id, ...newLead };
+    }
+  }
+
+  async function getDossierLeads() {
+    if (App.demoMode) {
+      return App.demoData.dossier_leads || [];
+    } else {
+      const snapshot = await App.db.collection('dossier_leads').orderBy('createdAt', 'desc').get();
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    }
+  }
+
   /* ---- Public API ---- */
   return {
     init,
@@ -616,6 +649,8 @@ App.auth = (function() {
     getCommissions,
     onAuthChange,
     resetPassword,
-    saveDemoData
+    saveDemoData,
+    saveDossierLead,
+    getDossierLeads
   };
 })();

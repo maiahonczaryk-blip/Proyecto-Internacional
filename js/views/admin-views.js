@@ -48,10 +48,38 @@
         .slice(0, 5);
       renderRecentActivity(recentActivity);
 
+      // 6. Render dossier downloads (leads)
+      const leads = await App.auth.getDossierLeads();
+      renderDossierLeads(leads);
+
     } catch (err) {
       console.error('[Admin] initDashboard error:', err);
       App.utils.showToast('Error loading admin dashboard.', 'error');
     }
+  }
+
+  /* ── Dossier Leads List ── */
+  function renderDossierLeads(leads) {
+    const container = document.getElementById('dossier-leads-table-body');
+    if (!container) return;
+
+    if (leads.length === 0) {
+      container.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #6b7280; padding: 2rem;">No downloads yet.</td></tr>';
+      return;
+    }
+
+    container.innerHTML = leads.map(lead => {
+      const dateStr = App.utils.formatDate(lead.createdAt);
+      return `
+        <tr>
+          <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${dateStr}</td>
+          <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb; font-weight: 600;">${App.utils.escapeHtml(lead.firstName)} ${App.utils.escapeHtml(lead.lastName)}</td>
+          <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${App.utils.escapeHtml(lead.email)}</td>
+          <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${App.utils.escapeHtml(lead.phone)}</td>
+          <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;"><span class="status-badge status-new">Buyer Guide</span></td>
+        </tr>
+      `;
+    }).join('');
   }
 
   /* ── Pending Applications List ── */

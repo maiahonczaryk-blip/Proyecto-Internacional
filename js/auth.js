@@ -118,6 +118,39 @@ function loadAdminDashboard() {
         `;
         tableBody.appendChild(row);
     });
+
+    // Initialize mock leads if empty
+    if (!localStorage.getItem('remax_demo_dossier_leads')) {
+        const mockLeads = [
+            { id: 'lead-001', firstName: 'Emily', lastName: 'Smith', email: 'emily.smith@example.com', phone: '+1 617 555 9001', createdAt: '2026-07-05T10:30:00Z' },
+            { id: 'lead-002', firstName: 'Jean-Pierre', lastName: 'Dubois', email: 'jp.dubois@example.fr', phone: '+33 6 1234 5678', createdAt: '2026-07-06T08:15:00Z' }
+        ];
+        localStorage.setItem('remax_demo_dossier_leads', JSON.stringify(mockLeads));
+    }
+
+    // Render dossier leads
+    const leads = JSON.parse(localStorage.getItem('remax_demo_dossier_leads') || '[]');
+    const leadsTableBody = document.getElementById('dossier-leads-table-body');
+    if (leadsTableBody) {
+        leadsTableBody.innerHTML = '';
+        if (leads.length === 0) {
+            leadsTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #6b7280; padding: 2rem;">No downloads yet.</td></tr>';
+        } else {
+            const sortedLeads = [...leads].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+            sortedLeads.forEach(lead => {
+                const row = document.createElement('tr');
+                const dateStr = new Date(lead.createdAt).toLocaleDateString();
+                row.innerHTML = `
+                    <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${dateStr}</td>
+                    <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb; font-weight: 600;">${lead.firstName} ${lead.lastName}</td>
+                    <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${lead.email}</td>
+                    <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${lead.phone}</td>
+                    <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;"><span style="background:#dbeafe;color:#1e40af;padding:0.2rem 0.5rem;border-radius:1rem;font-size:0.85rem;">Buyer Guide</span></td>
+                `;
+                leadsTableBody.appendChild(row);
+            });
+        }
+    }
 }
 
 function updatePartnerStatus(id, newStatus) {

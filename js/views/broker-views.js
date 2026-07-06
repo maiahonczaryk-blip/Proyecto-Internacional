@@ -50,10 +50,40 @@
       // Recent clients (latest 5)
       renderRecentClients(brokerClients);
 
+      // Dossier downloads (leads)
+      const leads = await App.auth.getDossierLeads();
+      renderDossierLeads(leads);
+
     } catch (err) {
       console.error('[Broker] initDashboard error:', err);
       App.utils.showToast('Error loading broker dashboard.', 'error');
     }
+  }
+
+  /* ── Dossier Leads ── */
+  function renderDossierLeads(leads) {
+    const section = document.getElementById('broker-dossier-leads-section');
+    const tbody = document.getElementById('broker-dossier-leads-tbody');
+    if (!tbody) return;
+
+    if (section) section.style.display = 'block';
+
+    if (leads.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #6b7280; padding: 2rem;">No downloads yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = leads.map(lead => {
+      const dateStr = App.utils.formatDate(lead.createdAt);
+      return `
+        <tr>
+          <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${dateStr}</td>
+          <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb; font-weight: 600;">${App.utils.escapeHtml(lead.firstName)} ${App.utils.escapeHtml(lead.lastName)}</td>
+          <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${App.utils.escapeHtml(lead.email)}</td>
+          <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${App.utils.escapeHtml(lead.phone)}</td>
+        </tr>
+      `;
+    }).join('');
   }
 
   /* ── Team Overview (dashboard widget) ── */

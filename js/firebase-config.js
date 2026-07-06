@@ -420,5 +420,23 @@ App.demoData = {
       closingDate: null,
       createdAt: '2025-05-25T09:00:00Z'
     }
+  ],
+  dossier_leads: [
+    {
+      id: 'lead-001',
+      firstName: 'Emily',
+      lastName: 'Smith',
+      email: 'emily.smith@example.com',
+      phone: '+1 617 555 9001',
+      createdAt: '2026-07-05T10:30:00Z'
+    },
+    {
+      id: 'lead-002',
+      firstName: 'Jean-Pierre',
+      lastName: 'Dubois',
+      email: 'jp.dubois@example.fr',
+      phone: '+33 6 1234 5678',
+      createdAt: '2026-07-06T08:15:00Z'
+    }
   ]
 };

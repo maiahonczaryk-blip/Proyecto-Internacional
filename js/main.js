@@ -513,4 +513,94 @@ document.addEventListener('DOMContentLoaded', () => {
     updatePropCarousel();
   }
 
+  // ── Dossier PDF Form Capture ──
+  const dossierLinks = document.querySelectorAll('a[href*="dossier.html"]');
+  dossierLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      const lang = document.body.classList.contains('lang-es') ? 'es' : 'en';
+      
+      const modalBody = `
+        <div class="dossier-lead-form" style="padding: 1.5rem 0.5rem 0;">
+          <p style="font-size: 0.9rem; color: #4b5563; margin-bottom: 1.5rem; line-height: 1.5;">
+            ${lang === 'es' 
+              ? 'Por favor, déjanos tus datos para descargar la Guía Completa de Compra en España de forma gratuita.' 
+              : 'Please enter your details to download the Complete Guide to Buying in Spain for free.'}
+          </p>
+          <form id="dossier-lead-form-el" style="display: flex; flex-direction: column; gap: 1.2rem;">
+            <div style="display: flex; gap: 1rem;">
+              <div style="flex: 1;">
+                <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: #0a1628;">${lang === 'es' ? 'Nombre' : 'First Name'}</label>
+                <input type="text" id="lead-first-name" required placeholder="${lang === 'es' ? 'Ej. Juan' : 'e.g. John'}" style="width: 100%; padding: 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 6px; font-family: inherit;">
+              </div>
+              <div style="flex: 1;">
+                <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: #0a1628;">${lang === 'es' ? 'Apellidos' : 'Last Name'}</label>
+                <input type="text" id="lead-last-name" required placeholder="${lang === 'es' ? 'Ej. Pérez' : 'e.g. Doe'}" style="width: 100%; padding: 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 6px; font-family: inherit;">
+              </div>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: #0a1628;">${lang === 'es' ? 'Correo Electrónico' : 'Email Address'}</label>
+              <input type="email" id="lead-email" required placeholder="name@example.com" style="width: 100%; padding: 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 6px; font-family: inherit;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: #0a1628;">${lang === 'es' ? 'Número de Teléfono' : 'Phone Number'}</label>
+              <input type="tel" id="lead-phone" required placeholder="e.g. +1 (305) 555-0199" style="width: 100%; padding: 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 6px; font-family: inherit;">
+            </div>
+            <button type="submit" class="btn btn-primary" style="background: #e51937; color: white; width: 100%; padding: 0.85rem; font-size: 0.95rem; font-weight: 700; border-radius: 6px; margin-top: 0.8rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>${lang === 'es' ? 'Descargar Guía Completa (PDF)' : 'Download Full Guide (PDF)'}</span>
+            </button>
+          </form>
+        </div>
+      `;
+
+      if (App && App.utils && App.utils.showModal) {
+        const modalInstance = App.utils.showModal({
+          title: lang === 'es' ? 'Descarga la Guía del Comprador' : 'Download Buyer\'s Guide',
+          body: modalBody,
+          className: 'modal--dossier-lead'
+        });
+
+        const form = document.getElementById('dossier-lead-form-el');
+        if (form) {
+          form.addEventListener('submit', async (formEvt) => {
+            formEvt.preventDefault();
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+
+            const leadData = {
+              firstName: document.getElementById('lead-first-name').value,
+              lastName: document.getElementById('lead-last-name').value,
+              email: document.getElementById('lead-email').value,
+              phone: document.getElementById('lead-phone').value,
+              source: 'download_dossier'
+            };
+
+            try {
+              if (App.auth && typeof App.auth.saveDossierLead === 'function') {
+                await App.auth.saveDossierLead(leadData);
+              }
+              
+              App.utils.showToast(
+                lang === 'es' ? '¡Gracias! Redirigiendo a la descarga...' : 'Thank you! Redirecting to download...',
+                'success'
+              );
+              
+              modalInstance.close();
+              
+              // Open dossier in new tab
+              window.open('dossier.html', '_blank');
+            } catch (err) {
+              console.error('Error saving dossier lead:', err);
+              App.utils.showToast('Error saving data. Please try again.', 'error');
+              if (submitBtn) submitBtn.disabled = false;
+            }
+          });
+        }
+      }
+    });
+  });
+
 });

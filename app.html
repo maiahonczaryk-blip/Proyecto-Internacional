@@ -1907,7 +1907,7 @@
   <div class="dashboard-layout">
     
     <!-- SIDEBAR -->
-    <aside class="dashboard-sidebar">
+    <aside class="dashboard-sidebar" id="dashboard-sidebar">
       <div class="dashboard-logo">
         <a href="index.html">
           <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás">
@@ -2047,6 +2047,29 @@
         </div>
       </section>
 
+      <!-- BUYER'S GUIDE DOWNLOADS (LEADS) - ONLY FOR BROKERS -->
+      <section class="dashboard-section" id="broker-dossier-leads-section" style="display: none;">
+        <h2>
+          <span class="lang-en">Buyer's Guide Downloads (Leads)</span>
+          <span class="lang-es">Descargas de la Guía del Comprador (Leads)</span>
+        </h2>
+        <div style="overflow-x: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date / Fecha</th>
+                <th>Name / Nombre</th>
+                <th>Email / Correo</th>
+                <th>Phone / Teléfono</th>
+              </tr>
+            </thead>
+            <tbody id="broker-dossier-leads-tbody">
+              <!-- Leads will be injected here -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -2085,6 +2108,24 @@
         </thead>
         <tbody id="partners-table-body">
           <!-- Rows will be injected here via JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <h1 class="admin-title" style="margin-top: 3rem;">Buyer's Guide Downloads (Leads)</h1>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody id="dossier-leads-table-body">
+          <!-- Lead rows will be injected here via JS -->
         </tbody>
       </table>
     </div>
@@ -2281,6 +2322,43 @@
         
         const slug = user.agencyName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
         document.getElementById('ref-link').value = 'https://inmomas.es/ref/' + slug;
+
+        // Render dossier leads if broker
+        if (user.role === 'broker') {
+          const leadsSection = document.getElementById('broker-dossier-leads-section');
+          if (leadsSection) leadsSection.style.display = 'block';
+
+          // Initialize mock leads if empty in localStorage
+          if (!localStorage.getItem('remax_demo_dossier_leads')) {
+            const mockLeads = [
+              { id: 'lead-001', firstName: 'Emily', lastName: 'Smith', email: 'emily.smith@example.com', phone: '+1 617 555 9001', createdAt: '2026-07-05T10:30:00Z' },
+              { id: 'lead-002', firstName: 'Jean-Pierre', lastName: 'Dubois', email: 'jp.dubois@example.fr', phone: '+33 6 1234 5678', createdAt: '2026-07-06T08:15:00Z' }
+            ];
+            localStorage.setItem('remax_demo_dossier_leads', JSON.stringify(mockLeads));
+          }
+
+          const leads = JSON.parse(localStorage.getItem('remax_demo_dossier_leads') || '[]');
+          const leadsTbody = document.getElementById('broker-dossier-leads-tbody');
+          if (leadsTbody) {
+            leadsTbody.innerHTML = '';
+            if (leads.length === 0) {
+              leadsTbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #6b7280; padding: 2rem;">No downloads yet.</td></tr>';
+            } else {
+              const sortedLeads = [...leads].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+              sortedLeads.forEach(lead => {
+                const row = document.createElement('tr');
+                const dateStr = new Date(lead.createdAt).toLocaleDateString();
+                row.innerHTML = `
+                  <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${dateStr}</td>
+                  <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;"><strong>${lead.firstName} ${lead.lastName}</strong></td>
+                  <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${lead.email}</td>
+                  <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${lead.phone}</td>
+                `;
+                leadsTbody.appendChild(row);
+              });
+            }
+          }
+        }
       }
     });
 
