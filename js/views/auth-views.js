@@ -36,6 +36,39 @@ App.views.auth = {
           submitBtn.disabled = false;
         }
       });
+
+      const googleBtn = newForm.querySelector('#login-google-btn') || document.getElementById('login-google-btn');
+      if (googleBtn) {
+        googleBtn.onclick = async () => {
+          const err = document.getElementById('login-error');
+          err.style.display = 'none';
+          
+          try {
+            const user = await App.auth.loginWithGoogle();
+            if (user) {
+              window.location.href = 'app.html#' + user.role + '/dashboard';
+            }
+          } catch (error) {
+            if (error.code === 'USER_NOT_REGISTERED') {
+              App.utils.showToast('Google account not registered. Please register first.', 'info');
+              window.location.hash = 'register';
+              
+              setTimeout(() => {
+                const regEmail = document.getElementById('register-email');
+                const regFirst = document.getElementById('register-firstName');
+                const regLast = document.getElementById('register-lastName');
+                
+                if (regEmail && error.email) regEmail.value = error.email;
+                if (regFirst && error.firstName) regFirst.value = error.firstName;
+                if (regLast && error.lastName) regLast.value = error.lastName;
+              }, 150);
+            } else {
+              err.textContent = error.message;
+              err.style.display = 'block';
+            }
+          }
+        };
+      }
     }
   },
 
@@ -505,6 +538,55 @@ App.views.auth = {
           alert(err.message);
         }
       });
+
+      const googleRegBtn = newForm.querySelector('#register-google-btn') || document.getElementById('register-google-btn');
+      if (googleRegBtn) {
+        googleRegBtn.onclick = async () => {
+          const termsChecked = newForm.querySelector('#register-terms').checked;
+          if (!termsChecked) {
+            App.utils.showToast('Please agree to the terms.', 'error');
+            return;
+          }
+
+          const roleRadio = newForm.querySelector('input[name="register-role"]:checked');
+          if (!roleRadio) {
+            App.utils.showToast('Please select a role (Broker or Realtor).', 'error');
+            return;
+          }
+
+          const firstName = newForm.querySelector('#register-firstName').value;
+          const lastName = newForm.querySelector('#register-lastName').value;
+          if (!firstName || !lastName) {
+            App.utils.showToast('First name and last name are required.', 'error');
+            return;
+          }
+
+          const data = {
+            role: roleRadio.value,
+            firstName,
+            lastName,
+            phone: newForm.querySelector('#register-phone').value,
+            country: newForm.querySelector('#register-country').value,
+            agencyName: agencyNameInput ? agencyNameInput.value : '',
+            brokerId: brokerSelect ? brokerSelect.value : '',
+          };
+
+          try {
+            const res = await App.auth.registerWithGoogle(data);
+            if (res && res.success) {
+              if (res.user.status === 'active') {
+                App.utils.showToast('Registration successful! Logging in... 🎉', 'success');
+                window.location.href = 'app.html#' + res.user.role + '/dashboard';
+              } else {
+                alert("Registration successful! Please wait for approval before logging in.");
+                App.router.navigateTo('login');
+              }
+            }
+          } catch (err) {
+            App.utils.showToast(err.message, 'error');
+          }
+        };
+      }
     }
   }
 };

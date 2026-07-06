@@ -49,42 +49,55 @@ App.auth = (function() {
 
   /* ---- Initialize ---- */
   function init() {
-    if (App.demoMode) {
-      loadDemoData();
-      
-      // Restore session from localStorage
-      const saved = localStorage.getItem(SESSION_KEY);
-      if (saved) {
-        try {
-          currentUser = JSON.parse(saved);
-          // Verify user still exists in demo data
-          const exists = App.demoData.users.find(u => u.id === currentUser.id);
-          if (!exists || exists.status !== 'active') {
+    return new Promise((resolve) => {
+      if (App.demoMode) {
+        loadDemoData();
+        
+        // Restore session from localStorage
+        const saved = localStorage.getItem(SESSION_KEY);
+        if (saved) {
+          try {
+            currentUser = JSON.parse(saved);
+            // Verify user still exists in demo data
+            const exists = App.demoData.users.find(u => u.id === currentUser.id);
+            if (!exists || exists.status !== 'active') {
+              currentUser = null;
+              localStorage.removeItem(SESSION_KEY);
+            }
+          } catch {
             currentUser = null;
             localStorage.removeItem(SESSION_KEY);
           }
-        } catch {
-          currentUser = null;
-          localStorage.removeItem(SESSION_KEY);
         }
-      }
-      notifyAuthChange();
-    } else {
-      // Firebase Auth listener
-      App.firebaseAuth.onAuthStateChanged(async (firebaseUser) => {
-        if (firebaseUser) {
-          const doc = await App.db.collection('users').doc(firebaseUser.uid).get();
-          if (doc.exists) {
-            currentUser = { id: firebaseUser.uid, ...doc.data() };
+        notifyAuthChange();
+        resolve(currentUser);
+      } else {
+        // Firebase Auth listener
+        let firstResolve = true;
+        App.firebaseAuth.onAuthStateChanged(async (firebaseUser) => {
+          if (firebaseUser) {
+            try {
+              const doc = await App.db.collection('users').doc(firebaseUser.uid).get();
+              if (doc.exists) {
+                currentUser = { id: firebaseUser.uid, ...doc.data() };
+              } else {
+                currentUser = null;
+              }
+            } catch (err) {
+              console.error('[Auth] Error fetching user profile:', err);
+              currentUser = null;
+            }
           } else {
             currentUser = null;
           }
-        } else {
-          currentUser = null;
-        }
-        notifyAuthChange();
-      });
-    }
+          notifyAuthChange();
+          if (firstResolve) {
+            firstResolve = false;
+            resolve(currentUser);
+          }
+        });
+      }
+    });
   }
 
   /* ---- Register ---- */
@@ -226,6 +239,141 @@ App.auth = (function() {
       currentUser = { id: credential.user.uid, ...userData };
       notifyAuthChange();
       return currentUser;
+    }
+  }
+
+  /* ---- Google Login ---- */
+  async function loginWithGoogle() {
+    if (App.demoMode) {
+      const user = App.demoData.users.find(u => u.email === 'mike.agent@remaxusa.com');
+      if (!user) throw new Error('Demo Google account not found.');
+      currentUser = { ...user };
+      delete currentUser.password;
+      localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
+      notifyAuthChange();
+      return currentUser;
+    } else {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      const credential = await App.firebaseAuth.signInWithPopup(provider);
+      const firebaseUser = credential.user;
+      
+      const doc = await App.db.collection('users').doc(firebaseUser.uid).get();
+      if (!doc.exists) {
+        const nameParts = (firebaseUser.displayName || '').split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+        
+        await App.firebaseAuth.signOut();
+        
+        const error = new Error('Google account not registered.');
+        error.code = 'USER_NOT_REGISTERED';
+        error.email = firebaseUser.email;
+        error.firstName = firstName;
+        error.lastName = lastName;
+        throw error;
+      }
+
+      const userData = doc.data();
+
+      if (userData.status === 'pending') {
+        await App.firebaseAuth.signOut();
+        throw new Error('PENDING');
+      }
+
+      if (userData.status === 'rejected') {
+        await App.firebaseAuth.signOut();
+        throw new Error('Your application has been rejected. Please contact support.');
+      }
+
+      currentUser = { id: firebaseUser.uid, ...userData };
+      notifyAuthChange();
+      return currentUser;
+    }
+  }
+
+  /* ---- Google Registration ---- */
+  async function registerWithGoogle(data) {
+    const { role, firstName, lastName, agencyName, phone, country, brokerId } = data;
+
+    if (!role || !firstName || !lastName) {
+      throw new Error('Please fill in all required fields.');
+    }
+
+    if (!['broker', 'realtor'].includes(role)) {
+      throw new Error('Invalid role selected.');
+    }
+
+    if (App.demoMode) {
+      const mockEmail = (firstName + '.' + lastName + '@gmail.com').toLowerCase();
+      const newUser = {
+        id: role.substring(0, 3) + '-' + Date.now(),
+        email: mockEmail,
+        role,
+        status: role === 'realtor' ? 'active' : 'pending',
+        brokerStatus: role === 'realtor' && brokerId ? 'pending' : null,
+        firstName,
+        lastName,
+        agencyName: agencyName || '',
+        phone: phone || '',
+        country: country || '',
+        brokerId: brokerId || null,
+        referralCode: `${role === 'broker' ? 'BRK' : 'REA'}-${lastName.toUpperCase()}`,
+        profileImage: null,
+        agreementSigned: false,
+        agreementSignedAt: null,
+        createdAt: new Date().toISOString()
+      };
+
+      App.demoData.users.push(newUser);
+      saveDemoData();
+
+      if (newUser.status === 'active') {
+        currentUser = { ...newUser };
+        localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
+        notifyAuthChange();
+      }
+
+      return { success: true, user: newUser };
+    } else {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      const credential = await App.firebaseAuth.signInWithPopup(provider);
+      const firebaseUser = credential.user;
+      const uid = firebaseUser.uid;
+
+      const doc = await App.db.collection('users').doc(uid).get();
+      if (doc.exists) {
+        throw new Error('This Google account is already registered. Please login instead.');
+      }
+
+      const userData = {
+        email: firebaseUser.email.toLowerCase(),
+        role,
+        status: role === 'realtor' ? 'active' : 'pending',
+        brokerStatus: role === 'realtor' && brokerId ? 'pending' : null,
+        firstName,
+        lastName,
+        agencyName: agencyName || '',
+        phone: phone || '',
+        country: country || '',
+        brokerId: brokerId || null,
+        referralCode: `${role === 'broker' ? 'BRK' : 'REA'}-${lastName.toUpperCase()}-${uid.substring(0, 4)}`,
+        profileImage: firebaseUser.photoURL || null,
+        agreementSigned: false,
+        agreementSignedAt: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      await App.db.collection('users').doc(uid).set(userData);
+
+      if (userData.status === 'pending') {
+        await App.firebaseAuth.signOut();
+      } else {
+        currentUser = { id: uid, ...userData };
+        notifyAuthChange();
+      }
+
+      return { success: true, user: { id: uid, ...userData } };
     }
   }
 
@@ -651,6 +799,8 @@ App.auth = (function() {
     resetPassword,
     saveDemoData,
     saveDossierLead,
-    getDossierLeads
+    getDossierLeads,
+    loginWithGoogle,
+    registerWithGoogle
   };
 })();

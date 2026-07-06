@@ -703,6 +703,19 @@
               <span class="lang-en">Sign In</span>
               <span class="lang-es">Iniciar Sesión</span>
             </button>
+            <div style="text-align: center; margin: 15px 0; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">
+              <span class="lang-en">or</span><span class="lang-es">o</span>
+            </div>
+            <button type="button" class="btn btn-outline" style="width:100%; display: flex; align-items: center; justify-content: center; gap: 8px; border-color: var(--border-light);" id="login-google-btn">
+              <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24">
+                <path fill="#EA4335" d="M12 5.04c1.7 0 3.2.6 4.4 1.76l3.24-3.24C17.68 1.6 15.02 1 12 1 7.24 1 3.2 3.84 1.25 7.96l3.86 3C6.06 7.8 8.8 5.04 12 5.04z"/>
+                <path fill="#4285F4" d="M23.5 12.25c0-.82-.07-1.6-.2-2.35H12v4.47h6.47c-.28 1.47-1.1 2.7-2.35 3.55l3.65 2.83c2.14-1.98 3.38-4.9 3.38-8.5z"/>
+                <path fill="#FBBC05" d="M5.1 14.5c-.24-.73-.38-1.52-.38-2.33s.14-1.6.38-2.33l-3.86-3C.48 8.48 0 10.18 0 12s.48 3.52 1.24 5.16l3.86-3z"/>
+                <path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.92l-3.65-2.83c-1.1.73-2.5 1.18-4.3 1.18-3.2 0-5.94-2.76-6.9-5.96l-3.86 3C3.2 20.16 7.24 23 12 23z"/>
+              </svg>
+              <span class="lang-en">Sign In with Google</span>
+              <span class="lang-es">Iniciar Sesión con Google</span>
+            </button>
           </form>
           <div class="auth-footer">
             <p><span class="lang-en">Don't have an account?</span><span class="lang-es">¿No tienes cuenta?</span> <a href="#register"><span class="lang-en">Register here</span><span class="lang-es">Regístrate aquí</span></a></p>
@@ -792,6 +805,19 @@
             <button type="submit" class="btn btn-primary" style="width:100%;" id="register-submit-btn">
               <span class="lang-en">Submit Application</span>
               <span class="lang-es">Enviar Solicitud</span>
+            </button>
+            <div style="text-align: center; margin: 15px 0; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">
+              <span class="lang-en">or</span><span class="lang-es">o</span>
+            </div>
+            <button type="button" class="btn btn-outline" style="width:100%; display: flex; align-items: center; justify-content: center; gap: 8px; border-color: var(--border-light);" id="register-google-btn">
+              <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24">
+                <path fill="#EA4335" d="M12 5.04c1.7 0 3.2.6 4.4 1.76l3.24-3.24C17.68 1.6 15.02 1 12 1 7.24 1 3.2 3.84 1.25 7.96l3.86 3C6.06 7.8 8.8 5.04 12 5.04z"/>
+                <path fill="#4285F4" d="M23.5 12.25c0-.82-.07-1.6-.2-2.35H12v4.47h6.47c-.28 1.47-1.1 2.7-2.35 3.55l3.65 2.83c2.14-1.98 3.38-4.9 3.38-8.5z"/>
+                <path fill="#FBBC05" d="M5.1 14.5c-.24-.73-.38-1.52-.38-2.33s.14-1.6.38-2.33l-3.86-3C.48 8.48 0 10.18 0 12s.48 3.52 1.24 5.16l3.86-3z"/>
+                <path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.92l-3.65-2.83c-1.1.73-2.5 1.18-4.3 1.18-3.2 0-5.94-2.76-6.9-5.96l-3.86 3C3.2 20.16 7.24 23 12 23z"/>
+              </svg>
+              <span class="lang-en">Sign Up with Google</span>
+              <span class="lang-es">Registrarse con Google</span>
             </button>
           </form>
           <div class="auth-footer">
@@ -908,7 +934,11 @@
     <div id="modal" class="modal"></div>
   </div>
 
-  <!-- ===================== SCRIPTS ===================== -->
+  <!-- ===================== Firebase SDKs ===================== -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/auth-service.js"></script>
@@ -921,9 +951,9 @@
   <script src="js/views/agent-views.js"></script>
   <script src="js/main.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       if (App && App.auth) {
-        App.auth.init();
+        await App.auth.init();
       }
       if (App && App.router) {
         App.router.init();
