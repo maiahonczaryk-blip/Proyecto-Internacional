@@ -97,6 +97,12 @@
       const roleBadge = App.utils.getRoleBadge(user.role);
       const dateStr = App.utils.formatDate(user.createdAt);
 
+      const isBroker = user.role === 'broker';
+      const brokerBorder = isBroker ? '#3b82f6' : '#e5e7eb';
+      const brokerBg = isBroker ? '#eff6ff' : '#fcfbf7';
+      const realtorBorder = !isBroker ? '#3b82f6' : '#e5e7eb';
+      const realtorBg = !isBroker ? '#eff6ff' : '#fcfbf7';
+
       return `
         <div class="pipeline-card" style="margin-bottom: 1rem; padding: 1.25rem;">
           <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
@@ -114,13 +120,37 @@
             <span>🌍 ${App.utils.escapeHtml(user.country || '—')}</span>
             <span>📅 ${dateStr}</span>
           </div>
-          <div style="display: flex; gap: 0.5rem;">
-            <button class="btn btn-primary btn-sm" onclick="App.views.admin.handleApprove('${user.id}')">
-              ✓ Approve
-            </button>
-            <button class="btn btn-danger btn-sm" onclick="App.views.admin.handleReject('${user.id}')">
-              ✕ Reject
-            </button>
+          
+          <div style="border-top: 1px solid #f3f4f6; padding-top: 1rem; margin-top: 1rem;">
+            <div style="font-size: 0.8rem; font-weight: 600; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Approve Application As:</div>
+            
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+              <!-- Broker Approval Card -->
+              <div onclick="App.views.admin.approveWithRole('${user.id}', 'broker')" 
+                   style="flex: 1; min-width: 180px; border: 2px solid ${brokerBorder}; border-radius: 0.75rem; padding: 1rem; cursor: pointer; text-align: center; background: ${brokerBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                   onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
+                   onmouseout="this.style.borderColor='${brokerBorder}'; this.style.backgroundColor='${brokerBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
+                <div style="font-size: 2rem; margin-bottom: 0.25rem;">🏢</div>
+                <div style="font-weight: 700; font-size: 0.85rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Broker</div>
+                <div style="font-size: 0.7rem; color: #6b7280; margin-top: 0.25rem; font-weight: 600; text-transform: uppercase; line-height: 1.2;">I manage a team of agents</div>
+              </div>
+              
+              <!-- Realtor Approval Card -->
+              <div onclick="App.views.admin.approveWithRole('${user.id}', 'realtor')" 
+                   style="flex: 1; min-width: 180px; border: 2px solid ${realtorBorder}; border-radius: 0.75rem; padding: 1rem; cursor: pointer; text-align: center; background: ${realtorBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                   onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
+                   onmouseout="this.style.borderColor='${realtorBorder}'; this.style.backgroundColor='${realtorBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
+                <div style="font-size: 2rem; margin-bottom: 0.25rem;">👤</div>
+                <div style="font-weight: 700; font-size: 0.85rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Realtor</div>
+                <div style="font-size: 0.7rem; color: #6b7280; margin-top: 0.25rem; font-weight: 600; text-transform: uppercase; line-height: 1.2;">I'm an individual agent</div>
+              </div>
+            </div>
+            
+            <div style="margin-top: 0.75rem;">
+              <button class="btn btn-outline btn-sm" onclick="App.views.admin.handleReject('${user.id}')" style="width: 100%; border-color: #d1d5db; color: #4b5563; background: #f3f4f6; font-weight: 500; padding: 0.5rem; border-radius: 0.375rem;">
+                ✕ Reject Application
+              </button>
+            </div>
           </div>
         </div>
       `;
@@ -321,72 +351,83 @@
   }
 
   /* ============================================
+     approveWithRole(userId, role)
+     Approves a pending user with the specified
+     role, then refreshes the active view.
+     ============================================ */
+  async function approveWithRole(userId, role) {
+    try {
+      // If modal is open, close it
+      App.utils.closeModal();
+      
+      // Update role
+      await App.auth.updateUserRole(userId, role);
+      // Approve status
+      await App.auth.updateUserStatus(userId, 'active');
+      App.utils.showToast(`User approved successfully as ${role}!`, 'success');
+
+      // Refresh view
+      const route = App.router.getCurrentRoute();
+      if (route === 'admin/dashboard') {
+        await initDashboard();
+      } else if (route === 'admin/users') {
+        await initUsers();
+      }
+    } catch (err) {
+      console.error('[Admin] approveWithRole error:', err);
+      App.utils.showToast('Error approving user: ' + err.message, 'error');
+    }
+  }
+
+  /* ============================================
      handleApprove(userId)
      Approves a pending user and refreshes
      the current view.
      ============================================ */
   async function handleApprove(userId) {
     try {
-      // Find the user to approve
       const user = allUsers.find(u => u.id === userId);
       if (!user) return;
+
+      const isBroker = user.role === 'broker';
+      const brokerBorder = isBroker ? '#3b82f6' : '#e5e7eb';
+      const brokerBg = isBroker ? '#eff6ff' : '#fcfbf7';
+      const realtorBorder = !isBroker ? '#3b82f6' : '#e5e7eb';
+      const realtorBg = !isBroker ? '#eff6ff' : '#fcfbf7';
 
       App.utils.showModal({
         title: 'Approve User',
         body: `
-          <div style="margin-bottom: 1rem;">
-            <p style="margin: 0 0 0.5rem;">Approve <strong>${App.utils.escapeHtml(user.firstName)} ${App.utils.escapeHtml(user.lastName)}</strong> (${App.utils.escapeHtml(user.email)})?</p>
-            <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">Select the user's role before approving.</p>
+          <div style="margin-bottom: 1.5rem; text-align: center;">
+            <p style="margin: 0 0 0.5rem; font-size: 1.1rem;">Approve <strong>${App.utils.escapeHtml(user.firstName)} ${App.utils.escapeHtml(user.lastName)}</strong>?</p>
+            <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">Select the role to approve the user with:</p>
           </div>
-          <div class="form-group" style="margin-bottom: 1rem;">
-            <label style="font-weight: 600; font-size: 0.875rem; color: #374151; display: block; margin-bottom: 0.25rem;">User Role</label>
-            <select id="approve-role-select" class="form-control" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background-color: white;">
-              <option value="realtor" ${user.role === 'realtor' ? 'selected' : ''}>Realtor</option>
-              <option value="broker" ${user.role === 'broker' ? 'selected' : ''}>Broker</option>
-            </select>
+          
+          <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+            <!-- Broker Approval Card -->
+            <div onclick="App.views.admin.approveWithRole('${user.id}', 'broker')" 
+                 style="flex: 1; min-width: 150px; border: 2px solid ${brokerBorder}; border-radius: 0.75rem; padding: 1.25rem; cursor: pointer; text-align: center; background: ${brokerBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                 onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
+                 onmouseout="this.style.borderColor='${brokerBorder}'; this.style.backgroundColor='${brokerBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
+              <div style="font-size: 2.25rem; margin-bottom: 0.5rem;">🏢</div>
+              <div style="font-weight: 700; font-size: 0.85rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Broker</div>
+              <div style="font-size: 0.7rem; color: #6b7280; margin-top: 0.25rem; font-weight: 600; text-transform: uppercase; line-height: 1.2;">I manage a team of agents</div>
+            </div>
+            
+            <!-- Realtor Approval Card -->
+            <div onclick="App.views.admin.approveWithRole('${user.id}', 'realtor')" 
+                 style="flex: 1; min-width: 150px; border: 2px solid ${realtorBorder}; border-radius: 0.75rem; padding: 1.25rem; cursor: pointer; text-align: center; background: ${realtorBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                 onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
+                 onmouseout="this.style.borderColor='${realtorBorder}'; this.style.backgroundColor='${realtorBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
+              <div style="font-size: 2.25rem; margin-bottom: 0.5rem;">👤</div>
+              <div style="font-weight: 700; font-size: 0.85rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Realtor</div>
+              <div style="font-size: 0.7rem; color: #6b7280; margin-top: 0.25rem; font-weight: 600; text-transform: uppercase; line-height: 1.2;">I'm an individual agent</div>
+            </div>
           </div>
         `,
-        footer: `
-          <button class="btn btn-outline btn-sm" id="modal-cancel-btn">Cancel</button>
-          <button class="btn btn-primary btn-sm" id="modal-confirm-approve-btn" style="margin-left: 0.5rem;">Approve & Save</button>
-        `,
+        footer: `<button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Cancel</button>`,
         onClose: () => {}
       });
-
-      // Bind modal buttons
-      const cancelBtn = document.getElementById('modal-cancel-btn');
-      const confirmBtn = document.getElementById('modal-confirm-approve-btn');
-
-      if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => App.utils.closeModal());
-      }
-
-      if (confirmBtn) {
-        confirmBtn.addEventListener('click', async () => {
-          const selectedRole = document.getElementById('approve-role-select').value;
-          App.utils.closeModal();
-          try {
-            // Update role if changed
-            if (selectedRole !== user.role) {
-              await App.auth.updateUserRole(userId, selectedRole);
-            }
-            // Approve status
-            await App.auth.updateUserStatus(userId, 'active');
-            App.utils.showToast('User approved successfully!', 'success');
-
-            // Refresh view
-            const route = App.router.getCurrentRoute();
-            if (route === 'admin/dashboard') {
-              await initDashboard();
-            } else if (route === 'admin/users') {
-              await initUsers();
-            }
-          } catch (err) {
-            console.error('[Admin] handleApprove error:', err);
-            App.utils.showToast('Error approving user: ' + err.message, 'error');
-          }
-        });
-      }
     } catch (err) {
       console.error('[Admin] handleApprove error:', err);
       App.utils.showToast('Error loading approval window.', 'error');
@@ -739,6 +780,7 @@
     initUsers,
     initClients,
     handleApprove,
+    approveWithRole,
     handleReject,
     viewUser,
     showClientDetail,
