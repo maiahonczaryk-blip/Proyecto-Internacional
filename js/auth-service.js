@@ -136,7 +136,7 @@ App.auth = (function() {
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
-        referralCode: `${role === 'broker' ? 'BRK' : 'REA'}-${lastName.toUpperCase()}`,
+        referralCode: `${role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : 'REA')}-${lastName.toUpperCase()}`,
         profileImage: null,
         agreementSigned: false,
         agreementSignedAt: null,
@@ -170,7 +170,7 @@ App.auth = (function() {
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
-        referralCode: `${role === 'broker' ? 'BRK' : 'REA'}-${lastName.toUpperCase()}-${uid.substring(0, 4)}`,
+        referralCode: `${role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : 'REA')}-${lastName.toUpperCase()}-${uid.substring(0, 4)}`,
         profileImage: null,
         agreementSigned: false,
         agreementSignedAt: null,
@@ -305,7 +305,7 @@ App.auth = (function() {
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
-        referralCode: `${role === 'broker' ? 'BRK' : 'REA'}-${mockLastName.toUpperCase()}`,
+        referralCode: `${role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : 'REA')}-${mockLastName.toUpperCase()}`,
         profileImage: null,
         agreementSigned: false,
         agreementSignedAt: null,
@@ -351,7 +351,7 @@ App.auth = (function() {
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
-        referralCode: `${role === 'broker' ? 'BRK' : 'REA'}-${(finalLastName || 'USER').toUpperCase()}-${uid.substring(0, 4)}`,
+        referralCode: `${role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : 'REA')}-${(finalLastName || 'USER').toUpperCase()}-${uid.substring(0, 4)}`,
         profileImage: firebaseUser.photoURL || null,
         agreementSigned: false,
         agreementSignedAt: null,
@@ -422,14 +422,43 @@ App.auth = (function() {
       const user = App.demoData.users.find(u => u.id === userId);
       if (!user) throw new Error('User not found.');
       user.role = newRole;
+      if (user.referralCode) {
+        const parts = user.referralCode.split('-');
+        const prefix = newRole === 'broker' ? 'BRK' : (newRole === 'agent_inmomas' ? 'LOC' : 'REA');
+        if (parts.length > 1) {
+          parts[0] = prefix;
+          user.referralCode = parts.join('-');
+        } else {
+          const lastName = user.lastName || 'USER';
+          user.referralCode = `${prefix}-${lastName.toUpperCase()}`;
+        }
+      }
       user.updatedAt = new Date().toISOString();
       saveDemoData();
       return true;
     } else {
-      await App.db.collection('users').doc(userId).update({
-        role: newRole,
-        updatedAt: new Date().toISOString()
-      });
+      const docRef = App.db.collection('users').doc(userId);
+      const doc = await docRef.get();
+      if (doc.exists) {
+        const userData = doc.data();
+        let updatedRefCode = userData.referralCode;
+        if (updatedRefCode) {
+          const parts = updatedRefCode.split('-');
+          const prefix = newRole === 'broker' ? 'BRK' : (newRole === 'agent_inmomas' ? 'LOC' : 'REA');
+          if (parts.length > 1) {
+            parts[0] = prefix;
+            updatedRefCode = parts.join('-');
+          } else {
+            const lastName = userData.lastName || 'USER';
+            updatedRefCode = `${prefix}-${lastName.toUpperCase()}-${userId.substring(0, 4)}`;
+          }
+        }
+        await docRef.update({
+          role: newRole,
+          referralCode: updatedRefCode,
+          updatedAt: new Date().toISOString()
+        });
+      }
       return true;
     }
   }
@@ -784,6 +813,106 @@ App.auth = (function() {
     }
   }
 
+  /* ---- Assign Lead To Agent ---- */
+  async function assignLeadToAgent(leadId, agentId, agentName) {
+    if (App.demoMode) {
+      if (!App.demoData.dossier_leads) App.demoData.dossier_leads = [];
+      const lead = App.demoData.dossier_leads.find(l => l.id === leadId);
+      if (!lead) throw new Error('Lead not found.');
+      
+      lead.localAgentId = agentId;
+      lead.localAgentName = agentName;
+      lead.assignedAt = new Date().toISOString();
+      
+      if (!App.demoData.clients) App.demoData.clients = [];
+      let client = App.demoData.clients.find(c => c.email.toLowerCase() === lead.email.toLowerCase());
+      if (!client) {
+        client = {
+          id: 'client_' + Date.now(),
+          firstName: lead.firstName,
+          lastName: lead.lastName,
+          email: lead.email,
+          phone: lead.phone || '—',
+          status: 'new',
+          referredBy: null,
+          localAgentId: agentId,
+          localAgentName: agentName,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          interestArea: 'Buyer Guide Lead',
+          statusHistory: [{
+            status: 'new',
+            date: new Date().toISOString(),
+            note: 'Created from Buyer Guide Lead and assigned to ' + agentName
+          }]
+        };
+        App.demoData.clients.push(client);
+      } else {
+        client.localAgentId = agentId;
+        client.localAgentName = agentName;
+        client.updatedAt = new Date().toISOString();
+        if (!client.statusHistory) client.statusHistory = [];
+        client.statusHistory.push({
+          status: client.status,
+          date: new Date().toISOString(),
+          note: 'Assigned local agent ' + agentName + ' via Buyer Guide Lead'
+        });
+      }
+      
+      saveDemoData();
+      return true;
+    } else {
+      const leadRef = App.db.collection('dossier_leads').doc(leadId);
+      await leadRef.update({
+        localAgentId: agentId,
+        localAgentName: agentName,
+        assignedAt: new Date().toISOString()
+      });
+      
+      const leadDoc = await leadRef.get();
+      const lead = leadDoc.data();
+      
+      const clientQuery = await App.db.collection('clients').where('email', '==', lead.email).get();
+      if (clientQuery.empty) {
+        const newClientId = 'client_' + Date.now();
+        await App.db.collection('clients').doc(newClientId).set({
+          firstName: lead.firstName,
+          lastName: lead.lastName,
+          email: lead.email,
+          phone: lead.phone || '—',
+          status: 'new',
+          referredBy: null,
+          localAgentId: agentId,
+          localAgentName: agentName,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          interestArea: 'Buyer Guide Lead',
+          statusHistory: [{
+            status: 'new',
+            date: new Date().toISOString(),
+            note: 'Created from Buyer Guide Lead and assigned to ' + agentName
+          }]
+        });
+      } else {
+        const clientDoc = clientQuery.docs[0];
+        const clientData = clientDoc.data();
+        const statusHistory = clientData.statusHistory || [];
+        statusHistory.push({
+          status: clientData.status || 'new',
+          date: new Date().toISOString(),
+          note: 'Assigned local agent ' + agentName + ' via Buyer Guide Lead'
+        });
+        await clientDoc.ref.update({
+          localAgentId: agentId,
+          localAgentName: agentName,
+          updatedAt: new Date().toISOString(),
+          statusHistory: statusHistory
+        });
+      }
+      return true;
+    }
+  }
+
   /* ---- Public API ---- */
   return {
     init,
@@ -802,6 +931,7 @@ App.auth = (function() {
     getClients,
     updateClientStatus,
     assignLocalAgent,
+    assignLeadToAgent,
     saveClientFinancials,
     getCommissions,
     onAuthChange,

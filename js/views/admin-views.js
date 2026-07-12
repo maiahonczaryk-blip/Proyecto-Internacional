@@ -14,6 +14,7 @@
   /* ── Local state ── */
   let allUsers = [];
   let allClients = [];
+  let allLeads = [];
 
   /* ============================================
      initDashboard()
@@ -43,13 +44,15 @@
 
       // 5. Render recent activity (latest 5 non-pending users, sorted newest first)
       const recentActivity = allUsers
-        .filter(u => u.status === 'active' || u.status === 'rejected')
-        .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
-        .slice(0, 5);
+         .filter(u => u.status === 'active' || u.status === 'rejected')
+         .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
+         .slice(0, 5);
       renderRecentActivity(recentActivity);
 
       // 6. Render dossier downloads (leads)
       const leads = await App.auth.getDossierLeads();
+      allLeads = leads;
+      setTextById('admin-stat-leads', leads.length);
       renderDossierLeads(leads);
 
     } catch (err) {
@@ -64,19 +67,32 @@
     if (!container) return;
 
     if (leads.length === 0) {
-      container.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #6b7280; padding: 2rem;">No downloads yet.</td></tr>';
+      container.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #6b7280; padding: 2rem;">No downloads yet.</td></tr>';
       return;
     }
 
     container.innerHTML = leads.map(lead => {
       const dateStr = App.utils.formatDate(lead.createdAt);
+      const agentBadge = lead.localAgentId 
+        ? `<span class="badge badge--approved">👤 ${App.utils.escapeHtml(lead.localAgentName)}</span>`
+        : `<span class="badge badge--rejected"><span class="lang-en">Unassigned</span><span class="lang-es">Sin asignar</span></span>`;
+      
+      const actionBtnText = lead.localAgentId
+        ? `<span class="lang-en">Reassign</span><span class="lang-es">Reasignar</span>`
+        : `<span class="lang-en">Assign Agent</span><span class="lang-es">Asignar Agente</span>`;
+
       return `
         <tr>
           <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${dateStr}</td>
           <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb; font-weight: 600;">${App.utils.escapeHtml(lead.firstName)} ${App.utils.escapeHtml(lead.lastName)}</td>
           <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${App.utils.escapeHtml(lead.email)}</td>
-          <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${App.utils.escapeHtml(lead.phone)}</td>
-          <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;"><span class="status-badge status-new">Buyer Guide</span></td>
+          <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${App.utils.escapeHtml(lead.phone || '—')}</td>
+          <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${agentBadge}</td>
+          <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">
+            <button class="btn btn-primary btn-sm" onclick="App.views.admin.showLeadAssignmentModal('${lead.id}')">
+              ${actionBtnText}
+            </button>
+          </td>
         </tr>
       `;
     }).join('');
@@ -97,17 +113,23 @@
       const roleBadge = App.utils.getRoleBadge(user.role);
       const dateStr = App.utils.formatDate(user.createdAt);
 
-      const isBroker = user.role === 'broker';
+      const requestedRole = user.role;
       const defaultBorder = '#e5e7eb';
       const defaultBg = '#ffffff';
 
-      const brokerBookmark = isBroker ? `
+      const brokerBookmark = requestedRole === 'broker' ? `
         <div style="position: absolute; top: 0; right: 12px; background: #3b82f6; color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
           Requested
         </div>
       ` : '';
 
-      const realtorBookmark = !isBroker ? `
+      const realtorBookmark = requestedRole === 'realtor' ? `
+        <div style="position: absolute; top: 0; right: 12px; background: #3b82f6; color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+          Requested
+        </div>
+      ` : '';
+
+      const agentInmomasBookmark = requestedRole === 'agent_inmomas' ? `
         <div style="position: absolute; top: 0; right: 12px; background: #3b82f6; color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
           Requested
         </div>
@@ -137,7 +159,7 @@
             <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
               <!-- Broker Approval Card -->
               <div onclick="App.views.admin.approveWithRole('${user.id}', 'broker')" 
-                   style="position: relative; flex: 1; min-width: 150px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 1rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                   style="position: relative; flex: 1; min-width: 120px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 0.5rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
                    onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
                    onmouseout="this.style.borderColor='${defaultBorder}'; this.style.backgroundColor='${defaultBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
                 ${brokerBookmark}
@@ -147,12 +169,22 @@
               
               <!-- Realtor Approval Card -->
               <div onclick="App.views.admin.approveWithRole('${user.id}', 'realtor')" 
-                   style="position: relative; flex: 1; min-width: 150px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 1rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                   style="position: relative; flex: 1; min-width: 120px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 0.5rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
                    onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
                    onmouseout="this.style.borderColor='${defaultBorder}'; this.style.backgroundColor='${defaultBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
                 ${realtorBookmark}
                 <div style="font-size: 2.25rem; margin-bottom: 0.25rem;">👤</div>
                 <div style="font-weight: 700; font-size: 0.9rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Realtor</div>
+              </div>
+
+              <!-- Agente Inmomás Approval Card -->
+              <div onclick="App.views.admin.approveWithRole('${user.id}', 'agent_inmomas')" 
+                   style="position: relative; flex: 1; min-width: 120px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 0.5rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                   onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
+                   onmouseout="this.style.borderColor='${defaultBorder}'; this.style.backgroundColor='${defaultBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
+                ${agentInmomasBookmark}
+                <div style="font-size: 2.25rem; margin-bottom: 0.25rem;">🏠</div>
+                <div style="font-weight: 700; font-size: 0.9rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Agente Inmomás</div>
               </div>
             </div>
             
@@ -399,17 +431,23 @@
       const user = allUsers.find(u => u.id === userId);
       if (!user) return;
 
-      const isBroker = user.role === 'broker';
+      const requestedRole = user.role;
       const defaultBorder = '#e5e7eb';
       const defaultBg = '#ffffff';
 
-      const brokerBookmark = isBroker ? `
+      const brokerBookmark = requestedRole === 'broker' ? `
         <div style="position: absolute; top: 0; right: 12px; background: #3b82f6; color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
           Requested
         </div>
       ` : '';
 
-      const realtorBookmark = !isBroker ? `
+      const realtorBookmark = requestedRole === 'realtor' ? `
+        <div style="position: absolute; top: 0; right: 12px; background: #3b82f6; color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+          Requested
+        </div>
+      ` : '';
+
+      const agentInmomasBookmark = requestedRole === 'agent_inmomas' ? `
         <div style="position: absolute; top: 0; right: 12px; background: #3b82f6; color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
           Requested
         </div>
@@ -426,7 +464,7 @@
           <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
             <!-- Broker Approval Card -->
             <div onclick="App.views.admin.approveWithRole('${user.id}', 'broker')" 
-                 style="position: relative; flex: 1; min-width: 150px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 1rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                 style="position: relative; flex: 1; min-width: 120px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 0.5rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
                  onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
                  onmouseout="this.style.borderColor='${defaultBorder}'; this.style.backgroundColor='${defaultBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
               ${brokerBookmark}
@@ -436,12 +474,22 @@
             
             <!-- Realtor Approval Card -->
             <div onclick="App.views.admin.approveWithRole('${user.id}', 'realtor')" 
-                 style="position: relative; flex: 1; min-width: 150px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 1rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                 style="position: relative; flex: 1; min-width: 120px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 0.5rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
                  onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
                  onmouseout="this.style.borderColor='${defaultBorder}'; this.style.backgroundColor='${defaultBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
               ${realtorBookmark}
               <div style="font-size: 2.25rem; margin-bottom: 0.25rem;">👤</div>
               <div style="font-weight: 700; font-size: 0.9rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Realtor</div>
+            </div>
+
+            <!-- Agente Inmomás Approval Card -->
+            <div onclick="App.views.admin.approveWithRole('${user.id}', 'agent_inmomas')" 
+                 style="position: relative; flex: 1; min-width: 120px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 0.5rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                 onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
+                 onmouseout="this.style.borderColor='${defaultBorder}'; this.style.backgroundColor='${defaultBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
+              ${agentInmomasBookmark}
+              <div style="font-size: 2.25rem; margin-bottom: 0.25rem;">🏠</div>
+              <div style="font-weight: 700; font-size: 0.9rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Agente Inmomás</div>
             </div>
           </div>
         `,
@@ -786,6 +834,97 @@
     }
   }
 
+  /* ── Lead Assignment Modal and Handlers ── */
+  function showLeadAssignmentModal(leadId) {
+    try {
+      const lead = allLeads.find(l => l.id === leadId);
+      if (!lead) return;
+
+      // Get all active local agents
+      const localAgents = allUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
+
+      const dropdownOptions = `
+        <option value="">-- Select Local Agent --</option>
+        ${localAgents.map(a => `
+          <option value="${a.id}" ${lead.localAgentId === a.id ? 'selected' : ''}>
+            ${a.firstName} ${a.lastName} (Inmomás)
+          </option>
+        `).join('')}
+      `;
+
+      App.utils.showModal({
+        title: 'Lead Details & Assignment',
+        body: `
+          <div style="margin-bottom: 1.5rem;">
+            <h3 style="margin: 0 0 0.25rem;">${App.utils.escapeHtml(lead.firstName)} ${App.utils.escapeHtml(lead.lastName)}</h3>
+            <div style="margin-bottom: 0.5rem;">
+              <span class="badge badge--info"><span class="lang-en">Buyer Guide Lead</span><span class="lang-es">Lead de Guía</span></span>
+            </div>
+          </div>
+          
+          <div style="background: rgba(180, 83, 9, 0.05); border: 1px solid rgba(180, 83, 9, 0.15); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <label for="assign-lead-agent-select" style="font-weight: 600; font-size: 0.85rem; color: #b45309; text-transform: uppercase;">
+              <span class="lang-en">Assign Local Agent (Agente Inmomás)</span>
+              <span class="lang-es">Asignar Agente Local (Agente Inmomás)</span>
+            </label>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <select id="assign-lead-agent-select" class="form-select" style="flex: 1; margin-bottom: 0;">
+                ${dropdownOptions}
+              </select>
+              <button class="btn btn-primary" onclick="App.views.admin.handleAssignLeadAgent('${lead.id}')" style="background: #b45309; border-color: #b45309;">
+                <span class="lang-en">Assign</span>
+                <span class="lang-es">Asignar</span>
+              </button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.875rem; margin-bottom: 1.5rem;">
+            <div>
+              <div style="font-weight: 600; color: #374151;">Email</div>
+              <div style="color: #6b7280;">${App.utils.escapeHtml(lead.email)}</div>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #374151;">Phone</div>
+              <div style="color: #6b7280;">${App.utils.escapeHtml(lead.phone || '—')}</div>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #374151;"><span class="lang-en">Lead Source</span><span class="lang-es">Origen del Lead</span></div>
+              <div style="color: #6b7280;">Buyer Guide Download</div>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #374151;"><span class="lang-en">Date Registered</span><span class="lang-es">Fecha de Registro</span></div>
+              <div style="color: #6b7280;">${App.utils.formatDate(lead.createdAt)}</div>
+            </div>
+          </div>
+        `,
+        footer: `<button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()"><span class="lang-en">Close</span><span class="lang-es">Cerrar</span></button>`
+      });
+    } catch (err) {
+      console.error(err);
+      App.utils.showToast('Error loading details.', 'error');
+    }
+  }
+
+  async function handleAssignLeadAgent(leadId) {
+    try {
+      const select = document.getElementById('assign-lead-agent-select');
+      const agentId = select.value;
+      let agentName = '';
+      if (agentId) {
+        const agent = allUsers.find(u => u.id === agentId);
+        if (agent) agentName = `${agent.firstName} ${agent.lastName}`;
+      }
+      
+      await App.auth.assignLeadToAgent(leadId, agentId || null, agentName || null);
+      App.utils.showToast('Local agent assigned to lead successfully!', 'success');
+      App.utils.closeModal();
+      initDashboard(); // reload dashboard stats and leads table
+    } catch (err) {
+      console.error(err);
+      App.utils.showToast(err.message, 'error');
+    }
+  }
+
   /* ── Utility: safely set text content ── */
   function setTextById(id, text) {
     const el = document.getElementById(id);
@@ -806,7 +945,9 @@
     showClientDetail,
     handleClientDrop,
     handleAssignAgent,
-    handleSaveFinancials
+    handleSaveFinancials,
+    showLeadAssignmentModal,
+    handleAssignLeadAgent
   };
 
 })();

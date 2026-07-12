@@ -41,13 +41,21 @@ App.views.public = {
           budget: 'TBD', // Placeholder
         };
 
-        // Find the realtor and assign
+        // Find the referrer and assign
         if (refCode) {
-          const realtor = App.demoData.users.find(u => u.referralCode === refCode);
-          if (realtor) {
-            clientData.realtorId = realtor.id;
-            clientData.realtorName = `${realtor.firstName} ${realtor.lastName}`;
-            clientData.brokerId = realtor.brokerId || null;
+          const referrer = App.demoData.users.find(u => u.referralCode === refCode);
+          if (referrer) {
+            if (referrer.role === 'broker') {
+              clientData.brokerId = referrer.id;
+            } else if (referrer.role === 'agent_inmomas') {
+              clientData.localAgentId = referrer.id;
+              clientData.localAgentName = `${referrer.firstName} ${referrer.lastName}`;
+            } else {
+              // realtor
+              clientData.realtorId = referrer.id;
+              clientData.realtorName = `${referrer.firstName} ${referrer.lastName}`;
+              clientData.brokerId = referrer.brokerId || null;
+            }
           }
         }
 

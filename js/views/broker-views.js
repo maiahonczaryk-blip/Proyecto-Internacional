@@ -54,6 +54,40 @@
       const leads = await App.auth.getDossierLeads();
       renderDossierLeads(leads);
 
+      // Referral link
+      const isPending = currentUser.status === 'pending';
+      const referralLink = isPending ? '' : App.utils.generateReferralLink(currentUser.referralCode || 'BRK-DEFAULT');
+      const linkInput = document.getElementById('broker-dash-referral-link');
+      if (linkInput) {
+        if (isPending) {
+          linkInput.value = 'Enlace pendiente de aprobación por el Administrador';
+          linkInput.disabled = true;
+          linkInput.style.color = '#9ca3af';
+          linkInput.style.fontStyle = 'italic';
+        } else {
+          linkInput.value = referralLink;
+          linkInput.disabled = false;
+          linkInput.style.color = '';
+          linkInput.style.fontStyle = '';
+        }
+      }
+
+      // Copy button handler
+      const copyBtn = document.getElementById('broker-dash-copy-link');
+      if (copyBtn) {
+        if (isPending) {
+          copyBtn.disabled = true;
+          copyBtn.style.opacity = '0.5';
+          copyBtn.style.cursor = 'not-allowed';
+          copyBtn.onclick = null;
+        } else {
+          copyBtn.disabled = false;
+          copyBtn.style.opacity = '';
+          copyBtn.style.cursor = '';
+          copyBtn.onclick = () => App.utils.copyToClipboard(referralLink);
+        }
+      }
+
     } catch (err) {
       console.error('[Broker] initDashboard error:', err);
       App.utils.showToast('Error loading broker dashboard.', 'error');

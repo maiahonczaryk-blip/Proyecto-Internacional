@@ -100,15 +100,36 @@
           <h1><span class="lang-en">Admin Dashboard</span><span class="lang-es">Panel de Administración</span></h1>
           <p class="dashboard-subtitle"><span class="lang-en">Manage the RE/MAX Inmomás International Platform</span><span class="lang-es">Gestiona la Plataforma Internacional de RE/MAX Inmomás</span></p>
         </div>
-        <div class="stat-cards-grid">
+        <div class="stat-cards-grid" style="grid-template-columns: repeat(5, 1fr);">
           <div class="stat-card stat-card--amber"><div class="stat-card__icon stat-card__icon--amber">⏳</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-pending">0</div><div class="stat-card__label"><span class="lang-en">Pending Approvals</span><span class="lang-es">Pendientes</span></div></div></div>
           <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">🏢</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-brokers">0</div><div class="stat-card__label"><span class="lang-en">Active Brokers</span><span class="lang-es">Brokers Activos</span></div></div></div>
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">👤</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-realtors">0</div><div class="stat-card__label"><span class="lang-en">Active Realtors</span><span class="lang-es">Realtors Activos</span></div></div></div>
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🤝</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Total Clients</span><span class="lang-es">Clientes Totales</span></div></div></div>
+          <div class="stat-card stat-card--red"><div class="stat-card__icon stat-card__icon--red">📥</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-leads">0</div><div class="stat-card__label"><span class="lang-en">Buyer Guide Leads</span><span class="lang-es">Leads de Guía</span></div></div></div>
         </div>
         <div class="dashboard-section">
           <h2><span class="lang-en">Pending Applications</span><span class="lang-es">Solicitudes Pendientes</span></h2>
           <div id="admin-pending-list" class="card-list"></div>
+        </div>
+        <div class="dashboard-section">
+          <h2><span class="lang-en">Buyer's Guide Downloads (Leads)</span><span class="lang-es">Descargas de la Guía del Comprador (Leads)</span></h2>
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
+                  <th><span class="lang-en">Name</span><span class="lang-es">Nombre</span></th>
+                  <th>Email</th>
+                  <th><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></th>
+                  <th><span class="lang-en">Assigned Agent</span><span class="lang-es">Agente Asignado</span></th>
+                  <th><span class="lang-en">Actions</span><span class="lang-es">Acciones</span></th>
+                </tr>
+              </thead>
+              <tbody id="dossier-leads-table-body">
+                <!-- Lead rows will be injected here via JS -->
+              </tbody>
+            </table>
+          </div>
         </div>
         <div class="dashboard-section">
           <h2><span class="lang-en">Recent Activity</span><span class="lang-es">Actividad Reciente</span></h2>
@@ -178,6 +199,17 @@
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🤝</div><div class="stat-card__body"><div class="stat-card__value" id="broker-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Total Clients</span><span class="lang-es">Clientes Totales</span></div></div></div>
           <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">🏠</div><div class="stat-card__body"><div class="stat-card__value" id="broker-stat-sales">0</div><div class="stat-card__label"><span class="lang-en">Completed Sales</span><span class="lang-es">Ventas Completadas</span></div></div></div>
           <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">💰</div><div class="stat-card__body"><div class="stat-card__value" id="broker-stat-commissions">€0</div><div class="stat-card__label"><span class="lang-en">Total Commissions</span><span class="lang-es">Comisiones Totales</span></div></div></div>
+        </div>
+        <!-- Referral Link Quick Access -->
+        <div class="dashboard-section referral-quick">
+          <h2>🔗 <span class="lang-en">Your Referral Link</span><span class="lang-es">Tu Enlace de Referido</span></h2>
+          <div style="display: flex; align-items: center; background: rgba(0, 67, 255, 0.04); border: 1px solid rgba(0, 67, 255, 0.15); border-radius: 12px; padding: 8px; gap: 12px; margin-top: 12px;">
+            <div style="background: white; border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <span style="font-size: 1.2rem;">✨</span>
+            </div>
+            <input type="text" readonly id="broker-dash-referral-link" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--text-primary); outline: none; padding: 0; min-width: 0;">
+            <button class="btn btn-primary" id="broker-dash-copy-link" style="border-radius: 8px; padding: 10px 20px; white-space: nowrap;"><span class="lang-en">Copy Link</span><span class="lang-es">Copiar Enlace</span></button>
+          </div>
         </div>
         <div class="dashboard-grid-2col">
           <div class="dashboard-section">
@@ -383,6 +415,17 @@
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🔄</div><div class="stat-card__body"><div class="stat-card__value" id="agent-stat-active">0</div><div class="stat-card__label"><span class="lang-en">Active Funnel</span><span class="lang-es">Embudo Activo</span></div></div></div>
           <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">🏠</div><div class="stat-card__body"><div class="stat-card__value" id="agent-stat-sales">0</div><div class="stat-card__label"><span class="lang-en">Closed Sales</span><span class="lang-es">Ventas Cerradas</span></div></div></div>
           <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">💰</div><div class="stat-card__body"><div class="stat-card__value" id="agent-stat-commissions">€0</div><div class="stat-card__label"><span class="lang-en">My Commission (Spain)</span><span class="lang-es">Mi Comisión (España)</span></div></div></div>
+        </div>
+        <!-- Referral Link Quick Access -->
+        <div class="dashboard-section referral-quick">
+          <h2>🔗 <span class="lang-en">Your Referral Link</span><span class="lang-es">Tu Enlace de Referido</span></h2>
+          <div style="display: flex; align-items: center; background: rgba(0, 67, 255, 0.04); border: 1px solid rgba(0, 67, 255, 0.15); border-radius: 12px; padding: 8px; gap: 12px; margin-top: 12px;">
+            <div style="background: white; border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <span style="font-size: 1.2rem;">✨</span>
+            </div>
+            <input type="text" readonly id="agent-dash-referral-link" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--text-primary); outline: none; padding: 0; min-width: 0;">
+            <button class="btn btn-primary" id="agent-dash-copy-link" style="border-radius: 8px; padding: 10px 20px; white-space: nowrap;"><span class="lang-en">Copy Link</span><span class="lang-es">Copiar Enlace</span></button>
+          </div>
         </div>
         <div class="dashboard-grid-2col">
           <div class="dashboard-section">
