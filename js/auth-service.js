@@ -913,6 +913,54 @@ App.auth = (function() {
     }
   }
 
+  /* ---- Add Client Manually ---- */
+  async function addClientManually(clientData) {
+    const user = getCurrentUser();
+    if (!user) throw new Error('Not authenticated.');
+
+    const newClient = {
+      id: 'client_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+      firstName: clientData.firstName,
+      lastName: clientData.lastName,
+      email: clientData.email,
+      phone: clientData.phone || '—',
+      country: clientData.country || '—',
+      budget: clientData.budget || '—',
+      interestArea: clientData.interestArea || '—',
+      notes: clientData.notes || '',
+      timeline: clientData.timeline || '—',
+      objective: clientData.objective || '—',
+      status: 'contacted',
+      referredBy: (user.role === 'realtor') ? user.id : null,
+      brokerId: (user.role === 'broker') ? user.id : (user.brokerId || null),
+      localAgentId: (user.role === 'agent_inmomas') ? user.id : null,
+      localAgentName: (user.role === 'agent_inmomas') ? (user.firstName + ' ' + user.lastName) : null,
+      addedManuallyBy: user.id,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      statusHistory: [{
+        status: 'contacted',
+        date: new Date().toISOString(),
+        note: 'Added manually by ' + user.firstName + ' ' + user.lastName
+      }]
+    };
+
+    // If realtor, also set brokerId from realtor's broker
+    if (user.role === 'realtor' && user.brokerId) {
+      newClient.brokerId = user.brokerId;
+    }
+
+    if (App.demoMode) {
+      if (!App.demoData.clients) App.demoData.clients = [];
+      App.demoData.clients.push(newClient);
+      saveDemoData();
+    } else {
+      await App.db.collection('clients').doc(newClient.id).set(newClient);
+    }
+
+    return newClient;
+  }
+
   /* ---- Public API ---- */
   return {
     init,
@@ -940,6 +988,7 @@ App.auth = (function() {
     saveDossierLead,
     getDossierLeads,
     loginWithGoogle,
-    registerWithGoogle
+    registerWithGoogle,
+    addClientManually
   };
 })();

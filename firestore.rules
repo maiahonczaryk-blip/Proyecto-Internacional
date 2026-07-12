@@ -21,9 +21,10 @@ service cloud.firestore {
       allow read, write: if isAuthenticated();
     }
     
-    // Dossier leads rules: Authenticated users can read/write leads
+    // Dossier leads rules: Anyone can create a lead (public form), only authenticated users can read/update/delete
     match /dossier_leads/{leadId} {
-      allow read, write: if isAuthenticated();
+      allow create: if true;
+      allow read, update, delete: if isAuthenticated();
     }
   }
 }

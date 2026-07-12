@@ -285,135 +285,282 @@ document.addEventListener('DOMContentLoaded', () => {
     startAutoPlay();
   }
 
-  // ── Buying Process Details Interactivity ──
-  const processSteps = document.querySelectorAll('.process-step');
+  // ── Buying Process Pipeline Interactivity ──
+  const pipelineNodes = document.querySelectorAll('.pipeline-node');
   const detailsTitle = document.getElementById('process-details-title');
   const detailsDesc = document.getElementById('process-details-desc');
+  const detailsPanelIcon = document.getElementById('details-panel-icon');
+  const detailsStepBadge = document.getElementById('details-step-badge');
+  const detailsNavCounter = document.getElementById('details-nav-counter');
+  const detailsHighlights = document.getElementById('details-panel-highlights');
+  const pipelineFill = document.getElementById('pipeline-fill');
+  const detailsPrevBtn = document.getElementById('details-prev-btn');
+  const detailsNextBtn = document.getElementById('details-next-btn');
   
-  if (processSteps.length > 0 && detailsTitle && detailsDesc) {
+  if (pipelineNodes.length > 0 && detailsTitle && detailsDesc) {
     let currentStep = 1;
+    const totalSteps = 8;
+    
+    // SVG icons for each step (matching the node circles)
+    const stepIcons = {
+      1: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>',
+      2: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
+      3: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+      4: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+      5: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
+      6: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>',
+      7: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+      8: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>'
+    };
     
     const stepDetails = {
       1: {
         en: {
-          title: "1. Get Your NIE",
-          desc: "The NIE (Foreigner Identity Number) is essential for buying property, opening bank accounts, or contracting utility services in Spain. Our partner law firm handles the entire application process with the immigration office or consulate, saving you any travel."
+          title: "Get Your NIE",
+          desc: "The NIE (Foreigner Identity Number) is essential for buying property, opening bank accounts, or contracting utility services in Spain. Our partner law firm handles the entire application process with the immigration office or consulate, saving you any travel.",
+          highlights: [
+            { icon: "⏱", text: "1–2 weeks" },
+            { icon: "🏛", text: "Fuster & Associates" },
+            { icon: "🌐", text: "100% remote" }
+          ]
         },
         es: {
-          title: "1. Obtener NIE",
-          desc: "El NIE (Número de Identidad de Extranjero) es imprescindible para comprar cualquier propiedad, abrir cuentas bancarias o contratar servicios en España. Nuestro despacho asociado se encarga de toda la gestión ante la oficina de extranjería o consulado correspondiente, evitándote desplazamientos."
+          title: "Obtener NIE",
+          desc: "El NIE (Número de Identidad de Extranjero) es imprescindible para comprar cualquier propiedad, abrir cuentas bancarias o contratar servicios en España. Nuestro despacho asociado se encarga de toda la gestión ante la oficina de extranjería o consulado correspondiente, evitándote desplazamientos.",
+          highlights: [
+            { icon: "⏱", text: "1–2 semanas" },
+            { icon: "🏛", text: "Fuster & Associates" },
+            { icon: "🌐", text: "100% remoto" }
+          ]
         }
       },
       2: {
         en: {
-          title: "2. Open Bank Account",
-          desc: "You will need a Spanish bank account to transfer purchase funds and set up direct debits for future utility bills and taxes. We assist you in opening the account quickly and remotely through our mortgage and banking partners."
+          title: "Open Bank Account",
+          desc: "You will need a Spanish bank account to transfer purchase funds and set up direct debits for future utility bills and taxes. We assist you in opening the account quickly and remotely through our mortgage and banking partners.",
+          highlights: [
+            { icon: "🏦", text: "Banco UCI partner" },
+            { icon: "📱", text: "Remote setup" },
+            { icon: "✅", text: "No travel needed" }
+          ]
         },
         es: {
-          title: "2. Abrir Cuenta Bancaria",
-          desc: "Necesitarás una cuenta en un banco español para transferir los fondos de la compra y domiciliar los futuros recibos e impuestos. Te ayudamos a abrir la cuenta de forma rápida y remota a través de nuestro partner hipotecario o bancario."
+          title: "Abrir Cuenta Bancaria",
+          desc: "Necesitarás una cuenta en un banco español para transferir los fondos de la compra y domiciliar los futuros recibos e impuestos. Te ayudamos a abrir la cuenta de forma rápida y remota a través de nuestro partner hipotecario o bancario.",
+          highlights: [
+            { icon: "🏦", text: "Partner Banco UCI" },
+            { icon: "📱", text: "Apertura remota" },
+            { icon: "✅", text: "Sin desplazamiento" }
+          ]
         }
       },
       3: {
         en: {
-          title: "3. Define Strategy",
-          desc: "We analyze your goals: whether you want a high-yield investment or a holiday home. We design a plan tailored to your financial and personal profile to optimize tax efficiency and returns."
+          title: "Define Strategy",
+          desc: "We analyze your goals: whether you want a high-yield investment or a holiday home. We design a plan tailored to your financial and personal profile to optimize tax efficiency and returns.",
+          highlights: [
+            { icon: "📊", text: "Personalized plan" },
+            { icon: "💰", text: "Tax optimization" },
+            { icon: "🏖", text: "Investment or holiday" }
+          ]
         },
         es: {
-          title: "3. Definir Estrategia",
-          desc: "Analizamos tus objetivos: si buscas una inversión de alta rentabilidad o una residencia vacacional. Diseñamos un plan adaptado a tu perfil financiero y personal para optimizar el retorno y los impuestos."
+          title: "Definir Estrategia",
+          desc: "Analizamos tus objetivos: si buscas una inversión de alta rentabilidad o una residencia vacacional. Diseñamos un plan adaptado a tu perfil financiero y personal para optimizar el retorno y los impuestos.",
+          highlights: [
+            { icon: "📊", text: "Plan personalizado" },
+            { icon: "💰", text: "Optimización fiscal" },
+            { icon: "🏖", text: "Inversión o vacaciones" }
+          ]
         }
       },
       4: {
         en: {
-          title: "4. Property Selection",
-          desc: "We filter the best properties on the Costa Blanca based on your criteria. We access the complete RE/MAX database and off-market listings to ensure you only visit highly qualified options."
+          title: "Property Selection",
+          desc: "We filter the best properties on the Costa Blanca based on your criteria. We access the complete RE/MAX database and off-market listings to ensure you only visit highly qualified options.",
+          highlights: [
+            { icon: "🏠", text: "RE/MAX database" },
+            { icon: "🔒", text: "Off-market access" },
+            { icon: "🎯", text: "Pre-qualified" }
+          ]
         },
         es: {
-          title: "4. Selección de Propiedades",
-          desc: "Filtramos las mejores propiedades en la Costa Blanca según tus criterios. Accedemos a la base de datos completa de RE/MAX y a propiedades fuera del mercado (off-market) para garantizar que solo visites opciones altamente cualificadas."
+          title: "Selección de Propiedades",
+          desc: "Filtramos las mejores propiedades en la Costa Blanca según tus criterios. Accedemos a la base de datos completa de RE/MAX y a propiedades fuera del mercado (off-market) para garantizar que solo visites opciones altamente cualificadas.",
+          highlights: [
+            { icon: "🏠", text: "Base datos RE/MAX" },
+            { icon: "🔒", text: "Acceso off-market" },
+            { icon: "🎯", text: "Pre-cualificadas" }
+          ]
         }
       },
       5: {
         en: {
-          title: "5. Due Diligence",
-          desc: "A crucial step for a safe purchase. Fuster & Associates performs an exhaustive study of the property's registry status, liens, debts, urban legality, and licenses so you buy with total peace of mind and zero risks."
+          title: "Due Diligence",
+          desc: "A crucial step for a safe purchase. Fuster & Associates performs an exhaustive study of the property's registry status, liens, debts, urban legality, and licenses so you buy with total peace of mind and zero risks.",
+          highlights: [
+            { icon: "⚖️", text: "Legal verification" },
+            { icon: "📋", text: "Registry check" },
+            { icon: "🛡", text: "Zero risk" }
+          ]
         },
         es: {
-          title: "5. Due Diligence (Estudio Legal)",
-          desc: "Paso crucial para una compra segura. Fuster & Associates realiza un estudio exhaustivo del estado registral de la propiedad, cargas, deudas, legalidad urbanística y licencias para que compres con total tranquilidad y cero riesgos."
+          title: "Due Diligence (Estudio Legal)",
+          desc: "Paso crucial para una compra segura. Fuster & Associates realiza un estudio exhaustivo del estado registral de la propiedad, cargas, deudas, legalidad urbanística y licencias para que compres con total tranquilidad y cero riesgos.",
+          highlights: [
+            { icon: "⚖️", text: "Verificación legal" },
+            { icon: "📋", text: "Check registral" },
+            { icon: "🛡", text: "Cero riesgos" }
+          ]
         }
       },
       6: {
         en: {
-          title: "6. Reservation",
-          desc: "Reservation deposit to remove the property from the market and freeze the agreed price. This amount is safely held in escrow and will be deducted from the final purchase price upon signing the deeds."
+          title: "Reservation",
+          desc: "Reservation deposit to remove the property from the market and freeze the agreed price. This amount is safely held in escrow and will be deducted from the final purchase price upon signing the deeds.",
+          highlights: [
+            { icon: "💶", text: "3.000 € – 10.000 €" },
+            { icon: "🔐", text: "Held in escrow" },
+            { icon: "❄️", text: "Price frozen" }
+          ]
         },
         es: {
-          title: "6. Reserva",
-          desc: "Depósito de reserva para retirar la propiedad del mercado y congelar el precio acordado. Este importe queda custodiado de forma segura y se descontará del precio final de compra en la firma de las escrituras."
+          title: "Reserva",
+          desc: "Depósito de reserva para retirar la propiedad del mercado y congelar el precio acordado. Este importe queda custodiado de forma segura y se descontará del precio final de compra en la firma de las escrituras.",
+          highlights: [
+            { icon: "💶", text: "3.000 € – 10.000 €" },
+            { icon: "🔐", text: "Depósito custodiado" },
+            { icon: "❄️", text: "Precio congelado" }
+          ]
         }
       },
       7: {
         en: {
-          title: "7. Contract",
-          desc: "Signing the Arras Contract (Purchase Agreement) which details all the conditions of the sale and requires a 10% deposit. This contract legally binds both parties and establishes guarantees and completion dates."
+          title: "Contract",
+          desc: "Signing the Arras Contract (Purchase Agreement) which details all the conditions of the sale and requires a 10% deposit. This contract legally binds both parties and establishes guarantees and completion dates.",
+          highlights: [
+            { icon: "📝", text: "Arras Contract" },
+            { icon: "💰", text: "10% deposit" },
+            { icon: "⚖️", text: "Legally binding" }
+          ]
         },
         es: {
-          title: "7. Contrato de Arras",
-          desc: "Firma del Contrato de Arras (Purchase Contract) donde se detallan todas las condiciones de la compraventa y se abona el 10% del precio total. Este contrato vincula legalmente a ambas partes y establece las garantías y plazos de entrega."
+          title: "Contrato de Arras",
+          desc: "Firma del Contrato de Arras (Purchase Contract) donde se detallan todas las condiciones de la compraventa y se abona el 10% del precio total. Este contrato vincula legalmente a ambas partes y establece las garantías y plazos de entrega.",
+          highlights: [
+            { icon: "📝", text: "Contrato de Arras" },
+            { icon: "💰", text: "10% del precio" },
+            { icon: "⚖️", text: "Vinculante" }
+          ]
         }
       },
       8: {
         en: {
-          title: "8. Completion",
-          desc: "The final signing before a Public Notary where the title is transferred and the remaining payment is made. If you cannot travel to Spain, you can grant a Power of Attorney (POA) to our law firm to sign 100% remotely."
+          title: "Completion",
+          desc: "The final signing before a Public Notary where the title is transferred and the remaining payment is made. If you cannot travel to Spain, you can grant a Power of Attorney (POA) to our law firm to sign 100% remotely.",
+          highlights: [
+            { icon: "🔑", text: "Keys in hand" },
+            { icon: "🏛", text: "Public Notary" },
+            { icon: "🌐", text: "Remote via POA" }
+          ]
         },
         es: {
-          title: "8. Escritura Pública",
-          desc: "La firma final ante Notario Público donde se transmite la propiedad y se entrega el resto del pago. Si no puedes viajar a España, puedes delegar un Poder Notarial (POA) a nuestro despacho jurídico para firmar 100% de forma remota."
+          title: "Escritura Pública",
+          desc: "La firma final ante Notario Público donde se transmite la propiedad y se entrega el resto del pago. Si no puedes viajar a España, puedes delegar un Poder Notarial (POA) a nuestro despacho jurídico para firmar 100% de forma remota.",
+          highlights: [
+            { icon: "🔑", text: "Llaves en mano" },
+            { icon: "🏛", text: "Notario Público" },
+            { icon: "🌐", text: "Remoto vía POA" }
+          ]
         }
       }
     };
     
-    function showDetails(stepNum) {
+    function updatePipeline(stepNum) {
       currentStep = stepNum;
       const lang = document.body.classList.contains('lang-es') ? 'es' : 'en';
       const details = stepDetails[stepNum][lang];
       
-      // Update contents
+      // Update node states
+      pipelineNodes.forEach(node => {
+        const nodeStep = parseInt(node.getAttribute('data-step'));
+        node.classList.remove('active', 'completed');
+        if (nodeStep === stepNum) {
+          node.classList.add('active');
+        } else if (nodeStep < stepNum) {
+          node.classList.add('completed');
+        }
+      });
+      
+      // Update progress track fill
+      if (pipelineFill) {
+        const fillPercent = ((stepNum - 1) / (totalSteps - 1)) * 100;
+        pipelineFill.style.width = fillPercent + '%';
+      }
+      
+      // Update icon in detail panel
+      if (detailsPanelIcon) {
+        detailsPanelIcon.innerHTML = stepIcons[stepNum] || '';
+      }
+      
+      // Update step badge
+      if (detailsStepBadge) {
+        detailsStepBadge.textContent = lang === 'es' ? `Paso ${stepNum}` : `Step ${stepNum}`;
+      }
+      
+      // Update title & description
       detailsTitle.textContent = details.title;
       detailsDesc.textContent = details.desc;
       
-      // Add active styling to selected step
-      processSteps.forEach(step => {
-        const stepId = parseInt(step.getAttribute('data-step'));
-        step.classList.toggle('active', stepId === stepNum);
-      });
+      // Update highlights
+      if (detailsHighlights) {
+        detailsHighlights.innerHTML = details.highlights.map(h =>
+          `<span class="details-highlight"><span class="hl-icon">${h.icon}</span>${h.text}</span>`
+        ).join('');
+      }
+      
+      // Update nav counter
+      if (detailsNavCounter) {
+        detailsNavCounter.textContent = `${stepNum} / ${totalSteps}`;
+      }
+      
+      // Update nav button states
+      if (detailsPrevBtn) detailsPrevBtn.disabled = stepNum <= 1;
+      if (detailsNextBtn) detailsNextBtn.disabled = stepNum >= totalSteps;
     }
     
-    // Add event listeners to steps
-    processSteps.forEach(step => {
-      const stepNum = parseInt(step.getAttribute('data-step'));
-      step.style.cursor = 'pointer';
-      step.addEventListener('click', () => {
-        showDetails(stepNum);
+    // Click handlers on pipeline nodes
+    pipelineNodes.forEach(node => {
+      node.addEventListener('click', () => {
+        const stepNum = parseInt(node.getAttribute('data-step'));
+        updatePipeline(stepNum);
       });
     });
+    
+    // Navigation buttons
+    if (detailsPrevBtn) {
+      detailsPrevBtn.addEventListener('click', () => {
+        if (currentStep > 1) updatePipeline(currentStep - 1);
+      });
+    }
+    if (detailsNextBtn) {
+      detailsNextBtn.addEventListener('click', () => {
+        if (currentStep < totalSteps) updatePipeline(currentStep + 1);
+      });
+    }
     
     // Listen for language changes to refresh details text
     const langToggles = document.querySelectorAll('.lang-toggle');
     langToggles.forEach(toggle => {
       toggle.addEventListener('click', () => {
-        // Use a short delay so body language class gets updated first
         setTimeout(() => {
-          showDetails(currentStep);
+          updatePipeline(currentStep);
         }, 50);
       });
     });
     
-    // Initialize step 1 details
-    showDetails(1);
+    // Initialize step 1
+    updatePipeline(1);
   }
 
   // ── Properties Carousel Interactivity ──

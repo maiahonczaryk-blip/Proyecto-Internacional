@@ -20,6 +20,7 @@ App.router = (function() {
     'register':       { view: 'view-register',       role: null,      sidebar: false, title: 'Register' },
     'pending':        { view: 'view-pending',        role: null,      sidebar: false, title: 'Application Pending' },
     'intake':         { view: 'view-intake',         role: null,      sidebar: false, title: 'VIP Client Intake' },
+    'referral':       { view: 'view-referral-form',   role: null,      sidebar: false, title: 'Referral Form' },
 
     // Profile route
     'profile':        { view: 'view-profile',        role: null,      sidebar: null,  title: 'My Profile' },
@@ -54,12 +55,21 @@ App.router = (function() {
 
   /* ---- Initialize Router ---- */
   function init() {
-    // Intercept ?ref= code from URL
+    // Intercept ?ref= code from URL (query string or hash params)
     const searchParams = new URLSearchParams(window.location.search);
-    const refCode = searchParams.get('ref');
+    let refCode = searchParams.get('ref');
+    // Also check hash-based ref params (e.g. #referral?ref=CODE)
+    if (!refCode) {
+      const hash = window.location.hash;
+      const hashQueryIdx = hash.indexOf('?');
+      if (hashQueryIdx >= 0) {
+        const hashParams = new URLSearchParams(hash.substring(hashQueryIdx + 1));
+        refCode = hashParams.get('ref');
+      }
+    }
     if (refCode) {
       sessionStorage.setItem('referralCode', refCode);
-      window.history.replaceState({}, document.title, window.location.pathname + '#intake');
+      window.history.replaceState({}, document.title, window.location.pathname + '#referral');
     }
 
     window.addEventListener('hashchange', handleRouteChange);
@@ -123,7 +133,7 @@ App.router = (function() {
     }
   }
 
-  /* ---- Handle Route Change ---- */
+   /* ---- Handle Route Change ---- */
   function handleRouteChange() {
     let hash = window.location.hash.substring(1) || 'home';
     
@@ -131,6 +141,17 @@ App.router = (function() {
     const queryIndex = hash.indexOf('?');
     const routeKey = queryIndex >= 0 ? hash.substring(0, queryIndex) : hash;
     const queryString = queryIndex >= 0 ? hash.substring(queryIndex + 1) : '';
+
+    // Capture ref code from hash-based referral links (e.g. #referral?ref=CODE)
+    if (routeKey === 'referral' && queryString) {
+      const hashParams = new URLSearchParams(queryString);
+      const refParam = hashParams.get('ref');
+      if (refParam) {
+        sessionStorage.setItem('referralCode', refParam);
+        // Clean the URL to remove the ref param
+        window.history.replaceState({}, document.title, window.location.pathname + '#referral');
+      }
+    }
 
     const route = routes[routeKey];
 
@@ -273,6 +294,7 @@ App.router = (function() {
       'register':          () => App.views.auth && App.views.auth.initRegister(params),
       'pending':           () => {},
       'intake':            () => App.views.public && App.views.public.initIntake(),
+      'referral':          () => App.views.public && App.views.public.initReferralForm(),
       'admin/dashboard':   () => App.views.admin && App.views.admin.initDashboard(),
       'admin/users':       () => App.views.admin && App.views.admin.initUsers(),
       'admin/clients':     () => App.views.admin && App.views.admin.initClients(),

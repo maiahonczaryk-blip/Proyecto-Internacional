@@ -136,7 +136,7 @@ App.utils.copyToClipboard = async function(text) {
 /* ---- Referral Links ---- */
 App.utils.generateReferralLink = function(referralCode) {
   const baseUrl = window.location.origin + window.location.pathname;
-  return `${baseUrl}#register?ref=${referralCode}`;
+  return `${baseUrl}#referral?ref=${referralCode}`;
 };
 
 /* ---- Status Helpers ---- */

@@ -88,6 +88,16 @@
         }
       }
 
+      // Manual Add Client button
+      const addBtnContainer = document.getElementById('broker-dash-add-client-btn');
+      if (addBtnContainer) {
+        addBtnContainer.innerHTML = `
+          <button class="btn btn-primary" onclick="App.views.broker.showAddClientModal()" style="display: flex; align-items: center; gap: 8px; padding: 0.65rem 1.25rem; font-size: 0.9rem; border-radius: 8px; background: linear-gradient(135deg, #0043ff, #0066ff); border: none; box-shadow: 0 2px 8px rgba(0,67,255,0.2);">
+            <span style="font-size: 1.1rem;">➕</span> Add Client Manually
+          </button>
+        `;
+      }
+
     } catch (err) {
       console.error('[Broker] initDashboard error:', err);
       App.utils.showToast('Error loading broker dashboard.', 'error');
@@ -464,6 +474,14 @@
               <div style="color: #6b7280;">${App.utils.escapeHtml(client.budget || '—')}</div>
             </div>
             <div>
+              <div style="font-weight: 600; color: #374151;">Timeline</div>
+              <div style="color: #6b7280;">⏱ ${App.utils.escapeHtml(client.timeline || '—')}</div>
+            </div>
+            <div>
+              <div style="font-weight: 600; color: #374151;">Objective</div>
+              <div style="color: #6b7280;">🎯 ${App.utils.escapeHtml(client.objective || '—')}</div>
+            </div>
+            <div>
               <div style="font-weight: 600; color: #374151;">Registered</div>
               <div style="color: #6b7280;">${App.utils.formatDate(client.createdAt)}</div>
             </div>
@@ -625,6 +643,143 @@
     }).join('');
   }
 
+  /* ── Add Client Manually Modal ── */
+  function showAddClientModal() {
+    App.utils.showModal({
+      title: '➕ Add Client Manually',
+      body: `
+        <form id="manual-client-form" style="display: grid; gap: 1rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">First Name *</label>
+              <input type="text" id="mc-firstName" class="form-input" placeholder="John" required style="margin-bottom: 0;">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Last Name *</label>
+              <input type="text" id="mc-lastName" class="form-input" placeholder="Smith" required style="margin-bottom: 0;">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Email *</label>
+              <input type="email" id="mc-email" class="form-input" placeholder="john@example.com" required style="margin-bottom: 0;">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Phone *</label>
+              <input type="tel" id="mc-phone" class="form-input" placeholder="+1 555 123 4567" required style="margin-bottom: 0;">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Country</label>
+              <input type="text" id="mc-country" class="form-input" placeholder="United States" style="margin-bottom: 0;">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Budget</label>
+              <select id="mc-budget" class="form-input" style="margin-bottom: 0;">
+                <option value="">Select budget range</option>
+                <option value="< €150,000">< €150,000</option>
+                <option value="€150,000 - €250,000">€150,000 - €250,000</option>
+                <option value="€250,000 - €400,000">€250,000 - €400,000</option>
+                <option value="€400,000 - €600,000">€400,000 - €600,000</option>
+                <option value="> €600,000">> €600,000</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Interest Area in Spain</label>
+            <select id="mc-interestArea" class="form-input" style="margin-bottom: 0;">
+              <option value="">Select area</option>
+              <option value="Alicante City">Alicante City</option>
+              <option value="Elche">Elche</option>
+              <option value="Santa Pola">Santa Pola</option>
+              <option value="Gran Alacant">Gran Alacant</option>
+              <option value="Benidorm">Benidorm</option>
+              <option value="Jávea">Jávea</option>
+              <option value="Torrevieja">Torrevieja</option>
+              <option value="Costa Blanca (General)">Costa Blanca (General)</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Timeline *</label>
+              <select id="mc-timeline" class="form-input" required style="margin-bottom: 0;">
+                <option value="">Select timeline</option>
+                <option value="0-3 months">0 - 3 months</option>
+                <option value="3-6 months">3 - 6 months</option>
+                <option value="6-12 months">6 - 12 months</option>
+                <option value="+1 year">+1 year</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Objective *</label>
+              <select id="mc-objective" class="form-input" required style="margin-bottom: 0;">
+                <option value="">Select objective</option>
+                <option value="Mudarse a España">Mudarse a España</option>
+                <option value="Invertir en España">Invertir en España</option>
+                <option value="Tener casa vacacional en España">Tener casa vacacional en España</option>
+                <option value="Retirarse en España">Retirarse en España</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Notes</label>
+            <textarea id="mc-notes" class="form-input" rows="3" placeholder="Additional notes about this client..." style="margin-bottom: 0; resize: vertical;"></textarea>
+          </div>
+        </form>
+      `,
+      footer: `
+        <button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="App.views.broker.handleAddClient()" style="margin-left: 0.5rem;">Save Client</button>
+      `
+    });
+  }
+
+  async function handleAddClient() {
+    const firstName = document.getElementById('mc-firstName')?.value.trim();
+    const lastName = document.getElementById('mc-lastName')?.value.trim();
+    const email = document.getElementById('mc-email')?.value.trim();
+    const phone = document.getElementById('mc-phone')?.value.trim();
+    const timeline = document.getElementById('mc-timeline')?.value;
+    const objective = document.getElementById('mc-objective')?.value;
+
+    if (!firstName || !lastName || !email || !phone) {
+      App.utils.showToast('Please fill in all required fields (Name, Email, Phone).', 'error');
+      return;
+    }
+    if (!timeline) {
+      App.utils.showToast('Please select a timeline.', 'error');
+      return;
+    }
+    if (!objective) {
+      App.utils.showToast('Please select an objective.', 'error');
+      return;
+    }
+
+    try {
+      await App.auth.addClientManually({
+        firstName,
+        lastName,
+        email,
+        phone,
+        country: document.getElementById('mc-country')?.value.trim() || '',
+        budget: document.getElementById('mc-budget')?.value || '',
+        interestArea: document.getElementById('mc-interestArea')?.value || '',
+        timeline,
+        objective,
+        notes: document.getElementById('mc-notes')?.value.trim() || ''
+      });
+
+      App.utils.closeModal();
+      App.utils.showToast('Client added successfully! 🎉', 'success');
+      initDashboard(); // Refresh dashboard
+    } catch (err) {
+      console.error('[Broker] handleAddClient error:', err);
+      App.utils.showToast('Error adding client: ' + err.message, 'error');
+    }
+  }
+
   /* ── Utility ── */
   function setTextById(id, text) {
     const el = document.getElementById(id);
@@ -643,7 +798,9 @@
     showRealtorDetail,
     showClientDetail,
     approveRealtor,
-    rejectRealtor
+    rejectRealtor,
+    showAddClientModal,
+    handleAddClient
   };
 
 })();

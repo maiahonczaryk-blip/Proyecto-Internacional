@@ -488,58 +488,143 @@
           <div class="text-center reveal">
             <span class="section-label"><span class="lang-en">Step by Step</span><span class="lang-es">Paso a Paso</span></span>
             <h2 class="section-title"><span class="lang-en">The Buying <span class="text-accent">Process</span></span><span class="lang-es">El <span class="text-accent">Proceso</span> de Compra</span></h2>
+            <p class="section-subtitle"><span class="lang-en">From first contact to keys in hand — we guide you through every stage</span><span class="lang-es">Desde el primer contacto hasta las llaves en mano — te acompañamos en cada etapa</span></p>
           </div>
-          <div class="process-timeline">
-            <div class="process-step reveal active" data-step="1">
-              <div class="step-num">1</div>
-              <h4><span class="lang-en">Get Your NIE</span><span class="lang-es">Obtener NIE</span></h4>
-              <p><span class="lang-en">Spanish tax ID. 1–2 weeks.</span><span class="lang-es">Número fiscal español. 1–2 semanas.</span></p>
+
+          <!-- Pipeline Visual -->
+          <div class="pipeline-wrapper reveal">
+            <!-- Progress Track -->
+            <div class="pipeline-track">
+              <div class="pipeline-track-bg"></div>
+              <div class="pipeline-track-fill" id="pipeline-fill"></div>
             </div>
-            <div class="process-step reveal" data-step="2">
-              <div class="step-num">2</div>
-              <h4><span class="lang-en">Open Bank Account</span><span class="lang-es">Abrir Cuenta</span></h4>
-              <p><span class="lang-en">Spanish bank account.</span><span class="lang-es">Cuenta bancaria española.</span></p>
-            </div>
-            <div class="process-step reveal" data-step="3">
-              <div class="step-num">3</div>
-              <h4><span class="lang-en">Define Strategy</span><span class="lang-es">Definir Estrategia</span></h4>
-              <p><span class="lang-en">Investment? Holiday?</span><span class="lang-es">¿Inversión? ¿Vacaciones?</span></p>
-            </div>
-            <div class="process-step reveal" data-step="4">
-              <div class="step-num">4</div>
-              <h4><span class="lang-en">Property Selection</span><span class="lang-es">Selección</span></h4>
-              <p><span class="lang-en">Pre-selected for your profile.</span><span class="lang-es">Pre-seleccionadas para tu perfil.</span></p>
-            </div>
-            <div class="process-step reveal" data-step="5">
-              <div class="step-num">5</div>
-              <h4><span class="lang-en">Due Diligence</span><span class="lang-es">Due Diligence</span></h4>
-              <p><span class="lang-en">Legal checks by Fuster.</span><span class="lang-es">Revisión legal por Fuster.</span></p>
-            </div>
-            <div class="process-step reveal" data-step="6">
-              <div class="step-num">6</div>
-              <h4><span class="lang-en">Reservation</span><span class="lang-es">Reserva</span></h4>
-              <p>3.000 € – 10.000 €</p>
-            </div>
-            <div class="process-step reveal" data-step="7">
-              <div class="step-num">7</div>
-              <h4><span class="lang-en">Contract</span><span class="lang-es">Contrato</span></h4>
-              <p><span class="lang-en">10% deposit.</span><span class="lang-es">10% depósito.</span></p>
-            </div>
-            <div class="process-step reveal" data-step="8">
-              <div class="step-num">8</div>
-              <h4><span class="lang-en">Completion</span><span class="lang-es">Escritura</span></h4>
-              <p><span class="lang-en">Notary or remote via POA.</span><span class="lang-es">Notaría o remotamente vía poder.</span></p>
+
+            <!-- Steps Row -->
+            <div class="pipeline-steps">
+              <div class="pipeline-node active" data-step="1">
+                <div class="node-connector"></div>
+                <div class="node-circle">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+                </div>
+                <div class="node-label">
+                  <span class="node-number">01</span>
+                  <h4><span class="lang-en">Get Your NIE</span><span class="lang-es">Obtener NIE</span></h4>
+                  <p><span class="lang-en">Tax ID · 1–2 weeks</span><span class="lang-es">Nº fiscal · 1–2 semanas</span></p>
+                </div>
+              </div>
+
+              <div class="pipeline-node" data-step="2">
+                <div class="node-connector"></div>
+                <div class="node-circle">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                </div>
+                <div class="node-label">
+                  <span class="node-number">02</span>
+                  <h4><span class="lang-en">Open Bank Account</span><span class="lang-es">Abrir Cuenta</span></h4>
+                  <p><span class="lang-en">Spanish bank setup</span><span class="lang-es">Cuenta bancaria española</span></p>
+                </div>
+              </div>
+
+              <div class="pipeline-node" data-step="3">
+                <div class="node-connector"></div>
+                <div class="node-circle">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </div>
+                <div class="node-label">
+                  <span class="node-number">03</span>
+                  <h4><span class="lang-en">Define Strategy</span><span class="lang-es">Definir Estrategia</span></h4>
+                  <p><span class="lang-en">Investment or holiday</span><span class="lang-es">¿Inversión o vacaciones?</span></p>
+                </div>
+              </div>
+
+              <div class="pipeline-node" data-step="4">
+                <div class="node-connector"></div>
+                <div class="node-circle">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <div class="node-label">
+                  <span class="node-number">04</span>
+                  <h4><span class="lang-en">Property Selection</span><span class="lang-es">Selección</span></h4>
+                  <p><span class="lang-en">Curated for you</span><span class="lang-es">Selección personalizada</span></p>
+                </div>
+              </div>
+
+              <div class="pipeline-node" data-step="5">
+                <div class="node-connector"></div>
+                <div class="node-circle">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <div class="node-label">
+                  <span class="node-number">05</span>
+                  <h4><span class="lang-en">Due Diligence</span><span class="lang-es">Due Diligence</span></h4>
+                  <p><span class="lang-en">Legal verification</span><span class="lang-es">Verificación legal</span></p>
+                </div>
+              </div>
+
+              <div class="pipeline-node" data-step="6">
+                <div class="node-connector"></div>
+                <div class="node-circle">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                </div>
+                <div class="node-label">
+                  <span class="node-number">06</span>
+                  <h4><span class="lang-en">Reservation</span><span class="lang-es">Reserva</span></h4>
+                  <p>3.000 € – 10.000 €</p>
+                </div>
+              </div>
+
+              <div class="pipeline-node" data-step="7">
+                <div class="node-connector"></div>
+                <div class="node-circle">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </div>
+                <div class="node-label">
+                  <span class="node-number">07</span>
+                  <h4><span class="lang-en">Contract</span><span class="lang-es">Contrato</span></h4>
+                  <p><span class="lang-en">10% deposit</span><span class="lang-es">10% depósito</span></p>
+                </div>
+              </div>
+
+              <div class="pipeline-node" data-step="8">
+                <div class="node-connector"></div>
+                <div class="node-circle">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                </div>
+                <div class="node-label">
+                  <span class="node-number">08</span>
+                  <h4><span class="lang-en">Completion</span><span class="lang-es">Escritura</span></h4>
+                  <p><span class="lang-en">Keys in hand 🔑</span><span class="lang-es">Llaves en mano 🔑</span></p>
+                </div>
+              </div>
             </div>
           </div>
           
           <!-- Detailed Step Info Panel -->
-          <div class="process-details-panel reveal" id="process-details-panel" style="margin-top: 48px; padding: 32px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); min-height: 120px; transition: all 0.3s ease; text-align: left; position: relative;">
-            <h4 id="process-details-title" style="margin-bottom: 12px; color: var(--gold); font-size: 1.15rem; font-weight: 700;">
-              <!-- Dynamic -->
-            </h4>
-            <p id="process-details-desc" style="font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary); margin: 0;">
-              <!-- Dynamic -->
-            </p>
+          <div class="process-details-panel reveal" id="process-details-panel">
+            <div class="details-panel-inner">
+              <div class="details-panel-icon" id="details-panel-icon">
+                <!-- Dynamic icon -->
+              </div>
+              <div class="details-panel-content">
+                <div class="details-panel-header">
+                  <span class="details-step-badge" id="details-step-badge">Step 1</span>
+                  <h4 id="process-details-title"><!-- Dynamic --></h4>
+                </div>
+                <p id="process-details-desc"><!-- Dynamic --></p>
+                <div class="details-panel-highlights" id="details-panel-highlights">
+                  <!-- Dynamic highlights -->
+                </div>
+              </div>
+            </div>
+            <div class="details-panel-nav">
+              <button class="details-nav-btn" id="details-prev-btn" aria-label="Previous step">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <span class="details-nav-counter" id="details-nav-counter">1 / 8</span>
+              <button class="details-nav-btn" id="details-next-btn" aria-label="Next step">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -827,6 +912,75 @@
       </section>
     </div>
 
+
+    <!-- ==================== VIEW: REFERRAL FORM ==================== -->
+    <div id="view-referral-form" class="app-view">
+      <section class="auth-section" style="padding: 100px 24px; min-height: 100vh;">
+        <div class="auth-card auth-card--wide" style="max-width: 620px;">
+          <div class="auth-header">
+            <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás" class="auth-logo">
+            <h2><span class="lang-en">Contact Us</span><span class="lang-es">Contáctanos</span></h2>
+            <p id="referral-welcome-msg" style="color: var(--primary);">
+              <span class="lang-en">Fill out the form below and we'll get in touch with you shortly.</span>
+              <span class="lang-es">Completa el formulario y nos pondremos en contacto contigo pronto.</span>
+            </p>
+          </div>
+
+          <!-- Contact type selector (hidden for realtor referrals, visible for broker/agent) -->
+          <div id="referral-type-selector" style="display:none; margin-bottom: 24px;">
+            <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 12px; display: block; color: var(--text-primary);">
+              <span class="lang-en">I am a…</span><span class="lang-es">Soy un…</span>
+            </label>
+            <div id="referral-type-options" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+              <!-- Options injected by JS based on referrer's role -->
+            </div>
+          </div>
+
+          <form id="referral-form" onsubmit="return false;">
+            <div class="form-row">
+              <div class="form-group">
+                <label><span class="lang-en">First Name</span><span class="lang-es">Nombre</span> *</label>
+                <input type="text" id="referral-firstName" required>
+              </div>
+              <div class="form-group">
+                <label><span class="lang-en">Last Name</span><span class="lang-es">Apellido</span> *</label>
+                <input type="text" id="referral-lastName" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label><span class="lang-en">Email</span><span class="lang-es">Correo Electrónico</span> *</label>
+                <input type="email" id="referral-email" required>
+              </div>
+              <div class="form-group">
+                <label><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span> *</label>
+                <input type="tel" id="referral-phone" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label><span class="lang-en">When are you planning to move?</span><span class="lang-es">¿Cuándo planeas mudarte?</span></label>
+              <select id="referral-timeline">
+                <option value="0-3 months"><span class="lang-en">0 – 3 months</span>0 – 3 meses</option>
+                <option value="3-6 months">3 – 6 meses</option>
+                <option value="6-12 months">6 – 12 meses</option>
+                <option value="+12 months">+12 meses</option>
+                <option value="no-date"><span class="lang-en">No specific date</span>Sin fecha definida</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label><span class="lang-en">Why are you moving?</span><span class="lang-es">¿Por qué te mudas?</span></label>
+              <textarea id="referral-reason" rows="3" placeholder="" style="resize: vertical; width: 100%; padding: 12px 16px; border: 1px solid rgba(0,0,0,0.12); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.95rem; background: var(--bg-card); color: var(--text-primary); transition: border-color 0.2s;"></textarea>
+            </div>
+            <div class="form-group" style="margin-top: 24px;">
+              <button type="submit" class="btn btn-primary" style="width: 100%;" id="referral-submit-btn">
+                <span class="lang-en">Submit</span>
+                <span class="lang-es">Enviar</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
 
     <!-- ==================== VIEW: PENDING APPROVAL ==================== -->
     <!-- ==================== VIEW: INTAKE (CLIENT PORTAL) ==================== -->
