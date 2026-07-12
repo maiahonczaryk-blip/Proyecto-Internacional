@@ -1,1708 +1,2915 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RE/MAX Inmomás — Dossier de Compra e Inversión en España</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    /* ==========================================================================
-       1. VARIABLES & RESET (RE/MAX 2025 BRAND STANDARDS)
-       ========================================================================== */
-    :root {
-      /* Official RE/MAX Brand Colors (2025 Evolution Global Supplement Page 11) */
-      --remax-red: #FF1200;      /* RE/MAX Primary Red: RGB 255, 18, 0 */
-      --remax-blue: #003DA5;     /* RE/MAX Primary Blue: Pantone 286 C / Reflex Blue */
-      --dark-blue: #000E35;      /* Dark Blue: CMYK 100, 92, 41, 55 / RGB 0, 14, 53 */
-      --dark-red: #660000;       /* Dark Red: CMYK 25, 100, 100, 55 */
-      --bridge-red: #AA1120;     /* Bridge Red: RGB 170, 17, 32 */
-      --bridge-blue: #0C2749;    /* Bridge Blue: RGB 12, 39, 73 */
-      --cream: #F7F5EE;          /* Cream Background: CMYK 2, 2, 7, 2 / RGB 247, 245, 238 */
-      --charcoal: #232323;       /* Dark Charcoal Gray: CMYK 0, 0, 0, 86 / RGB 35, 35, 35 */
-      --sky-blue: #A3D4F2;       /* Sky Blue: RGB 162, 212, 242 */
-      
-      --card-bg: #FFFFFF;
-      --text-main: var(--charcoal);
-      --border-accent: #E2D7C2;
-      --border-light: #E5E7EB;
-      
-      --page-width: 210mm;
-      --page-height: 297mm; /* Standard A4 dimensions */
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Outfit', 'Helvetica Neue', Arial, sans-serif;
-      background-color: #E2E8F0;
-      color: var(--text-main);
-      line-height: 1.5;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-
-    h1, h2, h3, h4, h5, h6 {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 800;
-      color: var(--dark-blue);
-    }
-
-    /* Bilingual logic */
-    body.lang-es .lang-en { display: none !important; }
-    body.lang-en .lang-es { display: none !important; }
-
-    /* ==========================================================================
-       2. CONTROLS HEADER & NAVIGATION (Screen Only)
-       ========================================================================== */
-    .controls-header {
-      background-color: var(--dark-blue);
-      color: white;
-      padding: 16px 24px;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-      border-bottom: 4px solid var(--remax-red);
-    }
-    
-    .controls-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-
-    .brand-title-area {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .brand-logo-c {
-      height: 32px;
-      display: flex;
-      align-items: center;
-    }
-
-    .brand-logo-c img {
-      height: 32px;
-      object-fit: contain;
-    }
-
-    .controls-title {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 1.05rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: white;
-    }
-
-    .controls-title span {
-      color: var(--sky-blue);
-    }
-
-    .buttons-group {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-lang {
-      background: rgba(255,255,255,0.1);
-      color: white;
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-
-    .btn-lang:hover, .btn-lang.active {
-      background: white;
-      color: var(--dark-blue);
-      border-color: white;
-    }
-
-    .btn-download {
-      background: var(--remax-red);
-      color: white;
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 700;
-      box-shadow: 0 4px 12px rgba(255, 18, 0, 0.3);
-    }
-
-    .btn-download:hover {
-      background: #e01000;
-      transform: translateY(-1px);
-    }
-
-    .help-banner {
-      background: #FFFDF2;
-      border-left: 4px solid var(--remax-blue);
-      padding: 12px 24px;
-      color: var(--bridge-blue);
-      font-size: 0.85rem;
-      text-align: center;
-      box-shadow: inset 0 -1px 0 rgba(0,0,0,0.05);
-    }
-
-    .help-banner strong {
-      color: var(--dark-blue);
-    }
-
-    /* ==========================================================================
-       3. DOCUMENT CONTAINER & PAGES (Fluid A4 height for printing)
-       ========================================================================== */
-    .document-container {
-      max-width: var(--page-width);
-      margin: 40px auto;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    }
-
-    .page {
-      width: var(--page-width);
-      min-height: var(--page-height);
-      background: var(--cream);
-      position: relative;
-      padding: 18mm 16mm;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      border-bottom: 1px solid #CBD5E1;
-      page-break-after: always;
-      break-after: page;
-    }
-
-    /* Page Header */
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid var(--remax-blue);
-      padding-bottom: 10px;
-      margin-bottom: 20px;
-    }
-
-    .page-header-title {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--dark-blue);
-      font-weight: 800;
-    }
-
-    .page-header-logo {
-      height: 22px;
-      object-fit: contain;
-    }
-
-    /* Page Footer */
-    .page-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid var(--border-accent);
-      padding-top: 10px;
-      margin-top: 24px;
-      font-size: 0.7rem;
-      color: var(--charcoal);
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 500;
-    }
-
-    .page-num::after {
-      content: attr(data-page);
-    }
-
-    /* Editorial Styling Components */
-    .section-title-dossier {
-      font-size: 1.65rem;
-      color: var(--dark-blue);
-      margin-bottom: 16px;
-      text-transform: uppercase;
-      letter-spacing: -0.5px;
-      border-bottom: 3px solid var(--remax-red);
-      padding-bottom: 6px;
-      display: inline-block;
-    }
-
-    .editorial-grid-2 {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 28px;
-      align-items: start;
-    }
-
-    .editorial-grid-equal {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    .editorial-intro {
-      font-size: 0.95rem;
-      line-height: 1.6;
-      color: var(--charcoal);
-      margin-bottom: 18px;
-      text-align: justify;
-    }
-
-    .editorial-card {
-      background: white;
-      border: 1px solid var(--border-accent);
-      border-radius: 6px;
-      padding: 18px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-    }
-
-    .card-title-ed {
-      font-size: 0.95rem;
-      color: var(--dark-blue);
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-left: 4px solid var(--remax-red);
-      padding-left: 8px;
-      font-weight: 800;
-    }
-
-    .card-text-ed {
-      font-size: 0.8rem;
-      color: var(--charcoal);
-      line-height: 1.5;
-    }
-
-    .image-block {
-      border: 1px solid var(--border-accent);
-      border-radius: 6px;
-      overflow: hidden;
-      margin-bottom: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      position: relative;
-    }
-
-    .image-block img {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .image-caption {
-      background: white;
-      padding: 8px 12px;
-      font-size: 0.72rem;
-      font-style: italic;
-      color: var(--charcoal);
-      border-top: 1px solid var(--border-accent);
-    }
-
-    /* ==========================================================================
-       4. GRAPHICS & CHARTS (PURE CSS VECTOR-STYLE ELEMENTS)
-       ========================================================================== */
-    
-    /* Weather Temperature Chart */
-    .weather-chart-container {
-      background: white;
-      border: 1px solid var(--border-accent);
-      border-radius: 6px;
-      padding: 16px;
-      margin: 14px 0;
-    }
-    
-    .chart-title {
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--dark-blue);
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .weather-legend {
-      display: flex;
-      gap: 12px;
-      font-size: 0.7rem;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .legend-color {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
-
-    .weather-grid-css {
-      display: flex;
-      height: 100px;
-      align-items: flex-end;
-      justify-content: space-between;
-      border-bottom: 1.5px solid var(--remax-blue);
-      padding-bottom: 4px;
-      margin-bottom: 6px;
-    }
-
-    .month-bar-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      height: 100%;
-      justify-content: flex-end;
-    }
-
-    .bar-value-spain {
-      width: 8px;
-      background: var(--remax-red);
-      border-radius: 2px 2px 0 0;
-      transition: height 0.3s;
-    }
-
-    .bar-value-ny {
-      width: 8px;
-      background: var(--remax-blue);
-      border-radius: 2px 2px 0 0;
-      transition: height 0.3s;
-    }
-
-    .month-lbl {
-      font-size: 0.6rem;
-      font-weight: 700;
-      color: var(--charcoal);
-      margin-top: 4px;
-    }
-
-    /* Savings Comparison Chart */
-    .savings-row-visual {
-      margin-bottom: 12px;
-    }
-
-    .savings-lbl-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--dark-blue);
-      margin-bottom: 4px;
-    }
-
-    .savings-bar-container {
-      height: 14px;
-      background: #E5E7EB;
-      border-radius: 7px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .savings-bar-spain {
-      height: 100%;
-      background: linear-gradient(90deg, var(--remax-red), #FF5E54);
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      padding-left: 8px;
-      color: white;
-      font-size: 0.65rem;
-      font-weight: 800;
-    }
-
-    .savings-bar-us {
-      height: 100%;
-      background: var(--bridge-blue);
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      padding-left: 8px;
-      color: white;
-      font-size: 0.65rem;
-      font-weight: 800;
-    }
-
-    /* Purchase Taxes stacked bar chart */
-    .stacked-tax-bar {
-      display: flex;
-      height: 24px;
-      border-radius: 12px;
-      overflow: hidden;
-      margin: 12px 0;
-      border: 1px solid var(--border-accent);
-    }
-
-    .tax-chunk {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 0.7rem;
-      font-weight: 800;
-    }
-
-    .tax-chunk-itp { background-color: var(--remax-red); width: 71.4%; }     /* 10% */
-    .tax-chunk-ajd { background-color: var(--remax-blue); width: 10.7%; }    /* 1.5% */
-    .tax-chunk-notary { background-color: var(--accent-gold); width: 10.7%; } /* 1.5% */
-    .tax-chunk-legal { background-color: var(--charcoal); width: 7.2%; }     /* 1.0% */
-
-    .tax-legend-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      font-size: 0.72rem;
-      margin-top: 10px;
-    }
-
-    .tax-leg-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .tax-leg-color {
-      width: 12px;
-      height: 12px;
-      border-radius: 3px;
-    }
-
-    /* ==========================================================================
-       5. INDIVIDUAL PAGES DESIGN
-       ========================================================================== */
-    
-    /* --- PAGE 1: PORTADA EDITORIAL (RE/MAX BRAND BOOK INSPIRED) --- */
-    .page-cover {
-      background: var(--cream);
-      color: var(--dark-blue);
-      padding: 30mm 20mm;
-      justify-content: space-between;
-      align-items: stretch;
-      text-align: left;
-      border: 8px solid var(--remax-blue);
-    }
-
-    .cover-top-ribbon {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      border-bottom: 2px solid var(--remax-red);
-      padding-bottom: 24px;
-    }
-
-    .cover-main-brand {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-    }
-
-    .cover-brand-logo {
-      height: 38px;
-      object-fit: contain;
-    }
-
-    .cover-balloon-img {
-      height: 48px;
-      object-fit: contain;
-    }
-
-    .cover-division-badge {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      color: var(--remax-red);
-      font-weight: 800;
-      margin-top: 6px;
-    }
-
-    .cover-body {
-      margin: auto 0;
-    }
-
-    .cover-title-primary {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 3.1rem;
-      font-weight: 900;
-      color: var(--dark-blue);
-      line-height: 1.05;
-      text-transform: uppercase;
-      letter-spacing: -1px;
-      margin-bottom: 20px;
-    }
-
-    .cover-title-primary span {
-      color: var(--remax-red);
-    }
-
-    .cover-subtitle-primary {
-      font-size: 1.15rem;
-      font-weight: 400;
-      color: var(--charcoal);
-      line-height: 1.6;
-      max-width: 95%;
-      border-left: 4px solid var(--remax-blue);
-      padding-left: 18px;
-      text-align: justify;
-    }
-
-    .cover-footer {
-      border-top: 2px solid var(--remax-blue);
-      padding-top: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.72rem;
-      color: var(--charcoal);
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-    }
-
-    .cover-partners-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .cover-partner-lbl {
-      background: var(--remax-blue);
-      color: white;
-      padding: 4px 10px;
-      font-size: 0.65rem;
-      font-weight: 800;
-      border-radius: 3px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    /* --- PAGE 2: ESTILO DE VIDA Y CONECTIVIDAD --- */
-    .weather-widget {
-      background: white;
-      border: 1px solid var(--border-accent);
-      border-radius: 6px;
-      padding: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      margin-bottom: 14px;
-    }
-
-    .weather-item {
-      text-align: center;
-    }
-
-    .weather-val {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--remax-red);
-      font-family: 'Montserrat', sans-serif;
-    }
-
-    .weather-lbl {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      color: var(--charcoal);
-      font-weight: 700;
-    }
-
-    .connectivity-list {
-      list-style: none;
-      font-size: 0.78rem;
-    }
-
-    .connectivity-list li {
-      margin-bottom: 8px;
-      padding-left: 16px;
-      position: relative;
-    }
-
-    .connectivity-list li::before {
-      content: "✈️";
-      position: absolute;
-      left: 0;
-    }
-
-    /* --- PAGE 3: COMPARATIVA FINANCIERA --- */
-    .comparison-table-ed {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.8rem;
-      margin-bottom: 14px;
-      background: white;
-      border: 1px solid var(--border-accent);
-    }
-
-    .comparison-table-ed th {
-      background: var(--dark-blue);
-      color: white;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 10px 12px;
-      text-align: left;
-    }
-
-    .comparison-table-ed td {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border-light);
-    }
-
-    .comparison-table-ed tr:nth-child(even) td {
-      background-color: var(--cream);
-    }
-
-    .comparative-highlight {
-      color: var(--remax-red);
-      font-weight: 800;
-    }
-
-    .financial-commentary {
-      font-size: 0.82rem;
-      line-height: 1.5;
-      color: var(--charcoal);
-      border-left: 4px solid var(--remax-red);
-      padding-left: 14px;
-      font-style: italic;
-    }
-
-    /* --- PAGE 4: VISADOS Y RESIDENCIA --- */
-    .visa-badge-ed {
-      display: inline-block;
-      background: var(--dark-blue);
-      color: white;
-      font-size: 0.68rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      padding: 3px 10px;
-      border-radius: 4px;
-      margin-bottom: 6px;
-      letter-spacing: 0.5px;
-    }
-
-    .visa-card-ed {
-      border-top: 3px solid var(--remax-blue);
-      margin-bottom: 14px;
-    }
-
-    .visa-requirement-tag {
-      font-size: 0.72rem;
-      font-weight: 800;
-      color: var(--remax-red);
-      background: rgba(255, 18, 0, 0.05);
-      padding: 2px 8px;
-      border-radius: 4px;
-      display: inline-block;
-      margin-top: 6px;
-    }
-
-    .alert-block-ed {
-      background: #FFFDF0;
-      border: 1px solid #F6E6B8;
-      border-left: 4px solid var(--remax-blue);
-      padding: 12px 16px;
-      border-radius: 4px;
-      font-size: 0.78rem;
-      line-height: 1.5;
-    }
-
-    /* --- PAGE 5: FISCALIDAD Y DOBLE IMPOSICIÓN --- */
-    .tax-box {
-      background: white;
-      border: 1px solid var(--border-accent);
-      padding: 16px;
-      border-radius: 6px;
-      margin-bottom: 14px;
-    }
-
-    .tax-box-title {
-      font-size: 0.88rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      color: var(--dark-blue);
-      margin-bottom: 8px;
-    }
-
-    .tax-list-ed {
-      list-style: none;
-      font-size: 0.78rem;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .tax-list-ed li {
-      padding-left: 14px;
-      position: relative;
-    }
-
-    .tax-list-ed li::before {
-      content: "•";
-      color: var(--remax-red);
-      font-weight: bold;
-      position: absolute;
-      left: 0;
-    }
-
-    /* --- PAGE 6: ECOMA DE ASESORAMIENTO Y 4 PILARES --- */
-    .ecosystem-diagram-css {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: white;
-      border: 1px solid var(--border-accent);
-      border-radius: 6px;
-      padding: 14px;
-      margin-bottom: 18px;
-    }
-
-    .dia-node {
-      background: var(--dark-blue);
-      color: white;
-      font-size: 0.65rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      padding: 8px 12px;
-      border-radius: 4px;
-      text-align: center;
-      width: 22%;
-      border-top: 3px solid var(--remax-blue);
-    }
-
-    .dia-node.remax-node {
-      background: var(--remax-red);
-      border-top-color: var(--dark-blue);
-    }
-
-    .dia-arrow {
-      color: var(--remax-blue);
-      font-size: 1.2rem;
-      font-weight: 800;
-    }
-
-    .pillars-grid-ed {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-
-    .pillar-card-ed {
-      background: white;
-      border: 1px solid var(--border-accent);
-      border-radius: 6px;
-      padding: 14px;
-    }
-
-    .pillar-card-ed-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border-light);
-      padding-bottom: 8px;
-      margin-bottom: 8px;
-    }
-
-    .pillar-card-ed-header img {
-      height: 18px;
-      max-width: 70px;
-      object-fit: contain;
-    }
-
-    .pillar-title-ed {
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: var(--dark-blue);
-    }
-
-    .pillar-text-ed {
-      font-size: 0.75rem;
-      color: var(--charcoal);
-      line-height: 1.45;
-    }
-
-    /* --- PAGE 7: VIP DISCOVERY TRIP --- */
-    .itinerary-timeline {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      position: relative;
-      padding-left: 16px;
-    }
-
-    .itinerary-timeline::before {
-      content: "";
-      position: absolute;
-      left: 6px;
-      top: 5px;
-      bottom: 5px;
-      width: 2px;
-      background-color: var(--border-accent);
-    }
-
-    .itinerary-day {
-      position: relative;
-      background: white;
-      border: 1px solid var(--border-accent);
-      border-radius: 6px;
-      padding: 10px 14px;
-    }
-
-    .day-circle {
-      position: absolute;
-      left: -14px;
-      top: 12px;
-      width: 8px;
-      height: 8px;
-      background: var(--remax-red);
-      border-radius: 50%;
-    }
-
-    .day-num-lbl {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      font-weight: 800;
-      color: var(--remax-blue);
-      margin-bottom: 2px;
-    }
-
-    .day-title-ed {
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: var(--dark-blue);
-      margin-bottom: 4px;
-    }
-
-    .day-desc-ed {
-      font-size: 0.74rem;
-      color: var(--charcoal);
-      line-height: 1.4;
-    }
-
-    /* --- PAGE 8: OFICINAS Y CONTACTO --- */
-    .back-letter-box {
-      background: white;
-      border: 1px solid var(--border-accent);
-      border-radius: 6px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .letter-title {
-      font-size: 0.95rem;
-      font-weight: 800;
-      color: var(--dark-blue);
-      margin-bottom: 10px;
-    }
-
-    .letter-body {
-      font-size: 0.78rem;
-      color: var(--charcoal);
-      line-height: 1.55;
-      text-align: justify;
-      margin-bottom: 14px;
-    }
-
-    .letter-signature {
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: var(--remax-blue);
-    }
-
-    .letter-signature span {
-      font-size: 0.7rem;
-      color: var(--charcoal);
-      font-weight: 400;
-      display: block;
-      margin-top: 2px;
-    }
-
-    .offices-grid-ed {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      background: white;
-      border: 1px solid var(--border-accent);
-      padding: 14px;
-      border-radius: 6px;
-    }
-
-    .office-cell-ed {
-      text-align: center;
-    }
-
-    .office-name-ed {
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: var(--remax-blue);
-      margin-bottom: 4px;
-    }
-
-    .office-address-ed {
-      font-size: 0.65rem;
-      color: var(--charcoal);
-      line-height: 1.35;
-    }
-
-    /* ==========================================================================
-       6. PRINT MEDIA OVERRIDES (FLUID HEIGHT AND BREAK CONTROLS)
-       ========================================================================== */
-    @media print {
-      body {
-        background-color: var(--cream) !important;
-        color: var(--charcoal) !important;
-      }
-
-      .no-print {
-        display: none !important;
-      }
-
-      .document-container {
-        margin: 0 !important;
-        box-shadow: none !important;
-        max-width: 100% !important;
-        width: 100% !important;
-      }
-
-      .page {
-        margin: 0 !important;
-        border: none !important;
-        page-break-after: always !important;
-        break-after: page !important;
-        width: var(--page-width) !important;
-        min-height: var(--page-height) !important;
-        height: auto !important;
-        padding: 12mm 15mm !important;
-        box-shadow: none !important;
-        float: none !important;
-        background: var(--cream) !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-
-      .page:last-child {
-        page-break-after: avoid !important;
-        break-after: avoid !important;
-      }
-
-      .page-cover {
-        border: 8px solid var(--remax-blue) !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-      
-      /* Avoid breaking inside important elements */
-      .editorial-card, .weather-chart-container, .tax-box, .back-letter-box {
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Inversión y Compra · RE/MAX Inmomás International</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ========================================================
+   CSS VARIABLES & DESIGN TOKENS
+   ======================================================== */
+:root {
+  --remax-red: #FF1200;
+  --remax-blue: #003DA5;
+  --dark-blue: #000E35;
+  --dark-red: #660000;
+  --bridge-red: #AA1120;
+  --bridge-blue: #0C2749;
+  --cream: #F7F5EE;
+  --charcoal: #232323;
+  --sky-blue: #A3D4F2;
+  --accent-gold: #D4A846;
+  --white: #FFFFFF;
+  --light-gray: #E8E6DF;
+  --medium-gray: #B0ADA5;
+  --page-width: 210mm;
+  --page-height: 297mm;
+  --page-padding: 18mm;
+  --page-padding-top: 22mm;
+  --page-padding-bottom: 16mm;
+}
+
+/* ========================================================
+   RESET & BASE
+   ======================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-size: 11pt;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  font-family: 'Outfit', 'Segoe UI', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--charcoal);
+  background: #C0BDB6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', 'Arial', sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--dark-blue);
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+/* ========================================================
+   BILINGUAL TOGGLE
+   ======================================================== */
+body.lang-es .lang-en { display: none !important; }
+body.lang-en .lang-es { display: none !important; }
+
+/* ========================================================
+   CONTROLS HEADER (Screen Only)
+   ======================================================== */
+.no-print {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  background: var(--dark-blue);
+  border-bottom: 3px solid var(--remax-red);
+  color: var(--white);
+  padding: 0;
+}
+
+.controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  gap: 16px;
+}
+
+.controls-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.controls-brand img {
+  height: 30px;
+  width: auto;
+}
+
+.controls-brand span {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.controls-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-lang {
+  border: 1.5px solid rgba(255,255,255,0.4);
+  background: transparent;
+  color: var(--white);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 5px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s;
+  letter-spacing: 0.5px;
+}
+
+.btn-lang:hover, .btn-lang.active {
+  background: var(--remax-red);
+  border-color: var(--remax-red);
+  color: var(--white);
+}
+
+.btn-action {
+  background: var(--remax-red);
+  color: var(--white);
+  border: none;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.25s;
+  letter-spacing: 0.3px;
+}
+
+.btn-action:hover {
+  background: var(--dark-red);
+}
+
+.btn-action.secondary {
+  background: var(--remax-blue);
+}
+
+.btn-action.secondary:hover {
+  background: var(--bridge-blue);
+}
+
+.help-banner {
+  background: rgba(255,255,255,0.07);
+  text-align: center;
+  padding: 7px 20px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.help-banner strong {
+  color: var(--accent-gold);
+}
+
+/* ========================================================
+   PAGE SYSTEM
+   ======================================================== */
+.page {
+  width: var(--page-width);
+  min-height: var(--page-height);
+  max-width: var(--page-width);
+  background: var(--cream);
+  margin: 24px auto;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.08);
+  page-break-after: always;
+}
+
+.page-inner {
+  padding: var(--page-padding-top) var(--page-padding) var(--page-padding-bottom);
+  min-height: calc(var(--page-height) - 0mm);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Page header & footer */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+  border-bottom: 1.5px solid var(--light-gray);
+}
+
+.page-header-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 8pt;
+  font-weight: 600;
+  color: var(--remax-blue);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.page-header img {
+  height: 18px;
+  width: auto;
+  opacity: 0.6;
+}
+
+.page-footer {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--light-gray);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 7pt;
+  color: var(--medium-gray);
+}
+
+.page-footer .page-number {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: var(--remax-red);
+  font-size: 9pt;
+}
+
+/* ========================================================
+   SECTION NUMBERING
+   ======================================================== */
+.section-num {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 42pt;
+  color: rgba(255, 18, 0, 0.08);
+  line-height: 1;
+  margin-bottom: -10px;
+  letter-spacing: -2px;
+}
+
+.section-label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--remax-red);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-label::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 2px;
+  background: var(--remax-red);
+}
+
+.section-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 20pt;
+  color: var(--dark-blue);
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+
+.section-title-sm {
+  font-size: 16pt;
+}
+
+/* ========================================================
+   PAGE 1 — COVER
+   ======================================================== */
+.page-cover {
+  background: url('images/alicante_lifestyle.png') center center / cover no-repeat;
+  position: relative;
+}
+
+.page-cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 14, 53, 0.35) 0%,
+    rgba(0, 14, 53, 0.15) 30%,
+    rgba(0, 14, 53, 0.25) 50%,
+    rgba(0, 14, 53, 0.70) 75%,
+    rgba(0, 14, 53, 0.92) 100%
+  );
+  z-index: 1;
+}
+
+.cover-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--page-height);
+  padding: 28mm 20mm 0;
+  text-align: center;
+  color: var(--white);
+}
+
+.cover-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.cover-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 4px;
+}
+
+.cover-logo-row img.logo-main {
+  height: 40px;
+  width: auto;
+  filter: brightness(0) invert(1);
+}
+
+.cover-logo-row img.logo-balloon {
+  height: 42px;
+  width: auto;
+}
+
+.cover-badge {
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 7pt;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  background: var(--remax-red);
+  color: var(--white);
+  padding: 6px 22px;
+  border-radius: 3px;
+  margin-top: 8px;
+}
+
+.cover-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6mm;
+}
+
+.cover-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 30pt;
+  line-height: 1.08;
+  color: var(--white);
+  margin-bottom: 14px;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  letter-spacing: -0.5px;
+}
+
+.cover-subtitle {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 300;
+  font-size: 13pt;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.cover-divider {
+  width: 60px;
+  height: 3px;
+  background: var(--remax-red);
+  margin: 14px auto;
+  border-radius: 2px;
+}
+
+.cover-bottom {
+  width: calc(100% + 40mm);
+  margin-left: -20mm;
+  margin-right: -20mm;
+  background: rgba(0, 14, 53, 0.82);
+  backdrop-filter: blur(8px);
+  padding: 16px 24px 14px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.cover-partners {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 10px;
+}
+
+.cover-partners img {
+  height: 26px;
+  width: auto;
+  opacity: 0.85;
+  filter: brightness(0) invert(1);
+}
+
+.cover-copyright {
+  font-family: 'Outfit', sans-serif;
+  font-size: 7pt;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+/* ========================================================
+   TYPOGRAPHY UTILITIES
+   ======================================================== */
+.text-body {
+  font-size: 9.5pt;
+  line-height: 1.65;
+  color: var(--charcoal);
+}
+
+.text-small {
+  font-size: 8pt;
+  color: #666;
+  line-height: 1.5;
+}
+
+.text-caption {
+  font-size: 7pt;
+  color: var(--medium-gray);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.text-lead {
+  font-size: 10.5pt;
+  line-height: 1.6;
+  color: var(--bridge-blue);
+  font-weight: 400;
+}
+
+.accent-red { color: var(--remax-red); }
+.accent-blue { color: var(--remax-blue); }
+.accent-gold { color: var(--accent-gold); }
+.fw-600 { font-weight: 600; }
+.fw-700 { font-weight: 700; }
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mt-16 { margin-top: 16px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-12 { margin-bottom: 12px; }
+.mb-16 { margin-bottom: 16px; }
+
+/* ========================================================
+   LAYOUT COMPONENTS
+   ======================================================== */
+.grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.grid-3col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.grid-60-40 {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 16px;
+}
+
+.card {
+  background: var(--white);
+  border-radius: 6px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  page-break-inside: avoid;
+}
+
+.card-bordered {
+  border: 1px solid var(--light-gray);
+}
+
+.card-accent-top {
+  border-top: 3px solid var(--remax-red);
+}
+
+.card-accent-left {
+  border-left: 3px solid var(--remax-red);
+}
+
+.card-blue-accent {
+  border-top: 3px solid var(--remax-blue);
+}
+
+.card-dark {
+  background: var(--dark-blue);
+  color: var(--white);
+}
+
+.card-dark h4, .card-dark h3 {
+  color: var(--white);
+}
+
+/* Image containers */
+.img-rounded {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.img-rounded img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Quote */
+.quote-block {
+  position: relative;
+  padding: 14px 18px 14px 22px;
+  border-left: 3px solid var(--remax-red);
+  background: var(--white);
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
+  font-size: 9pt;
+  line-height: 1.6;
+  color: var(--bridge-blue);
+  page-break-inside: avoid;
+}
+
+.quote-block::before {
+  content: '\201C';
+  font-family: 'Montserrat', serif;
+  font-size: 36pt;
+  color: var(--remax-red);
+  opacity: 0.2;
+  position: absolute;
+  top: -4px;
+  left: 8px;
+  line-height: 1;
+}
+
+.quote-author {
+  display: block;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 7.5pt;
+  color: var(--medium-gray);
+  margin-top: 6px;
+  letter-spacing: 0.3px;
+}
+
+/* ========================================================
+   WEATHER / STATS WIDGETS
+   ======================================================== */
+.stat-row {
+  display: flex;
+  gap: 10px;
+}
+
+.stat-box {
+  flex: 1;
+  background: var(--white);
+  border-radius: 6px;
+  padding: 10px 12px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  page-break-inside: avoid;
+}
+
+.stat-icon {
+  font-size: 18pt;
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 16pt;
+  color: var(--remax-blue);
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 7pt;
+  color: var(--medium-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+/* ========================================================
+   CSS BAR CHARTS
+   ======================================================== */
+.chart-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chart-row {
+  display: grid;
+  grid-template-columns: 50px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.chart-label {
+  font-size: 7.5pt;
+  font-weight: 600;
+  color: var(--charcoal);
+  text-align: right;
+}
+
+.chart-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.chart-bar {
+  height: 14px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  padding-left: 6px;
+  font-size: 7pt;
+  font-weight: 700;
+  color: var(--white);
+  transition: width 0.3s ease;
+  min-width: 28px;
+}
+
+.chart-bar.alicante {
+  background: linear-gradient(90deg, var(--remax-red) 0%, #FF4433 100%);
+}
+
+.chart-bar.usa {
+  background: linear-gradient(90deg, var(--remax-blue) 0%, #1A5FC9 100%);
+}
+
+/* ========================================================
+   TEMPERATURE COMPARISON
+   ======================================================== */
+.temp-chart {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.temp-col {
+  text-align: center;
+}
+
+.temp-month {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 7pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--charcoal);
+  margin-bottom: 4px;
+}
+
+.temp-bar-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  height: 70px;
+  padding-bottom: 2px;
+}
+
+.temp-bar {
+  width: 18px;
+  border-radius: 3px 3px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 3px;
+  font-size: 6.5pt;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.temp-bar.ali {
+  background: var(--remax-red);
+}
+
+.temp-bar.ny {
+  background: var(--remax-blue);
+}
+
+.temp-legend {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.temp-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 7pt;
+  color: var(--charcoal);
+}
+
+.temp-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.temp-legend-dot.ali { background: var(--remax-red); }
+.temp-legend-dot.ny { background: var(--remax-blue); }
+
+/* ========================================================
+   CONNECTIVITY CARD
+   ======================================================== */
+.connect-card {
+  background: var(--dark-blue);
+  border-radius: 6px;
+  padding: 12px 14px;
+  color: var(--white);
+}
+
+.connect-route {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 8pt;
+  margin-bottom: 4px;
+}
+
+.connect-city {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 9pt;
+}
+
+.connect-arrow {
+  color: var(--remax-red);
+  font-size: 12pt;
+}
+
+.connect-time {
+  font-size: 7pt;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+}
+
+/* ========================================================
+   PAGE 3 — ADVANTAGE CARDS
+   ======================================================== */
+.advantage-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.advantage-card {
+  background: var(--white);
+  border-radius: 6px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  page-break-inside: avoid;
+  border-left: 3px solid var(--remax-red);
+}
+
+.advantage-card:nth-child(even) {
+  border-left-color: var(--remax-blue);
+}
+
+.advantage-icon {
+  font-size: 18pt;
+  margin-bottom: 4px;
+}
+
+.advantage-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 9pt;
+  color: var(--dark-blue);
+  margin-bottom: 4px;
+}
+
+.advantage-text {
+  font-size: 7.5pt;
+  line-height: 1.5;
+  color: #555;
+}
+
+/* ========================================================
+   PAGE 4 — COMPARISON TABLE
+   ======================================================== */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8pt;
+  margin-top: 8px;
+}
+
+.comparison-table thead th {
+  background: var(--dark-blue);
+  color: var(--white);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 7.5pt;
+  padding: 8px 10px;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.comparison-table thead th:first-child {
+  border-radius: 4px 0 0 0;
+}
+
+.comparison-table thead th:last-child {
+  border-radius: 0 4px 0 0;
+}
+
+.comparison-table tbody td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--light-gray);
+  vertical-align: middle;
+}
+
+.comparison-table tbody tr:nth-child(odd) {
+  background: rgba(255,255,255,0.5);
+}
+
+.comparison-table tbody tr:nth-child(even) {
+  background: var(--white);
+}
+
+.comparison-table .item-name {
+  font-weight: 600;
+  color: var(--dark-blue);
+  font-size: 8.5pt;
+}
+
+.comparison-table .price-spain {
+  color: var(--remax-red);
+  font-weight: 700;
+}
+
+.comparison-table .price-usa {
+  color: var(--remax-blue);
+  font-weight: 600;
+}
+
+.savings-badge {
+  display: inline-block;
+  background: var(--remax-red);
+  color: var(--white);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 7pt;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+
+.savings-highlight {
+  background: linear-gradient(135deg, var(--remax-red), var(--bridge-red));
+  color: var(--white);
+  border-radius: 6px;
+  padding: 14px 18px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.savings-highlight-value {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 22pt;
+  line-height: 1.1;
+}
+
+.savings-highlight-label {
+  font-size: 9pt;
+  opacity: 0.9;
+  margin-top: 2px;
+}
+
+/* ========================================================
+   PAGE 5 — TIMELINE
+   ======================================================== */
+.timeline {
+  position: relative;
+  padding-left: 32px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--remax-red), var(--remax-blue));
+}
+
+.timeline-step {
+  position: relative;
+  margin-bottom: 9px;
+  page-break-inside: avoid;
+}
+
+.timeline-step:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -32px;
+  top: 2px;
+  width: 24px;
+  height: 24px;
+  background: var(--remax-red);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 8pt;
+  color: var(--white);
+  box-shadow: 0 2px 6px rgba(255,18,0,0.3);
+  z-index: 2;
+}
+
+.timeline-step:nth-child(even) .timeline-dot {
+  background: var(--remax-blue);
+  box-shadow: 0 2px 6px rgba(0,61,165,0.3);
+}
+
+.timeline-content {
+  background: var(--white);
+  border-radius: 5px;
+  padding: 9px 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.timeline-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 9pt;
+  color: var(--dark-blue);
+  margin-bottom: 2px;
+}
+
+.timeline-desc {
+  font-size: 7.5pt;
+  line-height: 1.45;
+  color: #555;
+}
+
+.timeline-time {
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 6.5pt;
+  color: var(--remax-red);
+  background: rgba(255,18,0,0.06);
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-top: 3px;
+  letter-spacing: 0.3px;
+}
+
+.timeline-total {
+  background: var(--dark-blue);
+  color: var(--white);
+  border-radius: 6px;
+  padding: 10px 16px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.timeline-total-label {
+  font-size: 9pt;
+  font-weight: 500;
+}
+
+.timeline-total-value {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 14pt;
+  color: var(--accent-gold);
+}
+
+/* ========================================================
+   PAGE 6 — VISA CARDS
+   ======================================================== */
+.visa-card {
+  background: var(--white);
+  border-radius: 6px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  page-break-inside: avoid;
+}
+
+.visa-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--remax-red);
+}
+
+.visa-card:nth-child(2) .visa-card-header {
+  border-bottom-color: var(--remax-blue);
+}
+
+.visa-icon {
+  font-size: 24pt;
+}
+
+.visa-type {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 11pt;
+  color: var(--dark-blue);
+  line-height: 1.2;
+}
+
+.visa-subtitle {
+  font-size: 7.5pt;
+  color: var(--medium-gray);
+  font-weight: 500;
+}
+
+.visa-detail {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  font-size: 8pt;
+}
+
+.visa-detail:last-child {
+  border-bottom: none;
+}
+
+.visa-detail-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.visa-detail-value {
+  font-weight: 700;
+  color: var(--dark-blue);
+}
+
+.alert-box {
+  background: rgba(255, 18, 0, 0.05);
+  border: 1px solid rgba(255, 18, 0, 0.15);
+  border-left: 3px solid var(--remax-red);
+  border-radius: 0 6px 6px 0;
+  padding: 12px 14px;
+  page-break-inside: avoid;
+}
+
+.alert-box-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 8.5pt;
+  color: var(--remax-red);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.alert-box-text {
+  font-size: 8pt;
+  line-height: 1.5;
+  color: #555;
+}
+
+/* ========================================================
+   PAGE 7 — TAXATION
+   ======================================================== */
+.tax-stack {
+  display: flex;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 36px;
+  margin: 8px 0;
+}
+
+.tax-segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 7pt;
+  color: var(--white);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.tax-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.tax-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 7.5pt;
+}
+
+.tax-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.tax-card {
+  background: var(--white);
+  border-radius: 6px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  page-break-inside: avoid;
+}
+
+.tax-card h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 9pt;
+  color: var(--dark-blue);
+  margin-bottom: 6px;
+}
+
+/* ========================================================
+   PAGE 8 — PARTNER ECOSYSTEM
+   ======================================================== */
+.flow-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 12px 0;
+}
+
+.flow-node {
+  background: var(--white);
+  border: 2px solid var(--remax-blue);
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 7pt;
+  color: var(--dark-blue);
+  min-width: 70px;
+}
+
+.flow-node:first-child {
+  border-color: var(--remax-red);
+  background: rgba(255,18,0,0.04);
+}
+
+.flow-arrow {
+  color: var(--remax-red);
+  font-size: 14pt;
+  font-weight: 700;
+}
+
+.partner-card {
+  background: var(--white);
+  border-radius: 6px;
+  padding: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  page-break-inside: avoid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.partner-logo {
+  height: 30px;
+  width: auto;
+  margin-bottom: 8px;
+  object-fit: contain;
+}
+
+.partner-name {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 9pt;
+  color: var(--dark-blue);
+  margin-bottom: 6px;
+}
+
+.partner-desc {
+  font-size: 7.5pt;
+  line-height: 1.5;
+  color: #555;
+}
+
+/* ========================================================
+   PAGE 9 — VIP ITINERARY
+   ======================================================== */
+.day-card {
+  background: var(--white);
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  page-break-inside: avoid;
+  display: grid;
+  grid-template-columns: 50px 1fr;
+  gap: 12px;
+}
+
+.day-number {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 24pt;
+  color: var(--remax-red);
+  line-height: 1;
+  text-align: center;
+}
+
+.day-label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 7pt;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--medium-gray);
+  text-align: center;
+}
+
+.day-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 10pt;
+  color: var(--dark-blue);
+  margin-bottom: 4px;
+}
+
+.day-activities {
+  list-style: none;
+  padding: 0;
+}
+
+.day-activities li {
+  font-size: 8pt;
+  line-height: 1.5;
+  color: #555;
+  padding: 2px 0 2px 14px;
+  position: relative;
+}
+
+.day-activities li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 6px;
+  height: 6px;
+  background: var(--remax-red);
+  border-radius: 50%;
+}
+
+.day-card:nth-child(2) .day-number { color: var(--remax-blue); }
+.day-card:nth-child(2) .day-activities li::before { background: var(--remax-blue); }
+.day-card:nth-child(3) .day-number { color: var(--accent-gold); }
+.day-card:nth-child(3) .day-activities li::before { background: var(--accent-gold); }
+
+/* ========================================================
+   PAGE 10 — CONTACT
+   ======================================================== */
+.personal-letter {
+  background: var(--white);
+  border-radius: 6px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  border-top: 3px solid var(--remax-red);
+  font-size: 9pt;
+  line-height: 1.65;
+  color: var(--charcoal);
+  margin-bottom: 14px;
+}
+
+.letter-signature {
+  margin-top: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 10pt;
+  color: var(--dark-blue);
+}
+
+.letter-role {
+  font-size: 8pt;
+  color: var(--medium-gray);
+  font-weight: 500;
+}
+
+.letter-contact-info {
+  display: flex;
+  gap: 20px;
+  margin-top: 8px;
+  font-size: 8pt;
+}
+
+.letter-contact-info a {
+  color: var(--remax-blue);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.office-card {
+  background: var(--white);
+  border-radius: 6px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  text-align: center;
+  page-break-inside: avoid;
+  border-top: 3px solid var(--remax-blue);
+}
+
+.office-city {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 11pt;
+  color: var(--dark-blue);
+  margin-bottom: 4px;
+}
+
+.office-address {
+  font-size: 8pt;
+  color: #555;
+  line-height: 1.5;
+}
+
+.office-zip {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 8pt;
+  color: var(--remax-blue);
+  margin-top: 3px;
+}
+
+.final-footer {
+  text-align: center;
+  padding: 16px 0 8px;
+  border-top: 2px solid var(--remax-red);
+  margin-top: auto;
+}
+
+.final-footer img {
+  height: 28px;
+  margin: 0 auto 6px;
+  opacity: 0.5;
+}
+
+.final-footer p {
+  font-size: 7pt;
+  color: var(--medium-gray);
+  letter-spacing: 0.5px;
+}
+
+/* ========================================================
+   PRINT STYLES
+   ======================================================== */
+@media print {
+  .no-print { display: none !important; }
+
+  html {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    background: white;
+    margin: 0;
+    padding: 0;
+  }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0;
+    box-shadow: none;
+    page-break-after: always;
+    page-break-inside: avoid;
+  }
+
+  .page:last-child {
+    page-break-after: auto;
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  .card, .advantage-card, .visa-card, .timeline-step, .office-card, .partner-card, .day-card {
+    page-break-inside: avoid;
+  }
+}
+
+/* ========================================================
+   RESPONSIVE HELPER (for screens narrower than A4)
+   ======================================================== */
+@media screen and (max-width: 800px) {
+  .page {
+    width: 100%;
+    min-height: auto;
+    margin: 0;
+    box-shadow: none;
+    border-bottom: 4px solid var(--light-gray);
+  }
+  .grid-60-40, .grid-2col {
+    grid-template-columns: 1fr;
+  }
+  .controls-bar {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+</style>
 </head>
 <body class="lang-es">
 
-  <!-- ==========================================================================
-       A. CONTROLS HEADER (Web preview only)
-       ========================================================================== -->
-  <header class="controls-header no-print">
-    <div class="controls-container">
-      <div class="brand-title-area">
-        <div class="brand-logo-c">
-          <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX Inmomás">
-        </div>
-        <div class="controls-title">
-          <span class="lang-es">Guía de Inversión y Compra <span>PDF</span></span>
-          <span class="lang-en">Buyer & Investment Guide <span>PDF</span></span>
-        </div>
+<!-- ============================================================
+     CONTROLS HEADER (Screen Only)
+     ============================================================ -->
+<div class="no-print">
+  <div class="controls-bar">
+    <div class="controls-brand">
+      <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX Inmomás" style="filter:brightness(0) invert(1);">
+      <span>
+        <span class="lang-es">Guía de Inversión y Compra</span>
+        <span class="lang-en">Investment & Buying Guide</span>
+      </span>
+    </div>
+    <div class="controls-actions">
+      <button class="btn-lang" id="btn-es" onclick="setLang('es')">ES</button>
+      <button class="btn-lang" id="btn-en" onclick="setLang('en')">EN</button>
+      <button class="btn-action secondary" onclick="window.print()">
+        <span class="lang-es">📥 Descargar PDF</span>
+        <span class="lang-en">📥 Download PDF</span>
+      </button>
+      <button class="btn-action" onclick="window.print()">
+        <span class="lang-es">🖨️ Imprimir</span>
+        <span class="lang-en">🖨️ Print</span>
+      </button>
+    </div>
+  </div>
+  <div class="help-banner">
+    <span class="lang-es">💡 Para mejor calidad, use <strong>Guardar como PDF</strong> en el diálogo de impresión · Formato <strong>A4</strong> · Márgenes <strong>Ninguno</strong></span>
+    <span class="lang-en">💡 For best quality, use <strong>Save as PDF</strong> in the print dialog · Format <strong>A4</strong> · Margins <strong>None</strong></span>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE 1 — COVER
+     ============================================================ -->
+<div class="page page-cover">
+  <div class="cover-content">
+    <div class="cover-top">
+      <div class="cover-logo-row">
+        <img src="Globo_CMYK.png" alt="RE/MAX Balloon" class="logo-balloon">
+        <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX Inmomás" class="logo-main">
       </div>
-      
-      <div class="buttons-group">
-        <button class="btn btn-lang active" data-lang="es" onclick="setLanguage('es')">Español (ES)</button>
-        <button class="btn btn-lang" data-lang="en" onclick="setLanguage('en')">English (EN)</button>
-        <button class="btn btn-download" onclick="window.print()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          <span class="lang-es">Guardar en PDF / Imprimir</span>
-          <span class="lang-en">Save as PDF / Print</span>
-        </button>
+      <div class="cover-badge">
+        <span class="lang-es">Asesoría Internacional</span>
+        <span class="lang-en">International Advisory</span>
       </div>
     </div>
-  </header>
-
-  <div class="help-banner no-print">
-    <span class="lang-es">💡 <strong>Recomendación de Impresión:</strong> Para exportar un PDF impecable, haz clic en el botón de arriba, selecciona <strong>"Guardar como PDF"</strong> y asegúrate de marcar la casilla <strong>"Gráficos de fondo"</strong> en las opciones de configuración del navegador.</span>
-    <span class="lang-en">💡 <strong>Print Recommendation:</strong> To export a flawless PDF, click the button above, select <strong>"Save as PDF"</strong>, and make sure to check the <strong>"Background graphics"</strong> box in your browser settings.</span>
+    <div class="cover-center">
+      <h1 class="cover-title">
+        <span class="lang-es">Guía Completa<br>para Comprar tu<br>Casa en España</span>
+        <span class="lang-en">Complete Guide<br>to Buying Your<br>Home in Spain</span>
+      </h1>
+      <div class="cover-divider"></div>
+      <p class="cover-subtitle">Costa Blanca · Alicante · Mediterranean Living</p>
+    </div>
+    <div class="cover-bottom">
+      <div class="cover-partners">
+        <img src="logo fuster.png" alt="Fuster & Associates">
+        <img src="Logo_UCI.png" alt="Banco UCI">
+        <img src="Inmomas-holidays-Op-3-color-e1752073650140.png" alt="Inmomás Holidays">
+      </div>
+      <p class="cover-copyright">2026 © RE/MAX Inmomás · Todos los derechos reservados</p>
+    </div>
   </div>
+</div>
 
-  <!-- ==========================================================================
-       B. DOSSIER PAGES
-       ========================================================================== -->
-  <div class="document-container">
+<!-- ============================================================
+     PAGE 2 — WELCOME TO COSTA BLANCA
+     ============================================================ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-title">
+        <span class="lang-es">Estilo de Vida y Conectividad</span>
+        <span class="lang-en">Lifestyle &amp; Connectivity</span>
+      </span>
+      <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX">
+    </div>
 
-    <!-- PAGINA 1: PORTADA EDITORIAL (RE/MAX 2025 BRAND SUPPLEMENT) -->
-    <section class="page page-cover">
-      <div class="cover-top-ribbon">
-        <div class="cover-main-brand">
-          <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX Inmomás" class="cover-brand-logo">
-          <img src="Globo_CMYK.png" alt="RE/MAX Balloon" class="cover-balloon-img">
-        </div>
-        <div class="cover-division-badge">
-          <span class="lang-es">Asesoría Internacional</span>
-          <span class="lang-en">International Division</span>
-        </div>
-      </div>
-      
-      <div class="cover-body">
-        <h1 class="cover-title-primary">
-          <span class="lang-es">Guía Completa<br>de Compra en <span>España</span></span>
-          <span class="lang-en">The Complete Guide<br>to Buying in <span>Spain</span></span>
-        </h1>
-        
-        <p class="cover-subtitle-primary">
-          <span class="lang-es">Tu transición segura al estilo de vida mediterráneo y la inversión de alto rendimiento en la Costa Blanca. Planificación legal, fiscal, financiera y posventa bajo un mismo techo.</span>
-          <span class="lang-en">Your secure transition to the Mediterranean lifestyle and high-yield real estate on the Costa Blanca. Legal, tax, financial, and management advisory under one single roof.</span>
+    <div class="section-num">01</div>
+    <div class="section-label">
+      <span class="lang-es">Bienvenidos</span>
+      <span class="lang-en">Welcome</span>
+    </div>
+    <h2 class="section-title">
+      <span class="lang-es">Estilo de Vida<br>y Conectividad</span>
+      <span class="lang-en">Lifestyle &amp;<br>Connectivity</span>
+    </h2>
+
+    <div class="grid-60-40 mb-12">
+      <div>
+        <p class="text-lead mb-8">
+          <span class="lang-es">La Costa Blanca ha sido reconocida por la Organización Mundial de la Salud como una de las regiones con el clima más saludable del planeta.</span>
+          <span class="lang-en">The Costa Blanca has been recognized by the World Health Organization as one of the regions with the healthiest climate on the planet.</span>
+        </p>
+        <p class="text-body mb-8">
+          <span class="lang-es">Desde la vibrante ciudad de Alicante hasta la elegancia de Jávea, pasando por la moderna Benidorm y la histórica Elche — cada rincón de la Costa Blanca ofrece una calidad de vida inigualable. Aquí, el estilo de vida mediterráneo no es un lujo: es lo cotidiano. Mercados al aire libre con productos frescos del día, paseos junto al mar al atardecer, cenas en terrazas con brisa marina, y una comunidad internacional que te hace sentir en casa desde el primer día.</span>
+          <span class="lang-en">From the vibrant city of Alicante to the elegance of Jávea, through modern Benidorm and historic Elche — every corner of the Costa Blanca offers an unparalleled quality of life. Here, the Mediterranean lifestyle isn't a luxury: it's everyday life. Open-air markets with daily fresh produce, sunset walks by the sea, dinners on terraces with ocean breezes, and an international community that makes you feel at home from day one.</span>
+        </p>
+        <p class="text-body">
+          <span class="lang-es">España ocupa el primer puesto del ranking Bloomberg de los países más saludables del mundo, y la provincia de Alicante es su joya costera. Con más de 320 días de sol al año, un coste de vida un 40-60% inferior al de Estados Unidos o Canadá, y una infraestructura sanitaria de primer nivel, la Costa Blanca es el destino elegido por miles de familias internacionales cada año.</span>
+          <span class="lang-en">Spain ranks first on Bloomberg's index of the world's healthiest countries, and the province of Alicante is its coastal jewel. With over 320 sunny days per year, a cost of living 40-60% lower than the US or Canada, and world-class healthcare infrastructure, the Costa Blanca is the destination chosen by thousands of international families every year.</span>
         </p>
       </div>
-
-      <div class="cover-footer">
-        <div class="cover-partners-row">
-          <span class="cover-partner-lbl">Alliance Partners:</span>
-          <span>Fuster & Associates</span>
-          <span>·</span>
-          <span>Banco UCI</span>
-          <span>·</span>
-          <span>Inmomás Holidays</span>
-        </div>
-        <div>2026 &copy; REMAX Inmomás</div>
+      <div class="img-rounded" style="height:220px;">
+        <img src="images/alicante_explanada.png" alt="Explanada de España, Alicante" style="height:100%;width:100%;object-fit:cover;">
       </div>
-    </section>
+    </div>
 
+    <!-- Weather Stats -->
+    <div class="stat-row mb-12">
+      <div class="stat-box">
+        <div class="stat-icon">☀️</div>
+        <div class="stat-value">320+</div>
+        <div class="stat-label">
+          <span class="lang-es">Días de Sol / Año</span>
+          <span class="lang-en">Sunny Days / Year</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🌡️</div>
+        <div class="stat-value">18ºC</div>
+        <div class="stat-label">
+          <span class="lang-es">Temp. Media Anual</span>
+          <span class="lang-en">Avg. Annual Temp</span>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🏖️</div>
+        <div class="stat-value">218 km</div>
+        <div class="stat-label">
+          <span class="lang-es">Línea de Costa</span>
+          <span class="lang-en">Coastline Length</span>
+        </div>
+      </div>
+    </div>
 
-    <!-- PAGINA 2: REALIDAD DE VIVIR EN LA COSTA BLANCA -->
-    <section class="page">
-      <div class="page-inner">
-        <header class="page-header">
-          <span class="page-header-title">
-            <span class="lang-es">01 · Estilo de Vida y Conectividad</span>
-            <span class="lang-en">01 · Lifestyle & Connectivity</span>
+    <!-- Temperature Comparison -->
+    <div class="card card-bordered mb-12" style="padding:12px 16px;">
+      <p class="text-caption mb-8">
+        <span class="lang-es">Comparativa de Temperaturas (°C)</span>
+        <span class="lang-en">Temperature Comparison (°C)</span>
+      </p>
+      <div class="temp-chart">
+        <div class="temp-col">
+          <div class="temp-month">
+            <span class="lang-es">Ene</span>
+            <span class="lang-en">Jan</span>
+          </div>
+          <div class="temp-bar-container">
+            <div class="temp-bar ali" style="height:38px;">17°</div>
+            <div class="temp-bar ny" style="height:10px;">3°</div>
+          </div>
+        </div>
+        <div class="temp-col">
+          <div class="temp-month">
+            <span class="lang-es">Abr</span>
+            <span class="lang-en">Apr</span>
+          </div>
+          <div class="temp-bar-container">
+            <div class="temp-bar ali" style="height:48px;">22°</div>
+            <div class="temp-bar ny" style="height:33px;">15°</div>
+          </div>
+        </div>
+        <div class="temp-col">
+          <div class="temp-month">Jul</div>
+          <div class="temp-bar-container">
+            <div class="temp-bar ali" style="height:68px;">32°</div>
+            <div class="temp-bar ny" style="height:62px;">29°</div>
+          </div>
+        </div>
+        <div class="temp-col">
+          <div class="temp-month">Oct</div>
+          <div class="temp-bar-container">
+            <div class="temp-bar ali" style="height:54px;">25°</div>
+            <div class="temp-bar ny" style="height:40px;">18°</div>
+          </div>
+        </div>
+      </div>
+      <div class="temp-legend">
+        <div class="temp-legend-item"><div class="temp-legend-dot ali"></div> Alicante</div>
+        <div class="temp-legend-item"><div class="temp-legend-dot ny"></div> New York</div>
+      </div>
+    </div>
+
+    <!-- Connectivity -->
+    <div class="connect-card">
+      <p class="text-caption" style="color:rgba(255,255,255,0.5); margin-bottom:8px; text-align:center;">
+        <span class="lang-es">✈️ Conectividad Internacional</span>
+        <span class="lang-en">✈️ International Connectivity</span>
+      </p>
+      <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;">
+        <div class="connect-route">
+          <span class="connect-city">Miami</span>
+          <span class="connect-arrow">→</span>
+          <span class="connect-city">Madrid</span>
+          <span class="connect-arrow">→</span>
+          <span class="connect-city" style="color:var(--accent-gold);">Alicante</span>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:24px;margin-top:6px;">
+        <div style="text-align:center;">
+          <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:13pt;color:var(--accent-gold);">8.5h</div>
+          <div class="connect-time">Miami → Madrid</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:13pt;color:var(--accent-gold);">7.5h</div>
+          <div class="connect-time">New York → Madrid</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:13pt;color:var(--accent-gold);">7.5h</div>
+          <div class="connect-time">Toronto → Madrid</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:13pt;color:var(--accent-gold);">1h</div>
+          <div class="connect-time">Madrid → Alicante</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>2026 © RE/MAX Inmomás · International Division</span>
+      <span class="page-number">02</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE 3 — WHY ALICANTE?
+     ============================================================ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-title">
+        <span class="lang-es">¿Por qué Alicante?</span>
+        <span class="lang-en">Why Alicante?</span>
+      </span>
+      <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX">
+    </div>
+
+    <div class="section-num">02</div>
+    <div class="section-label">
+      <span class="lang-es">Tu Nuevo Hogar</span>
+      <span class="lang-en">Your New Home</span>
+    </div>
+    <h2 class="section-title">
+      <span class="lang-es">¿Por qué Alicante?<br>Tu Nuevo Hogar</span>
+      <span class="lang-en">Why Alicante?<br>Your New Home</span>
+    </h2>
+
+    <div class="img-rounded mb-12" style="height:145px;">
+      <img src="images/mediterranean_terrace.png" alt="Mediterranean Terrace View" style="width:100%;height:100%;object-fit:cover;">
+    </div>
+
+    <div class="advantage-grid mb-12">
+      <!-- 1 -->
+      <div class="advantage-card">
+        <div class="advantage-icon">🏖️</div>
+        <div class="advantage-title">
+          <span class="lang-es">Playas Bandera Azul</span>
+          <span class="lang-en">Blue Flag Beaches</span>
+        </div>
+        <div class="advantage-text">
+          <span class="lang-es">Más de 200 km de costa con aguas cristalinas. San Juan, Postiguet y La Granadella entre las mejores de Europa.</span>
+          <span class="lang-en">Over 200km of coastline with crystal clear waters. San Juan, Postiguet, La Granadella among best in Europe.</span>
+        </div>
+      </div>
+      <!-- 2 -->
+      <div class="advantage-card">
+        <div class="advantage-icon">🍷</div>
+        <div class="advantage-title">
+          <span class="lang-es">Gastronomía Mediterránea</span>
+          <span class="lang-en">Mediterranean Gastronomy</span>
+        </div>
+        <div class="advantage-text">
+          <span class="lang-es">Restaurantes con Estrella Michelin, marisco fresco diario, arroces de fama mundial y vinos de la D.O. Alicante.</span>
+          <span class="lang-en">Michelin-starred restaurants, fresh seafood daily, world-famous rice dishes, local wines from Alicante D.O.</span>
+        </div>
+      </div>
+      <!-- 3 -->
+      <div class="advantage-card">
+        <div class="advantage-icon">⛳</div>
+        <div class="advantage-title">
+          <span class="lang-es">Golf y Deportes</span>
+          <span class="lang-en">Golf &amp; Sports</span>
+        </div>
+        <div class="advantage-text">
+          <span class="lang-es">7+ campos de golf de campeonato a menos de 30 min. Vela, buceo, senderismo en la Sierra de Aitana.</span>
+          <span class="lang-en">7+ championship golf courses within 30 min. Sailing, diving, hiking in Sierra de Aitana.</span>
+        </div>
+      </div>
+      <!-- 4 -->
+      <div class="advantage-card">
+        <div class="advantage-icon">🏥</div>
+        <div class="advantage-title">
+          <span class="lang-es">Sanidad de Primer Nivel</span>
+          <span class="lang-en">World-Class Healthcare</span>
+        </div>
+        <div class="advantage-text">
+          <span class="lang-es">España Nº1 país más saludable (Bloomberg). Sanidad pública y privada a una fracción del coste de EE.UU. Hospital Vithas en Alicante.</span>
+          <span class="lang-en">Spain #1 healthiest country (Bloomberg). Public and private healthcare at fraction of US cost. Hospital Vithas in Alicante.</span>
+        </div>
+      </div>
+      <!-- 5 -->
+      <div class="advantage-card">
+        <div class="advantage-icon">✈️</div>
+        <div class="advantage-title">
+          <span class="lang-es">Conectividad Internacional</span>
+          <span class="lang-en">International Connectivity</span>
+        </div>
+        <div class="advantage-text">
+          <span class="lang-es">Aeropuerto Alicante-Elche (ALC) con 150+ rutas directas. AVE de alta velocidad a Madrid en 2h.</span>
+          <span class="lang-en">Alicante-Elche Airport (ALC) with 150+ direct routes. AVE high-speed rail to Madrid in 2h.</span>
+        </div>
+      </div>
+      <!-- 6 -->
+      <div class="advantage-card">
+        <div class="advantage-icon">🎭</div>
+        <div class="advantage-title">
+          <span class="lang-es">Cultura y Tradición</span>
+          <span class="lang-en">Culture &amp; Tradition</span>
+        </div>
+        <div class="advantage-text">
+          <span class="lang-es">Hogueras de San Juan, Moros y Cristianos. Museo Arqueológico MARQ. Herencia romana y morisca.</span>
+          <span class="lang-en">Hogueras de San Juan, Moros y Cristianos festivals. MARQ archaeological museum. Roman and Moorish heritage.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="quote-block">
+      <span class="lang-es">"Mudarnos a Alicante fue la mejor decisión que hemos tomado. La calidad de vida aquí es simplemente incomparable."</span>
+      <span class="lang-en">"Moving to Alicante was the best decision we ever made. The quality of life here is simply unmatched."</span>
+      <span class="quote-author">— Sarah &amp; Michael, Texas, USA</span>
+    </div>
+
+    <div class="page-footer">
+      <span>2026 © RE/MAX Inmomás · International Division</span>
+      <span class="page-number">03</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE 4 — COST COMPARISON
+     ============================================================ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-title">
+        <span class="lang-es">Comparativa de Costes</span>
+        <span class="lang-en">Cost Comparison</span>
+      </span>
+      <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX">
+    </div>
+
+    <div class="section-num">03</div>
+    <div class="section-label">
+      <span class="lang-es">Realidad Financiera</span>
+      <span class="lang-en">Financial Reality</span>
+    </div>
+    <h2 class="section-title">
+      <span class="lang-es">Comparativa de Costes<br>y Realidad Financiera</span>
+      <span class="lang-en">Cost Comparison &amp;<br>Financial Reality</span>
+    </h2>
+
+    <p class="text-lead mb-12">
+      <span class="lang-es">Tu dólar o dólar canadiense rinde significativamente más en la Costa Blanca. No se trata solo de precio, sino de un nivel de vida superior por una fracción del coste.</span>
+      <span class="lang-en">Your US dollar or Canadian dollar goes significantly further on the Costa Blanca. It's not just about price — it's about a superior quality of life at a fraction of the cost.</span>
+    </p>
+
+    <table class="comparison-table mb-12">
+      <thead>
+        <tr>
+          <th style="width:32%;">
+            <span class="lang-es">Concepto</span>
+            <span class="lang-en">Item</span>
+          </th>
+          <th style="width:22%;">
+            <span class="lang-es">🇪🇸 España</span>
+            <span class="lang-en">🇪🇸 Spain</span>
+          </th>
+          <th style="width:26%;">🇺🇸 NY / Miami</th>
+          <th style="width:20%;">
+            <span class="lang-es">Ahorro</span>
+            <span class="lang-en">Savings</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="item-name">
+            <span class="lang-es">Seguro Médico Privado</span>
+            <span class="lang-en">Private Health Insurance</span>
+          </td>
+          <td class="price-spain">€80–150<span class="lang-es">/mes</span><span class="lang-en">/mo</span></td>
+          <td class="price-usa">$500–1,500<span class="lang-es">/mes</span><span class="lang-en">/mo</span></td>
+          <td><span class="savings-badge">~85%</span></td>
+        </tr>
+        <tr>
+          <td class="item-name">
+            <span class="lang-es">Cena Gourmet para Dos</span>
+            <span class="lang-en">Gourmet Dinner for Two</span>
+          </td>
+          <td class="price-spain">€35–60</td>
+          <td class="price-usa">$100–200</td>
+          <td><span class="savings-badge">~70%</span></td>
+        </tr>
+        <tr>
+          <td class="item-name">
+            <span class="lang-es">Cuota de Comunidad</span>
+            <span class="lang-en">HOA / Community Fees</span>
+          </td>
+          <td class="price-spain">€40–100<span class="lang-es">/mes</span><span class="lang-en">/mo</span></td>
+          <td class="price-usa">$400–1,200<span class="lang-es">/mes</span><span class="lang-en">/mo</span></td>
+          <td><span class="savings-badge">~90%</span></td>
+        </tr>
+        <tr>
+          <td class="item-name">
+            <span class="lang-es">Impuesto Anual (IBI)</span>
+            <span class="lang-en">Annual Property Tax (IBI)</span>
+          </td>
+          <td class="price-spain">€300–900<span class="lang-es">/año</span><span class="lang-en">/yr</span></td>
+          <td class="price-usa">$4,000–12,000<span class="lang-es">/año</span><span class="lang-en">/yr</span></td>
+          <td><span class="savings-badge">~92%</span></td>
+        </tr>
+        <tr>
+          <td class="item-name">
+            <span class="lang-es">Casa 3 Hab. de Calidad</span>
+            <span class="lang-en">Quality 3BR Home</span>
+          </td>
+          <td class="price-spain">
+            <span class="lang-es">desde</span><span class="lang-en">from</span> €250,000
+          </td>
+          <td class="price-usa">$900,000+</td>
+          <td><span class="savings-badge">~72%</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="grid-60-40 mb-12">
+      <div>
+        <div class="savings-highlight">
+          <div class="savings-highlight-value">40–60%</div>
+          <div class="savings-highlight-label">
+            <span class="lang-es">Ahorro en tu coste de vida</span>
+            <span class="lang-en">Savings on your cost of living</span>
+          </div>
+        </div>
+        <div class="quote-block mt-12">
+          <span class="lang-es">"Con el mismo presupuesto de jubilación o trabajo remoto, en la Costa Blanca vives con un nivel de vida significativamente superior."</span>
+          <span class="lang-en">"With the same retirement or remote work budget, on the Costa Blanca you live with a significantly superior standard of living."</span>
+        </div>
+      </div>
+      <div class="img-rounded" style="height:200px;">
+        <img src="images/alicante_castle.png" alt="Castle of Santa Bárbara, Alicante" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>2026 © RE/MAX Inmomás · International Division</span>
+      <span class="page-number">04</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE 5 — BUYING PROCESS
+     ============================================================ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-title">
+        <span class="lang-es">Proceso de Compra</span>
+        <span class="lang-en">Buying Process</span>
+      </span>
+      <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX">
+    </div>
+
+    <div class="section-num">04</div>
+    <div class="section-label">
+      <span class="lang-es">Paso a Paso</span>
+      <span class="lang-en">Step by Step</span>
+    </div>
+    <h2 class="section-title section-title-sm">
+      <span class="lang-es">El Proceso de Compra<br>Paso a Paso</span>
+      <span class="lang-en">The Buying Process<br>Step by Step</span>
+    </h2>
+
+    <div class="timeline mb-8">
+      <!-- Step 1 -->
+      <div class="timeline-step">
+        <div class="timeline-dot">1</div>
+        <div class="timeline-content">
+          <div class="timeline-title">
+            <span class="lang-es">NIE — Número de Identidad de Extranjero</span>
+            <span class="lang-en">NIE — Foreign Identity Number</span>
+          </div>
+          <div class="timeline-desc">
+            <span class="lang-es">Documento obligatorio para cualquier transacción en España. Lo gestionamos por ti.</span>
+            <span class="lang-en">Required document for any transaction in Spain. We handle it for you.</span>
+          </div>
+          <span class="timeline-time">2–4
+            <span class="lang-es">semanas</span>
+            <span class="lang-en">weeks</span>
           </span>
-          <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX" class="page-header-logo">
-        </header>
+        </div>
+      </div>
+      <!-- Step 2 -->
+      <div class="timeline-step">
+        <div class="timeline-dot">2</div>
+        <div class="timeline-content">
+          <div class="timeline-title">
+            <span class="lang-es">Cuenta Bancaria</span>
+            <span class="lang-en">Bank Account</span>
+          </div>
+          <div class="timeline-desc">
+            <span class="lang-es">Apertura de cuenta en banco español para gestionar pagos y transferencias.</span>
+            <span class="lang-en">Open a Spanish bank account to manage payments and transfers.</span>
+          </div>
+          <span class="timeline-time">1–2
+            <span class="lang-es">días</span>
+            <span class="lang-en">days</span>
+          </span>
+        </div>
+      </div>
+      <!-- Step 3 -->
+      <div class="timeline-step">
+        <div class="timeline-dot">3</div>
+        <div class="timeline-content">
+          <div class="timeline-title">
+            <span class="lang-es">Estrategia de Búsqueda</span>
+            <span class="lang-en">Search Strategy</span>
+          </div>
+          <div class="timeline-desc">
+            <span class="lang-es">Definimos juntos tu presupuesto, ubicación ideal y tipo de propiedad.</span>
+            <span class="lang-en">Together we define budget, ideal location and property type.</span>
+          </div>
+          <span class="timeline-time">1–2
+            <span class="lang-es">semanas</span>
+            <span class="lang-en">weeks</span>
+          </span>
+        </div>
+      </div>
+      <!-- Step 4 -->
+      <div class="timeline-step">
+        <div class="timeline-dot">4</div>
+        <div class="timeline-content">
+          <div class="timeline-title">
+            <span class="lang-es">Selección de Propiedades</span>
+            <span class="lang-en">Property Selection</span>
+          </div>
+          <div class="timeline-desc">
+            <span class="lang-es">Te presentamos una selección curada de propiedades que se ajustan a tus criterios.</span>
+            <span class="lang-en">We present a curated selection of properties matching your criteria.</span>
+          </div>
+          <span class="timeline-time">1–2
+            <span class="lang-es">semanas</span>
+            <span class="lang-en">weeks</span>
+          </span>
+        </div>
+      </div>
+      <!-- Step 5 -->
+      <div class="timeline-step">
+        <div class="timeline-dot">5</div>
+        <div class="timeline-content">
+          <div class="timeline-title">
+            <span class="lang-es">Due Diligence Legal</span>
+            <span class="lang-en">Legal Due Diligence</span>
+          </div>
+          <div class="timeline-desc">
+            <span class="lang-es">Verificación de cargas, deudas, permisos y titularidad por Fuster & Associates.</span>
+            <span class="lang-en">Verification of liens, debts, permits and ownership by Fuster & Associates.</span>
+          </div>
+          <span class="timeline-time">1
+            <span class="lang-es">semana</span>
+            <span class="lang-en">week</span>
+          </span>
+        </div>
+      </div>
+      <!-- Step 6 -->
+      <div class="timeline-step">
+        <div class="timeline-dot">6</div>
+        <div class="timeline-content">
+          <div class="timeline-title">
+            <span class="lang-es">Contrato de Arras</span>
+            <span class="lang-en">Reservation Contract</span>
+          </div>
+          <div class="timeline-desc">
+            <span class="lang-es">Contrato de reserva con depósito del 10%. Protege ambas partes legalmente.</span>
+            <span class="lang-en">Reservation contract with 10% deposit. Legally protects both parties.</span>
+          </div>
+          <span class="timeline-time">1
+            <span class="lang-es">día</span>
+            <span class="lang-en">day</span>
+          </span>
+        </div>
+      </div>
+      <!-- Step 7 -->
+      <div class="timeline-step">
+        <div class="timeline-dot">7</div>
+        <div class="timeline-content">
+          <div class="timeline-title">
+            <span class="lang-es">Escritura Notarial</span>
+            <span class="lang-en">Notary Deed</span>
+          </div>
+          <div class="timeline-desc">
+            <span class="lang-es">Firma ante notario público. Inscripción en el Registro de la Propiedad.</span>
+            <span class="lang-en">Signing before public notary. Registration in the Property Registry.</span>
+          </div>
+          <span class="timeline-time">1
+            <span class="lang-es">día</span>
+            <span class="lang-en">day</span>
+          </span>
+        </div>
+      </div>
+      <!-- Step 8 -->
+      <div class="timeline-step">
+        <div class="timeline-dot">8</div>
+        <div class="timeline-content">
+          <div class="timeline-title">
+            <span class="lang-es">Entrega de Llaves 🔑</span>
+            <span class="lang-en">Key Handover 🔑</span>
+          </div>
+          <div class="timeline-desc">
+            <span class="lang-es">¡Felicidades! Tu nueva vida en el Mediterráneo comienza aquí.</span>
+            <span class="lang-en">Congratulations! Your new Mediterranean life starts here.</span>
+          </div>
+          <span class="timeline-time">
+            <span class="lang-es">Mismo día</span>
+            <span class="lang-en">Same day</span>
+          </span>
+        </div>
+      </div>
+    </div>
 
-        <h2 class="section-title-dossier">
-          <span class="lang-es">Vivir en la Costa Blanca</span>
-          <span class="lang-en">Living in Costa Blanca</span>
-        </h2>
+    <div class="timeline-total">
+      <div class="timeline-total-label">
+        <span class="lang-es">⏱️ Proceso completo estimado</span>
+        <span class="lang-en">⏱️ Estimated complete process</span>
+      </div>
+      <div class="timeline-total-value">4–8
+        <span style="font-size:10pt;">
+          <span class="lang-es">semanas</span>
+          <span class="lang-en">weeks</span>
+        </span>
+      </div>
+    </div>
 
-        <div class="editorial-grid-2">
+    <p class="text-small mt-8" style="font-style:italic;">
+      <span class="lang-es">* Todo el proceso puede realizarse con poder notarial sin necesidad de presencia física en España.</span>
+      <span class="lang-en">* The entire process can be completed via Power of Attorney without physical presence in Spain.</span>
+    </p>
+
+    <div class="page-footer">
+      <span>2026 © RE/MAX Inmomás · International Division</span>
+      <span class="page-number">05</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE 6 — RESIDENCY & VISAS
+     ============================================================ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-title">
+        <span class="lang-es">Residencia y Visados</span>
+        <span class="lang-en">Residency &amp; Visas</span>
+      </span>
+      <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX">
+    </div>
+
+    <div class="section-num">05</div>
+    <div class="section-label">
+      <span class="lang-es">Vías Legales</span>
+      <span class="lang-en">Legal Pathways</span>
+    </div>
+    <h2 class="section-title">
+      <span class="lang-es">Residencia, Visados<br>y Vías Legales</span>
+      <span class="lang-en">Residency, Visas &amp;<br>Legal Pathways</span>
+    </h2>
+
+    <p class="text-lead mb-12">
+      <span class="lang-es">España ofrece múltiples vías legales para que ciudadanos de Estados Unidos, Canadá y otros países puedan establecer su residencia legal. Nuestro equipo legal en Fuster & Associates te guía durante todo el proceso.</span>
+      <span class="lang-en">Spain offers multiple legal pathways for citizens of the United States, Canada and other countries to establish legal residency. Our legal team at Fuster & Associates guides you through the entire process.</span>
+    </p>
+
+    <div class="grid-2col mb-16">
+      <!-- Digital Nomad Visa -->
+      <div class="visa-card">
+        <div class="visa-card-header">
+          <div class="visa-icon">💻</div>
           <div>
-            <p class="editorial-intro">
-              <span class="lang-es">La Costa Blanca no es solo un destino vacacional; es una de las regiones más saludables del planeta. La combinación de un clima microclimático excepcional y la gastronomía local basada en productos frescos del Mediterráneo define el día a día aquí. Vivir en ciudades como Alicante, Elche o Jávea combina el encanto de la historia europea con las comodidades modernas y seguras.</span>
-              <span class="lang-en">The Costa Blanca is not just a holiday destination; it is one of the healthiest regions on earth. The combination of an exceptional microclimate and local cuisine based on fresh Mediterranean products defines daily life here. Living in cities like Alicante, Elche, or Jávea blends European history with modern, secure amenities.</span>
-            </p>
-
-            <div class="weather-widget">
-              <div class="weather-item">
-                <div class="weather-val">320+</div>
-                <div class="weather-lbl"><span class="lang-es">Días de Sol / Año</span><span class="lang-en">Sunny Days / Year</span></div>
-              </div>
-              <div class="weather-item">
-                <div class="weather-val">18ºC</div>
-                <div class="weather-lbl"><span class="lang-es">Temp. Media Anual</span><span class="lang-en">Avg. Annual Temp</span></div>
-              </div>
-              <div class="weather-item">
-                <div class="weather-val">218 km</div>
-                <div class="weather-lbl"><span class="lang-es">Costa y Playas</span><span class="lang-en">Coast & Beaches</span></div>
-              </div>
+            <div class="visa-type">
+              <span class="lang-es">Visa Nómada Digital</span>
+              <span class="lang-en">Digital Nomad Visa</span>
             </div>
-
-            <!-- CSS Monthly Temperature Chart -->
-            <div class="weather-chart-container">
-              <div class="chart-title">
-                <span><span class="lang-es">Temperaturas Medias Mensuales (ºC)</span><span class="lang-en">Monthly Average Temperatures (ºC)</span></span>
-                <div class="weather-legend">
-                  <div class="legend-item"><span class="legend-color" style="background: var(--remax-red);"></span><span>Alicante</span></div>
-                  <div class="legend-item"><span class="legend-color" style="background: var(--remax-blue);"></span><span>New York</span></div>
-                </div>
-              </div>
-              <div class="weather-grid-css">
-                <!-- Jan -->
-                <div class="month-bar-col">
-                  <div style="display:flex; gap: 2px; align-items: flex-end;">
-                    <div class="bar-value-spain" style="height: 38px;" title="17ºC"></div>
-                    <div class="bar-value-ny" style="height: 8px;" title="3ºC"></div>
-                  </div>
-                  <span class="month-lbl">JAN</span>
-                </div>
-                <!-- Apr -->
-                <div class="month-bar-col">
-                  <div style="display:flex; gap: 2px; align-items: flex-end;">
-                    <div class="bar-value-spain" style="height: 50px;" title="22ºC"></div>
-                    <div class="bar-value-ny" style="height: 34px;" title="15ºC"></div>
-                  </div>
-                  <span class="month-lbl">APR</span>
-                </div>
-                <!-- Jul -->
-                <div class="month-bar-col">
-                  <div style="display:flex; gap: 2px; align-items: flex-end;">
-                    <div class="bar-value-spain" style="height: 72px;" title="32ºC"></div>
-                    <div class="bar-value-ny" style="height: 65px;" title="29ºC"></div>
-                  </div>
-                  <span class="month-lbl">JUL</span>
-                </div>
-                <!-- Oct -->
-                <div class="month-bar-col">
-                  <div style="display:flex; gap: 2px; align-items: flex-end;">
-                    <div class="bar-value-spain" style="height: 56px;" title="25ºC"></div>
-                    <div class="bar-value-ny" style="height: 40px;" title="18ºC"></div>
-                  </div>
-                  <span class="month-lbl">OCT</span>
-                </div>
-              </div>
+            <div class="visa-subtitle">
+              <span class="lang-es">Para trabajadores remotos</span>
+              <span class="lang-en">For remote workers</span>
             </div>
           </div>
+        </div>
+        <div class="visa-detail">
+          <span class="visa-detail-label">
+            <span class="lang-es">Dirigido a</span>
+            <span class="lang-en">Target</span>
+          </span>
+          <span class="visa-detail-value">
+            <span class="lang-es">Trabajadores remotos / freelancers</span>
+            <span class="lang-en">Remote workers / freelancers</span>
+          </span>
+        </div>
+        <div class="visa-detail">
+          <span class="visa-detail-label">
+            <span class="lang-es">Duración</span>
+            <span class="lang-en">Duration</span>
+          </span>
+          <span class="visa-detail-value">
+            <span class="lang-es">1 año (renovable a 3)</span>
+            <span class="lang-en">1 year (renewable to 3)</span>
+          </span>
+        </div>
+        <div class="visa-detail">
+          <span class="visa-detail-label">
+            <span class="lang-es">Ingreso mínimo</span>
+            <span class="lang-en">Min. income</span>
+          </span>
+          <span class="visa-detail-value">~€3,024<span class="lang-es">/mes</span><span class="lang-en">/mo</span></span>
+        </div>
+        <div class="visa-detail">
+          <span class="visa-detail-label">
+            <span class="lang-es">Beneficio fiscal</span>
+            <span class="lang-en">Tax benefit</span>
+          </span>
+          <span class="visa-detail-value" style="color:var(--remax-red);">
+            <span class="lang-es">Ley Beckham — tipo fijo 24%</span>
+            <span class="lang-en">Beckham Law — flat 24% rate</span>
+          </span>
+        </div>
+        <div class="visa-detail">
+          <span class="visa-detail-label">
+            <span class="lang-es">Requisito laboral</span>
+            <span class="lang-en">Work requirement</span>
+          </span>
+          <span class="visa-detail-value">
+            <span class="lang-es">Max 20% clientes en España</span>
+            <span class="lang-en">Max 20% clients in Spain</span>
+          </span>
+        </div>
+        <div class="visa-detail">
+          <span class="visa-detail-label">
+            <span class="lang-es">Familia</span>
+            <span class="lang-en">Family</span>
+          </span>
+          <span class="visa-detail-value">
+            <span class="lang-es">Incluye cónyuge e hijos</span>
+            <span class="lang-en">Includes spouse &amp; children</span>
+          </span>
+        </div>
+      </div>
 
+      <!-- Non-Lucrative Visa -->
+      <div class="visa-card">
+        <div class="visa-card-header">
+          <div class="visa-icon">🌅</div>
           <div>
-            <div class="image-block">
-              <img src="images/alicante_explanada.png" alt="Explanada de España, Alicante">
-              <div class="image-caption">
-                <span class="lang-es">Explanada de España, Alicante.</span>
-                <span class="lang-en">Explanada de España, Alicante.</span>
-              </div>
+            <div class="visa-type">
+              <span class="lang-es">Visa No Lucrativa</span>
+              <span class="lang-en">Non-Lucrative Visa</span>
             </div>
-
-            <div class="editorial-card" style="background: white; border: 1px solid var(--border-accent);">
-              <h4 class="card-title-ed" style="font-size: 0.8rem; margin-bottom: 6px;">
-                <span class="lang-es">Conectividad con Norteamérica</span>
-                <span class="lang-en">North American Connectivity</span>
-              </h4>
-              <ul class="connectivity-list">
-                <li><strong>Miami (MIA)</strong>: <span class="lang-es">8.5h vuelo directo a Madrid.</span><span class="lang-en">8.5h direct flight to Madrid.</span></li>
-                <li><strong>New York (JFK)</strong>: <span class="lang-es">7.5h vuelo directo a Madrid.</span><span class="lang-en">7.5h direct flight to Madrid.</span></li>
-                <li><strong>Toronto (YYZ)</strong>: <span class="lang-es">7.5h vuelo directo a Madrid.</span><span class="lang-en">7.5h direct flight to Madrid.</span></li>
-                <li><strong><span class="lang-es">Conexión Alicante</span><span class="lang-en">Alicante Connection</span></strong>: <span class="lang-es">Puente aéreo de 1h o AVE desde Madrid.</span><span class="lang-en">1h shuttle flight or high-speed AVE from Madrid.</span></li>
-              </ul>
+            <div class="visa-subtitle">
+              <span class="lang-es">Para jubilados / renta pasiva</span>
+              <span class="lang-en">For retirees / passive income</span>
             </div>
           </div>
+        </div>
+        <div class="visa-detail">
+          <span class="visa-detail-label">
+            <span class="lang-es">Dirigido a</span>
+            <span class="lang-en">Target</span>
+          </span>
+          <span class="visa-detail-value">
+            <span class="lang-es">Jubilados / inversores pasivos</span>
+            <span class="lang-en">Retirees / passive investors</span>
+          </span>
+        </div>
+        <div class="visa-detail">
+          <span class="visa-detail-label">
+            <span class="lang-es">Duración</span>
+            <span class="lang-en">Duration</span>
+          </span>
+          <span class="visa-detail-value">
+            <span class="lang-es">1 año (renovable a 2+2)</span>
+            <span class="lang-en">1 year (renewable 2+2)</span>
+          </span>
+        </div>
+        <div class="visa-detail">
+          <span class="visa-detail-label">
+            <span class="lang-es">Ingreso mínimo</span>
+            <span class="lang-en">Min. income</span>
+          </span>
+          <span class="visa-detail-value">~€28,800<span class="lang-es">/año</span><span class="lang-en">/yr</span></span>
+        </div>
+        <div class="visa-detail">
+          <span class="visa-detail-label">
+            <span class="lang-es">Trabajo</span>
+            <span class="lang-en">Employment</span>
+          </span>
+          <span class="visa-detail-value">
+            <span class="lang-es">No permite trabajar en España</span>
+            <span class="lang-en">Cannot work in Spain</span>
+          </span>
+        </div>
+        <div class="visa-detail">
+          <span class="visa-detail-label">
+            <span class="lang-es">Seguro médico</span>
+            <span class="lang-en">Health insurance</span>
+          </span>
+          <span class="visa-detail-value">
+            <span class="lang-es">Privado obligatorio (sin copago)</span>
+            <span class="lang-en">Private required (no co-pay)</span>
+          </span>
+        </div>
+        <div class="visa-detail">
+          <span class="visa-detail-label">
+            <span class="lang-es">Familia</span>
+            <span class="lang-en">Family</span>
+          </span>
+          <span class="visa-detail-value">
+            <span class="lang-es">Incluye cónyuge e hijos</span>
+            <span class="lang-en">Includes spouse &amp; children</span>
+          </span>
         </div>
       </div>
-      <footer class="page-footer">
-        <span>RE/MAX Inmomás · División Internacional</span>
-        <span class="page-num" data-page="2"></span>
-      </footer>
-    </section>
+    </div>
 
+    <!-- Golden Visa Alert -->
+    <div class="alert-box mb-12">
+      <div class="alert-box-title">
+        ⚠️ <span class="lang-es">Actualización Golden Visa</span>
+        <span class="lang-en">Golden Visa Update</span>
+      </div>
+      <div class="alert-box-text">
+        <span class="lang-es">El gobierno español está modificando y progresivamente eliminando la Golden Visa de inversión inmobiliaria de €500.000. Si estabas considerando esta vía, consulta con nuestro equipo legal para conocer las alternativas vigentes y los plazos de transición.</span>
+        <span class="lang-en">The Spanish government is modifying and progressively phasing out the €500,000 real estate investment Golden Visa. If you were considering this pathway, consult with our legal team to learn about current alternatives and transition timelines.</span>
+      </div>
+    </div>
 
-    <!-- PAGINA 3: COMPARATIVA FINANCIERA Y REALIDAD DE COSTES -->
-    <section class="page">
-      <div class="page-inner">
-        <header class="page-header">
-          <span class="page-header-title">
-            <span class="lang-es">02 · Comparativa de Costes y Realidad Financiera</span>
-            <span class="lang-en">02 · Cost Comparison & Financial Reality</span>
-          </span>
-          <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX" class="page-header-logo">
-        </header>
+    <!-- Other routes summary -->
+    <div class="card card-accent-left mb-12">
+      <h4 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:9pt;color:var(--dark-blue);margin-bottom:6px;">
+        <span class="lang-es">🏛️ Otras Vías de Residencia</span>
+        <span class="lang-en">🏛️ Other Residency Pathways</span>
+      </h4>
+      <div class="text-body" style="font-size:8pt;">
+        <span class="lang-es"><strong>Visa de Emprendedor:</strong> para lanzar un negocio en España. <strong>Reagrupación Familiar:</strong> si tienes familia ciudadana UE. <strong>Convenio de doble nacionalidad:</strong> ciudadanos de países hispanoamericanos pueden solicitar la nacionalidad tras 2 años de residencia legal.</span>
+        <span class="lang-en"><strong>Entrepreneur Visa:</strong> to launch a business in Spain. <strong>Family Reunification:</strong> if you have EU citizen family. <strong>Dual nationality agreement:</strong> citizens from Hispanic American countries can apply for citizenship after 2 years of legal residency.</span>
+      </div>
+    </div>
 
-        <h2 class="section-title-dossier">
-          <span class="lang-es">Realidad del Coste de Vida</span>
-          <span class="lang-en">The Real Cost of Living</span>
-        </h2>
+    <div class="card card-dark" style="text-align:center;padding:14px;">
+      <p style="font-size:8.5pt;margin-bottom:4px;">
+        <span class="lang-es">Todo el proceso de visado gestionado por</span>
+        <span class="lang-en">All visa processing managed by</span>
+      </p>
+      <p style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:12pt;color:var(--accent-gold);">Fuster & Associates</p>
+      <p style="font-size:7.5pt;color:rgba(255,255,255,0.5);margin-top:2px;">
+        <span class="lang-es">Abogados especializados en inmigración y derecho inmobiliario</span>
+        <span class="lang-en">Attorneys specialized in immigration and real estate law</span>
+      </p>
+    </div>
 
-        <p class="editorial-intro">
-          <span class="lang-es">El poder adquisitivo del dólar estadounidense y del dólar canadiense se multiplica de manera notable al trasladarse a la Costa Blanca. Los costes cotidianos representan una fracción de lo que se paga en las grandes áreas metropolitanas de Norteamérica.</span>
-          <span class="lang-en">The purchasing power of the US and Canadian dollar increases significantly when moving to the Costa Blanca. Everyday expenses represent a fraction of what is paid in major North American metropolitan areas.</span>
-        </p>
+    <div class="page-footer">
+      <span>2026 © RE/MAX Inmomás · International Division</span>
+      <span class="page-number">06</span>
+    </div>
+  </div>
+</div>
 
-        <table class="comparison-table-ed">
-          <thead>
-            <tr>
-              <th><span class="lang-es">Servicio / Gasto Promedio</span><span class="lang-en">Service / Average Expense</span></th>
-              <th>🇪🇸 Costa Blanca (España)</th>
-              <th>🇺🇸 Nueva York / Miami (EE.UU.)</th>
-              <th><span class="lang-es">Ratio de Ahorro</span><span class="lang-en">Savings Ratio</span></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong><span class="lang-es">Seguro Médico Privado</span><span class="lang-en">Private Health Insurance</span></strong></td>
-              <td class="comparative-highlight">80 € – 150 € / mes</td>
-              <td>500 $ – 1.500 $ / mes</td>
-              <td><strong>~85% <span class="lang-es">menos</span><span class="lang-en">less</span></strong></td>
-            </tr>
-            <tr>
-              <td><strong><span class="lang-es">Menú Gourmet Pareja</span><span class="lang-en">Dinner for Two (Gourmet)</span></strong></td>
-              <td class="comparative-highlight">35 € – 60 €</td>
-              <td>100 $ – 200 $</td>
-              <td><strong>~70% <span class="lang-es">menos</span><span class="lang-en">less</span></strong></td>
-            </tr>
-            <tr>
-              <td><strong><span class="lang-es">Gastos de Comunidad</span><span class="lang-en">Monthly Condo / HOA Fees</span></strong></td>
-              <td class="comparative-highlight">40 € – 100 € / mes</td>
-              <td>400 $ – 1.200 $ / mes</td>
-              <td><strong>~90% <span class="lang-es">menos</span><span class="lang-en">less</span></strong></td>
-            </tr>
-            <tr>
-              <td><strong><span class="lang-es">Impuesto Territorial (IBI)</span><span class="lang-en">Property Tax (IBI)</span></strong></td>
-              <td class="comparative-highlight">300 € – 900 € / año</td>
-              <td>4.000 $ – 12.000 $ / año</td>
-              <td><strong>~92% <span class="lang-es">menos</span><span class="lang-en">less</span></strong></td>
-            </tr>
-          </tbody>
-        </table>
+<!-- ============================================================
+     PAGE 7 — TAXATION
+     ============================================================ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-title">
+        <span class="lang-es">Fiscalidad</span>
+        <span class="lang-en">Taxation</span>
+      </span>
+      <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX">
+    </div>
 
-        <!-- Visual Savings Graph -->
-        <div class="editorial-card" style="margin-bottom: 18px;">
-          <h4 class="chart-title" style="margin-bottom: 10px;"><span class="lang-es">Comparación Visual de Gastos Mensuales (€/$)</span><span class="lang-en">Visual Monthly Expense Comparison (€/$)</span></h4>
-          
-          <div class="savings-row-visual">
-            <div class="savings-lbl-row"><span>Seguro Médico / Health Insurance</span><span>85% Ahorro</span></div>
-            <div style="display:flex; flex-direction:column; gap:4px;">
-              <div class="savings-bar-container"><div class="savings-bar-spain" style="width: 12%;">España: €120</div></div>
-              <div class="savings-bar-container"><div class="savings-bar-us" style="width: 100%;">EE.UU.: $1,000</div></div>
-            </div>
-          </div>
+    <div class="section-num">06</div>
+    <div class="section-label">
+      <span class="lang-es">Costes de Adquisición</span>
+      <span class="lang-en">Acquisition Costs</span>
+    </div>
+    <h2 class="section-title">
+      <span class="lang-es">Fiscalidad y Costes<br>de Adquisición</span>
+      <span class="lang-en">Taxation &amp;<br>Acquisition Costs</span>
+    </h2>
 
-          <div class="savings-row-visual" style="margin-bottom: 0;">
-            <div class="savings-lbl-row"><span>Gastos de Comunidad / HOA Fees</span><span>90% Ahorro</span></div>
-            <div style="display:flex; flex-direction:column; gap:4px;">
-              <div class="savings-bar-container"><div class="savings-bar-spain" style="width: 8%;">España: €60</div></div>
-              <div class="savings-bar-container"><div class="savings-bar-us" style="width: 100%;">EE.UU.: $800</div></div>
-            </div>
-          </div>
+    <p class="text-lead mb-12">
+      <span class="lang-es">Al comprar una propiedad en España, es fundamental entender los costes asociados a la transacción y los impuestos recurrentes. Aquí desglosamos todos los costes para que no haya sorpresas.</span>
+      <span class="lang-en">When buying a property in Spain, understanding the costs associated with the transaction and recurring taxes is essential. Here we break down all costs so there are no surprises.</span>
+    </p>
+
+    <!-- Purchase cost stacked bar -->
+    <div class="card card-bordered mb-12">
+      <h4 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:10pt;color:var(--dark-blue);margin-bottom:8px;">
+        <span class="lang-es">📊 Desglose de Costes de Compra (Propiedad de Reventa)</span>
+        <span class="lang-en">📊 Purchase Cost Breakdown (Resale Property)</span>
+      </h4>
+      <div class="tax-stack">
+        <div class="tax-segment" style="flex:10;background:var(--remax-red);">ITP 10%</div>
+        <div class="tax-segment" style="flex:1.5;background:var(--remax-blue);">AJD 1.5%</div>
+        <div class="tax-segment" style="flex:1.5;background:var(--bridge-blue);">
+          <span class="lang-es">Not. 1.5%</span>
+          <span class="lang-en">Not. 1.5%</span>
         </div>
-
-        <div class="editorial-grid-equal">
-          <div class="financial-commentary">
-            <span class="lang-es">"Muchos de nuestros clientes norteamericanos descubren que su presupuesto mensual de jubilación o teletrabajo les permite contratar ayuda doméstica y jugar al golf de forma regular, algo que en su país de origen requería ingresos del percentil más alto."</span>
-            <span class="lang-en">"Many of our North American clients discover that their monthly retirement or remote-work budget allows them to hire domestic help and play golf regularly—activities that in their home countries required top-percentile incomes."</span>
-          </div>
-
-          <div class="image-block">
-            <img src="images/alicante_castle.png" alt="Vista del Castillo de Alicante">
-            <div class="image-caption">
-              <span class="lang-es">El histórico Castillo de Santa Bárbara en Alicante.</span>
-              <span class="lang-en">The historic Santa Bárbara Castle in Alicante.</span>
-            </div>
-          </div>
+        <div class="tax-segment" style="flex:1;background:var(--accent-gold);color:var(--dark-blue);">Legal 1%</div>
+      </div>
+      <div class="tax-legend">
+        <div class="tax-legend-item">
+          <div class="tax-legend-dot" style="background:var(--remax-red);"></div>
+          <span>
+            <span class="lang-es"><strong>ITP</strong> — Impuesto de Transmisiones Patrimoniales (10%)</span>
+            <span class="lang-en"><strong>ITP</strong> — Property Transfer Tax (10%)</span>
+          </span>
+        </div>
+        <div class="tax-legend-item">
+          <div class="tax-legend-dot" style="background:var(--remax-blue);"></div>
+          <span>
+            <span class="lang-es"><strong>AJD</strong> — Actos Jurídicos Documentados (1.5%)</span>
+            <span class="lang-en"><strong>AJD</strong> — Documented Legal Acts Tax (1.5%)</span>
+          </span>
+        </div>
+        <div class="tax-legend-item">
+          <div class="tax-legend-dot" style="background:var(--bridge-blue);"></div>
+          <span>
+            <span class="lang-es"><strong>Notaría</strong> — Honorarios notariales y registro (~1.5%)</span>
+            <span class="lang-en"><strong>Notary</strong> — Notary and registry fees (~1.5%)</span>
+          </span>
+        </div>
+        <div class="tax-legend-item">
+          <div class="tax-legend-dot" style="background:var(--accent-gold);"></div>
+          <span>
+            <span class="lang-es"><strong>Legal</strong> — Honorarios abogado (~1%)</span>
+            <span class="lang-en"><strong>Legal</strong> — Attorney fees (~1%)</span>
+          </span>
         </div>
       </div>
-      <footer class="page-footer">
-        <span>RE/MAX Inmomás · División Internacional</span>
-        <span class="page-num" data-page="3"></span>
-      </footer>
-    </section>
+      <div style="margin-top:10px;background:var(--dark-blue);color:var(--white);padding:8px 14px;border-radius:4px;text-align:center;">
+        <span style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:12pt;">~14%</span>
+        <span style="font-size:8pt;margin-left:6px;">
+          <span class="lang-es">del precio de compra en costes totales</span>
+          <span class="lang-en">of purchase price in total costs</span>
+        </span>
+      </div>
+    </div>
 
+    <!-- New Build Info -->
+    <div class="card card-accent-left mb-12">
+      <h4 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:9pt;color:var(--dark-blue);margin-bottom:4px;">
+        <span class="lang-es">🏗️ Obra Nueva</span>
+        <span class="lang-en">🏗️ New Build Properties</span>
+      </h4>
+      <p class="text-body" style="font-size:8pt;">
+        <span class="lang-es">Para propiedades de obra nueva el ITP se sustituye por IVA (10%) + AJD (1.5%). El coste total es similar (~12.5-14%).</span>
+        <span class="lang-en">For new build properties, ITP is replaced by VAT (10%) + AJD (1.5%). Total cost is similar (~12.5-14%).</span>
+      </p>
+    </div>
 
-    <!-- PAGINA 4: VISADOS Y RESIDENCIA -->
-    <section class="page">
-      <div class="page-inner">
-        <header class="page-header">
-          <span class="page-header-title">
-            <span class="lang-es">03 · Residencia, Visados y Vías Legales</span>
-            <span class="lang-en">03 · Residency, Visas & Legal Pathways</span>
-          </span>
-          <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX" class="page-header-logo">
-        </header>
+    <!-- Annual Taxes -->
+    <h3 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:11pt;color:var(--dark-blue);margin-bottom:10px;">
+      <span class="lang-es">📅 Impuestos Anuales Recurrentes</span>
+      <span class="lang-en">📅 Annual Recurring Taxes</span>
+    </h3>
 
-        <h2 class="section-title-dossier">
-          <span class="lang-es">Vías de Residencia Legal</span>
-          <span class="lang-en">Legal Residency Pathways</span>
-        </h2>
-
-        <p class="editorial-intro">
-          <span class="lang-es">El marco legal español ofrece diversas alternativas atractivas y bien estructuradas para obtener la residencia legal. Nuestro socio jurídico Fuster & Associates evalúa cada caso para definir la vía óptima.</span>
-          <span class="lang-en">The Spanish legal framework offers several attractive and structured alternatives to obtain legal residency. Our legal partner Fuster & Associates evaluates each case to determine the optimal pathway.</span>
+    <div class="grid-2col mb-12">
+      <div class="tax-card">
+        <h4>
+          <span class="lang-es">IBI — Impuesto sobre Bienes Inmuebles</span>
+          <span class="lang-en">IBI — Property Tax (Municipal)</span>
+        </h4>
+        <p class="text-body" style="font-size:8pt;">
+          <span class="lang-es">Equivalente al property tax municipal. Calculado sobre el valor catastral (muy inferior al valor de mercado). Rango típico en Costa Blanca:</span>
+          <span class="lang-en">Equivalent to municipal property tax. Calculated on cadastral value (much lower than market value). Typical range on Costa Blanca:</span>
         </p>
-
-        <div class="editorial-grid-equal">
-          <div class="editorial-card visa-card-ed">
-            <div class="visa-badge-ed">Digital Nomad Visa</div>
-            <h3 style="font-size: 0.95rem; margin-bottom: 6px;"><span class="lang-es">Visado de Nómada Digital</span><span class="lang-en">Digital Nomad Visa</span></h3>
-            <p class="card-text-ed" style="margin-bottom: 6px;">
-              <span class="lang-es">Diseñado para profesionales que teletrabajan para empresas fuera de España. Permite vivir en España y tributar bajo un régimen fiscal beneficioso (Ley Beckham).</span>
-              <span class="lang-en">Designed for remote workers employed by companies based outside of Spain. Allows you to live in Spain and pay taxes under a beneficial tax regime (Beckham Law).</span>
-            </p>
-            <span class="visa-requirement-tag">
-              <span class="lang-es">Requisito: Ingresos mínimos de ~3.024 €/mes</span>
-              <span class="lang-en">Requirement: Min. income of ~€3,024/month</span>
-            </span>
-          </div>
-
-          <div class="editorial-card visa-card-ed">
-            <div class="visa-badge-ed" style="background: var(--remax-blue);">Non-Lucrative Visa</div>
-            <h3 style="font-size: 0.95rem; margin-bottom: 6px;"><span class="lang-es">Visado No Lucrativo</span><span class="lang-en">Non-Lucrative Visa</span></h3>
-            <p class="card-text-ed" style="margin-bottom: 6px;">
-              <span class="lang-es">Ideal para jubilados o personas con ingresos pasivos que no planean trabajar en España. Exige demostrar solvencia financiera suficiente y contar con seguro médico privado.</span>
-              <span class="lang-en">Ideal for retirees or individuals with passive income who do not plan to work in Spain. Requires proof of sufficient financial solvency and private health coverage.</span>
-            </p>
-            <span class="visa-requirement-tag" style="background: rgba(0,61,165,0.05); color: var(--remax-blue);">
-              <span class="lang-es">Requisito: Fondos de ~28.800 € anuales</span>
-              <span class="lang-en">Requirement: Funds of ~€28,800 annually</span>
-            </span>
-          </div>
-        </div>
-
-        <div class="alert-block-ed" style="margin-top: 20px;">
-          <h4 style="font-weight: 800; color: var(--dark-blue); margin-bottom: 4px; font-size: 0.8rem; text-transform: uppercase;">
-            <span class="lang-es">⚠️ Actualización Importante sobre la Golden Visa</span>
-            <span class="lang-en">⚠️ Important Update on the Golden Visa</span>
-          </h4>
-          <p>
-            <span class="lang-es">El gobierno español ha iniciado trámites para la modificación o supresión de la modalidad de Golden Visa por adquisición de inmuebles de 500.000 €. Nuestro equipo jurídico de Fuster & Associates mantiene una monitorización en tiempo real de los cambios legislativos para asesorarte sobre las alternativas vigentes más seguras.</span>
-            <span class="lang-en">The Spanish government has initiated procedures to modify or phase out the Golden Visa program based on the €500,000 real estate purchase. Our legal team at Fuster & Associates monitors legislative developments in real time to advise you on the safest current alternatives.</span>
-          </p>
+        <div style="text-align:center;margin-top:6px;">
+          <span style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:16pt;color:var(--remax-blue);">€250–800</span>
+          <span style="font-size:8pt;color:var(--medium-gray);"><span class="lang-es">/año</span><span class="lang-en">/year</span></span>
         </div>
       </div>
-      <footer class="page-footer">
-        <span>RE/MAX Inmomás · División Internacional</span>
-        <span class="page-num" data-page="4"></span>
-      </footer>
-    </section>
 
-
-    <!-- PAGINA 5: FISCALIDAD Y TRATADO DE DOBLE IMPOSICIÓN -->
-    <section class="page">
-      <div class="page-inner">
-        <header class="page-header">
-          <span class="page-header-title">
-            <span class="lang-es">04 · Fiscalidad y Tratado de Doble Imposición</span>
-            <span class="lang-en">04 · Taxation & Double Tax Treaty</span>
-          </span>
-          <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX" class="page-header-logo">
-        </header>
-
-        <h2 class="section-title-dossier">
-          <span class="lang-es">Impuestos y Tratado de Doble Imposición</span>
-          <span class="lang-en">Taxes & Double Taxation Treaty</span>
-        </h2>
-
-        <p class="editorial-intro">
-          <span class="lang-es">Comprender las obligaciones fiscales es fundamental para una inversión segura. España y Estados Unidos cuentan con un Convenio Bilateral de Doble Imposición en vigor, lo que protege a los inversores de tributar dos veces por el mismo concepto o renta.</span>
-          <span class="lang-en">Understanding tax obligations is fundamental for a safe investment. Spain and the United States have a Double Taxation Treaty in force, protecting investors from paying taxes twice on the same income or asset.</span>
+      <div class="tax-card">
+        <h4>
+          <span class="lang-es">IRNR — Impuesto de No Residentes</span>
+          <span class="lang-en">IRNR — Non-Resident Income Tax</span>
+        </h4>
+        <p class="text-body" style="font-size:8pt;">
+          <span class="lang-es">Impuesto imputado sobre la renta presunta (si no se alquila la propiedad). Se calcula como 1.1% del valor catastral × 24% tipo impositivo. Resultado típico:</span>
+          <span class="lang-en">Imputed income tax (if property is not rented). Calculated as 1.1% of cadastral value × 24% tax rate. Typical result:</span>
         </p>
+        <div style="text-align:center;margin-top:6px;">
+          <span style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:16pt;color:var(--remax-blue);">€100–350</span>
+          <span style="font-size:8pt;color:var(--medium-gray);"><span class="lang-es">/año</span><span class="lang-en">/year</span></span>
+        </div>
+      </div>
+    </div>
 
-        <div class="editorial-grid-equal">
-          <div class="tax-box">
-            <div class="tax-box-title">
-              <span class="lang-es">Gastos e Impuestos de Compra</span>
-              <span class="lang-en">Purchase Costs & Taxes</span>
-            </div>
-            
-            <!-- Stacked bar chart for taxes -->
-            <div class="stacked-tax-bar">
-              <div class="tax-chunk tax-chunk-itp" title="ITP 10%">10%</div>
-              <div class="tax-chunk tax-chunk-ajd" title="AJD 1.5%">1.5%</div>
-              <div class="tax-chunk tax-chunk-notary" title="Notary 1.5%">1.5%</div>
-              <div class="tax-chunk tax-chunk-legal" title="Legal 1.0%">1%</div>
-            </div>
+    <!-- Double Taxation -->
+    <div class="card card-dark mb-8">
+      <h4 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:9.5pt;color:var(--accent-gold);margin-bottom:6px;">
+        🇺🇸🇪🇸 <span class="lang-es">Convenio de Doble Imposición EE.UU.–España</span>
+        <span class="lang-en">US–Spain Double Taxation Treaty</span>
+      </h4>
+      <p style="font-size:8pt;line-height:1.55;color:rgba(255,255,255,0.85);">
+        <span class="lang-es">El convenio bilateral entre Estados Unidos y España evita la doble imposición fiscal. Los impuestos pagados en España pueden acreditarse contra tu declaración federal de EE.UU. mediante el <strong>Foreign Tax Credit (IRS Form 1116)</strong> incluido en tu declaración 1040. Consulta con tu asesor fiscal en ambos países para optimizar tu estrategia.</span>
+        <span class="lang-en">The bilateral treaty between the United States and Spain prevents double taxation. Taxes paid in Spain can be credited against your US federal return via the <strong>Foreign Tax Credit (IRS Form 1116)</strong> included in your 1040 filing. Consult with your tax advisor in both countries to optimize your strategy.</span>
+      </p>
+    </div>
 
-            <div class="tax-legend-grid">
-              <div class="tax-leg-item"><span class="tax-leg-color" style="background: var(--remax-red);"></span><span>ITP (Transfer)</span></div>
-              <div class="tax-leg-item"><span class="tax-leg-color" style="background: var(--remax-blue);"></span><span>AJD (Stamp duty)</span></div>
-              <div class="tax-leg-item"><span class="tax-leg-color" style="background: var(--accent-gold);"></span><span>Notary & Registry</span></div>
-              <div class="tax-leg-item"><span class="tax-leg-color" style="background: var(--charcoal);"></span><span>Legal Fees</span></div>
+    <div class="page-footer">
+      <span>2026 © RE/MAX Inmomás · International Division</span>
+      <span class="page-number">07</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE 8 — PARTNER ECOSYSTEM
+     ============================================================ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-title">
+        <span class="lang-es">Ecosistema de Valor</span>
+        <span class="lang-en">Value Ecosystem</span>
+      </span>
+      <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX">
+    </div>
+
+    <div class="section-num">07</div>
+    <div class="section-label">
+      <span class="lang-es">Socios Aliados</span>
+      <span class="lang-en">Allied Partners</span>
+    </div>
+    <h2 class="section-title">
+      <span class="lang-es">Ecosistema de Valor<br>y Socios Aliados</span>
+      <span class="lang-en">Value Ecosystem &amp;<br>Allied Partners</span>
+    </h2>
+
+    <p class="text-lead mb-12">
+      <span class="lang-es">No estarás solo. Hemos construido una alianza estratégica con los mejores profesionales de cada área para que tu experiencia de compra sea fluida, segura y sin preocupaciones.</span>
+      <span class="lang-en">You won't be alone. We've built a strategic alliance with the best professionals in each area so your buying experience is smooth, secure and worry-free.</span>
+    </p>
+
+    <!-- Flow Diagram -->
+    <div class="flow-diagram mb-16">
+      <div class="flow-node">RE/MAX<br>Inmomás</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Fuster &amp;<br>Associates</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Banco<br>UCI</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Inmomás<br>Holidays</div>
+    </div>
+
+    <!-- Partner Cards -->
+    <div class="grid-2col" style="gap:12px;">
+      <!-- RE/MAX Inmomás -->
+      <div class="partner-card" style="border-top:3px solid var(--remax-red);">
+        <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX Inmomás" class="partner-logo" style="height:28px;">
+        <div class="partner-name">RE/MAX Inmomás</div>
+        <div class="partner-desc">
+          <span class="lang-es">Asesoría inmobiliaria integral: tours de propiedades, análisis de mercado, negociación experta, valoración profesional y acompañamiento personalizado durante todo el proceso.</span>
+          <span class="lang-en">Comprehensive real estate advisory: property tours, market analysis, expert negotiation, professional valuation and personalized support throughout the entire process.</span>
+        </div>
+      </div>
+
+      <!-- Fuster & Associates -->
+      <div class="partner-card" style="border-top:3px solid var(--remax-blue);">
+        <img src="logo fuster.png" alt="Fuster & Associates" class="partner-logo" style="height:28px;">
+        <div class="partner-name">Fuster & Associates</div>
+        <div class="partner-desc">
+          <span class="lang-es">Due diligence legal completa, redacción de contratos, gestión de NIE y visados, optimización fiscal, inscripción registral y poderes notariales.</span>
+          <span class="lang-en">Complete legal due diligence, contract drafting, NIE and visa processing, tax optimization, property registration and powers of attorney.</span>
+        </div>
+      </div>
+
+      <!-- Banco UCI -->
+      <div class="partner-card" style="border-top:3px solid var(--accent-gold);">
+        <img src="Logo_UCI.png" alt="Banco UCI" class="partner-logo" style="height:28px;">
+        <div class="partner-name">Banco UCI</div>
+        <div class="partner-desc">
+          <span class="lang-es">Hipotecas para no residentes hasta el 70% LTV. Pre-aprobación en 48 horas. Tipos competitivos (fijo y variable). Proceso 100% digital con atención en inglés y español.</span>
+          <span class="lang-en">Non-resident mortgages up to 70% LTV. Pre-approval in 48 hours. Competitive rates (fixed and variable). 100% digital process with English and Spanish support.</span>
+        </div>
+      </div>
+
+      <!-- Inmomás Holidays -->
+      <div class="partner-card" style="border-top:3px solid var(--bridge-red);">
+        <img src="Inmomas-holidays-Op-3-color-e1752073650140.png" alt="Inmomás Holidays" class="partner-logo" style="height:28px;">
+        <div class="partner-name">Inmomás Holidays</div>
+        <div class="partner-desc">
+          <span class="lang-es">Gestión integral de alquiler vacacional: optimización de ROI, marketing en plataformas internacionales, mantenimiento de propiedad, check-in/out y atención al huésped 24/7.</span>
+          <span class="lang-en">Comprehensive vacation rental management: ROI optimization, international platform marketing, property maintenance, check-in/out and 24/7 guest support.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-dark mt-16" style="text-align:center;padding:14px;">
+      <p style="font-size:9pt;">
+        <span class="lang-es">🤝 Un solo punto de contacto para todo. <strong style="color:var(--accent-gold);">Tú te enfocas en elegir tu hogar. Nosotros nos encargamos del resto.</strong></span>
+        <span class="lang-en">🤝 A single point of contact for everything. <strong style="color:var(--accent-gold);">You focus on choosing your home. We take care of the rest.</strong></span>
+      </p>
+    </div>
+
+    <div class="page-footer">
+      <span>2026 © RE/MAX Inmomás · International Division</span>
+      <span class="page-number">08</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE 9 — VIP DISCOVERY TRIP
+     ============================================================ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-title">
+        <span class="lang-es">Viaje VIP de Descubrimiento</span>
+        <span class="lang-en">VIP Discovery Trip</span>
+      </span>
+      <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX">
+    </div>
+
+    <div class="section-num">08</div>
+    <div class="section-label">
+      <span class="lang-es">Experiencia Premium</span>
+      <span class="lang-en">Premium Experience</span>
+    </div>
+    <h2 class="section-title">
+      <span class="lang-es">Viaje VIP de<br>Descubrimiento</span>
+      <span class="lang-en">VIP Discovery<br>Trip</span>
+    </h2>
+
+    <p class="text-lead mb-12">
+      <span class="lang-es">Te invitamos a vivir la Costa Blanca antes de tomar una decisión. Nuestro programa VIP de 3 días te permite conocer la zona, visitar propiedades y reunirte con nuestro equipo legal — todo organizado por nosotros.</span>
+      <span class="lang-en">We invite you to experience the Costa Blanca before making a decision. Our 3-day VIP program lets you explore the area, visit properties and meet our legal team — all arranged by us.</span>
+    </p>
+
+    <div class="grid-60-40 mb-12">
+      <div>
+        <!-- Day 1 -->
+        <div class="day-card">
+          <div>
+            <div class="day-number">1</div>
+            <div class="day-label">
+              <span class="lang-es">Día</span>
+              <span class="lang-en">Day</span>
             </div>
           </div>
-
-          <div class="tax-box" style="background: white; border: 1px solid var(--border-accent);">
-            <div class="tax-box-title">
-              <span class="lang-es">Impuestos de Propiedad Anuales</span>
-              <span class="lang-en">Annual Property Ownership Taxes</span>
+          <div>
+            <div class="day-title">
+              <span class="lang-es">Llegada y Bienvenida</span>
+              <span class="lang-en">Arrival &amp; Welcome</span>
             </div>
-            <ul class="tax-list-ed">
-              <li><strong>IBI (Local Tax)</strong>: <span class="lang-es">Equivalente al impuesto municipal de propiedad estadounidense, pero hasta un 90% más económico (normalmente 250 € a 800 € anuales).</span><span class="lang-en">Similar to property tax in the US, but up to 90% cheaper (usually €250 to €800 annually).</span></li>
-              <li><strong>IRNR (Impuesto No Residentes)</strong>: <span class="lang-es">Tributación imputada para no residentes cuando la vivienda es de uso propio (cálculo de 24% sobre el 1.1% o 2% del valor catastral).</span><span class="lang-en">Deemed tax for non-residents when the home is for personal use (24% tax rate applied to 1.1% or 2% of the cadastral value).</span></li>
+            <ul class="day-activities">
+              <li>
+                <span class="lang-es">Check-in en hotel de lujo con vistas al mar</span>
+                <span class="lang-en">Check-in at luxury hotel with sea views</span>
+              </li>
+              <li>
+                <span class="lang-es">Cena de bienvenida en restaurante frente a la playa</span>
+                <span class="lang-en">Welcome dinner at beachfront restaurant</span>
+              </li>
+              <li>
+                <span class="lang-es">Presentación general de la zona y mercado inmobiliario</span>
+                <span class="lang-en">General overview of the area and real estate market</span>
+              </li>
             </ul>
           </div>
         </div>
 
-        <div style="background: white; border: 1px solid var(--border-accent); border-radius: 6px; padding: 16px; margin-top: 14px;">
-          <h4 style="font-weight: 800; color: var(--dark-blue); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 6px;">
-            <span class="lang-es">¿Cómo funciona el Tratado de Doble Imposición?</span>
-            <span class="lang-en">How does the Double Tax Treaty work?</span>
-          </h4>
-          <p style="font-size: 0.78rem; color: var(--charcoal); line-height: 1.5;">
-            <span class="lang-es">El convenio establece reglas claras de residencia fiscal y atribución de rentas. Si eres residente en EE.UU. y tienes rentas en España (por ejemplo, alquileres de tu propiedad), tributarás en España por esas rentas, pero luego podrás aplicar en tu declaración del IRS (Formulario 1040) un crédito fiscal por impuestos extranjeros (Foreign Tax Credit), evitando así pagar dos veces.</span>
-            <span class="lang-en">The treaty establishes clear rules for tax residency and allocation of income. If you are a US resident and earn income in Spain (e.g. from rental properties), you will pay tax in Spain on those earnings, and you can subsequently claim a Foreign Tax Credit on your IRS tax return (Form 1040) to offset double payments.</span>
+        <!-- Day 2 -->
+        <div class="day-card">
+          <div>
+            <div class="day-number">2</div>
+            <div class="day-label">
+              <span class="lang-es">Día</span>
+              <span class="lang-en">Day</span>
+            </div>
+          </div>
+          <div>
+            <div class="day-title">
+              <span class="lang-es">Tours de Propiedades</span>
+              <span class="lang-en">Property Tours</span>
+            </div>
+            <ul class="day-activities">
+              <li>
+                <span class="lang-es">Visita privada a 4-6 propiedades seleccionadas</span>
+                <span class="lang-en">Private tour of 4-6 curated properties</span>
+              </li>
+              <li>
+                <span class="lang-es">Reunión en oficinas de Fuster & Associates — briefing legal</span>
+                <span class="lang-en">Meeting at Fuster & Associates offices — legal briefing</span>
+              </li>
+              <li>
+                <span class="lang-es">Almuerzo típico mediterráneo en zona residencial</span>
+                <span class="lang-en">Typical Mediterranean lunch in residential area</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Day 3 -->
+        <div class="day-card">
+          <div>
+            <div class="day-number">3</div>
+            <div class="day-label">
+              <span class="lang-es">Día</span>
+              <span class="lang-en">Day</span>
+            </div>
+          </div>
+          <div>
+            <div class="day-title">
+              <span class="lang-es">Estilo de Vida y Plan de Acción</span>
+              <span class="lang-en">Lifestyle &amp; Action Plan</span>
+            </div>
+            <ul class="day-activities">
+              <li>
+                <span class="lang-es">Tour cultural: marina, golf, gastronomía local</span>
+                <span class="lang-en">Cultural tour: marina, golf, local gastronomy</span>
+              </li>
+              <li>
+                <span class="lang-es">Experiencia de estilo de vida mediterráneo</span>
+                <span class="lang-en">Mediterranean lifestyle experience</span>
+              </li>
+              <li>
+                <span class="lang-es">Reunión final de estrategia y plan de acción personalizado</span>
+                <span class="lang-en">Final strategy meeting and personalized action plan</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="img-rounded" style="flex:1;min-height:160px;">
+          <img src="images/lifestyle-mediterranean.png" alt="Mediterranean Lifestyle" style="width:100%;height:100%;object-fit:cover;">
+        </div>
+        <div class="card card-accent-top" style="text-align:center;">
+          <p style="font-size:8pt;color:var(--medium-gray);margin-bottom:4px;">
+            <span class="lang-es">Inversión en el viaje</span>
+            <span class="lang-en">Trip Investment</span>
+          </p>
+          <p style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:14pt;color:var(--dark-blue);">
+            <span class="lang-es">Consultar</span>
+            <span class="lang-en">Inquire</span>
+          </p>
+          <p style="font-size:7pt;color:var(--medium-gray);margin-top:2px;">
+            <span class="lang-es">*Reembolsable al concretar la compra de una propiedad</span>
+            <span class="lang-en">*Refundable upon completing a property purchase</span>
           </p>
         </div>
       </div>
-      <footer class="page-footer">
-        <span>RE/MAX Inmomás · División Internacional</span>
-        <span class="page-num" data-page="5"></span>
-      </footer>
-    </section>
+    </div>
 
+    <div class="quote-block">
+      <span class="lang-es">"El viaje de descubrimiento superó todas nuestras expectativas. En solo 3 días entendimos perfectamente por qué Alicante es el lugar ideal para nuestra nueva etapa."</span>
+      <span class="lang-en">"The discovery trip exceeded all our expectations. In just 3 days we perfectly understood why Alicante is the ideal place for our next chapter."</span>
+      <span class="quote-author">— Jennifer &amp; Robert, Ontario, Canada</span>
+    </div>
 
-    <!-- PAGINA 6: EL ECOSISTEMA DE ASESORAMIENTO Y LOS 4 PILARES -->
-    <section class="page">
-      <div class="page-inner">
-        <header class="page-header">
-          <span class="page-header-title">
-            <span class="lang-es">05 · Ecosistema de Valor y Socios Aliados</span>
-            <span class="lang-en">05 · Value Ecosystem & Allied Partners</span>
-          </span>
-          <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX" class="page-header-logo">
-        </header>
-
-        <h2 class="section-title-dossier">
-          <span class="lang-es">El Ecosistema del Servicio Integral</span>
-          <span class="lang-en">The Comprehensive Service Ecosystem</span>
-        </h2>
-
-        <!-- Diagrama Gráfico por CSS -->
-        <div class="ecosystem-diagram-css">
-          <div class="dia-node remax-node">RE/MAX Inmomás</div>
-          <div class="dia-arrow">→</div>
-          <div class="dia-node">Fuster & Associates</div>
-          <div class="dia-arrow">→</div>
-          <div class="dia-node">Banco UCI</div>
-          <div class="dia-arrow">→</div>
-          <div class="dia-node">Inmomás Holidays</div>
-        </div>
-
-        <div class="pillars-grid-ed">
-          <div class="pillar-card-ed">
-            <div class="pillar-card-ed-header">
-              <span class="pillar-title-ed">RE/MAX Inmomás</span>
-              <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX">
-            </div>
-            <p class="pillar-text-ed">
-              <span class="lang-es"><strong>Tu Asesor Inmobiliario</strong>. Localización, filtrado exclusivo y visitas guiadas a propiedades en Costa Blanca. Negociación comercial profesional y cierre.</span>
-              <span class="lang-en"><strong>Your Real Estate Advisor</strong>. Sourcing, filtering, and guiding property tours on the Costa Blanca. Professional negotiation and transaction closing.</span>
-            </p>
-          </div>
-
-          <div class="pillar-card-ed">
-            <div class="pillar-card-ed-header">
-              <span class="pillar-title-ed">Fuster & Associates</span>
-              <img src="logo fuster.png" alt="Fuster & Associates">
-            </div>
-            <p class="pillar-text-ed">
-              <span class="lang-es"><strong>Tu Escudo Legal y Fiscal</strong>. Análisis jurídico integral de la propiedad (due diligence), redacción de contratos, obtención de NIE, visados de residencia y liquidación de impuestos.</span>
-              <span class="lang-en"><strong>Your Legal & Tax Shield</strong>. Full legal title search (due diligence), contract drafting, NIE numbers, residency visas, and tax filing.</span>
-            </p>
-          </div>
-
-          <div class="pillar-card-ed">
-            <div class="pillar-card-ed-header">
-              <span class="pillar-title-ed">Banco UCI</span>
-              <img src="Logo_UCI.png" alt="Banco UCI">
-            </div>
-            <p class="pillar-text-ed">
-              <span class="lang-es"><strong>Tu Soporte Financiero</strong>. Préstamos hipotecarios estructurados a medida para no residentes (hasta el 70% del valor de tasación) con pre-aprobación en 48 horas.</span>
-              <span class="lang-en"><strong>Your Financial Support</strong>. Structured mortgage loans tailored for non-resident buyers (up to 70% of appraisal value) with 48h pre-approval.</span>
-            </p>
-          </div>
-
-          <div class="pillar-card-ed">
-            <div class="pillar-card-ed-header">
-              <span class="pillar-title-ed">Inmomás Holidays</span>
-              <img src="Inmomas-holidays-Op-3-color-e1752073650140.png" alt="Inmomás Holidays">
-            </div>
-            <p class="pillar-text-ed">
-              <span class="lang-es"><strong>Tu Socio en Renta (ROI)</strong>. Gestión integral y 100% libre de preocupaciones de alquiler vacacional y mantenimiento. Maximización de tus ingresos pasivos durante tu ausencia.</span>
-              <span class="lang-en"><strong>Your Rental Partner (ROI)</strong>. 100% hands-free property rental management and property care. Maximizing your passive rental returns while you are back home.</span>
-            </p>
-          </div>
-        </div>
-      </div>
-      <footer class="page-footer">
-        <span>RE/MAX Inmomás · División Internacional</span>
-        <span class="page-num" data-page="6"></span>
-      </footer>
-    </section>
-
-
-    <!-- PAGINA 7: TU VIAJE DE DESCUBRIMIENTO (VIP DISCOVERY TRIP) -->
-    <section class="page">
-      <div class="page-inner">
-        <header class="page-header">
-          <span class="page-header-title">
-            <span class="lang-es">06 · Itinerario VIP y Viaje de Descubrimiento</span>
-            <span class="lang-en">06 · VIP Itinerary & Discovery Trip</span>
-          </span>
-          <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX" class="page-header-logo">
-        </header>
-
-        <h2 class="section-title-dossier">
-          <span class="lang-es">Tu Viaje de Descubrimiento VIP</span>
-          <span class="lang-en">Your VIP Discovery Trip</span>
-        </h2>
-
-        <p class="editorial-intro">
-          <span class="lang-es">Diseñamos una experiencia en persona para que vivas y sientas la Costa Blanca antes de tomar tu decisión. Este viaje está organizado para combinar visitas inmobiliarias clave con la inmersión en la cultura, gastronomía y ocio locales.</span>
-          <span class="lang-en">We design a personalized in-person experience so you can feel and experience the Costa Blanca before making a decision. This trip is structured to blend key property viewings with local culture, dining, and lifestyle.</span>
-        </p>
-
-        <div class="editorial-grid-2">
-          <div class="itinerary-timeline">
-            <div class="itinerary-day">
-              <div class="day-circle"></div>
-              <div class="day-num-lbl">Día 1 / Day 1</div>
-              <h3 class="day-title-ed"><span class="lang-es">Llegada y Bienvenida Gourmet</span><span class="lang-en">Arrival & Gourmet Welcome</span></h3>
-              <p class="day-desc-ed">
-                <span class="lang-es">Check-in en hotel de lujo seleccionado en la Costa Blanca. Cena de bienvenida en un restaurante tradicional frente al mar para saborear la gastronomía local.</span>
-                <span class="lang-en">Check-in at a selected luxury hotel on the Costa Blanca. Welcome dinner at a traditional beachfront restaurant to experience local gastronomy.</span>
-              </p>
-            </div>
-
-            <div class="itinerary-day">
-              <div class="day-circle"></div>
-              <div class="day-num-lbl">Día 2 / Day 2</div>
-              <h3 class="day-title-ed"><span class="lang-es">Tours de Propiedades y Asesoría</span><span class="lang-en">Property Tours & Legal Briefing</span></h3>
-              <p class="day-desc-ed">
-                <span class="lang-es">Property Tour privado de las opciones seleccionadas. Reunión personal en las oficinas de Fuster & Associates para revisar tu estructura fiscal y legal.</span>
-                <span class="lang-en">Private property tour of selected residences. In-person meeting at Fuster & Associates offices to review your tax and legal structure.</span>
-              </p>
-            </div>
-
-            <div class="itinerary-day">
-              <div class="day-circle"></div>
-              <div class="day-num-lbl">Día 3 / Day 3</div>
-              <h3 class="day-title-ed"><span class="lang-es">Estilo de Vida y Cierre</span><span class="lang-en">Lifestyle Experience & Wrap-up</span></h3>
-              <p class="day-desc-ed">
-                <span class="lang-es">Visita al puerto deportivo, club de golf o recorrido cultural por la ciudad. Reunión de conclusiones para definir la estrategia final de adquisición.</span>
-                <span class="lang-en">Visit to the local marina, golf club, or historic city center. Final review meeting to align on your home acquisition strategy.</span>
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <div class="image-block" style="margin-top: 10px;">
-              <img src="images/lifestyle-mediterranean.png" alt="Estilo de vida Mediterráneo">
-              <div class="image-caption">
-                <span class="lang-es">Gastronomía y vida al aire libre en España.</span>
-                <span class="lang-en">Gastronomy and outdoor living in Spain.</span>
-              </div>
-            </div>
-            
-            <div class="editorial-card" style="border-left: 4px solid var(--accent-gold);">
-              <p style="font-size: 0.74rem; font-style: italic; color: var(--charcoal); line-height: 1.45;">
-                <span class="lang-es">"Nuestros clientes expresan que vivir la experiencia local durante el Discovery Trip les dio la seguridad y tranquilidad que necesitaban para avanzar con total confianza en su inversión."</span>
-                <span class="lang-en">"Our clients tell us that experiencing the local lifestyle during the Discovery Trip gave them the security and peace of mind they needed to proceed with complete confidence."</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <footer class="page-footer">
-        <span>RE/MAX Inmomás · División Internacional</span>
-        <span class="page-num" data-page="7"></span>
-      </footer>
-    </section>
-
-
-    <!-- PAGINA 8: DIRECTORIO DE OFICINAS Y CONTACTO HUMANO -->
-    <section class="page page-back-ed">
-      <div class="page-inner" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-        <div>
-          <header class="page-header">
-            <span class="page-header-title">
-              <span class="lang-es">07 · Contacto y Oficinas de la Alianza</span>
-              <span class="lang-en">07 · Contact & Alliance Offices</span>
-            </span>
-            <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX" class="page-header-logo">
-          </header>
-
-          <div class="back-letter-box">
-            <h3 class="letter-title">
-              <span class="lang-es">Un mensaje de nuestro Director Internacional</span>
-              <span class="lang-en">A message from our International Director</span>
-            </h3>
-            <p class="letter-body">
-              <span class="lang-es">Sabemos que dar el paso de comprar una propiedad en otro país genera múltiples dudas. Mi misión es asegurarme de que cada fase de este viaje sea clara, transparente y humana. Al coordinar bajo un mismo ecosistema a nuestros abogados asociados, el banco UCI y nuestra división de alquileres, te garantizamos que tu inversión estará protegida de inicio a fin. Estoy a tu entera disposición para realizar una primera llamada estratégica de asesoramiento sin ningún compromiso.</span>
-              <span class="lang-en">We know that purchasing a property in a foreign country raises many questions. My mission is to ensure that every stage of this journey is transparent, secure, and personal. By coordinating our associated law firm, Banco UCI, and our rental division under one ecosystem, we guarantee your investment is protected from start to finish. I am at your entire disposal to schedule a first strategic call with no obligation.</span>
-            </p>
-            
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px;">
-              <div class="letter-signature">
-                Jose Martínez
-                <span><span class="lang-es">Director de Expansión Internacional</span><span class="lang-en">International Expansion Director</span></span>
-              </div>
-              <div style="font-size: 0.8rem; font-weight: 700; color: var(--remax-red);">
-                📧 jose.martinez@remax.es<br>
-                🌐 remaxinmomas.com
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div style="text-align: center; margin-bottom: 12px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; color: var(--dark-blue); font-weight: 800;">
-            <span class="lang-es">Nuestras Oficinas en la Costa Blanca</span>
-            <span class="lang-en">Our Offices in Costa Blanca</span>
-          </div>
-
-          <div class="offices-grid-ed">
-            <div class="office-cell-ed">
-              <div class="office-name-ed">Elche</div>
-              <div class="office-address-ed">Av. de Alicante, 62<br>03202 Elche</div>
-            </div>
-            <div class="office-cell-ed">
-              <div class="office-name-ed">Alicante</div>
-              <div class="office-address-ed">Rambla de Méndez Núñez, 12<br>03002 Alicante</div>
-            </div>
-            <div class="office-cell-ed">
-              <div class="office-name-ed">Benidorm</div>
-              <div class="office-address-ed">Av. del Mediterráneo, 18<br>03503 Benidorm</div>
-            </div>
-            <div class="office-cell-ed">
-              <div class="office-name-ed">Jávea</div>
-              <div class="office-address-ed">Ctra. del Cap de la Nau, 124<br>03730 Jávea</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <footer class="page-footer" style="margin-top: 14px;">
-        <span>RE/MAX Inmomás · International Division</span>
-        <span class="page-num" data-page="8"></span>
-      </footer>
-    </section>
-
+    <div class="page-footer">
+      <span>2026 © RE/MAX Inmomás · International Division</span>
+      <span class="page-number">09</span>
+    </div>
   </div>
+</div>
 
-  <script>
-    // Simple script to toggle languages
-    function setLanguage(lang) {
-      document.body.className = 'lang-' + lang;
-      
-      // Update buttons active class
-      document.querySelectorAll('.btn-lang').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
-      });
+<!-- ============================================================
+     PAGE 10 — CONTACT & OFFICES
+     ============================================================ -->
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <span class="page-header-title">
+        <span class="lang-es">Contacto y Oficinas</span>
+        <span class="lang-en">Contact &amp; Offices</span>
+      </span>
+      <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX">
+    </div>
 
-      // Update URL hash without reload
-      window.location.hash = lang;
+    <div class="section-num">09</div>
+    <div class="section-label">
+      <span class="lang-es">Tu Próximo Paso</span>
+      <span class="lang-en">Your Next Step</span>
+    </div>
+    <h2 class="section-title">
+      <span class="lang-es">Contacto y<br>Oficinas de la Alianza</span>
+      <span class="lang-en">Contact &amp;<br>Alliance Offices</span>
+    </h2>
+
+    <!-- Personal Letter -->
+    <div class="personal-letter">
+      <p class="mb-8">
+        <span class="lang-es">Estimado futuro vecino,</span>
+        <span class="lang-en">Dear future neighbor,</span>
+      </p>
+      <p class="mb-8">
+        <span class="lang-es">Gracias por tu interés en la Costa Blanca y en nuestros servicios. En RE/MAX Inmomás llevamos años ayudando a familias de todo el mundo a encontrar su hogar ideal en el Mediterráneo. Entendemos que comprar una propiedad en otro país es una decisión importante — por eso hemos creado un ecosistema de profesionales que te acompaña en cada paso del camino.</span>
+        <span class="lang-en">Thank you for your interest in the Costa Blanca and our services. At RE/MAX Inmomás we have been helping families from around the world find their ideal Mediterranean home for years. We understand that buying a property in another country is an important decision — that's why we've created an ecosystem of professionals that accompanies you every step of the way.</span>
+      </p>
+      <p class="mb-8">
+        <span class="lang-es">No importa si estás en la fase de exploración o ya tienes claro que quieres dar el paso: estoy aquí para ayudarte personalmente. Te invito a agendar una videollamada sin compromiso para hablar de tus planes y cómo podemos hacerlos realidad.</span>
+        <span class="lang-en">Whether you're in the exploration phase or have already decided to take the leap: I'm here to help you personally. I invite you to schedule a no-obligation video call to discuss your plans and how we can make them a reality.</span>
+      </p>
+      <div class="letter-signature">Jose Martínez</div>
+      <div class="letter-role">
+        <span class="lang-es">Director de Expansión Internacional</span>
+        <span class="lang-en">International Expansion Director</span>
+      </div>
+      <div class="letter-contact-info">
+        <span>✉️ <a href="mailto:jose.martinez@remax.es">jose.martinez@remax.es</a></span>
+        <span>🌐 <a href="https://remaxinmomas.com" target="_blank">remaxinmomas.com</a></span>
+      </div>
+    </div>
+
+    <!-- Offices Grid -->
+    <h3 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:11pt;color:var(--dark-blue);margin-bottom:10px;">
+      <span class="lang-es">🏢 Nuestras Oficinas</span>
+      <span class="lang-en">🏢 Our Offices</span>
+    </h3>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
+      <div class="office-card">
+        <div class="office-city">Elche</div>
+        <div class="office-address">Av. de Alicante, 62</div>
+        <div class="office-zip">03202</div>
+      </div>
+      <div class="office-card">
+        <div class="office-city">Alicante</div>
+        <div class="office-address">Rambla de Méndez Núñez, 12</div>
+        <div class="office-zip">03002</div>
+      </div>
+      <div class="office-card">
+        <div class="office-city">Benidorm</div>
+        <div class="office-address">Av. del Mediterráneo, 18</div>
+        <div class="office-zip">03503</div>
+      </div>
+      <div class="office-card">
+        <div class="office-city">Jávea</div>
+        <div class="office-address">Ctra. del Cap de la Nau, 124</div>
+        <div class="office-zip">03730</div>
+      </div>
+    </div>
+
+    <!-- Schedule CTA -->
+    <div class="card card-dark" style="text-align:center;padding:18px 20px;">
+      <p style="font-size:10pt;margin-bottom:6px;">
+        <span class="lang-es">¿Listo para dar el primer paso?</span>
+        <span class="lang-en">Ready to take the first step?</span>
+      </p>
+      <p style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:14pt;color:var(--accent-gold);margin-bottom:8px;">
+        <span class="lang-es">Agenda tu Videollamada Gratuita</span>
+        <span class="lang-en">Schedule Your Free Video Call</span>
+      </p>
+      <p style="font-size:8pt;color:rgba(255,255,255,0.6);">
+        jose.martinez@remax.es · remaxinmomas.com
+      </p>
+    </div>
+
+    <!-- Final Footer -->
+    <div class="final-footer">
+      <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX Inmomás">
+      <p>2026 © RE/MAX Inmomás · International Division ·
+        <span class="lang-es">Todos los derechos reservados</span>
+        <span class="lang-en">All rights reserved</span>
+      </p>
+      <p style="margin-top:4px;font-size:6.5pt;color:#aaa;">
+        <span class="lang-es">Esta guía es informativa y no constituye asesoría legal o fiscal. Consulte con profesionales cualificados antes de tomar decisiones de inversión.</span>
+        <span class="lang-en">This guide is informational and does not constitute legal or tax advice. Consult qualified professionals before making investment decisions.</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     LANGUAGE TOGGLE SCRIPT
+     ============================================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // Read preference from hash or localStorage
+  function getPreferredLang() {
+    var hash = window.location.hash.replace('#', '').toLowerCase();
+    if (hash === 'en' || hash === 'es') return hash;
+    var stored = localStorage.getItem('dossier-lang');
+    if (stored === 'en' || stored === 'es') return stored;
+    // Try browser language
+    var nav = (navigator.language || '').toLowerCase();
+    if (nav.indexOf('es') === 0) return 'es';
+    return 'es'; // default
+  }
+
+  function applyLang(lang) {
+    document.body.classList.remove('lang-es', 'lang-en');
+    document.body.classList.add('lang-' + lang);
+    localStorage.setItem('dossier-lang', lang);
+
+    // Update button states
+    var btnEs = document.getElementById('btn-es');
+    var btnEn = document.getElementById('btn-en');
+    if (btnEs) {
+      btnEs.classList.toggle('active', lang === 'es');
     }
+    if (btnEn) {
+      btnEn.classList.toggle('active', lang === 'en');
+    }
+  }
 
-    // Read language from hash if present
-    window.addEventListener('DOMContentLoaded', () => {
-      const hash = window.location.hash.replace('#', '');
-      if (hash === 'en' || hash === 'es') {
-        setLanguage(hash);
-      }
-    });
-  </script>
+  // Global function for buttons
+  window.setLang = function(lang) {
+    applyLang(lang);
+    window.location.hash = lang;
+  };
+
+  // Apply on load
+  applyLang(getPreferredLang());
+
+  // Listen for hash changes
+  window.addEventListener('hashchange', function() {
+    var hash = window.location.hash.replace('#', '').toLowerCase();
+    if (hash === 'en' || hash === 'es') {
+      applyLang(hash);
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
