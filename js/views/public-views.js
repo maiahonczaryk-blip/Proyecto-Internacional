@@ -191,19 +191,18 @@ App.views.public = {
     // Ensure correct initial visibility
     updateFieldVisibility(selectedType);
 
-    // Form submission
+    // Form submission (no cloneNode — use form directly, prevent duplicate listeners with flag)
     const form = document.getElementById('referral-form');
-    if (form) {
-      const newForm = form.cloneNode(true);
-      form.parentNode.replaceChild(newForm, form);
+    if (form && !form.dataset.listenerAttached) {
+      form.dataset.listenerAttached = 'true';
 
-      newForm.addEventListener('submit', async (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const firstName = newForm.querySelector('#referral-firstName').value.trim();
-        const lastName = newForm.querySelector('#referral-lastName').value.trim();
-        const email = newForm.querySelector('#referral-email').value.trim();
-        const phone = newForm.querySelector('#referral-phone').value.trim();
+        const firstName = form.querySelector('#referral-firstName').value.trim();
+        const lastName = form.querySelector('#referral-lastName').value.trim();
+        const email = form.querySelector('#referral-email').value.trim();
+        const phone = form.querySelector('#referral-phone').value.trim();
 
         // Re-read the selected type from the radio (if present)
         const typeRadio = document.querySelector('input[name="referral-contact-type"]:checked');
@@ -219,12 +218,12 @@ App.views.public = {
         try {
           if (contactType === 'client') {
             // ---- Save as a new client via auth-service (Firestore or demo) ----
-            const country = newForm.querySelector('#referral-country')?.value.trim() || '';
-            const budget = newForm.querySelector('#referral-budget')?.value || '';
-            const interestArea = newForm.querySelector('#referral-interestArea')?.value || '';
-            const timeline = newForm.querySelector('#referral-timeline')?.value || '';
-            const objective = newForm.querySelector('#referral-objective')?.value || '';
-            const notes = newForm.querySelector('#referral-notes')?.value.trim() || '';
+            const country = form.querySelector('#referral-country')?.value.trim() || '';
+            const budget = form.querySelector('#referral-budget')?.value || '';
+            const interestArea = form.querySelector('#referral-interestArea')?.value || '';
+            const timeline = form.querySelector('#referral-timeline')?.value || '';
+            const objective = form.querySelector('#referral-objective')?.value || '';
+            const notes = form.querySelector('#referral-notes')?.value.trim() || '';
 
             const clientPayload = {
               firstName,
@@ -260,9 +259,9 @@ App.views.public = {
 
           } else {
             // ---- Save as a pending professional registration via auth-service ----
-            const agencyName = newForm.querySelector('#referral-agencyName')?.value.trim() || '';
-            const market = newForm.querySelector('#referral-market')?.value.trim() || '';
-            const notes = newForm.querySelector('#referral-notes')?.value.trim() || '';
+            const agencyName = form.querySelector('#referral-agencyName')?.value.trim() || '';
+            const market = form.querySelector('#referral-market')?.value.trim() || '';
+            const notes = form.querySelector('#referral-notes')?.value.trim() || '';
 
             const userPayload = {
               firstName,
@@ -292,7 +291,7 @@ App.views.public = {
 
           // Clear referral code and redirect
           sessionStorage.removeItem('referralCode');
-          newForm.reset();
+          form.reset();
           setTimeout(() => App.router.navigateTo('home'), 1500);
 
         } catch (err) {
