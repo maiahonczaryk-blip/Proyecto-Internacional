@@ -91,16 +91,16 @@ App.views.public = {
     const welcomeMsg = document.getElementById('referral-welcome-msg');
     const typeSelector = document.getElementById('referral-type-selector');
     const typeOptions = document.getElementById('referral-type-options');
-    const clientFields = document.getElementById('referral-client-fields');
-    const professionalFields = document.getElementById('referral-professional-fields');
 
     let referrer = null;
     let selectedType = 'client'; // default
 
-    // Toggle which field sections are visible
+    // Toggle which field sections are visible (always query DOM fresh to avoid stale refs after form clone)
     function updateFieldVisibility(type) {
-      if (clientFields) clientFields.style.display = type === 'client' ? '' : 'none';
-      if (professionalFields) professionalFields.style.display = type !== 'client' ? '' : 'none';
+      const cf = document.getElementById('referral-client-fields');
+      const pf = document.getElementById('referral-professional-fields');
+      if (cf) cf.style.display = type === 'client' ? '' : 'none';
+      if (pf) pf.style.display = type !== 'client' ? '' : 'none';
     }
 
     // Find the referrer: first try Firestore, fallback to demoData
