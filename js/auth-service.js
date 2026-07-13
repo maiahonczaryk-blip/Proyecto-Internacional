@@ -227,6 +227,16 @@ App.auth = (function() {
         throw new Error('Your application has been rejected. Please contact support.');
       }
 
+      // Auto-generate referralCode if missing (for users registered before this field existed)
+      if (!userData.referralCode && userData.role && userData.lastName) {
+        const prefix = userData.role === 'broker' ? 'BRK' : (userData.role === 'agent_inmomas' ? 'LOC' : 'REA');
+        const uid = credential.user.uid;
+        userData.referralCode = `${prefix}-${userData.lastName.toUpperCase()}-${uid.substring(0, 4)}`;
+        // Save back to Firestore
+        await App.db.collection('users').doc(uid).update({ referralCode: userData.referralCode });
+        console.log('[Auth] Auto-generated referralCode:', userData.referralCode);
+      }
+
       currentUser = { id: credential.user.uid, ...userData };
       notifyAuthChange();
       return currentUser;
@@ -269,6 +279,13 @@ App.auth = (function() {
       if (userData.status === 'rejected') {
         await App.firebaseAuth.signOut();
         throw new Error('Your application has been rejected. Please contact support.');
+      }
+
+      // Auto-generate referralCode if missing
+      if (!userData.referralCode && userData.role && userData.lastName) {
+        const prefix = userData.role === 'broker' ? 'BRK' : (userData.role === 'agent_inmomas' ? 'LOC' : 'REA');
+        userData.referralCode = `${prefix}-${userData.lastName.toUpperCase()}-${firebaseUser.uid.substring(0, 4)}`;
+        await App.db.collection('users').doc(firebaseUser.uid).update({ referralCode: userData.referralCode });
       }
 
       currentUser = { id: firebaseUser.uid, ...userData };
