@@ -143,7 +143,7 @@ App.views.public = {
       if (referrer.role === 'broker') {
         availableTypes = ['client', 'realtor'];
       } else if (referrer.role === 'agent_inmomas' || referrer.role === 'admin') {
-        availableTypes = ['client', 'broker'];
+        availableTypes = ['client', 'realtor', 'broker'];
       }
     }
 
