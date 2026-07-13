@@ -6,10 +6,11 @@ service cloud.firestore {
       return request.auth != null;
     }
     
-    // User profile rules: Anyone can create (referral registration), authenticated users can read/update/delete
+    // User profile rules: Anyone can read (referral lookup) and create (referral registration)
+    // Only authenticated users can update/delete
     match /users/{userId} {
-      allow create: if true;
-      allow read, update, delete: if isAuthenticated();
+      allow read, create: if true;
+      allow update, delete: if isAuthenticated();
     }
     
     // Clients rules: Anyone can create (referral form), authenticated users can read/update/delete

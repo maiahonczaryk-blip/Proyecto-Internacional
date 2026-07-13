@@ -86,7 +86,7 @@ App.views.public = {
        - broker   → "Cliente" or "Realtor"
        - agent_inmomas / admin → all three
      ============================================= */
-  initReferralForm: function() {
+  initReferralForm: async function() {
     const refCode = sessionStorage.getItem('referralCode');
     const welcomeMsg = document.getElementById('referral-welcome-msg');
     const typeSelector = document.getElementById('referral-type-selector');
@@ -103,9 +103,28 @@ App.views.public = {
       if (professionalFields) professionalFields.style.display = type !== 'client' ? '' : 'none';
     }
 
-    // Find the referrer and personalize the welcome message
-    if (refCode && App.demoData && App.demoData.users) {
-      referrer = App.demoData.users.find(u => u.referralCode === refCode);
+    // Find the referrer: first try Firestore, fallback to demoData
+    if (refCode) {
+      // Try Firestore query (works when Firebase is active)
+      if (!App.demoMode && App.db) {
+        try {
+          const snapshot = await App.db.collection('users')
+            .where('referralCode', '==', refCode)
+            .limit(1)
+            .get();
+          if (!snapshot.empty) {
+            const doc = snapshot.docs[0];
+            referrer = { id: doc.id, ...doc.data() };
+          }
+        } catch (err) {
+          console.warn('[Referral] Firestore lookup failed, falling back to demoData:', err);
+        }
+      }
+      // Fallback to demoData (demo mode or Firestore failed)
+      if (!referrer && App.demoData && App.demoData.users) {
+        referrer = App.demoData.users.find(u => u.referralCode === refCode);
+      }
+
       if (referrer && welcomeMsg) {
         welcomeMsg.innerHTML = `<span class="lang-en">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Please fill out the form below to register.</span>
                                 <span class="lang-es">Has sido referido por <strong>${referrer.firstName} ${referrer.lastName}</strong>. Completa el formulario para registrarte.</span>`;
