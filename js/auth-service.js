@@ -1035,6 +1035,29 @@ App.auth = (function() {
     return newUser;
   }
 
+  /* ---- Delete Client ---- */
+  async function deleteClient(clientId) {
+    if (!clientId) throw new Error('Client ID is required.');
+
+    if (App.demoMode) {
+      const idx = App.demoData.clients.findIndex(c => c.id === clientId);
+      if (idx === -1) throw new Error('Client not found.');
+      App.demoData.clients.splice(idx, 1);
+      // Also remove related commission
+      const commIdx = App.demoData.commissions.findIndex(c => c.clientId === clientId);
+      if (commIdx !== -1) App.demoData.commissions.splice(commIdx, 1);
+      saveDemoData();
+    } else {
+      await App.db.collection('clients').doc(clientId).delete();
+      // Also delete related commissions
+      const commQuery = await App.db.collection('commissions').where('clientId', '==', clientId).get();
+      const batch = App.db.batch();
+      commQuery.docs.forEach(doc => batch.delete(doc.ref));
+      if (!commQuery.empty) await batch.commit();
+    }
+    return true;
+  }
+
   /* ---- Public API ---- */
   return {
     init,
@@ -1052,6 +1075,7 @@ App.auth = (function() {
     getUser,
     getClients,
     updateClientStatus,
+    deleteClient,
     assignLocalAgent,
     assignLeadToAgent,
     saveClientFinancials,

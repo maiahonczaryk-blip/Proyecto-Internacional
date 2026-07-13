@@ -79,6 +79,43 @@ App.utils.closeModal = function() {
   }
 };
 
+/* ---- Delete Client Confirmation ---- */
+App.utils.confirmDeleteClient = function(clientId, clientName, onSuccess) {
+  App.utils.showModal({
+    title: '🗑️ Delete Client',
+    body: `
+      <p style="margin-bottom: 0.5rem; color: var(--text-primary);">
+        <span class="lang-en">Are you sure you want to delete <strong>${clientName}</strong>?</span>
+        <span class="lang-es">¿Estás seguro de que quieres eliminar a <strong>${clientName}</strong>?</span>
+      </p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem;">
+        <span class="lang-en">This action cannot be undone. All data for this client will be permanently removed.</span>
+        <span class="lang-es">Esta acción no se puede deshacer. Todos los datos de este cliente serán eliminados permanentemente.</span>
+      </p>
+    `,
+    footer: `
+      <button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">
+        <span class="lang-en">Cancel</span><span class="lang-es">Cancelar</span>
+      </button>
+      <button class="btn btn-sm" id="confirm-delete-client-btn" style="margin-left: 0.5rem; background: #ef4444; color: white; border: none;">
+        <span class="lang-en">Delete</span><span class="lang-es">Eliminar</span>
+      </button>
+    `
+  });
+
+  document.getElementById('confirm-delete-client-btn').addEventListener('click', async () => {
+    try {
+      await App.auth.deleteClient(clientId);
+      App.utils.closeModal();
+      App.utils.showToast('Client deleted successfully.', 'success');
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      console.error('[Delete] Error:', err);
+      App.utils.showToast('Error deleting client: ' + err.message, 'error');
+    }
+  });
+};
+
 /* ---- Formatting ---- */
 App.utils.formatCurrency = function(amount, currency = 'EUR') {
   return new Intl.NumberFormat('en-US', {

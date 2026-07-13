@@ -790,7 +790,8 @@
           <h4 style="margin: 0 0 0.75rem; font-size: 0.9rem; color: #374151;">Status Timeline</h4>
           ${timeline || '<p style="color: #6b7280;">No history available.</p>'}
         `,
-        footer: `<button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Close</button>`
+        footer: `<button class="btn btn-sm" onclick="App.utils.confirmDeleteClient('${clientId}', '${client.firstName} ${client.lastName}', () => App.views.admin.initClients())" style="background: #ef4444; color: white; border: none;">🗑️ Delete</button>
+          <button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Close</button>`
       });
     } catch (err) {
       console.error(err);
