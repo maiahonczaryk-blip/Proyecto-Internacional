@@ -135,12 +135,10 @@ App.utils.copyToClipboard = async function(text) {
 
 /* ---- Referral Links ---- */
 App.utils.generateReferralLink = function(referralCode) {
-  // Always point to index.html (public page) where the referral form lives,
-  // regardless of whether the user is currently on app.html or index.html
-  const origin = window.location.origin;
-  let basePath = window.location.pathname.replace(/[^/]*$/, ''); // directory only
-  if (!basePath.endsWith('/')) basePath += '/';
-  return `${origin}${basePath}index.html#referral?ref=${referralCode}`;
+  // Always use the production URL so referral links are publicly accessible
+  // (preview deployments on Vercel require authentication)
+  const prodUrl = 'https://proyecto-internacional.vercel.app';
+  return `${prodUrl}/index.html#referral?ref=${referralCode}`;
 };
 
 /* ---- Status Helpers ---- */
