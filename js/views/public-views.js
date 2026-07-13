@@ -78,27 +78,36 @@ App.views.public = {
 
   /* =============================================
      initReferralForm()
-     Public referral form. Shows contact type
-     options based on the referrer's role:
+     Public referral registration form matching
+     the "Add Client Manually" fields. Shows
+     contact type options based on referrer role:
        - realtor  → only "Cliente"
        - broker   → "Cliente" or "Realtor"
-       - agent_inmomas / admin → "Cliente", "Realtor", or "Broker"
+       - agent_inmomas / admin → all three
      ============================================= */
   initReferralForm: function() {
     const refCode = sessionStorage.getItem('referralCode');
     const welcomeMsg = document.getElementById('referral-welcome-msg');
     const typeSelector = document.getElementById('referral-type-selector');
     const typeOptions = document.getElementById('referral-type-options');
+    const clientFields = document.getElementById('referral-client-fields');
+    const professionalFields = document.getElementById('referral-professional-fields');
 
     let referrer = null;
     let selectedType = 'client'; // default
+
+    // Toggle which field sections are visible
+    function updateFieldVisibility(type) {
+      if (clientFields) clientFields.style.display = type === 'client' ? '' : 'none';
+      if (professionalFields) professionalFields.style.display = type !== 'client' ? '' : 'none';
+    }
 
     // Find the referrer and personalize the welcome message
     if (refCode && App.demoData && App.demoData.users) {
       referrer = App.demoData.users.find(u => u.referralCode === refCode);
       if (referrer && welcomeMsg) {
-        welcomeMsg.innerHTML = `<span class="lang-en">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Please fill out the form below.</span>
-                                <span class="lang-es">Has sido referido por <strong>${referrer.firstName} ${referrer.lastName}</strong>. Por favor completa el formulario.</span>`;
+        welcomeMsg.innerHTML = `<span class="lang-en">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Please fill out the form below to register.</span>
+                                <span class="lang-es">Has sido referido por <strong>${referrer.firstName} ${referrer.lastName}</strong>. Completa el formulario para registrarte.</span>`;
       }
     }
 
@@ -135,17 +144,21 @@ App.views.public = {
           </label>`;
       }).join('');
 
-      // Handle selection styling
+      // Handle selection styling + field toggling
       typeOptions.querySelectorAll('.referral-type-card').forEach(card => {
         card.addEventListener('click', function() {
           typeOptions.querySelectorAll('.referral-type-card').forEach(c => c.classList.remove('selected'));
           this.classList.add('selected');
           selectedType = this.querySelector('input').value;
+          updateFieldVisibility(selectedType);
         });
       });
     } else if (typeSelector) {
       typeSelector.style.display = 'none';
     }
+
+    // Ensure correct initial visibility
+    updateFieldVisibility(selectedType);
 
     // Form submission
     const form = document.getElementById('referral-form');
@@ -160,10 +173,8 @@ App.views.public = {
         const lastName = newForm.querySelector('#referral-lastName').value.trim();
         const email = newForm.querySelector('#referral-email').value.trim();
         const phone = newForm.querySelector('#referral-phone').value.trim();
-        const timeline = newForm.querySelector('#referral-timeline').value;
-        const reason = newForm.querySelector('#referral-reason').value.trim();
 
-        // Re-read the selected type from the cloned form's radio (if present)
+        // Re-read the selected type from the radio (if present)
         const typeRadio = document.querySelector('input[name="referral-contact-type"]:checked');
         const contactType = typeRadio ? typeRadio.value : selectedType;
 
@@ -175,19 +186,28 @@ App.views.public = {
         }
 
         if (contactType === 'client') {
-          // ---- Save as a new client ----
+          // ---- Save as a new client (same fields as Add Client Manually) ----
+          const country = newForm.querySelector('#referral-country')?.value.trim() || '';
+          const budget = newForm.querySelector('#referral-budget')?.value || '';
+          const interestArea = newForm.querySelector('#referral-interestArea')?.value || '';
+          const timeline = newForm.querySelector('#referral-timeline')?.value || '';
+          const objective = newForm.querySelector('#referral-objective')?.value || '';
+          const notes = newForm.querySelector('#referral-notes')?.value.trim() || '';
+
           const clientData = {
             id: 'client_' + Date.now(),
             firstName,
             lastName,
             email,
             phone,
+            currentLocation: country,
+            budget: budget || 'TBD',
+            interestArea,
             timeline,
-            movingReason: reason,
+            objective,
             status: 'contactado',
             createdAt: new Date().toISOString(),
-            notes: `Timeline: ${timeline} | Reason: ${reason}`,
-            budget: 'TBD',
+            notes: notes || `Objective: ${objective} | Timeline: ${timeline}`,
             source: 'referral',
           };
 
@@ -214,6 +234,10 @@ App.views.public = {
 
         } else {
           // ---- Save as a pending professional registration (realtor or broker) ----
+          const agencyName = newForm.querySelector('#referral-agencyName')?.value.trim() || '';
+          const market = newForm.querySelector('#referral-market')?.value.trim() || '';
+          const notes = newForm.querySelector('#referral-notes')?.value.trim() || '';
+
           const newUser = {
             id: contactType + '_ref_' + Date.now(),
             firstName,
@@ -224,9 +248,9 @@ App.views.public = {
             status: 'pending',
             createdAt: new Date().toISOString(),
             referralCode: `${contactType === 'broker' ? 'BRK' : 'REA'}-${lastName.toUpperCase()}`,
-            agencyName: '',
-            timeline,
-            movingReason: reason,
+            agencyName,
+            market,
+            notes,
             source: 'referral',
             referredBy: referrer ? referrer.id : null,
           };
@@ -248,7 +272,7 @@ App.views.public = {
         if (App.utils && App.utils.showToast) {
           App.utils.showToast(
             contactType === 'client'
-              ? '¡Perfil enviado con éxito! Nos pondremos en contacto contigo pronto.'
+              ? '¡Registro exitoso! Nos pondremos en contacto contigo pronto.'
               : '¡Solicitud enviada! Tu registro será revisado por el administrador.',
             'success'
           );

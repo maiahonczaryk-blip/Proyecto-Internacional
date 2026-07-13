@@ -916,13 +916,13 @@
     <!-- ==================== VIEW: REFERRAL FORM ==================== -->
     <div id="view-referral-form" class="app-view">
       <section class="auth-section" style="padding: 100px 24px; min-height: 100vh;">
-        <div class="auth-card auth-card--wide" style="max-width: 620px;">
+        <div class="auth-card auth-card--wide" style="max-width: 660px;">
           <div class="auth-header">
             <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás" class="auth-logo">
-            <h2><span class="lang-en">Contact Us</span><span class="lang-es">Contáctanos</span></h2>
+            <h2><span class="lang-en">Register</span><span class="lang-es">Regístrate</span></h2>
             <p id="referral-welcome-msg" style="color: var(--primary);">
-              <span class="lang-en">Fill out the form below and we'll get in touch with you shortly.</span>
-              <span class="lang-es">Completa el formulario y nos pondremos en contacto contigo pronto.</span>
+              <span class="lang-en">Fill out the form below to get started.</span>
+              <span class="lang-es">Completa el formulario para comenzar.</span>
             </p>
           </div>
 
@@ -937,40 +937,104 @@
           </div>
 
           <form id="referral-form" onsubmit="return false;">
+            <!-- Row 1: Name -->
             <div class="form-row">
               <div class="form-group">
                 <label><span class="lang-en">First Name</span><span class="lang-es">Nombre</span> *</label>
-                <input type="text" id="referral-firstName" required>
+                <input type="text" id="referral-firstName" required placeholder="John">
               </div>
               <div class="form-group">
                 <label><span class="lang-en">Last Name</span><span class="lang-es">Apellido</span> *</label>
-                <input type="text" id="referral-lastName" required>
+                <input type="text" id="referral-lastName" required placeholder="Smith">
               </div>
             </div>
+            <!-- Row 2: Contact -->
             <div class="form-row">
               <div class="form-group">
                 <label><span class="lang-en">Email</span><span class="lang-es">Correo Electrónico</span> *</label>
-                <input type="email" id="referral-email" required>
+                <input type="email" id="referral-email" required placeholder="john@example.com">
               </div>
               <div class="form-group">
                 <label><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span> *</label>
-                <input type="tel" id="referral-phone" required>
+                <input type="tel" id="referral-phone" required placeholder="+1 555 123 4567">
               </div>
             </div>
-            <div class="form-group">
-              <label><span class="lang-en">When are you planning to move?</span><span class="lang-es">¿Cuándo planeas mudarte?</span></label>
-              <select id="referral-timeline">
-                <option value="0-3 months"><span class="lang-en">0 – 3 months</span>0 – 3 meses</option>
-                <option value="3-6 months">3 – 6 meses</option>
-                <option value="6-12 months">6 – 12 meses</option>
-                <option value="+12 months">+12 meses</option>
-                <option value="no-date"><span class="lang-en">No specific date</span>Sin fecha definida</option>
-              </select>
+            <!-- Row 3: Country + Budget (client fields, hidden for professional registrations) -->
+            <div id="referral-client-fields">
+              <div class="form-row">
+                <div class="form-group">
+                  <label><span class="lang-en">Country</span><span class="lang-es">País</span></label>
+                  <input type="text" id="referral-country" placeholder="United States">
+                </div>
+                <div class="form-group">
+                  <label>Budget</label>
+                  <select id="referral-budget">
+                    <option value=""><span class="lang-en">Select budget range</span></option>
+                    <option value="< €150,000">< €150,000</option>
+                    <option value="€150,000 - €250,000">€150,000 - €250,000</option>
+                    <option value="€250,000 - €400,000">€250,000 - €400,000</option>
+                    <option value="€400,000 - €600,000">€400,000 - €600,000</option>
+                    <option value="> €600,000">> €600,000</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Interest Area -->
+              <div class="form-group">
+                <label><span class="lang-en">Interest Area in Spain</span><span class="lang-es">Zona de Interés en España</span></label>
+                <select id="referral-interestArea">
+                  <option value=""><span class="lang-en">Select area</span></option>
+                  <option value="Alicante City">Alicante City</option>
+                  <option value="Elche">Elche</option>
+                  <option value="Santa Pola">Santa Pola</option>
+                  <option value="Gran Alacant">Gran Alacant</option>
+                  <option value="Benidorm">Benidorm</option>
+                  <option value="Jávea">Jávea</option>
+                  <option value="Torrevieja">Torrevieja</option>
+                  <option value="Costa Blanca (General)">Costa Blanca (General)</option>
+                  <option value="Other"><span class="lang-en">Other</span><span class="lang-es">Otro</span></option>
+                </select>
+              </div>
+              <!-- Timeline + Objective -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Timeline *</label>
+                  <select id="referral-timeline" required>
+                    <option value=""><span class="lang-en">Select timeline</span></option>
+                    <option value="0-3 months">0 - 3 months</option>
+                    <option value="3-6 months">3 - 6 months</option>
+                    <option value="6-12 months">6 - 12 months</option>
+                    <option value="+1 year">+1 year</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label><span class="lang-en">Objective</span><span class="lang-es">Objetivo</span> *</label>
+                  <select id="referral-objective" required>
+                    <option value=""><span class="lang-en">Select objective</span></option>
+                    <option value="Mudarse a España"><span class="lang-en">Move to Spain</span><span class="lang-es">Mudarse a España</span></option>
+                    <option value="Invertir en España"><span class="lang-en">Invest in Spain</span><span class="lang-es">Invertir en España</span></option>
+                    <option value="Tener casa vacacional en España"><span class="lang-en">Vacation home in Spain</span><span class="lang-es">Casa vacacional en España</span></option>
+                    <option value="Retirarse en España"><span class="lang-en">Retire in Spain</span><span class="lang-es">Retirarse en España</span></option>
+                  </select>
+                </div>
+              </div>
             </div>
-            <div class="form-group">
-              <label><span class="lang-en">Why are you moving?</span><span class="lang-es">¿Por qué te mudas?</span></label>
-              <textarea id="referral-reason" rows="3" placeholder="" style="resize: vertical; width: 100%; padding: 12px 16px; border: 1px solid rgba(0,0,0,0.12); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.95rem; background: var(--bg-card); color: var(--text-primary); transition: border-color 0.2s;"></textarea>
+            <!-- Professional fields (shown when realtor/broker type is selected) -->
+            <div id="referral-professional-fields" style="display: none;">
+              <div class="form-group">
+                <label><span class="lang-en">Agency / Brokerage Name</span><span class="lang-es">Nombre de la Agencia</span></label>
+                <input type="text" id="referral-agencyName" placeholder="RE/MAX, Keller Williams...">
+              </div>
+              <div class="form-group">
+                <label><span class="lang-en">Country / Market</span><span class="lang-es">País / Mercado</span></label>
+                <input type="text" id="referral-market" placeholder="United States">
+              </div>
             </div>
+            <!-- Notes -->
+            <div class="form-group">
+              <label><span class="lang-en">Notes</span><span class="lang-es">Notas</span></label>
+              <textarea id="referral-notes" rows="3" placeholder="" style="resize: vertical; width: 100%; padding: 12px 16px; border: 1px solid rgba(0,0,0,0.12); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.95rem; background: var(--bg-card); color: var(--text-primary); transition: border-color 0.2s;"></textarea>
+            </div>
+            <!-- Submit -->
             <div class="form-group" style="margin-top: 24px;">
               <button type="submit" class="btn btn-primary" style="width: 100%;" id="referral-submit-btn">
                 <span class="lang-en">Submit</span>
