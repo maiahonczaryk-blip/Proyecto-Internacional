@@ -6,14 +6,16 @@ service cloud.firestore {
       return request.auth != null;
     }
     
-    // User profile rules: Authenticated users can read/write their own or others profiles (needed for broker/client lookups)
+    // User profile rules: Anyone can create (referral registration), authenticated users can read/update/delete
     match /users/{userId} {
-      allow read, write: if isAuthenticated();
+      allow create: if true;
+      allow read, update, delete: if isAuthenticated();
     }
     
-    // Clients rules: Authenticated users can read/write clients
+    // Clients rules: Anyone can create (referral form), authenticated users can read/update/delete
     match /clients/{clientId} {
-      allow read, write: if isAuthenticated();
+      allow create: if true;
+      allow read, update, delete: if isAuthenticated();
     }
     
     // Commissions rules: Authenticated users can read/write commissions

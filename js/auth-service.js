@@ -961,6 +961,80 @@ App.auth = (function() {
     return newClient;
   }
 
+  /* ---- Add Client via Referral (public, no auth required) ---- */
+  async function addReferralClient(clientData) {
+    const newClient = {
+      id: 'client_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+      firstName: clientData.firstName,
+      lastName: clientData.lastName,
+      email: clientData.email,
+      phone: clientData.phone || '—',
+      currentLocation: clientData.currentLocation || '—',
+      budget: clientData.budget || 'TBD',
+      interestArea: clientData.interestArea || '—',
+      timeline: clientData.timeline || '—',
+      objective: clientData.objective || '—',
+      notes: clientData.notes || '',
+      status: 'contacted',
+      referredBy: clientData.referredBy || null,
+      realtorId: clientData.realtorId || null,
+      realtorName: clientData.realtorName || null,
+      brokerId: clientData.brokerId || null,
+      localAgentId: clientData.localAgentId || null,
+      localAgentName: clientData.localAgentName || null,
+      source: 'referral',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      statusHistory: [{
+        status: 'contacted',
+        date: new Date().toISOString(),
+        note: 'Registered via referral link'
+      }]
+    };
+
+    if (App.demoMode) {
+      if (!App.demoData.clients) App.demoData.clients = [];
+      App.demoData.clients.push(newClient);
+      saveDemoData();
+    } else {
+      await App.db.collection('clients').doc(newClient.id).set(newClient);
+    }
+
+    return newClient;
+  }
+
+  /* ---- Add Professional via Referral (public, no auth required) ---- */
+  async function addReferralUser(userData) {
+    const newUser = {
+      id: userData.role + '_ref_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      email: userData.email,
+      phone: userData.phone || '—',
+      role: userData.role, // 'realtor' or 'broker'
+      status: 'pending',
+      agencyName: userData.agencyName || '',
+      market: userData.market || '',
+      notes: userData.notes || '',
+      referralCode: `${userData.role === 'broker' ? 'BRK' : 'REA'}-${(userData.lastName || 'USER').toUpperCase()}`,
+      source: 'referral',
+      referredBy: userData.referredBy || null,
+      brokerId: userData.brokerId || null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    if (App.demoMode) {
+      if (!App.demoData.users) App.demoData.users = [];
+      App.demoData.users.push(newUser);
+      saveDemoData();
+    } else {
+      await App.db.collection('users').doc(newUser.id).set(newUser);
+    }
+
+    return newUser;
+  }
+
   /* ---- Public API ---- */
   return {
     init,
@@ -989,6 +1063,8 @@ App.auth = (function() {
     getDossierLeads,
     loginWithGoogle,
     registerWithGoogle,
-    addClientManually
+    addClientManually,
+    addReferralClient,
+    addReferralUser
   };
 })();

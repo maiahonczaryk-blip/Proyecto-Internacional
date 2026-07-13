@@ -186,104 +186,91 @@ App.views.public = {
           return;
         }
 
-        if (contactType === 'client') {
-          // ---- Save as a new client (same fields as Add Client Manually) ----
-          const country = newForm.querySelector('#referral-country')?.value.trim() || '';
-          const budget = newForm.querySelector('#referral-budget')?.value || '';
-          const interestArea = newForm.querySelector('#referral-interestArea')?.value || '';
-          const timeline = newForm.querySelector('#referral-timeline')?.value || '';
-          const objective = newForm.querySelector('#referral-objective')?.value || '';
-          const notes = newForm.querySelector('#referral-notes')?.value.trim() || '';
+        try {
+          if (contactType === 'client') {
+            // ---- Save as a new client via auth-service (Firestore or demo) ----
+            const country = newForm.querySelector('#referral-country')?.value.trim() || '';
+            const budget = newForm.querySelector('#referral-budget')?.value || '';
+            const interestArea = newForm.querySelector('#referral-interestArea')?.value || '';
+            const timeline = newForm.querySelector('#referral-timeline')?.value || '';
+            const objective = newForm.querySelector('#referral-objective')?.value || '';
+            const notes = newForm.querySelector('#referral-notes')?.value.trim() || '';
 
-          const clientData = {
-            id: 'client_' + Date.now(),
-            firstName,
-            lastName,
-            email,
-            phone,
-            currentLocation: country,
-            budget: budget || 'TBD',
-            interestArea,
-            timeline,
-            objective,
-            status: 'contacted',
-            createdAt: new Date().toISOString(),
-            statusHistory: [{ status: 'contacted', date: new Date().toISOString(), note: 'Registered via referral link' }],
-            notes: notes || `Objective: ${objective} | Timeline: ${timeline}`,
-            source: 'referral',
-          };
+            const clientPayload = {
+              firstName,
+              lastName,
+              email,
+              phone,
+              currentLocation: country,
+              budget,
+              interestArea,
+              timeline,
+              objective,
+              notes: notes || `Objective: ${objective} | Timeline: ${timeline}`,
+            };
 
-          if (referrer) {
-            clientData.referredBy = referrer.id;
-            if (referrer.role === 'broker') {
-              clientData.brokerId = referrer.id;
-            } else if (referrer.role === 'agent_inmomas') {
-              clientData.localAgentId = referrer.id;
-              clientData.localAgentName = `${referrer.firstName} ${referrer.lastName}`;
-            } else if (referrer.role === 'admin') {
-              clientData.brokerId = null;
-              clientData.localAgentId = null;
-            } else {
-              // realtor
-              clientData.realtorId = referrer.id;
-              clientData.realtorName = `${referrer.firstName} ${referrer.lastName}`;
-              clientData.brokerId = referrer.brokerId || null;
+            if (referrer) {
+              clientPayload.referredBy = referrer.id;
+              if (referrer.role === 'broker') {
+                clientPayload.brokerId = referrer.id;
+              } else if (referrer.role === 'agent_inmomas') {
+                clientPayload.localAgentId = referrer.id;
+                clientPayload.localAgentName = `${referrer.firstName} ${referrer.lastName}`;
+              } else if (referrer.role === 'admin') {
+                // Admin referral — no specific assignment
+              } else {
+                // realtor
+                clientPayload.realtorId = referrer.id;
+                clientPayload.realtorName = `${referrer.firstName} ${referrer.lastName}`;
+                clientPayload.brokerId = referrer.brokerId || null;
+              }
             }
+
+            await App.auth.addReferralClient(clientPayload);
+
+          } else {
+            // ---- Save as a pending professional registration via auth-service ----
+            const agencyName = newForm.querySelector('#referral-agencyName')?.value.trim() || '';
+            const market = newForm.querySelector('#referral-market')?.value.trim() || '';
+            const notes = newForm.querySelector('#referral-notes')?.value.trim() || '';
+
+            const userPayload = {
+              firstName,
+              lastName,
+              email,
+              phone,
+              role: contactType,
+              agencyName,
+              market,
+              notes,
+              referredBy: referrer ? referrer.id : null,
+              brokerId: (referrer && referrer.role === 'broker') ? referrer.id : null,
+            };
+
+            await App.auth.addReferralUser(userPayload);
           }
 
-          if (!App.demoData.clients) App.demoData.clients = [];
-          App.demoData.clients.push(clientData);
-
-        } else {
-          // ---- Save as a pending professional registration (realtor or broker) ----
-          const agencyName = newForm.querySelector('#referral-agencyName')?.value.trim() || '';
-          const market = newForm.querySelector('#referral-market')?.value.trim() || '';
-          const notes = newForm.querySelector('#referral-notes')?.value.trim() || '';
-
-          const newUser = {
-            id: contactType + '_ref_' + Date.now(),
-            firstName,
-            lastName,
-            email,
-            phone,
-            role: contactType, // 'realtor' or 'broker'
-            status: 'pending',
-            createdAt: new Date().toISOString(),
-            referralCode: `${contactType === 'broker' ? 'BRK' : 'REA'}-${lastName.toUpperCase()}`,
-            agencyName,
-            market,
-            notes,
-            source: 'referral',
-            referredBy: referrer ? referrer.id : null,
-          };
-
-          if (referrer && referrer.role === 'broker') {
-            newUser.brokerId = referrer.id;
+          // Success feedback
+          if (App.utils && App.utils.showToast) {
+            App.utils.showToast(
+              contactType === 'client'
+                ? '¡Registro exitoso! Nos pondremos en contacto contigo pronto.'
+                : '¡Solicitud enviada! Tu registro será revisado por el administrador.',
+              'success'
+            );
           }
 
-          if (!App.demoData.users) App.demoData.users = [];
-          App.demoData.users.push(newUser);
-        }
+          // Clear referral code and redirect
+          sessionStorage.removeItem('referralCode');
+          newForm.reset();
+          setTimeout(() => App.router.navigateTo('home'), 1500);
 
-        // Persist
-        if (App.auth && typeof App.auth.saveDemoData === 'function') {
-          App.auth.saveDemoData();
+        } catch (err) {
+          console.error('[Referral] Error submitting form:', err);
+          if (App.utils && App.utils.showToast) {
+            App.utils.showToast('Error al enviar el formulario. Intenta de nuevo.', 'error');
+          }
         }
-
-        // Success feedback
-        if (App.utils && App.utils.showToast) {
-          App.utils.showToast(
-            contactType === 'client'
-              ? '¡Registro exitoso! Nos pondremos en contacto contigo pronto.'
-              : '¡Solicitud enviada! Tu registro será revisado por el administrador.',
-            'success'
-          );
-        }
-
-        // Clear referral code and redirect
-        sessionStorage.removeItem('referralCode');
-        newForm.reset();
-        setTimeout(() => App.router.navigateTo('home'), 1500);
       });
     }
   }
