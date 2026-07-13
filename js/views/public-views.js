@@ -103,8 +103,10 @@ App.views.public = {
       if (pf) pf.style.display = type !== 'client' ? '' : 'none';
     }
 
-    // Find the referrer: first try Firestore, fallback to demoData
+    // Find the referrer: try Firestore first, then always fallback to demoData
     if (refCode) {
+      console.log('[Referral] Looking up referrer with code:', refCode);
+
       // Try Firestore query (works when Firebase is active)
       if (!App.demoMode && App.db) {
         try {
@@ -115,14 +117,23 @@ App.views.public = {
           if (!snapshot.empty) {
             const doc = snapshot.docs[0];
             referrer = { id: doc.id, ...doc.data() };
+            console.log('[Referral] Found referrer in Firestore:', referrer.firstName, referrer.lastName, '(' + referrer.role + ')');
+          } else {
+            console.log('[Referral] No user found in Firestore with referralCode:', refCode);
           }
         } catch (err) {
-          console.warn('[Referral] Firestore lookup failed, falling back to demoData:', err);
+          console.warn('[Referral] Firestore lookup failed:', err);
         }
       }
-      // Fallback to demoData (demo mode or Firestore failed)
+
+      // Always fallback to demoData (mock users are always loaded in memory)
       if (!referrer && App.demoData && App.demoData.users) {
         referrer = App.demoData.users.find(u => u.referralCode === refCode);
+        if (referrer) {
+          console.log('[Referral] Found referrer in demoData:', referrer.firstName, referrer.lastName, '(' + referrer.role + ')');
+        } else {
+          console.log('[Referral] No referrer found in demoData either. Available codes:', App.demoData.users.map(u => u.referralCode).filter(Boolean));
+        }
       }
 
       if (referrer && welcomeMsg) {

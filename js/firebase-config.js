@@ -208,6 +208,7 @@ App.demoData = {
       agencyName: 'RE/MAX Inmomás',
       phone: '+34 965 999 111',
       country: 'Spain',
+      referralCode: 'LOC-GARCÍA',
       profileImage: null,
       createdAt: '2025-01-20T10:00:00Z'
     },
@@ -222,6 +223,7 @@ App.demoData = {
       agencyName: 'RE/MAX Inmomás',
       phone: '+34 965 999 222',
       country: 'Spain',
+      referralCode: 'LOC-MARTÍNEZ',
       profileImage: null,
       createdAt: '2025-02-01T10:00:00Z'
     }
