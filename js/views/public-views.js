@@ -35,10 +35,11 @@ App.views.public = {
           currentLocation: newForm.querySelector('#intake-currentLocation').value,
           targetLocation: newForm.querySelector('#intake-targetLocation').value,
           services: services,
-          status: 'contactado', // Default kanban status
+          status: 'contacted',
           createdAt: new Date().toISOString(),
+          statusHistory: [{ status: 'contacted', date: new Date().toISOString(), note: 'Registered via referral link' }],
           notes: `Services requested: ${services.join(', ')}`,
-          budget: 'TBD', // Placeholder
+          budget: 'TBD'
         };
 
         // Find the referrer and assign
@@ -205,8 +206,9 @@ App.views.public = {
             interestArea,
             timeline,
             objective,
-            status: 'contactado',
+            status: 'contacted',
             createdAt: new Date().toISOString(),
+            statusHistory: [{ status: 'contacted', date: new Date().toISOString(), note: 'Registered via referral link' }],
             notes: notes || `Objective: ${objective} | Timeline: ${timeline}`,
             source: 'referral',
           };
