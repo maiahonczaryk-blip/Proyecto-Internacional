@@ -175,7 +175,7 @@ App.utils.generateReferralLink = function(referralCode) {
   // Always use the production URL so referral links are publicly accessible
   // (preview deployments on Vercel require authentication)
   const prodUrl = 'https://proyecto-internacional.vercel.app';
-  return `${prodUrl}/index.html#referral?ref=${referralCode}`;
+  return `${prodUrl}/index.html#referral?ref=${encodeURIComponent(referralCode)}`;
 };
 
 /* ---- Status Helpers ---- */
