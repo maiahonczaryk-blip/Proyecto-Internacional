@@ -388,6 +388,24 @@ body.lang-es .lang-en { display: none; }
   background: var(--bg-primary);
 }
 
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.hero-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: heroZoom 25s ease-in-out infinite alternate;
+}
+
+@keyframes heroZoom {
+  from { transform: scale(1); }
+  to   { transform: scale(1.08); }
+}
+
 .hero-split {
   display: flex;
   width: 100%;
@@ -2178,6 +2196,48 @@ body.lang-es .lang-en { display: none; }
     --section-padding: 64px 0;
   }
 
+  /* Centered logo navbar on mobile */
+  .navbar .container {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    position: relative;
+    height: 64px;
+  }
+
+  .nav-logo {
+    display: flex !important;
+    justify-content: center !important;
+    margin: 0 auto !important;
+  }
+
+  .nav-logo img {
+    height: 38px;
+    width: auto;
+  }
+
+  .nav-right {
+    position: static !important;
+    display: block !important;
+  }
+
+  .lang-toggle {
+    position: absolute !important;
+    left: 16px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+  }
+
+  .mobile-menu-btn {
+    position: absolute !important;
+    right: 16px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+    display: block !important;
+  }
+
   .nav-links {
     display: none;
     position: absolute;
@@ -2196,25 +2256,77 @@ body.lang-es .lang-en { display: none; }
     display: flex;
   }
 
-  .mobile-menu-btn {
-    display: block;
+  /* Center the image and put text below it on mobile */
+  .hero {
+    flex-direction: column !important;
+    padding-top: 80px !important;
+    min-height: auto !important;
+    text-align: center !important;
   }
 
-  .lang-toggle {
-    margin-left: 0;
-    margin-top: 8px;
+  .hero-bg {
+    position: relative !important;
+    width: 100% !important;
+    height: 260px !important;
+    z-index: 2 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-bottom: 24px !important;
+    overflow: hidden;
+    border-radius: var(--radius-md) !important;
+    padding: 0 16px !important;
+    box-sizing: border-box !important;
+  }
+
+  .hero-bg img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: var(--radius-md) !important;
+    animation: none !important;
+  }
+
+  .hero-content {
+    max-width: 100% !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+  }
+
+  .hero-badge {
+    justify-content: center !important;
+    margin-bottom: 20px !important;
   }
 
   .hero-title {
     font-size: 2.1rem;
+    text-align: center !important;
+  }
+
+  .hero-subtitle {
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 
   .hero-stats {
     gap: 28px;
+    justify-content: center !important;
+  }
+
+  .hero-stat {
+    text-align: center !important;
+    padding-left: 0 !important;
+  }
+
+  .hero-stat::before {
+    display: none !important;
   }
 
   .hero-ctas {
     flex-direction: column;
+    justify-content: center !important;
+    align-items: center !important;
   }
 
   .hero-ctas .btn {
@@ -2589,26 +2701,10 @@ body.lang-es .lang-en { display: none; }
 }
 
 @media (max-width: 768px) {
-  .nav-right { gap: 4px; }
   .trust-divider { display: none; }
   .trust-logos { flex-direction: column; gap: 16px; text-align: center; }
   .trust-item { flex-direction: column; gap: 2px; }
   .empathy-grid { grid-template-columns: 1fr; }
-  .nav-links {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    flex-direction: column;
-    background: rgba(10, 22, 40, 0.98);
-    backdrop-filter: blur(12px);
-    padding: 24px;
-    gap: 16px;
-    border-bottom: 1px solid var(--border-subtle);
-  }
-  .nav-links.active { display: flex; }
-  .mobile-menu-btn { display: block; }
 }
 
 
