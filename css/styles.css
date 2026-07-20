@@ -1672,6 +1672,11 @@ body.lang-es .lang-en { display: none; }
   background: var(--gold);
 }
 
+.team-card.smbiotica::before {
+  background: #F5C400;
+}
+
+
 .team-card .team-logo {
   height: 36px;
   width: auto;
