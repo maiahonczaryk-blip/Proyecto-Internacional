@@ -2669,9 +2669,17 @@ body.lang-es .lang-en { display: none; }
   transition: padding-left var(--transition-smooth);
 }
 
+/* Desktop: content shifted right to make room for permanent sidebar */
 @media (min-width: 992px) {
   .app-main.has-sidebar {
     padding-left: var(--sidebar-width);
+  }
+}
+
+/* Mobile: content is never shifted — sidebar is overlay only */
+@media (max-width: 991px) {
+  .app-main {
+    padding-left: 0 !important;
   }
 }
 
@@ -3069,16 +3077,22 @@ body.lang-es .lang-en { display: none; }
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-right: 1px solid rgba(255, 255, 255, 0.06);
+  /* Always hidden by default — JS adds .active to show */
   transform: translateX(-100%);
 }
 
-.dashboard-sidebar.active {
-  transform: translateX(0);
-}
-
+/* Desktop: sidebar is permanently visible when .active */
 @media (min-width: 992px) {
   .dashboard-sidebar.active {
     transform: translateX(0);
+  }
+}
+
+/* Mobile: sidebar slides in as overlay; .active = open */
+@media (max-width: 991px) {
+  .dashboard-sidebar.active {
+    transform: translateX(0);
+    box-shadow: 4px 0 32px rgba(0,0,0,0.4);
   }
 }
 
@@ -4512,42 +4526,68 @@ body.lang-es .lang-en { display: none; }
 /* ------------------------------------------
    SECTION 16: Sidebar Mobile Toggle
    ------------------------------------------ */
+/* Base sidebar toggle: shown only on mobile via @media below */
 .sidebar-toggle {
-  display: none;
+  display: none; /* overridden to flex by @media (max-width: 991px) */
   position: fixed;
   top: 16px;
   left: 16px;
-  z-index: 200;
+  z-index: 1001; /* above sidebar z-index: 1000 so it stays clickable */
   width: 44px;
   height: 44px;
   border-radius: 12px;
   border: none;
-  background: var(--bg-card);
+  background: var(--sidebar-bg);
   box-shadow: var(--shadow-md);
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
-  color: var(--text-primary);
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px;
   transition: background var(--transition-fast);
 }
 
-.sidebar-toggle:hover {
-  background: var(--bg-secondary);
+.sidebar-toggle span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background-color: #fff;
+  border-radius: 2px;
+  transition: all 0.25s ease;
 }
 
+.sidebar-toggle:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* Base sidebar backdrop: hidden; shown on mobile via @media + .active */
 .sidebar-backdrop {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.5);
-  z-index: 99;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 999;
   opacity: 0;
   transition: opacity var(--transition-smooth);
+  pointer-events: none;
 }
 
 .sidebar-backdrop.active {
   opacity: 1;
+  pointer-events: all;
+}
+
+/* On desktop: hide mobile-only controls */
+@media (min-width: 992px) {
+  .sidebar-toggle {
+    display: none !important;
+  }
+  .sidebar-backdrop,
+  .sidebar-backdrop.active {
+    display: none !important;
+    pointer-events: none !important;
+  }
 }
 
 /* ------------------------------------------
@@ -4703,30 +4743,34 @@ body.lang-es .lang-en { display: none; }
   }
 }
 
-/* Medium: <= 992px — Sidebar collapses */
-@media (max-width: 992px) {
+/* Medium: <= 991px — Sidebar becomes overlay */
+@media (max-width: 991px) {
+  /* Hamburger always visible */
   .sidebar-toggle {
-    display: flex;
+    display: flex !important;
   }
 
+  /* Sidebar hidden behind left edge; .active slides it in */
   .dashboard-sidebar {
-    transform: translateX(-100%);
-    z-index: 150;
+    z-index: 1000;
   }
 
-  .dashboard-sidebar.open {
-    transform: translateX(0);
-    box-shadow: var(--shadow-xl);
-  }
-
+  /* Backdrop visible when sidebar open */
   .sidebar-backdrop {
     display: block;
   }
 
+  /* No left margin on mobile — sidebar is overlay */
   .dashboard-main {
     margin-left: 0;
   }
 
+  /* Give content top padding for the hamburger button */
+  .dashboard-content {
+    padding-top: 72px;
+  }
+
+  /* Shift header right to avoid hamburger overlap */
   .dashboard-header {
     padding: 16px 20px;
     padding-left: 68px;
@@ -4735,6 +4779,11 @@ body.lang-es .lang-en { display: none; }
   .referral-stats {
     flex-wrap: wrap;
     gap: 16px;
+  }
+
+  /* Override any inline grid-template-columns on stat grids */
+  .stat-cards-grid[style*="grid-template-columns"] {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 }
 
@@ -4834,8 +4883,10 @@ body.lang-es .lang-en { display: none; }
 
 /* Extra Small: <= 480px */
 @media (max-width: 480px) {
-  .stat-cards-grid {
-    grid-template-columns: 1fr;
+  /* Force single column even with inline styles */
+  .stat-cards-grid,
+  .stat-cards-grid[style*="grid-template-columns"] {
+    grid-template-columns: 1fr 1fr !important;
   }
 
   .role-selector {
@@ -4863,50 +4914,24 @@ body.lang-es .lang-en { display: none; }
     width: 100%;
     justify-content: center;
   }
-}
 
-/* ---- Sidebar Backdrop (Mobile) ---- */
-.sidebar-backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 990;
-  backdrop-filter: blur(4px);
-  opacity: 0;
-  transition: opacity var(--transition-smooth);
-}
-.sidebar-backdrop.active {
-  display: block;
-  opacity: 1;
-}
-@media (min-width: 992px) {
-  .sidebar-backdrop, .sidebar-backdrop.active {
-    display: none !important;
+  /* Referral link: stack vertically on very small screens */
+  .referral-quick [style*="display: flex"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .referral-quick [style*="display: flex"] button {
+    width: 100% !important;
+    white-space: normal !important;
+  }
+
+  /* Dashboard grid: single column */
+  .dashboard-grid-2col {
+    grid-template-columns: 1fr !important;
   }
 }
 
-/* Sidebar Toggle Button icon styling */
-.sidebar-toggle {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.sidebar-toggle span {
-  width: 24px;
-  height: 2px;
-  background-color: var(--text-primary);
-  border-radius: 2px;
-}
-@media (min-width: 992px) {
-  .sidebar-toggle {
-    display: none !important;
-  }
-}
+/* (sidebar-backdrop styles are defined in Section 16 above) */
 
 .sidebar-logout-btn {
   background: none;

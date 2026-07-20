@@ -85,8 +85,7 @@ App.router = (function() {
           
           // On mobile, close sidebar after navigation
           if (window.innerWidth < 992) {
-            document.getElementById('dashboard-sidebar')?.classList.remove('active');
-            document.getElementById('sidebar-backdrop')?.classList.remove('active');
+            closeMobileSidebar();
           }
         }
       }
@@ -97,14 +96,19 @@ App.router = (function() {
     const sidebarBackdrop = document.getElementById('sidebar-backdrop');
     if (sidebarToggle) {
       sidebarToggle.addEventListener('click', () => {
-        document.getElementById('dashboard-sidebar')?.classList.toggle('active');
-        sidebarBackdrop?.classList.toggle('active');
+        const sidebar = document.getElementById('dashboard-sidebar');
+        const isOpen = sidebar?.classList.contains('active');
+        if (isOpen) {
+          closeMobileSidebar();
+        } else {
+          sidebar?.classList.add('active');
+          sidebarBackdrop?.classList.add('active');
+        }
       });
     }
     if (sidebarBackdrop) {
       sidebarBackdrop.addEventListener('click', () => {
-        document.getElementById('dashboard-sidebar')?.classList.remove('active');
-        sidebarBackdrop.classList.remove('active');
+        closeMobileSidebar();
       });
     }
 
@@ -221,7 +225,14 @@ App.router = (function() {
     if (!sidebar || !appMain) return;
 
     if (sidebarType) {
-      sidebar.classList.add('active');
+      // On desktop (>=992px): sidebar is permanently visible when a dashboard route is active.
+      // On mobile (<992px): sidebar starts closed — user opens it via the hamburger button.
+      if (window.innerWidth >= 992) {
+        sidebar.classList.add('active');
+      } else {
+        // Ensure sidebar is closed when navigating on mobile
+        closeMobileSidebar();
+      }
       appMain.classList.add('has-sidebar');
 
       // Show correct sidebar nav for role
@@ -256,11 +267,23 @@ App.router = (function() {
   function updateNavbar(sidebarType) {
     const publicNav = document.getElementById('public-nav');
     const dashNav = document.getElementById('dashboard-nav');
-    const sidebarToggle = document.getElementById('mobile-sidebar-toggle');
+    // NOTE: sidebar toggle visibility is now handled by CSS media query only
+    // We only need to toggle the data-has-sidebar attribute for context
+    const appMain = document.getElementById('app-main');
 
     if (publicNav) publicNav.style.display = sidebarType ? 'none' : '';
     if (dashNav) dashNav.style.display = sidebarType ? 'flex' : 'none';
-    if (sidebarToggle) sidebarToggle.style.display = sidebarType ? 'block' : 'none';
+
+    // On mobile, always close the sidebar when switching routes
+    if (window.innerWidth < 992) {
+      closeMobileSidebar();
+    }
+  }
+
+  /* ---- Close Mobile Sidebar ---- */
+  function closeMobileSidebar() {
+    document.getElementById('dashboard-sidebar')?.classList.remove('active');
+    document.getElementById('sidebar-backdrop')?.classList.remove('active');
   }
 
   /* ---- Update Active Sidebar Link ---- */
