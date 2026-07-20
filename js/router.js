@@ -23,7 +23,7 @@ App.router = (function() {
     'referral':       { view: 'view-referral-form',   role: null,      sidebar: false, title: 'Referral Form' },
 
     // Profile route
-    'profile':        { view: 'view-profile',        role: null,      sidebar: null,  title: 'My Profile' },
+    'profile':        { view: 'view-profile',        role: 'authenticated', sidebar: 'user',  title: 'My Profile' },
 
     // Admin routes
     'admin/dashboard': { view: 'view-admin-dashboard', role: 'admin',  sidebar: 'admin', title: 'Admin Dashboard' },
@@ -171,7 +171,7 @@ App.router = (function() {
         window.location.href = 'index.html#login';
         return;
       }
-      if (user.role !== route.role) {
+      if (route.role !== 'authenticated' && user.role !== route.role) {
         // Redirect to appropriate dashboard
         navigateTo(user.role + '/dashboard', true);
         return;
@@ -236,8 +236,13 @@ App.router = (function() {
       appMain.classList.add('has-sidebar');
 
       // Show correct sidebar nav for role
-      document.querySelectorAll('.sidebar-nav-group').forEach(g => g.style.display = 'none');
-      const roleNav = document.getElementById(`sidebar-${sidebarType}`);
+      document.querySelectorAll('.sidebar-nav').forEach(g => g.style.display = 'none');
+      let targetNavId = `sidebar-${sidebarType}`;
+      if (sidebarType === 'user') {
+        const user = App.auth.getCurrentUser();
+        if (user) targetNavId = `sidebar-${user.role}`;
+      }
+      const roleNav = document.getElementById(targetNavId);
       if (roleNav) roleNav.style.display = 'block';
 
       // Update sidebar user info

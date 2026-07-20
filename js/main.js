@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Mobile Menu Toggle ──
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-  const navLinks = document.getElementById('nav-links');
+  const navLinks = document.getElementById('public-nav');
 
   if (mobileMenuBtn && navLinks) {
     mobileMenuBtn.addEventListener('click', () => {
