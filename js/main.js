@@ -5,29 +5,74 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  // ── Language Toggle ──
-  const langToggles = document.querySelectorAll('.lang-toggle');
+  // ── Language Selector (4 idiomas: EN, ES, FR, FR-CA) ──
   const body = document.body;
   let currentLang = 'en';
 
-  langToggles.forEach(toggle => {
-    toggle.addEventListener('click', () => {
-      currentLang = currentLang === 'en' ? 'es' : 'en';
-      body.classList.remove('lang-en', 'lang-es');
-      body.classList.add('lang-' + currentLang);
-      
-      langToggles.forEach(t => {
-        const label = t.querySelector('.lang-label');
-        if (label) label.textContent = currentLang === 'en' ? 'ES' : 'EN';
-      });
+  const langConfig = {
+    en:    { flag: '🇺🇸', code: 'EN' },
+    es:    { flag: '🇪🇸', code: 'ES' },
+    fr:    { flag: '🇫🇷', code: 'FR' },
+    'fr-ca': { flag: '🇨🇦', code: 'FR' }
+  };
 
-      // Update html lang attribute
-      document.documentElement.lang = currentLang;
-      
-      // Update form placeholders
-      updateFormPlaceholders(currentLang);
+  const langSelectorWrapper = document.getElementById('lang-selector-wrapper');
+  const langSelectorBtn = document.getElementById('lang-selector-btn');
+  const langFlag = document.getElementById('lang-flag');
+  const langCode = document.getElementById('lang-code');
+  const langDropdown = document.getElementById('lang-dropdown');
+  const langDropdownItems = document.querySelectorAll('.lang-dropdown-item');
+
+  function setLang(lang) {
+    if (!langConfig[lang]) return;
+    currentLang = lang;
+
+    // Update body class
+    body.classList.remove('lang-en', 'lang-es', 'lang-fr', 'lang-fr-ca');
+    body.classList.add('lang-' + lang);
+
+    // Update html lang attribute
+    const htmlLangMap = { en: 'en', es: 'es', fr: 'fr', 'fr-ca': 'fr-CA' };
+    document.documentElement.lang = htmlLangMap[lang];
+
+    // Update button appearance
+    if (langFlag) langFlag.textContent = langConfig[lang].flag;
+    if (langCode) langCode.textContent = langConfig[lang].code;
+
+    // Update active state on dropdown items
+    langDropdownItems.forEach(item => {
+      item.classList.toggle('active', item.dataset.lang === lang);
+    });
+
+    // Update form placeholders
+    updateFormPlaceholders(lang);
+  }
+
+  // Toggle dropdown open/close
+  if (langSelectorBtn) {
+    langSelectorBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      langSelectorWrapper.classList.toggle('open');
+    });
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (langSelectorWrapper && !langSelectorWrapper.contains(e.target)) {
+      langSelectorWrapper.classList.remove('open');
+    }
+  });
+
+  // Language option click
+  langDropdownItems.forEach(item => {
+    item.addEventListener('click', () => {
+      setLang(item.dataset.lang);
+      langSelectorWrapper.classList.remove('open');
     });
   });
+
+  // Initialize with English
+  setLang('en');
 
   function updateFormPlaceholders(lang) {
     const placeholders = {
@@ -42,6 +87,18 @@ document.addEventListener('DOMContentLoaded', () => {
         'last-name': 'García',
         'email': 'maria@ejemplo.com',
         'phone': '+34 600 123 456'
+      },
+      fr: {
+        'first-name': 'Jean',
+        'last-name': 'Dupont',
+        'email': 'jean@exemple.fr',
+        'phone': '+33 6 12 34 56 78'
+      },
+      'fr-ca': {
+        'first-name': 'Jean',
+        'last-name': 'Tremblay',
+        'email': 'jean@exemple.ca',
+        'phone': '+1 (514) 555-1234'
       }
     };
     Object.entries(placeholders[lang] || {}).forEach(([id, placeholder]) => {
@@ -175,16 +232,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
       setTimeout(() => {
         submitBtn.classList.remove('loading');
-        submitBtn.classList.add('success');
-        submitBtn.innerHTML = currentLang === 'en' 
-          ? '✓ Registered Successfully' 
-          : '✓ Registrado con Éxito';
+        const successMsgs = {
+          en: '✓ Registered Successfully',
+          es: '✓ Registrado con Éxito',
+          fr: '✓ Inscription réussie',
+          'fr-ca': '✓ Inscription réussie'
+        };
+        const detailMsgs = {
+          en: '🎉 Check your email for webinar details and your free guide!',
+          es: '🎉 ¡Revisa tu email para los detalles del webinar y tu guía gratuita!',
+          fr: '🎉 Consultez votre e-mail pour les détails du webinaire et votre guide gratuit !',
+          'fr-ca': '🎉 Vérifiez votre courriel pour les détails du webinaire et votre guide gratuit !'
+        };
+        submitBtn.innerHTML = successMsgs[currentLang] || successMsgs['en'];
 
         const msg = document.createElement('p');
         msg.className = 'form-success-msg';
-        msg.textContent = currentLang === 'en'
-          ? '🎉 Check your email for webinar details and your free guide!'
-          : '🎉 ¡Revisa tu email para los detalles del webinar y tu guía gratuita!';
+        msg.textContent = detailMsgs[currentLang] || detailMsgs['en'];
         form.parentNode.appendChild(msg);
 
         console.log('Registration:', data);
@@ -312,7 +376,6 @@ document.addEventListener('DOMContentLoaded', () => {
       7: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
       8: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>'
     };
-    
     const stepDetails = {
       1: {
         en: {
@@ -320,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
           desc: "The NIE (Foreigner Identity Number) is essential for buying property, opening bank accounts, or contracting utility services in Spain. Our partner law firm handles the entire application process with the immigration office or consulate, saving you any travel.",
           highlights: [
             { icon: "⏱", text: "1–2 weeks" },
-            { icon: "🏛", text: "Fuster & Associates" },
+            { icon: "🏰", text: "Fuster & Associates" },
             { icon: "🌐", text: "100% remote" }
           ]
         },
@@ -329,8 +392,26 @@ document.addEventListener('DOMContentLoaded', () => {
           desc: "El NIE (Número de Identidad de Extranjero) es imprescindible para comprar cualquier propiedad, abrir cuentas bancarias o contratar servicios en España. Nuestro despacho asociado se encarga de toda la gestión ante la oficina de extranjería o consulado correspondiente, evitándote desplazamientos.",
           highlights: [
             { icon: "⏱", text: "1–2 semanas" },
-            { icon: "🏛", text: "Fuster & Associates" },
+            { icon: "🏰", text: "Fuster & Associates" },
             { icon: "🌐", text: "100% remoto" }
+          ]
+        },
+        fr: {
+          title: "Obtenir votre NIE",
+          desc: "Le NIE (Numéro d'identité des étrangers) est indispensable pour acheter un bien immobilier, ouvrir un compte bancaire ou souscrire à des services en Espagne. Notre cabinet juridique partenaire gère l'ensemble de la procédure auprès du bureau de l'immigration ou du consulat.",
+          highlights: [
+            { icon: "⏱", text: "1–2 semaines" },
+            { icon: "🏰", text: "Fuster & Associates" },
+            { icon: "🌐", text: "100% à distance" }
+          ]
+        },
+        'fr-ca': {
+          title: "Obtenir votre NIE",
+          desc: "Le NIE (Numéro d'identité des étrangers) est indispensable pour acheter une propriété, ouvrir un compte bancaire ou souscrire à des services en Espagne. Notre cabinet juridique partenaire gère l'ensemble de la démarche auprès du bureau de l'immigration ou du consulat, sans que vous ayez à vous déplacer.",
+          highlights: [
+            { icon: "⏱", text: "1–2 semaines" },
+            { icon: "🏰", text: "Fuster & Associates" },
+            { icon: "🌐", text: "100% à distance" }
           ]
         }
       },
@@ -352,6 +433,24 @@ document.addEventListener('DOMContentLoaded', () => {
             { icon: "📱", text: "Apertura remota" },
             { icon: "✅", text: "Sin desplazamiento" }
           ]
+        },
+        fr: {
+          title: "Ouvrir un Compte Bancaire",
+          desc: "Vous aurez besoin d'un compte bancaire espagnol pour transférer les fonds d'achat et domicilier vos futures factures et impôts. Nous vous aidons à ouvrir un compte rapidement et à distance via nos partenaires bancaires et hypothécaires.",
+          highlights: [
+            { icon: "🏦", text: "Partenaire Banco UCI" },
+            { icon: "📱", text: "Ouverture à distance" },
+            { icon: "✅", text: "Sans déplacement" }
+          ]
+        },
+        'fr-ca': {
+          title: "Ouvrir un Compte Bancaire",
+          desc: "Vous aurez besoin d'un compte bancaire espagnol pour transférer les fonds d'achat et mettre en place les prélèvements automatiques pour vos futures factures et impôts. Nous vous accompagnons pour ouvrir votre compte rapidement et à distance via nos partenaires bancaires.",
+          highlights: [
+            { icon: "🏦", text: "Partenaire Banco UCI" },
+            { icon: "📱", text: "Ouverture à distance" },
+            { icon: "✅", text: "Sans déplacement" }
+          ]
         }
       },
       3: {
@@ -371,6 +470,24 @@ document.addEventListener('DOMContentLoaded', () => {
             { icon: "📊", text: "Plan personalizado" },
             { icon: "💰", text: "Optimización fiscal" },
             { icon: "🏖", text: "Inversión o vacaciones" }
+          ]
+        },
+        fr: {
+          title: "Définir votre Stratégie",
+          desc: "Nous analysons vos objectifs : investissement à haut rendement ou résidence de vacances. Nous élaborons un plan adapté à votre profil financier et personnel pour optimiser la fiscalité et le rendement.",
+          highlights: [
+            { icon: "📊", text: "Plan personnalisé" },
+            { icon: "💰", text: "Optimisation fiscale" },
+            { icon: "🏖", text: "Investissement ou vacances" }
+          ]
+        },
+        'fr-ca': {
+          title: "Définir votre Stratégie",
+          desc: "Nous analysons vos objectifs : placement immobilier à haut rendement ou résidence de vacances. Nous concevons un plan sur mesure adapté à votre profil financier et personnel pour optimiser la fiscalité et le retour sur investissement.",
+          highlights: [
+            { icon: "📊", text: "Plan sur mesure" },
+            { icon: "💰", text: "Optimisation fiscale" },
+            { icon: "🏖", text: "Placement ou vacances" }
           ]
         }
       },
@@ -392,6 +509,24 @@ document.addEventListener('DOMContentLoaded', () => {
             { icon: "🔒", text: "Acceso off-market" },
             { icon: "🎯", text: "Pre-cualificadas" }
           ]
+        },
+        fr: {
+          title: "Sélection de Biens",
+          desc: "Nous sélectionnons les meilleures propriétés sur la Costa Blanca selon vos critères. Nous accédons à la base de données complète RE/MAX et aux biens hors marché pour vous garantir des visites ciblées et qualifiées.",
+          highlights: [
+            { icon: "🏠", text: "Base RE/MAX" },
+            { icon: "🔒", text: "Accès hors marché" },
+            { icon: "🎯", text: "Pré-qualifiées" }
+          ]
+        },
+        'fr-ca': {
+          title: "Sélection de Propriétés",
+          desc: "Nous sélectionnons les meilleures propriétés sur la Costa Blanca en fonction de vos critères. Nous accédons à la base de données complète RE/MAX et aux inscriptions hors marché pour vous garantir des visites ciblées et pré-qualifiées.",
+          highlights: [
+            { icon: "🏠", text: "Base de données RE/MAX" },
+            { icon: "🔒", text: "Accès hors marché" },
+            { icon: "🎯", text: "Pré-qualifiées" }
+          ]
         }
       },
       5: {
@@ -411,6 +546,24 @@ document.addEventListener('DOMContentLoaded', () => {
             { icon: "⚖️", text: "Verificación legal" },
             { icon: "📋", text: "Check registral" },
             { icon: "🛡", text: "Cero riesgos" }
+          ]
+        },
+        fr: {
+          title: "Due Diligence",
+          desc: "Une étape cruciale pour un achat sécurisé. Fuster & Associates réalise une étude exhaustive du statut cadastral du bien, des charges, dettes, légalité urbanistique et licences, pour que vous achetiez en toute sérénité et sans risque.",
+          highlights: [
+            { icon: "⚖️", text: "Vérification juridique" },
+            { icon: "📋", text: "Contrôle cadastral" },
+            { icon: "🛡", text: "Zéro risque" }
+          ]
+        },
+        'fr-ca': {
+          title: "Diligence Raisonnable",
+          desc: "Une étape cruciale pour un achat sécuritaire. Fuster & Associates effectue une étude exhaustive de l'état du titre de propriété, des hypothèques, dettes, conformité urbanistique et permis, pour que vous achetiez en toute tranquillité et sans risque.",
+          highlights: [
+            { icon: "⚖️", text: "Vérification juridique" },
+            { icon: "📋", text: "Contrôle du titre" },
+            { icon: "🛡", text: "Zéro risque" }
           ]
         }
       },
@@ -432,6 +585,24 @@ document.addEventListener('DOMContentLoaded', () => {
             { icon: "🔐", text: "Depósito custodiado" },
             { icon: "❄️", text: "Precio congelado" }
           ]
+        },
+        fr: {
+          title: "Réservation",
+          desc: "Acompte de réservation pour retirer le bien du marché et geler le prix convenu. Cette somme est conservée en séquestre et sera déduite du prix final lors de la signature de l'acte.",
+          highlights: [
+            { icon: "💶", text: "3.000 € – 10.000 €" },
+            { icon: "🔐", text: "Fonds en séquestre" },
+            { icon: "❄️", text: "Prix gelé" }
+          ]
+        },
+        'fr-ca': {
+          title: "Dépôt de Réservation",
+          desc: "Dépôt de réservation pour retirer la propriété du marché et bloquer le prix convenu. Cette somme est conservée en fiducie et sera déduite du prix final lors de la signature de l'acte notarié.",
+          highlights: [
+            { icon: "💶", text: "3.000 € – 10.000 €" },
+            { icon: "🔐", text: "Fonds en fiducie" },
+            { icon: "❄️", text: "Prix bloqué" }
+          ]
         }
       },
       7: {
@@ -452,6 +623,24 @@ document.addEventListener('DOMContentLoaded', () => {
             { icon: "💰", text: "10% del precio" },
             { icon: "⚖️", text: "Vinculante" }
           ]
+        },
+        fr: {
+          title: "Promesse de Vente",
+          desc: "Signature de la promesse de vente (Contrato de Arras) qui détaille toutes les conditions de la transaction et requiert un acompte de 10%. Ce contrat lie juridiquement les deux parties et fixe les garanties et les délais de réalisation.",
+          highlights: [
+            { icon: "📝", text: "Promesse de vente" },
+            { icon: "💰", text: "Acompte de 10%" },
+            { icon: "⚖️", text: "Juridiquement contraignant" }
+          ]
+        },
+        'fr-ca': {
+          title: "Promesse d'Achat",
+          desc: "Signature de la promesse d'achat (Contrato de Arras) qui détaille toutes les conditions de la transaction et exige un acompte de 10%. Ce contrat lie juridiquement les deux parties et établit les garanties et les délais de conclusion.",
+          highlights: [
+            { icon: "📝", text: "Promesse d'achat" },
+            { icon: "💰", text: "Acompte de 10%" },
+            { icon: "⚖️", text: "Juridiquement contraignant" }
+          ]
         }
       },
       8: {
@@ -460,7 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
           desc: "The final signing before a Public Notary where the title is transferred and the remaining payment is made. If you cannot travel to Spain, you can grant a Power of Attorney (POA) to our law firm to sign 100% remotely.",
           highlights: [
             { icon: "🔑", text: "Keys in hand" },
-            { icon: "🏛", text: "Public Notary" },
+            { icon: "🏰", text: "Public Notary" },
             { icon: "🌐", text: "Remote via POA" }
           ]
         },
@@ -469,8 +658,26 @@ document.addEventListener('DOMContentLoaded', () => {
           desc: "La firma final ante Notario Público donde se transmite la propiedad y se entrega el resto del pago. Si no puedes viajar a España, puedes delegar un Poder Notarial (POA) a nuestro despacho jurídico para firmar 100% de forma remota.",
           highlights: [
             { icon: "🔑", text: "Llaves en mano" },
-            { icon: "🏛", text: "Notario Público" },
+            { icon: "🏰", text: "Notario Público" },
             { icon: "🌐", text: "Remoto vía POA" }
+          ]
+        },
+        fr: {
+          title: "Acte de Vente",
+          desc: "La signature finale devant un notaire public où le titre est transféré et le solde du prix est réglé. Si vous ne pouvez pas vous rendre en Espagne, vous pouvez accorder une procuration (POA) à notre cabinet juridique pour signer à 100% à distance.",
+          highlights: [
+            { icon: "🔑", text: "Clés en main" },
+            { icon: "🏰", text: "Notaire public" },
+            { icon: "🌐", text: "À distance via POA" }
+          ]
+        },
+        'fr-ca': {
+          title: "Acte Notarié",
+          desc: "La signature finale devant un notaire public espagnol où le titre de propriété est transféré et le solde du prix est payé. Si vous ne pouvez pas vous déplacer en Espagne, vous pouvez accorder une procuration (POA) à notre cabinet juridique pour tout signer à distance, depuis le Canada.",
+          highlights: [
+            { icon: "🔑", text: "Clés en main" },
+            { icon: "🏰", text: "Notaire public" },
+            { icon: "🌐", text: "À distance depuis le Canada" }
           ]
         }
       }
@@ -478,8 +685,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function updatePipeline(stepNum) {
       currentStep = stepNum;
-      const lang = document.body.classList.contains('lang-es') ? 'es' : 'en';
-      const details = stepDetails[stepNum][lang];
+      const body = document.body;
+      const lang = body.classList.contains('lang-es') ? 'es' : body.classList.contains('lang-fr-ca') ? 'fr-ca' : body.classList.contains('lang-fr') ? 'fr' : 'en';
+      const details = stepDetails[stepNum][lang] || stepDetails[stepNum]['en'];
       
       // Update node states
       pipelineNodes.forEach(node => {
@@ -505,7 +713,8 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Update step badge
       if (detailsStepBadge) {
-        detailsStepBadge.textContent = lang === 'es' ? `Paso ${stepNum}` : `Step ${stepNum}`;
+        const stepLabels = { en: 'Step', es: 'Paso', fr: 'Étape', 'fr-ca': 'Étape' };
+        detailsStepBadge.textContent = `${stepLabels[lang] || 'Step'} ${stepNum}`;
       }
       
       // Update title & description
@@ -549,10 +758,9 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
     
-    // Listen for language changes to refresh details text
-    const langToggles = document.querySelectorAll('.lang-toggle');
-    langToggles.forEach(toggle => {
-      toggle.addEventListener('click', () => {
+    // Listen for language changes to refresh details text (via lang dropdown)
+    document.querySelectorAll('.lang-dropdown-item').forEach(item => {
+      item.addEventListener('click', () => {
         setTimeout(() => {
           updatePipeline(currentStep);
         }, 50);
@@ -666,37 +874,83 @@ document.addEventListener('DOMContentLoaded', () => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       
-      const lang = document.body.classList.contains('lang-es') ? 'es' : 'en';
+      const bodyEl = document.body;
+      const lang = bodyEl.classList.contains('lang-es') ? 'es'
+                 : bodyEl.classList.contains('lang-fr-ca') ? 'fr-ca'
+                 : bodyEl.classList.contains('lang-fr') ? 'fr'
+                 : 'en';
+      
+      const t = {
+        en: {
+          intro: 'Please enter your details to download the Complete Guide to Buying in Spain for free.',
+          firstName: 'First Name', firstPlaceholder: 'e.g. John',
+          lastName: 'Last Name', lastPlaceholder: 'e.g. Doe',
+          email: 'Email Address', phone: 'Phone Number',
+          phonePlaceholder: 'e.g. +1 (514) 555-0199',
+          btn: 'Download Full Guide (PDF)',
+          modalTitle: "Download Buyer's Guide",
+          toast: 'Thank you! Redirecting to download...'
+        },
+        es: {
+          intro: 'Por favor, déjanos tus datos para descargar la Guía Completa de Compra en España de forma gratuita.',
+          firstName: 'Nombre', firstPlaceholder: 'Ej. Juan',
+          lastName: 'Apellidos', lastPlaceholder: 'Ej. Pérez',
+          email: 'Correo Electrónico', phone: 'Número de Teléfono',
+          phonePlaceholder: '+34 600 123 456',
+          btn: 'Descargar Guía Completa (PDF)',
+          modalTitle: 'Descarga la Guía del Comprador',
+          toast: '¡Gracias! Redirigiendo a la descarga...'
+        },
+        fr: {
+          intro: "Veuillez saisir vos coordonnées pour télécharger gratuitement le Guide Complet d'Achat en Espagne.",
+          firstName: 'Prénom', firstPlaceholder: 'ex. Jean',
+          lastName: 'Nom', lastPlaceholder: 'ex. Dupont',
+          email: 'Adresse e-mail', phone: 'Numéro de téléphone',
+          phonePlaceholder: '+33 6 12 34 56 78',
+          btn: 'Télécharger le Guide Complet (PDF)',
+          modalTitle: "Télécharger le Guide de l'Acheteur",
+          toast: 'Merci ! Redirection vers le téléchargement...'
+        },
+        'fr-ca': {
+          intro: "Veuillez entrer vos coordonnées pour télécharger gratuitement le Guide Complet d'Achat en Espagne.",
+          firstName: 'Prénom', firstPlaceholder: 'ex. Jean',
+          lastName: 'Nom de famille', lastPlaceholder: 'ex. Tremblay',
+          email: 'Adresse courriel', phone: 'Numéro de téléphone',
+          phonePlaceholder: '+1 (514) 555-0199',
+          btn: 'Télécharger le Guide Complet (PDF)',
+          modalTitle: "Télécharger le Guide de l'Acheteur",
+          toast: 'Merci ! Redirection vers le téléchargement...'
+        }
+      };
+      const s = t[lang] || t['en'];
       
       const modalBody = `
         <div class="dossier-lead-form" style="padding: 1.5rem 0.5rem 0;">
           <p style="font-size: 0.9rem; color: #4b5563; margin-bottom: 1.5rem; line-height: 1.5;">
-            ${lang === 'es' 
-              ? 'Por favor, déjanos tus datos para descargar la Guía Completa de Compra en España de forma gratuita.' 
-              : 'Please enter your details to download the Complete Guide to Buying in Spain for free.'}
+            ${s.intro}
           </p>
           <form id="dossier-lead-form-el" style="display: flex; flex-direction: column; gap: 1.2rem;">
             <div style="display: flex; gap: 1rem;">
               <div style="flex: 1;">
-                <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: #0a1628;">${lang === 'es' ? 'Nombre' : 'First Name'}</label>
-                <input type="text" id="lead-first-name" required placeholder="${lang === 'es' ? 'Ej. Juan' : 'e.g. John'}" style="width: 100%; padding: 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 6px; font-family: inherit;">
+                <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: #0a1628;">${s.firstName}</label>
+                <input type="text" id="lead-first-name" required placeholder="${s.firstPlaceholder}" style="width: 100%; padding: 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 6px; font-family: inherit;">
               </div>
               <div style="flex: 1;">
-                <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: #0a1628;">${lang === 'es' ? 'Apellidos' : 'Last Name'}</label>
-                <input type="text" id="lead-last-name" required placeholder="${lang === 'es' ? 'Ej. Pérez' : 'e.g. Doe'}" style="width: 100%; padding: 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 6px; font-family: inherit;">
+                <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: #0a1628;">${s.lastName}</label>
+                <input type="text" id="lead-last-name" required placeholder="${s.lastPlaceholder}" style="width: 100%; padding: 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 6px; font-family: inherit;">
               </div>
             </div>
             <div>
-              <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: #0a1628;">${lang === 'es' ? 'Correo Electrónico' : 'Email Address'}</label>
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: #0a1628;">${s.email}</label>
               <input type="email" id="lead-email" required placeholder="name@example.com" style="width: 100%; padding: 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 6px; font-family: inherit;">
             </div>
             <div>
-              <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: #0a1628;">${lang === 'es' ? 'Número de Teléfono' : 'Phone Number'}</label>
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: #0a1628;">${s.phone}</label>
               <input type="tel" id="lead-phone" required placeholder="e.g. +1 (305) 555-0199" style="width: 100%; padding: 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 6px; font-family: inherit;">
             </div>
             <button type="submit" class="btn btn-primary" style="background: #e51937; color: white; width: 100%; padding: 0.85rem; font-size: 0.95rem; font-weight: 700; border-radius: 6px; margin-top: 0.8rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-              <span>${lang === 'es' ? 'Descargar Guía Completa (PDF)' : 'Download Full Guide (PDF)'}</span>
+              <span>${s.btn}</span>
             </button>
           </form>
         </div>
@@ -704,7 +958,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (App && App.utils && App.utils.showModal) {
         const modalInstance = App.utils.showModal({
-          title: lang === 'es' ? 'Descarga la Guía del Comprador' : 'Download Buyer\'s Guide',
+          title: s.modalTitle,
           body: modalBody,
           className: 'modal--dossier-lead'
         });
@@ -731,7 +985,7 @@ document.addEventListener('DOMContentLoaded', () => {
               }
               
               App.utils.showToast(
-                lang === 'es' ? '¡Gracias! Redirigiendo a la descarga...' : 'Thank you! Redirecting to download...',
+                s.toast,
                 'success'
               );
               

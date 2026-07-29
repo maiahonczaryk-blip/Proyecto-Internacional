@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RE/MAX Inmomás — International Advisory Division</title>
-  <meta name="description" content="Expert advisory for Americans buying property in Spain. 30+ years on the Costa Blanca. Legal, tax, mortgages, rentals & real estate — one trusted team.">
+  <meta name="description" content="Advisory for international buyers — Canadians, Americans, Europeans — buying property in Spain. 30+ years on the Costa Blanca. Legal, tax, mortgages, rentals & real estate — one trusted team.">
   <meta property="og:title" content="REMAX Inmomás — International Advisory Division">
   <meta property="og:description" content="Your trusted team for buying property on Spain's Costa Blanca. Legal, tax & real estate advisory for international buyers.">
   <meta property="og:type" content="website">
@@ -26,26 +26,38 @@
         <a href="#home">
           <span class="lang-en">Home</span>
           <span class="lang-es">Inicio</span>
+          <span class="lang-fr">Accueil</span>
+          <span class="lang-fr-ca">Accueil</span>
         </a>
         <a href="#about-spain">
           <span class="lang-en">About Spain</span>
           <span class="lang-es">Sobre España</span>
+          <span class="lang-fr">À propos de l'Espagne</span>
+          <span class="lang-fr-ca">À propos de l'Espagne</span>
         </a>
         <a href="dossier.html" target="_blank" class="nav-dossier-link">
           <span class="lang-en">Buyer Guide (PDF)</span>
           <span class="lang-es">Guía de Compra (PDF)</span>
+          <span class="lang-fr">Guide d'Achat (PDF)</span>
+          <span class="lang-fr-ca">Guide d'Achat (PDF)</span>
         </a>
         <a href="#professionals">
           <span class="lang-en">For Realtors</span>
           <span class="lang-es">Para Agentes</span>
+          <span class="lang-fr">Pour les Agents</span>
+          <span class="lang-fr-ca">Pour les Agents</span>
         </a>
         <a href="#login" class="btn btn-outline btn-sm nav-cta" id="nav-login-btn">
           <span class="lang-en">Partner Login</span>
           <span class="lang-es">Acceso Partners</span>
+          <span class="lang-fr">Accès Partenaires</span>
+          <span class="lang-fr-ca">Accès Partenaires</span>
         </a>
         <a href="#register" class="btn btn-primary btn-sm nav-cta" id="nav-register-btn">
           <span class="lang-en">Join as Partner</span>
           <span class="lang-es">Únete como Partner</span>
+          <span class="lang-fr">Devenir Partenaire</span>
+          <span class="lang-fr-ca">Devenir Partenaire</span>
         </a>
       </div>
 
@@ -55,13 +67,37 @@
         <button class="btn btn-outline btn-sm" id="nav-logout-btn" onclick="App.auth.logout().then(() => App.router.navigateTo('home'))">
           <span class="lang-en">Logout</span>
           <span class="lang-es">Cerrar Sesión</span>
+          <span class="lang-fr">Déconnexion</span>
+          <span class="lang-fr-ca">Déconnexion</span>
         </button>
       </div>
 
       <div class="nav-right">
-        <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">
-          <span class="lang-label">ES</span>
-        </button>
+        <div class="lang-selector-wrapper" id="lang-selector-wrapper">
+          <button class="lang-selector-btn" id="lang-selector-btn" aria-label="Sélectionner la langue / Select language">
+            <span class="lang-flag" id="lang-flag">🇨🇦</span>
+            <span class="lang-code" id="lang-code">EN</span>
+            <svg class="lang-chevron" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 4 5 7 8 4"/></svg>
+          </button>
+          <div class="lang-dropdown" id="lang-dropdown">
+            <button class="lang-dropdown-item" data-lang="en" id="lang-option-en">
+              <span class="item-flag">🇺🇸</span>
+              <span class="item-text"><span class="item-name">English</span><span class="item-region">United States</span></span>
+            </button>
+            <button class="lang-dropdown-item" data-lang="es" id="lang-option-es">
+              <span class="item-flag">🇪🇸</span>
+              <span class="item-text"><span class="item-name">Español</span><span class="item-region">España</span></span>
+            </button>
+            <button class="lang-dropdown-item" data-lang="fr" id="lang-option-fr">
+              <span class="item-flag">🇫🇷</span>
+              <span class="item-text"><span class="item-name">Français</span><span class="item-region">France</span></span>
+            </button>
+            <button class="lang-dropdown-item" data-lang="fr-ca" id="lang-option-fr-ca">
+              <span class="item-flag">🇨🇦</span>
+              <span class="item-text"><span class="item-name">Français</span><span class="item-region">Canada</span></span>
+            </button>
+          </div>
+        </div>
         <button class="sidebar-toggle" id="sidebar-toggle-btn" aria-label="Toggle sidebar">
           <span></span><span></span><span></span>
         </button>
@@ -91,23 +127,33 @@
             <div class="hero-badge">
               <span class="lang-en">International Advisory Division · Costa Blanca</span>
               <span class="lang-es">División de Asesoría Internacional · Costa Blanca</span>
+              <span class="lang-fr">Division Conseil International · Costa Blanca</span>
+              <span class="lang-fr-ca">Division Conseil International · Costa Blanca</span>
             </div>
             <h1 class="hero-title">
               <span class="lang-en">Thinking About Buying<br>Property in Spain?</span>
               <span class="lang-es">¿Estás Pensando en Comprar<br>una Propiedad en España?</span>
+              <span class="lang-fr">Vous songez à Acheter<br>une Propriété en Espagne ?</span>
+              <span class="lang-fr-ca">Vous songez à Acheter<br>une Propriété en Espagne ?</span>
             </h1>
             <p class="hero-subtitle">
               <span class="lang-en">We know it feels overwhelming. The legal questions, the tax implications, the distance. That's exactly why we exist — to guide you through every step, so you can make the right decision with total confidence.</span>
               <span class="lang-es">Sabemos que puede parecer abrumador. Las preguntas legales, las implicaciones fiscales, la distancia. Por eso existimos — para guiarte en cada paso, para que tomes la decisión correcta con total confianza.</span>
+              <span class="lang-fr">Nous savons que cela peut paraître intimidant. Les questions juridiques, les implications fiscales, la distance. C'est exactement pour cela que nous existons — pour vous guider à chaque étape, afin que vous preniez la bonne décision en toute confiance.</span>
+              <span class="lang-fr-ca">Nous savons que ça peut sembler compliqué. Les questions juridiques, les implications fiscales, la distance. C'est exactement pourquoi nous existons — pour vous accompagner à chaque étape, afin que vous preniez la bonne décision en toute confiance.</span>
             </p>
             <div class="hero-ctas">
               <a href="#about-spain" class="btn btn-primary" id="hero-cta-webinar">
                 <span class="lang-en">Discover Spain</span>
                 <span class="lang-es">Descubre España</span>
+                <span class="lang-fr">Découvrir l'Espagne</span>
+                <span class="lang-fr-ca">Découvrir l'Espagne</span>
               </a>
               <a href="#professionals" class="btn btn-outline" id="hero-cta-realtors">
                 <span class="lang-en">I'm a Realtor</span>
                 <span class="lang-es">Soy Agente Inmobiliario</span>
+                <span class="lang-fr">Je suis Agent Immobilier</span>
+                <span class="lang-fr-ca">Je suis Courtier Immobilier</span>
               </a>
             </div>
             <div class="hero-stats">
@@ -116,6 +162,8 @@
                 <div class="hero-stat-label">
                   <span class="lang-en">Years of Experience</span>
                   <span class="lang-es">Años de Experiencia</span>
+                  <span class="lang-fr">Années d'Expérience</span>
+                  <span class="lang-fr-ca">Années d'Expérience</span>
                 </div>
               </div>
               <div class="hero-stat">
@@ -123,6 +171,8 @@
                 <div class="hero-stat-label">
                   <span class="lang-en">Active Agents</span>
                   <span class="lang-es">Agentes Activos</span>
+                  <span class="lang-fr">Agents Actifs</span>
+                  <span class="lang-fr-ca">Courtiers Actifs</span>
                 </div>
               </div>
               <div class="hero-stat">
@@ -130,6 +180,8 @@
                 <div class="hero-stat-label">
                   <span class="lang-en">Offices</span>
                   <span class="lang-es">Oficinas</span>
+                  <span class="lang-fr">Bureaux</span>
+                  <span class="lang-fr-ca">Bureaux</span>
                 </div>
               </div>
               <div class="hero-stat">
@@ -174,24 +226,34 @@
           <h2 class="section-title">
             <span class="lang-en">Your <span class="text-accent">Gateway</span> to Spain</span>
             <span class="lang-es">Tu <span class="text-accent">Puerta</span> a España</span>
+            <span class="lang-fr">Votre <span class="text-accent">Passerelle</span> vers l'Espagne</span>
+            <span class="lang-fr-ca">Votre <span class="text-accent">Passerelle</span> vers l'Espagne</span>
           </h2>
           <p class="section-subtitle" style="max-width: 700px; margin: 0 auto;">
             <span class="lang-en">Whether you're a buyer exploring Spain or a Realtor growing your international network — we're your trusted team on the Costa Blanca.</span>
             <span class="lang-es">Ya seas un comprador explorando España o un agente inmobiliario ampliando tu red internacional — somos tu equipo de confianza en la Costa Blanca.</span>
+            <span class="lang-fr">Que vous soyez un acheteur explorant l’Espagne ou un agent immobilier développant votre réseau international — nous sommes votre équipe de confiance sur la Costa Blanca.</span>
+            <span class="lang-fr-ca">Que vous soyez un acheteur qui explore l’Espagne ou un courtier immobilier qui développe son réseau international — nous sommes votre équipe de confiance sur la Costa Blanca.</span>
           </p>
           <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 32px;">
             <a href="#about-spain" class="btn btn-primary">
               <span class="lang-en">About Spain</span>
               <span class="lang-es">Sobre España</span>
+              <span class="lang-fr">À propos de l'Espagne</span>
+              <span class="lang-fr-ca">À propos de l'Espagne</span>
             </a>
             <a href="dossier.html" target="_blank" class="btn btn-primary" style="background: var(--red); border-color: var(--red); display: inline-flex; align-items: center; gap: 8px;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
               <span class="lang-en">Download Buyer Guide (PDF)</span>
               <span class="lang-es">Descargar Guía de Compra (PDF)</span>
+              <span class="lang-fr">Télécharger le Guide d'Achat (PDF)</span>
+              <span class="lang-fr-ca">Télécharger le Guide d'Achat (PDF)</span>
             </a>
             <a href="#professionals" class="btn btn-outline">
               <span class="lang-en">Partner with Us</span>
               <span class="lang-es">Asóciate con Nosotros</span>
+              <span class="lang-fr">Devenir Partenaire</span>
+              <span class="lang-fr-ca">Devenir Partenaire</span>
             </a>
           </div>
         </div>
@@ -204,10 +266,14 @@
             <span class="section-label">
               <span class="lang-en">Your Trusted Team</span>
               <span class="lang-es">Tu Equipo de Confianza</span>
+              <span class="lang-fr">Notre Équipe de Confiance</span>
+              <span class="lang-fr-ca">Notre Équipe de Confiance</span>
             </span>
             <h2 class="section-title">
               <span class="lang-en">Five Partners. <span class="text-accent">One Mission.</span></span>
               <span class="lang-es">Cinco Socios. <span class="text-accent">Una Misión.</span></span>
+              <span class="lang-fr">Cinq Partenaires. <span class="text-accent">Une Mission.</span></span>
+              <span class="lang-fr-ca">Cinq Partenaires. <span class="text-accent">Une Mission.</span></span>
             </h2>
           </div>
           <div class="team-grid">
@@ -216,45 +282,45 @@
               <h3>RE/MAX Inmomás</h3>
               <p class="team-tagline">Real Estate</p>
               <div class="team-stats">
-                <span><strong>30+</strong> <span class="lang-en">years</span><span class="lang-es">años</span></span>
-                <span><strong>115+</strong> <span class="lang-en">agents</span><span class="lang-es">agentes</span></span>
-                <span><strong>4</strong> <span class="lang-en">offices</span><span class="lang-es">oficinas</span></span>
+                <span><strong>30+</strong> <span class="lang-en">years</span><span class="lang-es">años</span><span class="lang-fr">ans</span><span class="lang-fr-ca">ans</span></span>
+                <span><strong>115+</strong> <span class="lang-en">agents</span><span class="lang-es">agentes</span><span class="lang-fr">agents</span><span class="lang-fr-ca">courtiers</span></span>
+                <span><strong>4</strong> <span class="lang-en">offices</span><span class="lang-es">oficinas</span><span class="lang-fr">bureaux</span><span class="lang-fr-ca">bureaux</span></span>
               </div>
             </div>
             <div class="card team-card fuster reveal">
               <img src="logo fuster.png" alt="Fuster & Associates" class="team-logo">
               <h3>Fuster & Associates</h3>
-              <p class="team-tagline"><span class="lang-en">Legal & Tax</span><span class="lang-es">Legal y Fiscal</span></p>
+              <p class="team-tagline"><span class="lang-en">Legal &amp; Tax</span><span class="lang-es">Legal y Fiscal</span><span class="lang-fr">Juridique &amp; Fiscal</span><span class="lang-fr-ca">Juridique &amp; Fiscal</span></p>
               <div class="team-stats">
-                <span><strong>10</strong> <span class="lang-en">lawyers</span><span class="lang-es">abogados</span></span>
-                <span><strong>7</strong> <span class="lang-en">languages</span><span class="lang-es">idiomas</span></span>
+                <span><strong>10</strong> <span class="lang-en">lawyers</span><span class="lang-es">abogados</span><span class="lang-fr">avocats</span><span class="lang-fr-ca">avocats</span></span>
+                <span><strong>7</strong> <span class="lang-en">languages</span><span class="lang-es">idiomas</span><span class="lang-fr">langues</span><span class="lang-fr-ca">langues</span></span>
               </div>
             </div>
             <div class="card team-card uci reveal">
               <img src="Logo_UCI.png" alt="Banco UCI" class="team-logo">
               <h3>Banco UCI</h3>
-              <p class="team-tagline"><span class="lang-en">Mortgages</span><span class="lang-es">Hipotecas</span></p>
+              <p class="team-tagline"><span class="lang-en">Mortgages</span><span class="lang-es">Hipotecas</span><span class="lang-fr">Hypothèques</span><span class="lang-fr-ca">Hypothèques</span></p>
               <div class="team-stats">
-                <span><strong>75%</strong> <span class="lang-en">Max LTV</span><span class="lang-es">LTV Máx</span></span>
-                <span><strong>48h</strong> <span class="lang-en">Approval</span><span class="lang-es">Aprobación</span></span>
+                <span><strong>75%</strong> <span class="lang-en">Max LTV</span><span class="lang-es">LTV Máx</span><span class="lang-fr">LTV Max</span><span class="lang-fr-ca">LTV Max</span></span>
+                <span><strong>48h</strong> <span class="lang-en">Approval</span><span class="lang-es">Aprobación</span><span class="lang-fr">Approbation</span><span class="lang-fr-ca">Approbation</span></span>
               </div>
             </div>
             <div class="card team-card holidays reveal">
               <img src="Inmomas-holidays-Op-3-color-e1752073650140.png" alt="Inmomás Holidays" class="team-logo">
               <h3>Inmomás Holidays</h3>
-              <p class="team-tagline"><span class="lang-en">Rentals</span><span class="lang-es">Alquileres</span></p>
+              <p class="team-tagline"><span class="lang-en">Rentals</span><span class="lang-es">Alquileres</span><span class="lang-fr">Locations</span><span class="lang-fr-ca">Locations</span></p>
               <div class="team-stats">
-                <span><strong>100%</strong> <span class="lang-en">Hands-free</span><span class="lang-es">Gestión Total</span></span>
-                <span><strong>ROI</strong> <span class="lang-en">Maximized</span><span class="lang-es">Maximizado</span></span>
+                <span><strong>100%</strong> <span class="lang-en">Hands-free</span><span class="lang-es">Gestión Total</span><span class="lang-fr">Clé en main</span><span class="lang-fr-ca">Clé en main</span></span>
+                <span><strong>ROI</strong> <span class="lang-en">Maximized</span><span class="lang-es">Maximizado</span><span class="lang-fr">Maximisé</span><span class="lang-fr-ca">Maximisé</span></span>
               </div>
             </div>
             <div class="card team-card smbiotica reveal">
               <img src="smbiotica-logo.png" alt="Smbiotica" class="team-logo" style="mix-blend-mode: multiply;">
               <h3>Smbiotica</h3>
-              <p class="team-tagline"><span class="lang-en">Marketing &amp; Digital</span><span class="lang-es">Marketing y Digital</span></p>
+              <p class="team-tagline"><span class="lang-en">Marketing &amp; Digital</span><span class="lang-es">Marketing y Digital</span><span class="lang-fr">Marketing &amp; Digital</span><span class="lang-fr-ca">Marketing &amp; Digital</span></p>
               <div class="team-stats">
-                <span><strong>360°</strong> <span class="lang-en">Digital</span><span class="lang-es">Digital</span></span>
-                <span><strong>TIC</strong> <span class="lang-en">Solutions</span><span class="lang-es">Soluciones</span></span>
+                <span><strong>360°</strong> <span class="lang-en">Digital</span><span class="lang-es">Digital</span><span class="lang-fr">Digital</span><span class="lang-fr-ca">Digital</span></span>
+                <span><strong>TIC</strong> <span class="lang-en">Solutions</span><span class="lang-es">Soluciones</span><span class="lang-fr">Solutions</span><span class="lang-fr-ca">Solutions</span></span>
               </div>
             </div>
           </div>
@@ -270,30 +336,40 @@
               <p>
                 <span class="lang-en">International Advisory Division — Costa Blanca, Spain.</span>
                 <span class="lang-es">División de Asesoría Internacional — Costa Blanca, España.</span>
+                <span class="lang-fr">Division Conseil International — Costa Blanca, Espagne.</span>
+                <span class="lang-fr-ca">Division Conseil International — Costa Blanca, Espagne.</span>
               </p>
             </div>
             <div>
-              <h4><span class="lang-en">Platform</span><span class="lang-es">Plataforma</span></h4>
+              <h4><span class="lang-en">Platform</span><span class="lang-es">Plataforma</span><span class="lang-fr">Plateforme</span><span class="lang-fr-ca">Plateforme</span></h4>
               <div class="footer-links">
-                <a href="#about-spain"><span class="lang-en">About Spain</span><span class="lang-es">Sobre España</span></a>
-                <a href="#professionals"><span class="lang-en">For Realtors</span><span class="lang-es">Para Agentes</span></a>
-                <a href="#login"><span class="lang-en">Partner Login</span><span class="lang-es">Acceso Partners</span></a>
+                <a href="#about-spain"><span class="lang-en">About Spain</span><span class="lang-es">Sobre España</span><span class="lang-fr">À propos de l'Espagne</span><span class="lang-fr-ca">À propos de l'Espagne</span></a>
+                <a href="#professionals"><span class="lang-en">For Realtors</span><span class="lang-es">Para Agentes</span><span class="lang-fr">Pour les Agents</span><span class="lang-fr-ca">Pour les Courtiers</span></a>
+                <a href="#login"><span class="lang-en">Partner Login</span><span class="lang-es">Acceso Partners</span><span class="lang-fr">Accès Partenaires</span><span class="lang-fr-ca">Accès Partenaires</span></a>
               </div>
             </div>
             <div>
-              <h4><span class="lang-en">Markets</span><span class="lang-es">Mercados</span></h4>
+              <h4><span class="lang-en">Our Offices</span><span class="lang-es">Nuestras Oficinas</span><span class="lang-fr">Nos Bureaux</span><span class="lang-fr-ca">Nos Bureaux</span></h4>
               <div class="footer-links">
-                <a href="#about-spain">Elche</a>
-                <a href="#about-spain">Alicante</a>
-                <a href="#about-spain">Benidorm</a>
-                <a href="#about-spain">Jávea</a>
+                <a href="https://maps.google.com/?q=Carrer+Doctor+José+Luis+de+la+Vega,+2,+03015+Alicante" target="_blank" rel="noopener">
+                  <strong>Alicante</strong> · Carrer Doctor José Luis de la Vega, 2, 03015
+                </a>
+                <a href="https://maps.google.com/?q=Avinguda+País+Valencià,+2,+03509+Finestrat,+Alicante" target="_blank" rel="noopener">
+                  <strong>Benidorm</strong> · Avinguda País Valencià, 2, 03509 Finestrat
+                </a>
+                <a href="https://maps.google.com/?q=Carrer+Conrado+del+Campo,+16,+03204+Elx,+Alicante" target="_blank" rel="noopener">
+                  <strong>Elche</strong> · Carrer Conrado del Campo, 16, 03204 Elx
+                </a>
+                <a href="https://maps.google.com/?q=Ctra.+del+Cap+de+la+Nau+Pla,+124,+Local+5,+03738+Xàbia,+Alicante" target="_blank" rel="noopener">
+                  <strong>Jávea</strong> · Ctra. Cap de la Nau Pla, 124, Local 5, 03738 Xàbia
+                </a>
               </div>
             </div>
             <div>
-              <h4><span class="lang-en">Contact</span><span class="lang-es">Contacto</span></h4>
+              <h4><span class="lang-en">Contact</span><span class="lang-es">Contacto</span><span class="lang-fr">Contact</span><span class="lang-fr-ca">Contact</span></h4>
               <div class="footer-links">
                 <a href="mailto:jose.martinez@remax.es">jose.martinez@remax.es</a>
-                <a href="https://remaxinmomas.com" target="_blank">remaxinmomas.com</a>
+                <a href="https://www.remaxinmomas.com" target="_blank">www.remaxinmomas.com</a>
               </div>
             </div>
           </div>
@@ -315,52 +391,58 @@
             <span class="section-label">
               <span class="lang-en">The Opportunity</span>
               <span class="lang-es">La Oportunidad</span>
+              <span class="lang-fr">L'Opportunité</span>
+              <span class="lang-fr-ca">L'Opportunité</span>
             </span>
             <h2 class="section-title">
-              <span class="lang-en">Why Americans Are <span class="text-accent">Choosing Spain</span></span>
-              <span class="lang-es">Por Qué los Americanos <span class="text-accent">Eligen España</span></span>
+              <span class="lang-en">Why International Buyers Are <span class="text-accent">Choosing Spain</span></span>
+              <span class="lang-es">Por Qué los Compradores Internacionales <span class="text-accent">Eligen España</span></span>
+              <span class="lang-fr">Pourquoi les Acheteurs Internationaux <span class="text-accent">Choisissent l'Espagne</span></span>
+              <span class="lang-fr-ca">Pourquoi les Canadiens <span class="text-accent">Choisissent l'Espagne</span></span>
             </h2>
             <p class="section-subtitle">
-              <span class="lang-en">+45 million Americans have considered living abroad. 73% prefer Europe. Spain is their #1 destination.</span>
-              <span class="lang-es">+45 millones de americanos han considerado vivir en el extranjero. El 73% prefiere Europa. España es su destino #1.</span>
+              <span class="lang-en">+45 million international buyers have considered living abroad. 73% prefer Europe. Spain is the #1 destination.</span>
+              <span class="lang-es">+45 millones de compradores internacionales han considerado vivir en el extranjero. El 73% prefiere Europa. España es su destino #1.</span>
+              <span class="lang-fr">+45 millions d'acheteurs internationaux ont envisagé de vivre à l’étranger. 73 % préfèrent l’Europe. L’Espagne est leur destination n° 1.</span>
+              <span class="lang-fr-ca">Plus d’un million de Canadiens ont envisagé de vivre à l’étranger. 73 % préfèrent l’Europe. L’Espagne est leur destination numéro 1.</span>
             </p>
           </div>
           <div class="reasons-grid">
             <div class="card reason-card reveal">
               <div class="card-icon">☀️</div>
-              <h3><span class="lang-en">Climate & Lifestyle</span><span class="lang-es">Clima y Estilo de Vida</span></h3>
-              <p><span class="lang-en">Mediterranean living at its finest. World-class gastronomy, pristine beaches, and vibrant culture.</span><span class="lang-es">Lo mejor de la vida mediterránea. Gastronomía de clase mundial, playas vírgenes y cultura vibrante.</span></p>
-              <span class="stat-badge"><span class="lang-en">300+ days of sunshine/year</span><span class="lang-es">300+ días de sol/año</span></span>
+              <h3><span class="lang-en">Climate & Lifestyle</span><span class="lang-es">Clima y Estilo de Vida</span><span class="lang-fr">Climat & Art de Vivre</span><span class="lang-fr-ca">Climat & Style de Vie</span></h3>
+              <p><span class="lang-en">Mediterranean living at its finest. World-class gastronomy, pristine beaches, and vibrant culture.</span><span class="lang-es">Lo mejor de la vida mediterránea. Gastronomía de clase mundial, playas vírgenes y cultura vibrante.</span><span class="lang-fr">Le mode de vie méditerranéen dans toute sa splendeur. Gastronomie de classe mondiale, plages immaculées et culture vibrante.</span><span class="lang-fr-ca">Le mode de vie méditerranéen dans toute sa splendeur. Gastronomie d'exception, plages immaculées et culture vibrante.</span></p>
+              <span class="stat-badge"><span class="lang-en">300+ days of sunshine/year</span><span class="lang-es">300+ días de sol/año</span><span class="lang-fr">300+ jours de soleil/an</span><span class="lang-fr-ca">300+ jours de soleil/an</span></span>
             </div>
             <div class="card reason-card reveal">
               <div class="card-icon">💰</div>
-              <h3><span class="lang-en">Cost of Living</span><span class="lang-es">Coste de Vida</span></h3>
-              <p><span class="lang-en">Your money goes dramatically further in Spain. Premium quality of life at a fraction of what you pay in the US.</span><span class="lang-es">Tu dinero rinde mucho más en España. Calidad de vida premium a una fracción del coste en EE.UU.</span></p>
-              <span class="stat-badge"><span class="lang-en">40–60% lower than US cities</span><span class="lang-es">40–60% menor que ciudades de EE.UU.</span></span>
+              <h3><span class="lang-en">Cost of Living</span><span class="lang-es">Coste de Vida</span><span class="lang-fr">Coût de la Vie</span><span class="lang-fr-ca">Coût de la Vie</span></h3>
+              <p><span class="lang-en">Your money goes dramatically further in Spain. Premium quality of life at a fraction of what you pay in the US.</span><span class="lang-es">Tu dinero rinde mucho más en España. Calidad de vida premium a una fracción del coste en EE.UU.</span><span class="lang-fr">Votre argent va bien plus loin en Espagne. Une qualité de vie premium à une fraction des prix en France.</span><span class="lang-fr-ca">Votre argent va bien plus loin en Espagne. Une qualité de vie premium à une fraction de ce que vous payez au Canada.</span></p>
+              <span class="stat-badge"><span class="lang-en">40–60% lower than US cities</span><span class="lang-es">40–60% menor que ciudades de EE.UU.</span><span class="lang-fr">40–60% moins cher qu'en France</span><span class="lang-fr-ca">40–60% moins cher qu'au Canada</span></span>
             </div>
             <div class="card reason-card reveal">
               <div class="card-icon">🏥</div>
-              <h3><span class="lang-en">World-Class Healthcare</span><span class="lang-es">Sanidad de Clase Mundial</span></h3>
-              <p><span class="lang-en">Bloomberg ranked Spain the #1 healthiest country in the world. Top-tier public and private healthcare.</span><span class="lang-es">Bloomberg clasificó a España como el país más saludable del mundo. Sanidad pública y privada de primer nivel.</span></p>
-              <span class="stat-badge"><span class="lang-en">Private insurance from €80/mo</span><span class="lang-es">Seguro privado desde €80/mes</span></span>
+              <h3><span class="lang-en">World-Class Healthcare</span><span class="lang-es">Sanidad de Clase Mundial</span><span class="lang-fr">Soins de Santé de Classe Mondiale</span><span class="lang-fr-ca">Soins de Santé de Classe Mondiale</span></h3>
+              <p><span class="lang-en">Bloomberg ranked Spain the #1 healthiest country in the world. Top-tier public and private healthcare.</span><span class="lang-es">Bloomberg clasificó a España como el país más saludable del mundo. Sanidad pública y privada de primer nivel.</span><span class="lang-fr">Bloomberg a classé l'Espagne comme le pays le plus sain du monde. Soins publics et privés de premier niveau.</span><span class="lang-fr-ca">Bloomberg a classé l'Espagne comme le pays le plus sain du monde. Soins publics et privés de premier ordre.</span></p>
+              <span class="stat-badge"><span class="lang-en">Private insurance from €80/mo</span><span class="lang-es">Seguro privado desde €80/mes</span><span class="lang-fr">Assurance privée dès 80 €/mois</span><span class="lang-fr-ca">Assurance privée dès 80 €/mois</span></span>
             </div>
             <div class="card reason-card reveal">
               <div class="card-icon">🌐</div>
-              <h3><span class="lang-en">Gateway to Europe</span><span class="lang-es">Puerta a Europa</span></h3>
-              <p><span class="lang-en">Schengen access to 27 countries. Your property in Spain becomes your base to explore all of Europe.</span><span class="lang-es">Acceso Schengen a 27 países. Tu propiedad en España se convierte en tu base para explorar toda Europa.</span></p>
-              <span class="stat-badge"><span class="lang-en">EU legal security</span><span class="lang-es">Seguridad jurídica UE</span></span>
+              <h3><span class="lang-en">Gateway to Europe</span><span class="lang-es">Puerta a Europa</span><span class="lang-fr">Porte d'Entrée en Europe</span><span class="lang-fr-ca">Porte d'Entrée en Europe</span></h3>
+              <p><span class="lang-en">Schengen access to 27 countries. Your property in Spain becomes your base to explore all of Europe.</span><span class="lang-es">Acceso Schengen a 27 países. Tu propiedad en España se convierte en tu base para explorar toda Europa.</span><span class="lang-fr">Accès Schengen à 27 pays. Votre propriété en Espagne devient votre base pour explorer toute l'Europe.</span><span class="lang-fr-ca">Accès Schengen à 27 pays. Votre propriété en Espagne devient votre base pour découvrir toute l'Europe sans visa.</span></p>
+              <span class="stat-badge"><span class="lang-en">EU legal security</span><span class="lang-es">Seguridad jurídica UE</span><span class="lang-fr">Sécurité juridique UE</span><span class="lang-fr-ca">Sécurité juridique UE</span></span>
             </div>
             <div class="card reason-card reveal">
               <div class="card-icon">📈</div>
-              <h3><span class="lang-en">Investment Returns</span><span class="lang-es">Rentabilidad</span></h3>
-              <p><span class="lang-en">Tourist rental demand on the Costa Blanca is booming. Strong yields combined with capital appreciation.</span><span class="lang-es">La demanda de alquiler turístico en la Costa Blanca está en auge. Altos rendimientos con revalorización del capital.</span></p>
-              <span class="stat-badge"><span class="lang-en">5–8% average annual yields</span><span class="lang-es">5–8% rendimiento medio anual</span></span>
+              <h3><span class="lang-en">Investment Returns</span><span class="lang-es">Rentabilidad</span><span class="lang-fr">Rendement Locatif</span><span class="lang-fr-ca">Rendement Locatif</span></h3>
+              <p><span class="lang-en">Tourist rental demand on the Costa Blanca is booming. Strong yields combined with capital appreciation.</span><span class="lang-es">La demanda de alquiler turístico en la Costa Blanca está en auge. Altos rendimientos con revalorización del capital.</span><span class="lang-fr">La demande de location touristique sur la Costa Blanca est en plein essor. Forts rendements combinés à une appréciation du capital.</span><span class="lang-fr-ca">La demande de location touristique sur la Costa Blanca est en plein essor. Rendements élevés combinés à une appréciation du capital.</span></p>
+              <span class="stat-badge"><span class="lang-en">5–8% average annual yields</span><span class="lang-es">5–8% rendimiento medio anual</span><span class="lang-fr">5–8% de rendement annuel moyen</span><span class="lang-fr-ca">5–8% de rendement annuel moyen</span></span>
             </div>
             <div class="card reason-card reveal">
               <div class="card-icon">🔒</div>
-              <h3><span class="lang-en">Legal Security</span><span class="lang-es">Seguridad Legal</span></h3>
-              <p><span class="lang-en">Transparent property registry and established EU legal framework. US/Spain double taxation treaty protection.</span><span class="lang-es">Registro de propiedad transparente y marco legal europeo. Tratado de doble imposición EE.UU./España.</span></p>
-              <span class="stat-badge"><span class="lang-en">No restrictions for foreign buyers</span><span class="lang-es">Sin restricciones para extranjeros</span></span>
+              <h3><span class="lang-en">Legal Security</span><span class="lang-es">Seguridad Legal</span><span class="lang-fr">Sécurité Juridique</span><span class="lang-fr-ca">Sécurité Juridique</span></h3>
+              <p><span class="lang-en">Transparent property registry and established EU legal framework. US/Spain double taxation treaty protection.</span><span class="lang-es">Registro de propiedad transparente y marco legal europeo. Tratado de doble imposición EE.UU./España.</span><span class="lang-fr">Registre foncier transparent et cadre juridique européen. Protection par le traité de double imposition France/Espagne.</span><span class="lang-fr-ca">Registre foncier transparent et cadre juridique européen. Protection par la convention de double imposition Canada/Espagne.</span></p>
+              <span class="stat-badge"><span class="lang-en">No restrictions for foreign buyers</span><span class="lang-es">Sin restricciones para extranjeros</span><span class="lang-fr">Pas de restrictions pour les acheteurs étrangers</span><span class="lang-fr-ca">Pas de restrictions pour les acheteurs étrangers</span></span>
             </div>
           </div>
           
@@ -370,6 +452,8 @@
               <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">
                 <span class="lang-en">Download Our Comprehensive Buyer's Guide & Dossier</span>
                 <span class="lang-es">Descarga Nuestra Guía Completa de Compra y Dossier</span>
+                <span class="lang-fr">Téléchargez Notre Guide Complet de l'Acheteur</span>
+                <span class="lang-fr-ca">Téléchargez Notre Guide Complet de l'Acheteur</span>
               </h3>
               <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">
                 <span class="lang-en">Get the complete 6-page PDF guide about living in Spain, detailed purchase costs comparison, legal procedures by Fuster & Associates, and rental management ROI.</span>
@@ -381,6 +465,8 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 <span class="lang-en">Download PDF Guide</span>
                 <span class="lang-es">Descargar Guía en PDF</span>
+                <span class="lang-fr">Télécharger le Guide PDF</span>
+                <span class="lang-fr-ca">Télécharger le Guide PDF</span>
               </a>
             </div>
           </div>
@@ -392,23 +478,23 @@
       <section class="section cost-comparison">
         <div class="container">
           <div class="text-center reveal">
-            <span class="section-label"><span class="lang-en">Your Money, Further</span><span class="lang-es">Tu Dinero, Más Lejos</span></span>
-            <h2 class="section-title"><span class="lang-en">Spain vs. <span class="text-accent">United States</span></span><span class="lang-es">España vs. <span class="text-accent">Estados Unidos</span></span></h2>
+            <span class="section-label"><span class="lang-en">Your Money, Further</span><span class="lang-es">Tu Dinero, Más Lejos</span><span class="lang-fr">Votre Argent, Plus Loin</span><span class="lang-fr-ca">Votre Argent, Plus Loin</span></span>
+            <h2 class="section-title"><span class="lang-en">Spain vs. <span class="text-accent">United States</span></span><span class="lang-es">España vs. <span class="text-accent">Estados Unidos</span></span><span class="lang-fr">Espagne vs. <span class="text-accent">France</span></span><span class="lang-fr-ca">Espagne vs. <span class="text-accent">Canada</span></span></h2>
           </div>
           <div class="comparison-table reveal">
             <div class="comparison-row header">
-              <div class="label"><span class="lang-en">Expense</span><span class="lang-es">Gasto</span></div>
-              <div class="spain-val">🇪🇸 <span class="lang-en">Spain</span><span class="lang-es">España</span></div>
-              <div class="usa-val">🇺🇸 <span class="lang-en">United States</span><span class="lang-es">Estados Unidos</span></div>
+              <div class="label"><span class="lang-en">Expense</span><span class="lang-es">Gasto</span><span class="lang-fr">Dépense</span><span class="lang-fr-ca">Dépense</span></div>
+              <div class="spain-val">🇪🇸 <span class="lang-en">Spain</span><span class="lang-es">España</span><span class="lang-fr">Espagne</span><span class="lang-fr-ca">Espagne</span></div>
+              <div class="usa-val"><span class="lang-en">🇺🇸 United States</span><span class="lang-es">🇺🇸 Estados Unidos</span><span class="lang-fr">🇫🇷 France</span><span class="lang-fr-ca">🇨🇦 Canada</span></div>
             </div>
-            <div class="comparison-row"><div class="label"><span class="lang-en">Dinner for Two</span><span class="lang-es">Cena para Dos</span></div><div class="spain-val">€25 – €40</div><div class="usa-val">$80 – $150</div></div>
-            <div class="comparison-row"><div class="label"><span class="lang-en">Monthly Rent (2BR)</span><span class="lang-es">Alquiler Mensual (2 Hab.)</span></div><div class="spain-val">€700 – €1,200</div><div class="usa-val">$3,500 – $6,000</div></div>
-            <div class="comparison-row"><div class="label"><span class="lang-en">Health Insurance</span><span class="lang-es">Seguro Médico</span></div><div class="spain-val">€80 – €150/mo</div><div class="usa-val">$500 – $1,500/mo</div></div>
-            <div class="comparison-row"><div class="label"><span class="lang-en">Quality 3BR Home</span><span class="lang-es">Casa 3 Hab. de Calidad</span></div><div class="spain-val"><span class="lang-en">from</span><span class="lang-es">desde</span> €250,000</div><div class="usa-val">$900,000+</div></div>
-            <div class="comparison-row"><div class="label"><span class="lang-en">Annual Property Tax (IBI)</span><span class="lang-es">IBI (Impuesto Anual)</span></div><div class="spain-val">€250 – €800/<span class="lang-en">yr</span><span class="lang-es">año</span></div><div class="usa-val">$3,000 – $10,000+/<span class="lang-en">yr</span><span class="lang-es">año</span></div></div>
+            <div class="comparison-row"><div class="label"><span class="lang-en">Dinner for Two</span><span class="lang-es">Cena para Dos</span><span class="lang-fr">Dîner pour Deux</span><span class="lang-fr-ca">Souper pour Deux</span></div><div class="spain-val">€25 – €40</div><div class="usa-val">$80 – $150</div></div>
+            <div class="comparison-row"><div class="label"><span class="lang-en">Monthly Rent (2BR)</span><span class="lang-es">Alquiler Mensual (2 Hab.)</span><span class="lang-fr">Loyer Mensuel (2 ch.)</span><span class="lang-fr-ca">Loyer Mensuel (2 ch.)</span></div><div class="spain-val">€700 – €1,200</div><div class="usa-val">$3,500 – $6,000</div></div>
+            <div class="comparison-row"><div class="label"><span class="lang-en">Health Insurance</span><span class="lang-es">Seguro Médico</span><span class="lang-fr">Assurance Santé</span><span class="lang-fr-ca">Assurance Santé</span></div><div class="spain-val">€80 – €150/mo</div><div class="usa-val">$500 – $1,500/mo</div></div>
+            <div class="comparison-row"><div class="label"><span class="lang-en">Quality 3BR Home</span><span class="lang-es">Casa 3 Hab. de Calidad</span><span class="lang-fr">Maison 3 ch. de qualité</span><span class="lang-fr-ca">Maison 3 ch. de qualité</span></div><div class="spain-val"><span class="lang-en">from</span><span class="lang-es">desde</span><span class="lang-fr">à partir de</span><span class="lang-fr-ca">à partir de</span> €250,000</div><div class="usa-val">$900,000+</div></div>
+            <div class="comparison-row"><div class="label"><span class="lang-en">Annual Property Tax (IBI)</span><span class="lang-es">IBI (Impuesto Anual)</span><span class="lang-fr">Taxe foncière annuelle</span><span class="lang-fr-ca">Taxe foncière annuelle</span></div><div class="spain-val">€250 – €800/<span class="lang-en">yr</span><span class="lang-es">año</span><span class="lang-fr">an</span><span class="lang-fr-ca">an</span></div><div class="usa-val">$3,000 – $10,000+/<span class="lang-en">yr</span><span class="lang-es">año</span><span class="lang-fr">an</span><span class="lang-fr-ca">an</span></div></div>
           </div>
           <div class="text-center reveal" style="margin-top: 36px;">
-            <span class="savings-tag"><span class="lang-en">Save 40–60% on your cost of living while upgrading your lifestyle</span><span class="lang-es">Ahorra un 40–60% en tu coste de vida mientras mejoras tu estilo de vida</span></span>
+            <span class="savings-tag"><span class="lang-en">Save 40–60% on your cost of living while upgrading your lifestyle</span><span class="lang-es">Ahorra un 40–60% en tu coste de vida mientras mejoras tu estilo de vida</span><span class="lang-fr">Économisez 40–60% sur votre coût de la vie tout en améliorant votre qualité de vie</span><span class="lang-fr-ca">Économisez 40–60% sur votre coût de la vie tout en améliorant votre qualité de vie</span></span>
           </div>
         </div>
       </section>
@@ -417,8 +503,8 @@
       <section class="section properties">
         <div class="container">
           <div class="text-center reveal">
-            <span class="section-label"><span class="lang-en">Real Opportunities</span><span class="lang-es">Oportunidades Reales</span></span>
-            <h2 class="section-title"><span class="lang-en">Featured <span class="text-accent">Properties</span></span><span class="lang-es"><span class="text-accent">Propiedades</span> Destacadas</span></h2>
+            <span class="section-label"><span class="lang-en">Real Opportunities</span><span class="lang-es">Oportunidades Reales</span><span class="lang-fr">Opportunités Réelles</span><span class="lang-fr-ca">Opportunités Réelles</span></span>
+            <h2 class="section-title"><span class="lang-en">Featured <span class="text-accent">Properties</span></span><span class="lang-es"><span class="text-accent">Propiedades</span> Destacadas</span><span class="lang-fr"><span class="text-accent">Propriétés</span> en Vedette</span><span class="lang-fr-ca"><span class="text-accent">Propriétés</span> en Vedette</span></h2>
           </div>
           <div class="properties-carousel">
             <div class="properties-viewport">
@@ -500,9 +586,9 @@
       <section class="section process">
         <div class="container">
           <div class="text-center reveal">
-            <span class="section-label"><span class="lang-en">Step by Step</span><span class="lang-es">Paso a Paso</span></span>
-            <h2 class="section-title"><span class="lang-en">The Buying <span class="text-accent">Process</span></span><span class="lang-es">El <span class="text-accent">Proceso</span> de Compra</span></h2>
-            <p class="section-subtitle"><span class="lang-en">From first contact to keys in hand — we guide you through every stage</span><span class="lang-es">Desde el primer contacto hasta las llaves en mano — te acompañamos en cada etapa</span></p>
+            <span class="section-label"><span class="lang-en">Step by Step</span><span class="lang-es">Paso a Paso</span><span class="lang-fr">Étape par Étape</span><span class="lang-fr-ca">Étape par Étape</span></span>
+            <h2 class="section-title"><span class="lang-en">The Buying <span class="text-accent">Process</span></span><span class="lang-es">El <span class="text-accent">Proceso</span> de Compra</span><span class="lang-fr">Le Processus <span class="text-accent">d'Achat</span></span><span class="lang-fr-ca">Le Processus <span class="text-accent">d'Achat</span></span></h2>
+            <p class="section-subtitle"><span class="lang-en">From first contact to keys in hand — we guide you through every stage</span><span class="lang-es">Desde el primer contacto hasta las llaves en mano — te acompañamos en cada etapa</span><span class="lang-fr">Du premier contact jusqu'aux clés en main — nous vous guidons à chaque étape</span><span class="lang-fr-ca">Du premier contact jusqu'aux clés en main — nous vous accompagnons à chaque étape</span></p>
           </div>
 
           <!-- Pipeline Visual -->
@@ -522,8 +608,8 @@
                 </div>
                 <div class="node-label">
                   <span class="node-number">01</span>
-                  <h4><span class="lang-en">Get Your NIE</span><span class="lang-es">Obtener NIE</span></h4>
-                  <p><span class="lang-en">Tax ID · 1–2 weeks</span><span class="lang-es">Nº fiscal · 1–2 semanas</span></p>
+                  <h4><span class="lang-en">Get Your NIE</span><span class="lang-es">Obtener NIE</span><span class="lang-fr">Obtenir votre NIE</span><span class="lang-fr-ca">Obtenir votre NIE</span></h4>
+                  <p><span class="lang-en">Tax ID · 1–2 weeks</span><span class="lang-es">Nº fiscal · 1–2 semanas</span><span class="lang-fr">ID fiscal · 1–2 semaines</span><span class="lang-fr-ca">ID fiscal · 1–2 semaines</span></p>
                 </div>
               </div>
 
@@ -534,8 +620,8 @@
                 </div>
                 <div class="node-label">
                   <span class="node-number">02</span>
-                  <h4><span class="lang-en">Open Bank Account</span><span class="lang-es">Abrir Cuenta</span></h4>
-                  <p><span class="lang-en">Spanish bank setup</span><span class="lang-es">Cuenta bancaria española</span></p>
+                  <h4><span class="lang-en">Open Bank Account</span><span class="lang-es">Abrir Cuenta</span><span class="lang-fr">Ouvrir un Compte</span><span class="lang-fr-ca">Ouvrir un Compte</span></h4>
+                  <p><span class="lang-en">Spanish bank setup</span><span class="lang-es">Cuenta bancaria española</span><span class="lang-fr">Compte bancaire espagnol</span><span class="lang-fr-ca">Compte bancaire espagnol</span></p>
                 </div>
               </div>
 
@@ -546,8 +632,8 @@
                 </div>
                 <div class="node-label">
                   <span class="node-number">03</span>
-                  <h4><span class="lang-en">Define Strategy</span><span class="lang-es">Definir Estrategia</span></h4>
-                  <p><span class="lang-en">Investment or holiday</span><span class="lang-es">¿Inversión o vacaciones?</span></p>
+                  <h4><span class="lang-en">Define Strategy</span><span class="lang-es">Definir Estrategia</span><span class="lang-fr">Définir votre Stratégie</span><span class="lang-fr-ca">Définir votre Stratégie</span></h4>
+                  <p><span class="lang-en">Investment or holiday</span><span class="lang-es">¿Inversión o vacaciones?</span><span class="lang-fr">Investissement ou vacances</span><span class="lang-fr-ca">Placement ou vacances</span></p>
                 </div>
               </div>
 
@@ -558,8 +644,8 @@
                 </div>
                 <div class="node-label">
                   <span class="node-number">04</span>
-                  <h4><span class="lang-en">Property Selection</span><span class="lang-es">Selección</span></h4>
-                  <p><span class="lang-en">Curated for you</span><span class="lang-es">Selección personalizada</span></p>
+                  <h4><span class="lang-en">Property Selection</span><span class="lang-es">Selección</span><span class="lang-fr">Sélection de Biens</span><span class="lang-fr-ca">Sélection de Propriétés</span></h4>
+                  <p><span class="lang-en">Curated for you</span><span class="lang-es">Selección personalizada</span><span class="lang-fr">Pré-sélectionnées</span><span class="lang-fr-ca">Pré-sélectionnées</span></p>
                 </div>
               </div>
 
@@ -570,8 +656,8 @@
                 </div>
                 <div class="node-label">
                   <span class="node-number">05</span>
-                  <h4><span class="lang-en">Due Diligence</span><span class="lang-es">Due Diligence</span></h4>
-                  <p><span class="lang-en">Legal verification</span><span class="lang-es">Verificación legal</span></p>
+                  <h4><span class="lang-en">Due Diligence</span><span class="lang-es">Due Diligence</span><span class="lang-fr">Due Diligence</span><span class="lang-fr-ca">Diligence Raisonnable</span></h4>
+                  <p><span class="lang-en">Legal verification</span><span class="lang-es">Verificación legal</span><span class="lang-fr">Vérification juridique</span><span class="lang-fr-ca">Vérification juridique</span></p>
                 </div>
               </div>
 
@@ -582,7 +668,7 @@
                 </div>
                 <div class="node-label">
                   <span class="node-number">06</span>
-                  <h4><span class="lang-en">Reservation</span><span class="lang-es">Reserva</span></h4>
+                  <h4><span class="lang-en">Reservation</span><span class="lang-es">Reserva</span><span class="lang-fr">Réservation</span><span class="lang-fr-ca">Dépôt de Réservation</span></h4>
                   <p>3.000 € – 10.000 €</p>
                 </div>
               </div>
@@ -594,8 +680,8 @@
                 </div>
                 <div class="node-label">
                   <span class="node-number">07</span>
-                  <h4><span class="lang-en">Contract</span><span class="lang-es">Contrato</span></h4>
-                  <p><span class="lang-en">10% deposit</span><span class="lang-es">10% depósito</span></p>
+                  <h4><span class="lang-en">Contract</span><span class="lang-es">Contrato</span><span class="lang-fr">Promesse de Vente</span><span class="lang-fr-ca">Promesse d'Achat</span></h4>
+                  <p><span class="lang-en">10% deposit</span><span class="lang-es">10% depósito</span><span class="lang-fr">Acompte 10%</span><span class="lang-fr-ca">Acompte 10%</span></p>
                 </div>
               </div>
 
@@ -606,8 +692,8 @@
                 </div>
                 <div class="node-label">
                   <span class="node-number">08</span>
-                  <h4><span class="lang-en">Completion</span><span class="lang-es">Escritura</span></h4>
-                  <p><span class="lang-en">Keys in hand 🔑</span><span class="lang-es">Llaves en mano 🔑</span></p>
+                  <h4><span class="lang-en">Completion</span><span class="lang-es">Escritura</span><span class="lang-fr">Acte de Vente</span><span class="lang-fr-ca">Acte Notarié</span></h4>
+                  <p><span class="lang-en">Keys in hand 🔑</span><span class="lang-es">Llaves en mano 🔑</span><span class="lang-fr">Clés en main 🔑</span><span class="lang-fr-ca">Clés en main 🔑</span></p>
                 </div>
               </div>
             </div>
@@ -647,17 +733,17 @@
       <section class="section faq">
         <div class="container">
           <div class="text-center reveal">
-            <h2 class="section-title"><span class="lang-en">Frequently Asked <span class="text-accent">Questions</span></span><span class="lang-es">Preguntas <span class="text-accent">Frecuentes</span></span></h2>
+            <h2 class="section-title"><span class="lang-en">Frequently Asked <span class="text-accent">Questions</span></span><span class="lang-es">Preguntas <span class="text-accent">Frecuentes</span></span><span class="lang-fr">Foire Aux <span class="text-accent">Questions</span></span><span class="lang-fr-ca">Questions <span class="text-accent">Fréquentes</span></span></h2>
           </div>
           <div class="faq-list">
-            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">Can Americans buy property in Spain?</span><span class="lang-es">¿Pueden los americanos comprar propiedad en España?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">Yes, absolutely. There are no restrictions for non-EU citizens. You only need a NIE (Spanish tax ID number), which our team typically obtains in 1–2 weeks.</span><span class="lang-es">Sí, por supuesto. No existen restricciones para ciudadanos de fuera de la UE. Solo necesitas un NIE (Número de Identidad de Extranjero), que nuestro equipo suele tramitar en 1-2 semanas.</span></div></div></div>
-            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">Will I be taxed twice?</span><span class="lang-es">¿Me cobrarán impuestos dos veces?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">No. The United States and Spain have a Double Taxation Treaty in place. This protects you from paying taxes twice on the same income or asset.</span><span class="lang-es">No. España y Estados Unidos tienen en vigor un Convenio de Doble Imposición. Esto evita que pagues impuestos por duplicado por el mismo concepto o rentas.</span></div></div></div>
-            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">Can I buy without traveling to Spain?</span><span class="lang-es">¿Puedo comprar sin viajar a España?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">Yes. By granting a Power of Attorney (POA) to our associated law firm, Fuster & Associates, they can handle the entire purchase, NIE, and bank setup on your behalf, 100% remotely.</span><span class="lang-es">Sí. Al otorgar un Poder Notarial (POA) a nuestro despacho jurídico asociado Fuster & Associates, ellos se encargan de formalizar la compra, solicitar el NIE y abrir tu cuenta bancaria de forma 100% remota.</span></div></div></div>
-            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">What rental returns can I expect?</span><span class="lang-es">¿Qué rentabilidad por alquiler puedo esperar?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">Typically 5% – 8% annually in prime tourist areas of the Costa Blanca. Premium properties managed by Inmomás Holidays generate between 60.000 € and 80.000 €/year.</span><span class="lang-es">Por lo general, entre un 5% y un 8% anual en zonas turísticas de la Costa Blanca. Propiedades gestionadas por Inmomás Holidays pueden llegar a generar entre 60.000 € y 80.000 €/año.</span></div></div></div>
-            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">What additional costs and taxes should I expect?</span><span class="lang-es">¿Qué gastos e impuestos adicionales debo esperar?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">You should budget approximately 11% – 13% on top of the purchase price for closing costs. This includes the Property Transfer Tax (ITP, 10% in Comunidad Valenciana), Notary fees, Land Registry, and legal fees.</span><span class="lang-es">Debes presupuestar aproximadamente entre un 11% y un 13% adicional sobre el precio de compra. Esto incluye el Impuesto de Transmisiones Patrimoniales (ITP, 10% en la Comunidad Valenciana), Notaría, Registro de la Propiedad y honorarios de asesoría jurídica.</span></div></div></div>
-            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">Can I get a mortgage in Spain as a US citizen?</span><span class="lang-es">¿Es posible obtener una hipoteca en España siendo ciudadano de EE.UU.?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">Yes. Our partner Banco UCI specializes in mortgages for non-residents. They can finance up to 60% – 70% of the property value, with approval processes taking as little as 48 hours.</span><span class="lang-es">Sí. Nuestro socio Banco UCI se especializa en hipotecas para no residentes. Pueden financiar hasta el 60% - 70% del valor de la propiedad, con pre-aprobación en un plazo de 48 horas.</span></div></div></div>
-            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">How long does the entire purchase process take?</span><span class="lang-es">¿Cuánto tiempo lleva todo el proceso de compra?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">Usually between 4 and 8 weeks from the reservation deposit to signing the deed before a notary. Having documents like your NIE ready beforehand speeds up the process significantly.</span><span class="lang-es">Generalmente entre 4 y 8 semanas desde el depósito de reserva hasta la firma de las escrituras ante notario. Contar con el NIE y los fondos listos ayuda a acelerar este plazo considerablemente.</span></div></div></div>
-            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">Who manages my property if I live in the United States?</span><span class="lang-es">¿Quién gestionará mi propiedad mientras esté en Estados Unidos?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">Our division, Inmomás Holidays, provides complete vacation rental management: guest communication, key exchange, professional cleaning, maintenance, and marketing. You just receive your monthly yield.</span><span class="lang-es">Nuestra división Inmomás Holidays ofrece un servicio integral de gestión de alquileres vacacionales: atención al huésped, entrega de llaves, limpieza profesional, mantenimiento y marketing. Tú solo recibes tu rentabilidad mensual.</span></div></div></div>
+            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">Can international buyers purchase property in Spain?</span><span class="lang-es">¿Pueden los compradores internacionales comprar propiedad en España?</span><span class="lang-fr">Les acheteurs étrangers peuvent-ils acheter un bien en Espagne ?</span><span class="lang-fr-ca">Les acheteurs canadiens peuvent-ils acheter une propriété en Espagne ?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">Yes, absolutely. There are no restrictions for non-EU citizens. You only need a NIE (Spanish tax ID number), which our team typically obtains in 1–2 weeks.</span><span class="lang-es">Sí, por supuesto. No existen restricciones para ciudadanos de fuera de la UE. Solo necesitas un NIE (Número de Identidad de Extranjero), que nuestro equipo suele tramitar en 1-2 semanas.</span><span class="lang-fr">Oui, absolument. Il n'y a aucune restriction pour les citoyens non-européens. Il vous faut uniquement un NIE (numéro fiscal espagnol), que notre équipe obtient généralement en 1–2 semaines.</span><span class="lang-fr-ca">Oui, absolument. Il n'y a aucune restriction pour les citoyens non-européens, y compris les Canadiens. Il vous faut uniquement un NIE (numéro d'identification fiscal espagnol), que notre équipe obtient généralement en 1–2 semaines.</span></div></div></div>
+            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">Will I be taxed twice?</span><span class="lang-es">¿Me cobrarán impuestos dos veces?</span><span class="lang-fr">Serai-je imposé deux fois ?</span><span class="lang-fr-ca">Serai-je imposé deux fois ?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">No. The United States and Spain have a Double Taxation Treaty in place. This protects you from paying taxes twice on the same income or asset.</span><span class="lang-es">No. España y Estados Unidos tienen en vigor un Convenio de Doble Imposición. Esto evita que pagues impuestos por duplicado por el mismo concepto o rentas.</span><span class="lang-fr">Non. La France et l'Espagne ont signé une convention de double imposition. Cela vous protège contre une double taxation sur les mêmes revenus ou actifs.</span><span class="lang-fr-ca">Non. Le Canada et l'Espagne ont conclu une convention de double imposition. Cela vous protège contre une double imposition sur les mêmes revenus ou biens.</span></div></div></div>
+            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">Can I buy without traveling to Spain?</span><span class="lang-es">¿Puedo comprar sin viajar a España?</span><span class="lang-fr">Puis-je acheter sans me déplacer en Espagne ?</span><span class="lang-fr-ca">Puis-je acheter sans voyager en Espagne ?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">Yes. By granting a Power of Attorney (POA) to our associated law firm, Fuster & Associates, they can handle the entire purchase, NIE, and bank setup on your behalf, 100% remotely.</span><span class="lang-es">Sí. Al otorgar un Poder Notarial (POA) a nuestro despacho jurídico asociado Fuster & Associates, ellos se encargan de formalizar la compra, solicitar el NIE y abrir tu cuenta bancaria de forma 100% remota.</span><span class="lang-fr">Oui. En accordant une procuration (POA) à notre cabinet juridique partenaire Fuster & Associates, ils peuvent gérer l'intégralité de l'achat, le NIE et l'ouverture du compte bancaire, 100% à distance.</span><span class="lang-fr-ca">Oui. En accordant une procuration (POA) à notre cabinet juridique partenaire Fuster & Associates, ils peuvent gérer l'intégralité de l'achat, le NIE et l'ouverture du compte bancaire depuis le Canada, 100% à distance.</span></div></div></div>
+            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">What rental returns can I expect?</span><span class="lang-es">¿Qué rentabilidad por alquiler puedo esperar?</span><span class="lang-fr">Quel rendement locatif puis-je espérer ?</span><span class="lang-fr-ca">Quel rendement locatif puis-je espérer ?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">Typically 5% – 8% annually in prime tourist areas of the Costa Blanca. Premium properties managed by Inmomás Holidays generate between 60.000 € and 80.000 €/year.</span><span class="lang-es">Por lo general, entre un 5% y un 8% anual en zonas turísticas de la Costa Blanca. Propiedades gestionadas por Inmomás Holidays pueden llegar a generar entre 60.000 € y 80.000 €/año.</span><span class="lang-fr">En général, entre 5% et 8% par an dans les zones touristiques de la Costa Blanca. Les biens haut de gamme gérés par Inmomás Holidays génèrent entre 60.000 € et 80.000 €/an.</span><span class="lang-fr-ca">Généralement entre 5% et 8% par année dans les zones touristiques de la Costa Blanca. Les propriétés haut de gamme gérées par Inmomás Holidays génèrent entre 60 000 € et 80 000 €/année.</span></div></div></div>
+            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">What additional costs and taxes should I expect?</span><span class="lang-es">¿Qué gastos e impuestos adicionales debo esperar?</span><span class="lang-fr">Quels frais et taxes supplémentaires dois-je prévoir ?</span><span class="lang-fr-ca">Quels frais et taxes supplémentaires dois-je prévoir ?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">You should budget approximately 11% – 13% on top of the purchase price for closing costs. This includes the Property Transfer Tax (ITP, 10% in Comunidad Valenciana), Notary fees, Land Registry, and legal fees.</span><span class="lang-es">Debes presupuestar aproximadamente entre un 11% y un 13% adicional sobre el precio de compra. Esto incluye el Impuesto de Transmisiones Patrimoniales (ITP, 10% en la Comunidad Valenciana), Notaría, Registro de la Propiedad y honorarios de asesoría jurídica.</span><span class="lang-fr">Prévoyez environ 11% à 13% supplémentaires sur le prix d'achat pour les frais de clôture. Cela comprend la taxe de transfert de propriété (ITP, 10% en Comunidad Valenciana), les frais de notaire, d'enregistrement et les honoraires juridiques.</span><span class="lang-fr-ca">Prévoyez environ 11% à 13% supplémentaires sur le prix d'achat pour les frais d'acquisition. Cela comprend la taxe de transfert (ITP, 10% en Communauté valencienne), les frais de notaire, d'enregistrement et les honoraires juridiques.</span></div></div></div>
+            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">Can I get a mortgage in Spain as a foreign buyer?</span><span class="lang-es">¿Es posible obtener una hipoteca en España siendo comprador extranjero?</span><span class="lang-fr">Puis-je obtenir un crédit immobilier en Espagne en tant qu'étranger ?</span><span class="lang-fr-ca">Puis-je obtenir une hypothèque en Espagne en tant que Canadien ?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">Yes. Our partner Banco UCI specializes in mortgages for non-residents. They can finance up to 60% – 70% of the property value, with approval processes taking as little as 48 hours.</span><span class="lang-es">Sí. Nuestro socio Banco UCI se especializa en hipotecas para no residentes. Pueden financiar hasta el 60% - 70% del valor de la propiedad, con pre-aprobación en un plazo de 48 horas.</span><span class="lang-fr">Oui. Notre partenaire Banco UCI est spécialisé dans les crédits immobiliers pour les non-résidents. Ils peuvent financer jusqu'à 60% – 70% de la valeur du bien, avec un accord préalable sous 48 heures.</span><span class="lang-fr-ca">Oui. Notre partenaire Banco UCI est spécialisé dans les hypothèques pour non-résidents. Ils peuvent financer jusqu'à 60% – 70% de la valeur de la propriété, avec une pré-approbation sous 48 heures.</span></div></div></div>
+            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">How long does the entire purchase process take?</span><span class="lang-es">¿Cuánto tiempo lleva todo el proceso de compra?</span><span class="lang-fr">Combien de temps dure l'ensemble du processus d'achat ?</span><span class="lang-fr-ca">Combien de temps dure l'ensemble du processus d'achat ?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">Usually between 4 and 8 weeks from the reservation deposit to signing the deed before a notary. Having documents like your NIE ready beforehand speeds up the process significantly.</span><span class="lang-es">Generalmente entre 4 y 8 semanas desde el depósito de reserva hasta la firma de las escrituras ante notario. Contar con el NIE y los fondos listos ayuda a acelerar este plazo considerablemente.</span><span class="lang-fr">Généralement entre 4 et 8 semaines, depuis le dépôt de réservation jusqu'à la signature de l'acte chez le notaire. Disposer du NIE et des fonds à l'avance accélère considérablement le processus.</span><span class="lang-fr-ca">Généralement entre 4 et 8 semaines, depuis le dépôt de réservation jusqu'à la signature de l'acte notarié. Avoir votre NIE et vos fonds prêts à l'avance accélère considérablement le processus.</span></div></div></div>
+            <div class="faq-item reveal"><button class="faq-question"><span class="lang-en">Who manages my property if I live abroad?</span><span class="lang-es">¿Quién gestionará mi propiedad mientras esté en el extranjero?</span><span class="lang-fr">Qui gère ma propriété si je vis à l'étranger ?</span><span class="lang-fr-ca">Qui gère ma propriété si je vis au Canada ?</span><span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner"><span class="lang-en">Our division, Inmomás Holidays, provides complete vacation rental management: guest communication, key exchange, professional cleaning, maintenance, and marketing. You just receive your monthly yield.</span><span class="lang-es">Nuestra división Inmomás Holidays ofrece un servicio integral de gestión de alquileres vacacionales: atención al huésped, entrega de llaves, limpieza profesional, mantenimiento y marketing. Tú solo recibes tu rentabilidad mensual.</span><span class="lang-fr">Notre division Inmomás Holidays propose une gestion complète des locations de vacances : communication avec les locataires, remise des clés, nettoyage professionnel, entretien et marketing. Vous percevez simplement votre revenu mensuel.</span><span class="lang-fr-ca">Notre division Inmomás Holidays offre une gestion complète des locations de vacances : communication avec les locataires, remise des clés, nettoyage professionnel, entretien et mise en marché. Vous n'avez qu'à recevoir votre revenu mensuel.</span></div></div></div>
           </div>
         </div>
       </section>
@@ -672,18 +758,24 @@
             <div class="hero-badge">
               <span class="lang-en">International Referral Program</span>
               <span class="lang-es">Programa Internacional de Referidos</span>
+              <span class="lang-fr">Programme de Référence International</span>
+              <span class="lang-fr-ca">Programme de Référence International</span>
             </div>
             <h1 class="hero-title">
               <span class="lang-en">Your Clients Buy in Spain.<br><span class="text-accent">You Earn the Commission.</span></span>
               <span class="lang-es">Tus Clientes Compran en España.<br><span class="text-accent">Tú Ganas la Comisión.</span></span>
+              <span class="lang-fr">Vos Clients Achètent en Espagne.<br><span class="text-accent">Vous Touchez la Commission.</span></span>
+              <span class="lang-fr-ca">Vos Clients Achètent en Espagne.<br><span class="text-accent">Vous Touchez la Commission.</span></span>
             </h1>
             <p class="hero-subtitle">
               <span class="lang-en">Join RE/MAX Inmomás' International Referral Network. Refer your clients interested in Costa Blanca properties and earn 25% of the buyer-side commission — fully automated, fully transparent.</span>
               <span class="lang-es">Únete a la Red Internacional de Referidos de RE/MAX Inmomás. Refiere a tus clientes interesados en propiedades en la Costa Blanca y gana el 25% de la comisión del lado comprador — totalmente automatizado, totalmente transparente.</span>
+              <span class="lang-fr">Rejoignez le Réseau International de Référence de RE/MAX Inmomás. Référez vos clients intéressés par des biens sur la Costa Blanca et percevez 25% de la commission côté acheteur — totalement automatisé, totalement transparent.</span>
+              <span class="lang-fr-ca">Rejoignez le Réseau International de Référence de RE/MAX Inmomás. Référez vos clients intéressés par des propriétés sur la Costa Blanca et percevez 25% de la commission côté acheteur — entièrement automatisé, entièrement transparent.</span>
             </p>
             <div class="hero-ctas">
-              <a href="#register" class="btn btn-primary"><span class="lang-en">Apply as Partner</span><span class="lang-es">Aplicar como Partner</span></a>
-              <a href="#login" class="btn btn-outline"><span class="lang-en">Partner Login</span><span class="lang-es">Acceso Partners</span></a>
+              <a href="#register" class="btn btn-primary"><span class="lang-en">Apply as Partner</span><span class="lang-es">Aplicar como Partner</span><span class="lang-fr">Devenir Partenaire</span><span class="lang-fr-ca">Devenir Partenaire</span></a>
+              <a href="#login" class="btn btn-outline"><span class="lang-en">Partner Login</span><span class="lang-es">Acceso Partners</span><span class="lang-fr">Accès Partenaires</span><span class="lang-fr-ca">Accès Partenaires</span></a>
             </div>
           </div>
         </div>
@@ -693,10 +785,10 @@
       <section class="section" style="padding: 48px 0;">
         <div class="container">
           <div class="hero-stats" style="justify-content: center;">
-            <div class="hero-stat"><div class="hero-stat-value">13%</div><div class="hero-stat-label"><span class="lang-en">YoY Market Growth</span><span class="lang-es">Crecimiento Anual</span></div></div>
-            <div class="hero-stat"><div class="hero-stat-value">#1</div><div class="hero-stat-label"><span class="lang-en">EU Destination for US Buyers</span><span class="lang-es">Destino UE para Compradores de EE.UU.</span></div></div>
-            <div class="hero-stat"><div class="hero-stat-value">6-8%</div><div class="hero-stat-label"><span class="lang-en">Average ROI</span><span class="lang-es">ROI Medio</span></div></div>
-            <div class="hero-stat"><div class="hero-stat-value">25%</div><div class="hero-stat-label"><span class="lang-en">Your Commission Share</span><span class="lang-es">Tu Parte de Comisión</span></div></div>
+            <div class="hero-stat"><div class="hero-stat-value">13%</div><div class="hero-stat-label"><span class="lang-en">YoY Market Growth</span><span class="lang-es">Crecimiento Anual</span><span class="lang-fr">Croissance Annuelle</span><span class="lang-fr-ca">Croissance Annuelle</span></div></div>
+            <div class="hero-stat"><div class="hero-stat-value">#1</div><div class="hero-stat-label"><span class="lang-en">EU Destination for International Buyers</span><span class="lang-es">Destino UE para Compradores Internacionales</span><span class="lang-fr">Destination UE pour Acheteurs Internationaux</span><span class="lang-fr-ca">Destination UE pour Acheteurs Canadiens</span></div></div>
+            <div class="hero-stat"><div class="hero-stat-value">6-8%</div><div class="hero-stat-label"><span class="lang-en">Average ROI</span><span class="lang-es">ROI Medio</span><span class="lang-fr">ROI Moyen</span><span class="lang-fr-ca">ROI Moyen</span></div></div>
+            <div class="hero-stat"><div class="hero-stat-value">25%</div><div class="hero-stat-label"><span class="lang-en">Your Commission Share</span><span class="lang-es">Tu Parte de Comisión</span><span class="lang-fr">Votre Part de Commission</span><span class="lang-fr-ca">Votre Part de Commission</span></div></div>
           </div>
         </div>
       </section>
