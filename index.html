@@ -3,12 +3,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>RE/MAX Inmomás — International Advisory Division</title>
   <meta name="description" content="Advisory for international buyers — Canadians, Americans, Europeans — buying property in Spain. 30+ years on the Costa Blanca. Legal, tax, mortgages, rentals & real estate — one trusted team.">
   <meta property="og:title" content="REMAX Inmomás — International Advisory Division">
   <meta property="og:description" content="Your trusted team for buying property on Spain's Costa Blanca. Legal, tax & real estate advisory for international buyers.">
   <meta property="og:type" content="website">
+  <!-- Mobile / PWA -->
+  <meta name="theme-color" content="#0043ff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="mobile-web-app-capable" content="yes">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="icon" type="image/png" href="Globo_CMYK.png">
 </head>
@@ -47,7 +52,7 @@
           <span class="lang-fr">Pour les Agents</span>
           <span class="lang-en-ca">For Agents</span>
         </a>
-        <a href="#faq">
+        <a href="#about-spain" data-scroll-to="faq">
           <span class="lang-en">FAQ</span>
           <span class="lang-es">FAQ</span>
           <span class="lang-fr">FAQ</span>
@@ -113,6 +118,9 @@
       </div>
     </div>
   </nav>
+
+  <!-- Mobile Nav Drawer Overlay -->
+  <div class="mobile-nav-overlay" id="mobile-nav-overlay" aria-hidden="true"></div>
 
   
 

@@ -5780,35 +5780,39 @@ body.lang-en-ca .lang-fr { display: none; }
 
 
 
+
+
 /* ============================================
-   MOBILE OPTIMIZATION — RE/MAX Inmomás
-   Comprehensive fixes for mobile layout,
-   image centering, and text overlap prevention
+   MOBILE WEB-APP OPTIMIZATION — RE/MAX Inmomás
+   Full mobile-first experience:
+   - Hero full-cover image with overlay
+   - Slide-in drawer navigation
+   - Body scroll lock when nav open
+   - Centered sections, correct padding
+   - No text overlaps
    ============================================ */
 
-/* --- Hero Background Image (full-cover behind text) --- */
+/* ===========================================
+   1. HERO — Full-cover image + text overlay
+   =========================================== */
+
 .hero-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .hero-bg img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
+  object-position: center 30%;
   display: block;
 }
 
-/* Ensure hero content sits above the background */
-.hero .container {
-  position: relative;
-  z-index: 2;
-}
-
-/* Dark overlay on hero so text is readable over the image */
+/* Dark gradient overlay so text is readable */
 .hero::before {
   content: '';
   position: absolute;
@@ -5816,52 +5820,280 @@ body.lang-en-ca .lang-fr { display: none; }
   z-index: 1;
   background: linear-gradient(
     160deg,
-    rgba(0, 0, 0, 0.55) 0%,
-    rgba(0, 0, 0, 0.30) 60%,
-    rgba(0, 0, 0, 0.10) 100%
+    rgba(0, 10, 40, 0.70) 0%,
+    rgba(0, 20, 60, 0.50) 50%,
+    rgba(0, 10, 30, 0.35) 100%
   );
   pointer-events: none;
 }
 
-/* Ensure hero text is light on the dark overlay */
-.hero .hero-title,
-.hero .hero-badge,
-.hero .hero-stat-value,
-.hero .hero-stat-label {
-  color: #ffffff;
+/* All hero content above the image+overlay */
+.hero .container {
+  position: relative;
+  z-index: 2;
 }
 
-.hero .hero-subtitle {
-  color: rgba(255, 255, 255, 0.85);
+/* Hero text: white over dark overlay */
+.hero-title {
+  color: #ffffff !important;
 }
 
-/* --- Container: tighter padding on mobile --- */
-@media (max-width: 480px) {
-  :root {
-    --container-padding: 0 16px;
-    --section-padding: 48px 0;
+.hero-badge {
+  color: rgba(255,255,255,0.9) !important;
+  border-color: rgba(255,255,255,0.25) !important;
+  background: rgba(255,255,255,0.08) !important;
+}
+
+.hero-subtitle {
+  color: rgba(255,255,255,0.82) !important;
+}
+
+.hero-stat-value {
+  color: #ffffff !important;
+}
+
+.hero-stat-label {
+  color: rgba(255,255,255,0.70) !important;
+}
+
+.hero-stat::before {
+  background: rgba(255,255,255,0.5) !important;
+}
+
+/* Outline button in hero: white border on dark bg */
+.hero-ctas .btn-outline {
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,0.45) !important;
+  background: rgba(255,255,255,0.08) !important;
+}
+
+.hero-ctas .btn-outline:hover {
+  background: rgba(255,255,255,0.18) !important;
+  border-color: rgba(255,255,255,0.7) !important;
+}
+
+
+/* ===========================================
+   2. BODY SCROLL LOCK when nav is open
+   =========================================== */
+body.nav-open {
+  overflow: hidden;
+  /* iOS Safari needs this to actually prevent scroll */
+  position: fixed;
+  width: 100%;
+}
+
+
+/* ===========================================
+   3. MOBILE DRAWER OVERLAY (backdrop)
+   =========================================== */
+.mobile-nav-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 10, 40, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 998;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.mobile-nav-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+  .mobile-nav-overlay {
+    display: block;
   }
-
-  .container {
-    padding: 0 16px;
-  }
 }
 
-/* ============================================
-   MOBILE: <= 768px
-   ============================================ */
+
+/* ===========================================
+   4. HAMBURGER BUTTON — animated to X
+   =========================================== */
 @media (max-width: 768px) {
 
-  /* --- Hero: stack content, reduce min-height --- */
-  .hero {
-    min-height: 100svh;
-    padding-top: 70px;
+  /* Ensure it's always visible */
+  .mobile-menu-btn {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    gap: 0;
+    background: rgba(0, 67, 255, 0.08);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 1001;
+    position: relative;
+  }
+
+  .mobile-menu-btn span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--text-primary);
+    border-radius: 2px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: absolute;
+  }
+
+  .mobile-menu-btn span:nth-child(1) { top: 12px; }
+  .mobile-menu-btn span:nth-child(2) { top: 19px; }
+  .mobile-menu-btn span:nth-child(3) { top: 26px; }
+
+  /* Animate to X when active */
+  .mobile-menu-btn.active span:nth-child(1) {
+    top: 19px;
+    transform: rotate(45deg);
+  }
+  .mobile-menu-btn.active span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  .mobile-menu-btn.active span:nth-child(3) {
+    top: 19px;
+    transform: rotate(-45deg);
+  }
+
+  /* Hide sidebar-toggle on public pages (only show mobile-menu-btn) */
+  .sidebar-toggle {
+    display: none !important;
+  }
+}
+
+
+/* ===========================================
+   5. SLIDE-IN DRAWER NAVIGATION
+   =========================================== */
+@media (max-width: 768px) {
+
+  /* Drawer: slides in from left */
+  #public-nav.nav-links {
+    display: flex !important; /* Always in DOM, controlled by transform */
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(300px, 85vw);
+    flex-direction: column;
     align-items: flex-start;
+    background: #ffffff;
+    padding: 80px 28px 40px;
+    gap: 4px;
+    z-index: 999;
+    transform: translateX(-100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 8px 0 40px rgba(0, 0, 0, 0.15);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    border-right: 1px solid var(--border-subtle);
+  }
+
+  #public-nav.nav-links.active {
+    transform: translateX(0);
+  }
+
+  /* Nav links inside drawer: full-width tap targets */
+  #public-nav.nav-links a {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    border-radius: 10px;
+    transition: background 0.2s, color 0.2s;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  #public-nav.nav-links a:hover,
+  #public-nav.nav-links a:active {
+    background: rgba(0, 67, 255, 0.06);
+    color: var(--blue);
+  }
+
+  /* CTA buttons in drawer: full width */
+  #public-nav.nav-links a.btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+    padding: 13px 20px;
+    font-size: 0.9rem;
+  }
+
+  /* Divider before CTA buttons */
+  #public-nav.nav-links a.btn-outline {
+    margin-top: 16px;
+    border-top: 1px solid var(--border-subtle);
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-top: 20px;
+    padding-bottom: 16px;
+  }
+
+  #public-nav.nav-links a.btn-primary {
+    background: var(--gradient-red);
+    color: #fff;
+    border-radius: 10px;
+    margin-top: 8px;
+    border: none;
+  }
+
+  /* Navbar: always solid white on mobile */
+  .navbar {
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-sm);
+    padding: 12px 0;
+  }
+
+  /* Navbar container: logo left, right controls right */
+  .navbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* Nav-right: lang + hamburger side by side */
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+
+/* ===========================================
+   6. HERO — Mobile layout
+   =========================================== */
+@media (max-width: 768px) {
+
+  .hero {
+    min-height: 100dvh;
+    min-height: 100svh;
+    padding-top: 68px; /* navbar height */
+    align-items: center;
+    display: flex;
   }
 
   .hero .container {
-    padding-top: 32px;
-    padding-bottom: 48px;
+    padding-top: 28px;
+    padding-bottom: 52px;
+    width: 100%;
   }
 
   .hero-content {
@@ -5871,85 +6103,181 @@ body.lang-en-ca .lang-fr { display: none; }
 
   .hero-badge {
     justify-content: center;
-    text-align: center;
     flex-wrap: wrap;
     white-space: normal;
+    font-size: 0.68rem !important;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    padding: 6px 14px;
   }
 
   .hero-title {
-    font-size: clamp(1.8rem, 7vw, 2.4rem);
-    line-height: 1.18;
+    font-size: clamp(1.85rem, 8vw, 2.6rem) !important;
+    line-height: 1.15;
+    margin-bottom: 16px;
   }
 
   .hero-subtitle {
-    font-size: 1rem;
+    font-size: 0.98rem !important;
     max-width: 100%;
+    line-height: 1.75;
+    margin-bottom: 32px;
   }
 
+  /* CTA buttons: stacked, full width */
   .hero-ctas {
-    justify-content: center;
     flex-direction: column;
     align-items: center;
     gap: 12px;
+    margin-bottom: 40px;
   }
 
   .hero-ctas .btn {
     width: 100%;
-    max-width: 320px;
+    max-width: 340px;
     justify-content: center;
+    font-size: 0.92rem;
+    padding: 14px 24px;
   }
 
-  /* Hero stats: center on mobile */
+  /* Stats: grid 2×2 on mobile */
   .hero-stats {
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
     flex-wrap: wrap;
-    gap: 20px 32px;
   }
 
   .hero-stat {
     text-align: center;
     padding-left: 0;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 14px 12px;
   }
 
   .hero-stat::before {
-    display: none;
+    display: none !important;
   }
 
   .hero-stat-value {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
   }
 
-  /* --- Trust / partner logos bar: center & wrap --- */
-  .trust-bar .trust-logos,
+  .hero-stat-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+  }
+}
+
+
+/* ===========================================
+   7. CONTAINER — Consistent mobile padding
+   =========================================== */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+
+  :root {
+    --section-padding: 60px 0;
+    --container-padding: 0 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  :root {
+    --section-padding: 48px 0;
+    --container-padding: 0 16px;
+  }
+}
+
+
+/* ===========================================
+   8. TRUST BAR — Partner logos centered
+   =========================================== */
+@media (max-width: 768px) {
+
+  .trust-bar {
+    padding: 20px 0;
+  }
+
   .trust-logos {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
     gap: 16px 24px !important;
   }
 
   .trust-item {
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 0;
   }
 
   .trust-item img {
-    height: 28px;
+    height: 26px !important;
     object-fit: contain;
   }
 
   .trust-divider {
-    display: none;
+    display: none !important;
   }
 
   .trust-partner-name,
   .trust-partner-role {
     text-align: center;
+    font-size: 0.78rem;
+  }
+}
+
+
+/* ===========================================
+   9. QUICK INTRO SECTION
+   =========================================== */
+@media (max-width: 768px) {
+
+  .section .container.text-center [style*="display: flex"] {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 12px !important;
   }
 
-  /* --- Team cards: center images and content --- */
+  .section .container.text-center .btn {
+    min-width: 0;
+    flex: 1 1 calc(50% - 6px);
+    font-size: 0.82rem;
+    padding: 12px 16px;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .section .container.text-center .btn {
+    flex: 1 1 100%;
+  }
+}
+
+
+/* ===========================================
+   10. TEAM GRID — Single column, centered
+   =========================================== */
+@media (max-width: 768px) {
+
+  .team-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
   .team-card {
     text-align: center;
     padding: 28px 24px;
@@ -5959,6 +6287,11 @@ body.lang-en-ca .lang-fr { display: none; }
     margin-left: auto;
     margin-right: auto;
     display: block;
+    height: 32px;
+  }
+
+  .team-card h3 {
+    font-size: 1.1rem;
   }
 
   .team-card .team-stats {
@@ -5968,77 +6301,165 @@ body.lang-en-ca .lang-fr { display: none; }
   .team-card .team-services {
     align-items: center;
   }
+}
 
-  /* --- Team grid: always single column on mobile --- */
-  .team-grid {
-    grid-template-columns: 1fr !important;
-    gap: 20px;
+
+/* ===========================================
+   11. SECTION HEADERS — Centered mobile
+   =========================================== */
+@media (max-width: 768px) {
+
+  .section-label {
+    justify-content: center !important;
   }
 
-  /* --- Section headers: center consistently --- */
-  .section-label {
-    justify-content: center;
-    text-align: center;
+  .section-title {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    line-height: 1.25;
   }
 
   .section-subtitle {
     text-align: center;
     margin-left: auto;
     margin-right: auto;
+    font-size: 0.95rem;
   }
 
-  /* --- Comparison table: prevent text overflow --- */
-  .comparison-table {
-    max-width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  .text-center .section-label {
+    justify-content: center !important;
   }
+}
 
-  .comparison-row {
-    grid-template-columns: 1.4fr 0.8fr 0.8fr;
-    gap: 4px;
-    padding: 14px 0;
-  }
 
-  .comparison-row .label {
-    font-size: 0.78rem;
-    line-height: 1.3;
-  }
+/* ===========================================
+   12. REASON / WHY-SPAIN GRID
+   =========================================== */
+@media (max-width: 768px) {
 
-  .comparison-row .spain-val,
-  .comparison-row .spain-price,
-  .comparison-row .usa-val,
-  .comparison-row .usa-price {
-    font-size: 0.85rem;
-    text-align: center;
-  }
-
-  .comparison-row.header {
-    font-size: 0.72rem;
-    letter-spacing: 0.5px;
-  }
-
-  /* --- Reason cards: single column --- */
   .reasons-grid {
     grid-template-columns: 1fr !important;
-    gap: 16px;
+    gap: 14px;
   }
 
   .reason-card {
-    padding: 24px;
+    padding: 22px 20px;
   }
 
-  /* --- Empathy / fear grid: single column --- */
+  .reason-card h3 {
+    font-size: 1rem;
+  }
+}
+
+
+/* ===========================================
+   13. EMPATHY / FEAR GRID
+   =========================================== */
+@media (max-width: 768px) {
+
   .empathy-grid,
   .fear-grid {
     grid-template-columns: 1fr !important;
-    gap: 16px;
+    gap: 14px;
   }
 
-  /* --- Footer grid: single column, centered --- */
-  .footer-grid {
+  .empathy-card,
+  .fear-card {
+    padding: 22px 20px 22px 18px;
+  }
+}
+
+
+/* ===========================================
+   14. COMPARISON TABLE
+   =========================================== */
+@media (max-width: 768px) {
+
+  .comparison-table {
+    max-width: 100%;
+  }
+
+  .comparison-row {
+    grid-template-columns: 1.5fr 0.75fr 0.75fr;
+    gap: 4px;
+    padding: 13px 0;
+  }
+
+  .comparison-row .label {
+    font-size: 0.76rem;
+    line-height: 1.35;
+  }
+
+  .comparison-row .spain-val,
+  .comparison-row .spain-price {
+    font-size: 0.84rem;
+  }
+
+  .comparison-row .usa-val,
+  .comparison-row .usa-price {
+    font-size: 0.78rem;
+  }
+
+  .comparison-row.header {
+    font-size: 0.68rem;
+    letter-spacing: 0.3px;
+  }
+
+  .savings-badge,
+  .savings-tag {
+    display: flex;
+    justify-content: center;
+    margin: 24px auto 0;
+    font-size: 0.88rem;
+  }
+}
+
+
+/* ===========================================
+   15. PROPERTIES CAROUSEL
+   =========================================== */
+@media (max-width: 768px) {
+
+  .properties-carousel {
+    padding: 0 4px;
+  }
+
+  .properties-prev,
+  .properties-next {
+    width: 34px;
+    height: 34px;
+    font-size: 0.85rem;
+  }
+
+  .properties-prev { left: -4px; }
+  .properties-next { right: -4px; }
+}
+
+
+/* ===========================================
+   16. VIP / WEBINAR CONTENT
+   =========================================== */
+@media (max-width: 768px) {
+
+  .vip-content,
+  .webinar-content {
     grid-template-columns: 1fr !important;
     gap: 24px;
+  }
+}
+
+
+/* ===========================================
+   17. FOOTER — Single column, centered
+   =========================================== */
+@media (max-width: 768px) {
+
+  .footer {
+    padding: 48px 0 32px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 28px;
     text-align: center;
   }
 
@@ -6047,145 +6468,128 @@ body.lang-en-ca .lang-fr { display: none; }
   }
 
   .footer-logo {
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto 12px;
   }
 
   .footer-links {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-  }
-
-  .footer-links a {
-    text-align: center;
-    justify-content: center;
-  }
-
-  .footer-bottom {
-    text-align: center;
-    justify-content: center;
-  }
-
-  /* --- Properties carousel buttons smaller --- */
-  .properties-prev,
-  .properties-next {
-    width: 36px;
-    height: 36px;
-    font-size: 0.9rem;
-  }
-
-  .properties-carousel {
-    padding: 0 8px;
-  }
-
-  /* --- Modal: full-width on mobile --- */
-  .modal-body-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .modal-features-row {
-    flex-wrap: wrap;
     gap: 8px;
   }
 
-  /* --- VIP / webinar content --- */
-  .vip-content,
-  .webinar-content {
-    grid-template-columns: 1fr !important;
-    gap: 24px;
-  }
-
-  /* --- Savings badge: center --- */
-  .savings-badge,
-  .savings-tag {
-    margin-left: auto;
-    margin-right: auto;
+  .footer-links a {
+    font-size: 0.85rem;
     text-align: center;
   }
 
-  /* --- Process / pipeline: horizontal scroll --- */
-  .pipeline-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 8px;
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    padding-top: 20px;
   }
 
-  /* --- Quick intro section buttons: stack --- */
-  .section .container [style*="display: flex"] {
-    flex-wrap: wrap;
+  .footer-bottom p {
+    font-size: 0.76rem;
   }
 }
 
-/* ============================================
-   MOBILE: <= 480px (extra small)
-   ============================================ */
-@media (max-width: 480px) {
 
-  /* Hero: tighter */
-  .hero {
-    min-height: 100svh;
+/* ===========================================
+   18. ABOUT SPAIN PAGE — section padding
+   =========================================== */
+@media (max-width: 768px) {
+
+  /* Compensate for the fixed navbar */
+  #view-about-spain .why-spain,
+  #view-about-spain section:first-child {
+    padding-top: 88px;
   }
 
+  /* PDF CTA Banner */
+  #view-about-spain .card[style*="display: flex"] {
+    flex-direction: column !important;
+    text-align: center;
+  }
+
+  #view-about-spain .card[style*="display: flex"] a {
+    width: 100%;
+    justify-content: center !important;
+  }
+}
+
+
+/* ===========================================
+   19. ALL VIEWS: ensure nav-offset padding
+   =========================================== */
+@media (max-width: 768px) {
+
+  /* Any section with padding-top: 120px should reduce on mobile */
+  [style*="padding-top: 120px"] {
+    padding-top: 88px !important;
+  }
+
+  /* Inline-flex buttons: allow wrap */
+  .btn {
+    white-space: normal;
+    text-align: center;
+  }
+
+  /* Prevent horizontal overflow site-wide */
+  body {
+    overflow-x: hidden;
+  }
+}
+
+
+/* ===========================================
+   20. MISC small-screen polish
+   =========================================== */
+@media (max-width: 480px) {
+
   .hero-title {
-    font-size: 1.75rem;
+    font-size: 1.8rem !important;
   }
 
   .hero-stat-value {
-    font-size: 1.3rem;
+    font-size: 1.35rem;
   }
 
-  /* Navbar: compact logo */
   .nav-logo-img {
-    height: 32px;
+    height: 30px;
   }
 
-  /* Cards: reduce padding */
   .card,
   .glass-card,
   .reason-card,
   .fear-card,
   .empathy-card {
-    padding: 20px 18px;
+    padding: 18px 16px;
   }
 
   .team-card {
-    padding: 24px 18px;
+    padding: 22px 16px;
   }
 
-  /* Trust logos: smaller */
-  .trust-item img {
-    height: 24px;
-  }
-
-  /* Section titles */
   .section-title {
-    font-size: 1.55rem;
-    line-height: 1.22;
+    font-size: 1.45rem;
   }
 
-  /* Buttons: full width in hero */
-  .hero-ctas .btn {
-    max-width: 100%;
-    font-size: 0.88rem;
-    padding: 13px 24px;
-  }
-
-  /* Comparison table: auto-collapse to scrollable */
-  .comparison-row {
-    grid-template-columns: 1.2fr 0.9fr 0.9fr;
-    padding: 12px 0;
-  }
-
-  /* Footer offices: smaller text */
+  /* Footer office addresses: smaller */
   .footer-links a {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
+    line-height: 1.5;
   }
 
-  /* Team stats badges */
-  .team-stats span {
-    font-size: 0.75rem;
-    padding: 4px 10px;
+  /* Comparison: slightly smaller */
+  .comparison-row .label {
+    font-size: 0.72rem;
+  }
+
+  /* Properties track: full card on mobile */
+  .properties-track .property-card {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
   }
 }
-
-
-
