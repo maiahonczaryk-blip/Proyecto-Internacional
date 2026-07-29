@@ -5883,9 +5883,6 @@ body.lang-en-ca .lang-fr { display: none; }
    =========================================== */
 body.nav-open {
   overflow: hidden;
-  /* iOS Safari needs this to actually prevent scroll */
-  position: fixed;
-  width: 100%;
 }
 
 
@@ -5991,11 +5988,10 @@ body.nav-open {
     bottom: 0 !important;
     width: 280px !important;
     max-width: 85vw !important;
-    height: 100% !important;
     flex-direction: column !important;
     align-items: flex-start !important;
     background: #ffffff !important;
-    padding: 84px 24px 40px !important;
+    padding: 72px 20px 40px !important;
     gap: 2px !important;
     z-index: 999 !important;
     transform: translateX(-100%) !important;
