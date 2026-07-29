@@ -5780,3 +5780,412 @@ body.lang-en-ca .lang-fr { display: none; }
 
 
 
+/* ============================================
+   MOBILE OPTIMIZATION — RE/MAX Inmomás
+   Comprehensive fixes for mobile layout,
+   image centering, and text overlap prevention
+   ============================================ */
+
+/* --- Hero Background Image (full-cover behind text) --- */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+/* Ensure hero content sits above the background */
+.hero .container {
+  position: relative;
+  z-index: 2;
+}
+
+/* Dark overlay on hero so text is readable over the image */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    160deg,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.30) 60%,
+    rgba(0, 0, 0, 0.10) 100%
+  );
+  pointer-events: none;
+}
+
+/* Ensure hero text is light on the dark overlay */
+.hero .hero-title,
+.hero .hero-badge,
+.hero .hero-stat-value,
+.hero .hero-stat-label {
+  color: #ffffff;
+}
+
+.hero .hero-subtitle {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* --- Container: tighter padding on mobile --- */
+@media (max-width: 480px) {
+  :root {
+    --container-padding: 0 16px;
+    --section-padding: 48px 0;
+  }
+
+  .container {
+    padding: 0 16px;
+  }
+}
+
+/* ============================================
+   MOBILE: <= 768px
+   ============================================ */
+@media (max-width: 768px) {
+
+  /* --- Hero: stack content, reduce min-height --- */
+  .hero {
+    min-height: 100svh;
+    padding-top: 70px;
+    align-items: flex-start;
+  }
+
+  .hero .container {
+    padding-top: 32px;
+    padding-bottom: 48px;
+  }
+
+  .hero-content {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .hero-badge {
+    justify-content: center;
+    text-align: center;
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+
+  .hero-title {
+    font-size: clamp(1.8rem, 7vw, 2.4rem);
+    line-height: 1.18;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+    max-width: 100%;
+  }
+
+  .hero-ctas {
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hero-ctas .btn {
+    width: 100%;
+    max-width: 320px;
+    justify-content: center;
+  }
+
+  /* Hero stats: center on mobile */
+  .hero-stats {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px 32px;
+  }
+
+  .hero-stat {
+    text-align: center;
+    padding-left: 0;
+  }
+
+  .hero-stat::before {
+    display: none;
+  }
+
+  .hero-stat-value {
+    font-size: 1.4rem;
+  }
+
+  /* --- Trust / partner logos bar: center & wrap --- */
+  .trust-bar .trust-logos,
+  .trust-logos {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 16px 24px !important;
+  }
+
+  .trust-item {
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .trust-item img {
+    height: 28px;
+    object-fit: contain;
+  }
+
+  .trust-divider {
+    display: none;
+  }
+
+  .trust-partner-name,
+  .trust-partner-role {
+    text-align: center;
+  }
+
+  /* --- Team cards: center images and content --- */
+  .team-card {
+    text-align: center;
+    padding: 28px 24px;
+  }
+
+  .team-card .team-logo {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+  }
+
+  .team-card .team-stats {
+    justify-content: center;
+  }
+
+  .team-card .team-services {
+    align-items: center;
+  }
+
+  /* --- Team grid: always single column on mobile --- */
+  .team-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px;
+  }
+
+  /* --- Section headers: center consistently --- */
+  .section-label {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .section-subtitle {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* --- Comparison table: prevent text overflow --- */
+  .comparison-table {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .comparison-row {
+    grid-template-columns: 1.4fr 0.8fr 0.8fr;
+    gap: 4px;
+    padding: 14px 0;
+  }
+
+  .comparison-row .label {
+    font-size: 0.78rem;
+    line-height: 1.3;
+  }
+
+  .comparison-row .spain-val,
+  .comparison-row .spain-price,
+  .comparison-row .usa-val,
+  .comparison-row .usa-price {
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  .comparison-row.header {
+    font-size: 0.72rem;
+    letter-spacing: 0.5px;
+  }
+
+  /* --- Reason cards: single column --- */
+  .reasons-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  .reason-card {
+    padding: 24px;
+  }
+
+  /* --- Empathy / fear grid: single column --- */
+  .empathy-grid,
+  .fear-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  /* --- Footer grid: single column, centered --- */
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px;
+    text-align: center;
+  }
+
+  .footer-brand {
+    text-align: center;
+  }
+
+  .footer-logo {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .footer-links {
+    align-items: center;
+  }
+
+  .footer-links a {
+    text-align: center;
+    justify-content: center;
+  }
+
+  .footer-bottom {
+    text-align: center;
+    justify-content: center;
+  }
+
+  /* --- Properties carousel buttons smaller --- */
+  .properties-prev,
+  .properties-next {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+
+  .properties-carousel {
+    padding: 0 8px;
+  }
+
+  /* --- Modal: full-width on mobile --- */
+  .modal-body-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-features-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* --- VIP / webinar content --- */
+  .vip-content,
+  .webinar-content {
+    grid-template-columns: 1fr !important;
+    gap: 24px;
+  }
+
+  /* --- Savings badge: center --- */
+  .savings-badge,
+  .savings-tag {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  /* --- Process / pipeline: horizontal scroll --- */
+  .pipeline-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+  }
+
+  /* --- Quick intro section buttons: stack --- */
+  .section .container [style*="display: flex"] {
+    flex-wrap: wrap;
+  }
+}
+
+/* ============================================
+   MOBILE: <= 480px (extra small)
+   ============================================ */
+@media (max-width: 480px) {
+
+  /* Hero: tighter */
+  .hero {
+    min-height: 100svh;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+  }
+
+  .hero-stat-value {
+    font-size: 1.3rem;
+  }
+
+  /* Navbar: compact logo */
+  .nav-logo-img {
+    height: 32px;
+  }
+
+  /* Cards: reduce padding */
+  .card,
+  .glass-card,
+  .reason-card,
+  .fear-card,
+  .empathy-card {
+    padding: 20px 18px;
+  }
+
+  .team-card {
+    padding: 24px 18px;
+  }
+
+  /* Trust logos: smaller */
+  .trust-item img {
+    height: 24px;
+  }
+
+  /* Section titles */
+  .section-title {
+    font-size: 1.55rem;
+    line-height: 1.22;
+  }
+
+  /* Buttons: full width in hero */
+  .hero-ctas .btn {
+    max-width: 100%;
+    font-size: 0.88rem;
+    padding: 13px 24px;
+  }
+
+  /* Comparison table: auto-collapse to scrollable */
+  .comparison-row {
+    grid-template-columns: 1.2fr 0.9fr 0.9fr;
+    padding: 12px 0;
+  }
+
+  /* Footer offices: smaller text */
+  .footer-links a {
+    font-size: 0.82rem;
+  }
+
+  /* Team stats badges */
+  .team-stats span {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+  }
+}
+
+
+
