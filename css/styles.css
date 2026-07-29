@@ -5915,270 +5915,129 @@ body.nav-open {
 
 
 /* ===========================================
-   4. HAMBURGER BUTTON — animated to X
+   4. HIDE OLD HAMBURGER + NAV-LINKS ON MOBILE
+   (replaced by bottom nav bar)
    =========================================== */
 @media (max-width: 768px) {
+  /* Hide hamburger button — not needed with bottom nav */
+  .mobile-menu-btn { display: none !important; }
+  .sidebar-toggle  { display: none !important; }
 
-  .mobile-menu-btn {
-    display: flex !important;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    gap: 0;
-    background: rgba(0, 67, 255, 0.08);
-    border: 1px solid var(--border-subtle);
-    border-radius: 8px;
-    cursor: pointer;
-    z-index: 200;
-    position: relative;
-    flex-shrink: 0;
-  }
+  /* Hide the top nav links completely on mobile */
+  #public-nav.nav-links { display: none !important; }
 
-  .mobile-menu-btn span {
-    display: block;
-    width: 20px;
-    height: 2px;
-    background: var(--text-primary);
-    border-radius: 2px;
-    transition: all 0.28s ease;
-    position: absolute;
-  }
+  /* Hide overlay — no longer needed */
+  .mobile-nav-overlay { display: none !important; }
 
-  .mobile-menu-btn span:nth-child(1) { top: 12px; }
-  .mobile-menu-btn span:nth-child(2) { top: 19px; }
-  .mobile-menu-btn span:nth-child(3) { top: 26px; }
-
-  .mobile-menu-btn.active span:nth-child(1) {
-    top: 19px;
-    transform: rotate(45deg);
-  }
-  .mobile-menu-btn.active span:nth-child(2) {
-    opacity: 0;
-    transform: scaleX(0);
-  }
-  .mobile-menu-btn.active span:nth-child(3) {
-    top: 19px;
-    transform: rotate(-45deg);
-  }
-
-  .sidebar-toggle {
-    display: none !important;
-  }
-}
-
-
-/* ===========================================
-   5. MOBILE DROPDOWN NAVIGATION
-   =========================================== */
-@media (max-width: 768px) {
-
-  /* Navbar stays solid white */
+  /* Navbar on mobile: logo + language selector only */
   .navbar {
-    background: #ffffff !important;
+    background: rgba(255,255,255,0.97) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
     border-bottom: 1px solid var(--border-subtle) !important;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08) !important;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06) !important;
     padding: 10px 0 !important;
-    position: fixed !important;
-    z-index: 100 !important;
   }
 
-  .navbar .container {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    flex-wrap: nowrap !important;
-  }
-
-  .nav-right {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    flex-shrink: 0;
-  }
-
-  /* ── Dropdown panel ── */
-  #public-nav.nav-links {
-    display: none !important;
-    position: absolute !important;
-    top: 100% !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    flex-direction: column !important;
-    background: #ffffff !important;
-    border-top: 1px solid var(--border-subtle) !important;
-    border-bottom: 2px solid var(--border-subtle) !important;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.10) !important;
-    padding: 12px 16px 20px !important;
-    gap: 2px !important;
-    z-index: 99 !important;
-    transform: none !important;
-    transition: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    overflow: visible !important;
-  }
-
-  #public-nav.nav-links.active {
-    display: flex !important;
-  }
-
-  /* Each link: tall tap target */
-  #public-nav.nav-links a {
-    display: block !important;
-    width: 100% !important;
-    padding: 13px 12px !important;
-    font-size: 1rem !important;
-    font-weight: 500 !important;
-    color: var(--text-primary) !important;
-    background: transparent !important;
-    border-radius: 8px !important;
-    text-decoration: none !important;
-    line-height: 1.2 !important;
-    box-sizing: border-box !important;
-    border: none !important;
-  }
-
-  #public-nav.nav-links a:active {
-    background: rgba(0, 67, 255, 0.06) !important;
-  }
-
-  /* Login CTA */
-  #public-nav.nav-links a.btn-outline.nav-cta {
-    margin-top: 10px !important;
-    text-align: center !important;
-    border: 1.5px solid var(--border-light) !important;
-    border-radius: 10px !important;
-    padding: 13px 12px !important;
-    color: var(--text-primary) !important;
-    background: transparent !important;
-  }
-
-  /* Join as Partner CTA */
-  #public-nav.nav-links a.btn-primary.nav-cta {
-    margin-top: 6px !important;
-    text-align: center !important;
-    border-radius: 10px !important;
-    padding: 13px 12px !important;
-    background: var(--red, #cc1e12) !important;
-    color: #ffffff !important;
-    border: none !important;
+  /* Add bottom padding to main content so it clears the bottom nav */
+  .app-main,
+  main,
+  body > main {
+    padding-bottom: 70px !important;
   }
 }
 
 
 /* ===========================================
-   5. SLIDE-IN DRAWER NAVIGATION
+   5. MOBILE BOTTOM NAVIGATION BAR
    =========================================== */
+
+/* Hidden on desktop */
+.mobile-bottom-nav {
+  display: none;
+}
+
 @media (max-width: 768px) {
-
-  /* Drawer: slides in from left — !important needed to override
-     older .nav-links rules at lines ~2284 and ~2701 */
-  #public-nav.nav-links {
-    display: flex !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: auto !important;
-    bottom: 0 !important;
-    width: 280px !important;
-    max-width: 85vw !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    background: #ffffff !important;
-    padding: 72px 20px 40px !important;
-    gap: 2px !important;
-    z-index: 999 !important;
-    transform: translateX(-100%) !important;
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    box-shadow: 6px 0 32px rgba(0, 0, 0, 0.18) !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
-    border-right: 1px solid var(--border-subtle) !important;
-    border-bottom: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    /* iOS safe area */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    height: calc(60px + env(safe-area-inset-bottom, 0px));
+    align-items: stretch;
   }
 
-  #public-nav.nav-links.active {
-    transform: translateX(0) !important;
-  }
-
-  /* Nav links inside drawer: full-width tap targets */
-  #public-nav.nav-links a {
-    display: flex !important;
+  /* Each tab item */
+  .bnav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    width: 100% !important;
-    padding: 13px 14px !important;
-    font-size: 0.97rem !important;
-    font-weight: 500;
-    color: var(--text-primary) !important;
-    border-radius: 10px;
-    transition: background 0.18s, color 0.18s;
-    gap: 8px;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 4px;
     text-decoration: none;
+    color: #9ca3af;
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    transition: color 0.18s ease;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+    border: none;
+    background: none;
+    min-width: 0;
+  }
+
+  .bnav-item svg {
+    width: 22px;
+    height: 22px;
+    stroke-width: 1.8;
+    flex-shrink: 0;
+  }
+
+  /* Active / current tab */
+  .bnav-item.active {
+    color: #0043ff;
+  }
+
+  .bnav-item.active svg {
+    stroke: #0043ff;
+  }
+
+  /* Hover / tap feedback */
+  .bnav-item:active {
+    color: #0043ff;
+    opacity: 0.75;
+  }
+
+  /* Center "Guide" tab: highlighted pill */
+  .bnav-item.bnav-center {
+    color: #dc2626;
+  }
+
+  .bnav-item.bnav-center svg {
+    stroke: #dc2626;
+  }
+
+  .bnav-item.bnav-center:active {
+    color: #b91c1c;
+  }
+
+  /* Only show the correct language label */
+  .bnav-item span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
-    box-sizing: border-box;
-  }
-
-  #public-nav.nav-links a:hover,
-  #public-nav.nav-links a:active {
-    background: rgba(0, 67, 255, 0.07) !important;
-    color: var(--blue) !important;
-  }
-
-  /* Login button: outlined style */
-  #public-nav.nav-links a.btn-outline.nav-cta {
-    margin-top: 14px !important;
-    width: 100% !important;
-    justify-content: center !important;
-    padding: 12px 16px !important;
-    font-size: 0.9rem !important;
-    border-radius: 10px !important;
-    border: 1px solid var(--border-light) !important;
-    color: var(--text-primary) !important;
-    background: transparent !important;
-  }
-
-  /* Join as Partner button: red fill */
-  #public-nav.nav-links a.btn-primary.nav-cta {
-    width: 100% !important;
-    justify-content: center !important;
-    padding: 13px 16px !important;
-    font-size: 0.9rem !important;
-    border-radius: 10px !important;
-    background: var(--gradient-red) !important;
-    color: #fff !important;
-    border: none !important;
-    margin-top: 6px !important;
-  }
-
-  /* Navbar: always solid white on mobile */
-  .navbar {
-    background: rgba(255, 255, 255, 0.98) !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border-subtle);
-    box-shadow: var(--shadow-sm);
-    padding: 12px 0;
-  }
-
-  /* Navbar container: logo left, right controls right */
-  .navbar .container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  /* Nav-right: lang + hamburger side by side */
-  .nav-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    line-height: 1;
   }
 }
 

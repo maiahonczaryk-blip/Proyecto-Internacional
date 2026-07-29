@@ -115,55 +115,33 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll();
 
-  // ── Mobile Drawer Menu ──
-  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-  const navLinks = document.getElementById('public-nav');
-  const mobileNavOverlay = document.getElementById('mobile-nav-overlay');
+  // ── Bottom Nav — active tab on scroll ──
+  const bnavItems = document.querySelectorAll('.bnav-item[data-section]');
 
-  function openMobileNav() {
-    navLinks.classList.add('active');
-    mobileMenuBtn.classList.add('active');
-    document.body.classList.add('nav-open');
-    if (mobileNavOverlay) {
-      mobileNavOverlay.classList.add('active');
-      mobileNavOverlay.setAttribute('aria-hidden', 'false');
-    }
-  }
+  function updateBottomNav() {
+    if (!bnavItems.length) return;
+    const navH = navbar ? navbar.offsetHeight : 60;
+    let currentSection = '';
 
-  function closeMobileNav() {
-    navLinks.classList.remove('active');
-    mobileMenuBtn.classList.remove('active');
-    document.body.classList.remove('nav-open');
-    if (mobileNavOverlay) {
-      mobileNavOverlay.classList.remove('active');
-      mobileNavOverlay.setAttribute('aria-hidden', 'true');
-    }
-  }
-
-  if (mobileMenuBtn && navLinks) {
-    mobileMenuBtn.addEventListener('click', () => {
-      if (navLinks.classList.contains('active')) {
-        closeMobileNav();
-      } else {
-        openMobileNav();
+    bnavItems.forEach(item => {
+      const sectionId = item.dataset.section;
+      const section = document.getElementById('view-' + sectionId) ||
+                      document.getElementById(sectionId);
+      if (section) {
+        const rect = section.getBoundingClientRect();
+        if (rect.top <= navH + 80) {
+          currentSection = sectionId;
+        }
       }
     });
 
-    // Close on link click
-    navLinks.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', closeMobileNav);
-    });
-
-    // Close on overlay click
-    if (mobileNavOverlay) {
-      mobileNavOverlay.addEventListener('click', closeMobileNav);
-    }
-
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeMobileNav();
+    bnavItems.forEach(item => {
+      item.classList.toggle('active', item.dataset.section === currentSection);
     });
   }
+
+  window.addEventListener('scroll', updateBottomNav, { passive: true });
+  updateBottomNav();
 
   // ── Smooth Scroll ──
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
