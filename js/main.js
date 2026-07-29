@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateBottomNav() {
     if (!bnavItems.length) return;
     const navH = navbar ? navbar.offsetHeight : 60;
-    let currentSection = '';
+    let currentSection = 'home'; // default to home
 
     bnavItems.forEach(item => {
       const sectionId = item.dataset.section;
@@ -129,7 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
                       document.getElementById(sectionId);
       if (section) {
         const rect = section.getBoundingClientRect();
-        if (rect.top <= navH + 80) {
+        // Skip hidden sections (display:none returns height 0)
+        if (rect.height > 0 && rect.top <= navH + 80) {
           currentSection = sectionId;
         }
       }
