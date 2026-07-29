@@ -5,15 +5,15 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  // ── Language Selector (4 idiomas: EN, ES, FR, FR-CA) ──
+  // ── Language Selector (4 idiomas: EN, ES, FR, EN-CA) ──
   const body = document.body;
   let currentLang = 'en';
 
   const langConfig = {
-    en:    { flag: '🇺🇸', code: 'EN' },
-    es:    { flag: '🇪🇸', code: 'ES' },
-    fr:    { flag: '🇫🇷', code: 'FR' },
-    'fr-ca': { flag: '🇨🇦', code: 'FR' }
+    en:      { flag: '🇺🇸', code: 'EN' },
+    es:      { flag: '🇪🇸', code: 'ES' },
+    fr:      { flag: '🇨🇦', code: 'FR' },
+    'en-ca': { flag: '🇨🇦', code: 'EN-CA' }
   };
 
   const langSelectorWrapper = document.getElementById('lang-selector-wrapper');
@@ -28,11 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
     currentLang = lang;
 
     // Update body class
-    body.classList.remove('lang-en', 'lang-es', 'lang-fr', 'lang-fr-ca');
+    body.classList.remove('lang-en', 'lang-es', 'lang-fr', 'lang-en-ca');
     body.classList.add('lang-' + lang);
 
     // Update html lang attribute
-    const htmlLangMap = { en: 'en', es: 'es', fr: 'fr', 'fr-ca': 'fr-CA' };
+    const htmlLangMap = { en: 'en', es: 'es', fr: 'fr', 'en-ca': 'en-CA' };
     document.documentElement.lang = htmlLangMap[lang];
 
     // Update button appearance
@@ -94,11 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
         'email': 'jean@exemple.fr',
         'phone': '+33 6 12 34 56 78'
       },
-      'fr-ca': {
-        'first-name': 'Jean',
-        'last-name': 'Tremblay',
-        'email': 'jean@exemple.ca',
-        'phone': '+1 (514) 555-1234'
+      'en-ca': {
+        'first-name': 'James',
+        'last-name': 'Thompson',
+        'email': 'james@example.ca',
+        'phone': '+1 (416) 555-1234'
       }
     };
     Object.entries(placeholders[lang] || {}).forEach(([id, placeholder]) => {
@@ -236,13 +236,13 @@ document.addEventListener('DOMContentLoaded', () => {
           en: '✓ Registered Successfully',
           es: '✓ Registrado con Éxito',
           fr: '✓ Inscription réussie',
-          'fr-ca': '✓ Inscription réussie'
+          'en-ca': '✓ Registered Successfully'
         };
         const detailMsgs = {
           en: '🎉 Check your email for webinar details and your free guide!',
           es: '🎉 ¡Revisa tu email para los detalles del webinar y tu guía gratuita!',
           fr: '🎉 Consultez votre e-mail pour les détails du webinaire et votre guide gratuit !',
-          'fr-ca': '🎉 Vérifiez votre courriel pour les détails du webinaire et votre guide gratuit !'
+          'en-ca': '🎉 Check your email for webinar details and your free guide!'
         };
         submitBtn.innerHTML = successMsgs[currentLang] || successMsgs['en'];
 
@@ -397,21 +397,21 @@ document.addEventListener('DOMContentLoaded', () => {
           ]
         },
         fr: {
-          title: "Obtenir votre NIE",
+          title: "Get Your NIE",
           desc: "Le NIE (Numéro d'identité des étrangers) est indispensable pour acheter un bien immobilier, ouvrir un compte bancaire ou souscrire à des services en Espagne. Notre cabinet juridique partenaire gère l'ensemble de la procédure auprès du bureau de l'immigration ou du consulat.",
           highlights: [
-            { icon: "⏱", text: "1–2 semaines" },
+            { icon: "⏱", text: "1–2 weeks" },
             { icon: "🏰", text: "Fuster & Associates" },
-            { icon: "🌐", text: "100% à distance" }
+            { icon: "🌐", text: "100% remote" }
           ]
         },
-        'fr-ca': {
-          title: "Obtenir votre NIE",
-          desc: "Le NIE (Numéro d'identité des étrangers) est indispensable pour acheter une propriété, ouvrir un compte bancaire ou souscrire à des services en Espagne. Notre cabinet juridique partenaire gère l'ensemble de la démarche auprès du bureau de l'immigration ou du consulat, sans que vous ayez à vous déplacer.",
+        'en-ca': {
+          title: "Get Your NIE",
+          desc: "The NIE (Foreigner Identity Number) is essential for buying property, opening bank accounts, or contracting utility services in Spain. Our partner law firm handles the entire application process with the immigration office or consulate — no travel required from Canada.",
           highlights: [
-            { icon: "⏱", text: "1–2 semaines" },
+            { icon: "⏱", text: "1–2 weeks" },
             { icon: "🏰", text: "Fuster & Associates" },
-            { icon: "🌐", text: "100% à distance" }
+            { icon: "🌐", text: "100% remote" }
           ]
         }
       },
@@ -435,21 +435,21 @@ document.addEventListener('DOMContentLoaded', () => {
           ]
         },
         fr: {
-          title: "Ouvrir un Compte Bancaire",
+          title: "Open Bank Account",
           desc: "Vous aurez besoin d'un compte bancaire espagnol pour transférer les fonds d'achat et domicilier vos futures factures et impôts. Nous vous aidons à ouvrir un compte rapidement et à distance via nos partenaires bancaires et hypothécaires.",
           highlights: [
             { icon: "🏦", text: "Partenaire Banco UCI" },
             { icon: "📱", text: "Ouverture à distance" },
-            { icon: "✅", text: "Sans déplacement" }
+            { icon: "✅", text: "No travel needed" }
           ]
         },
-        'fr-ca': {
-          title: "Ouvrir un Compte Bancaire",
-          desc: "Vous aurez besoin d'un compte bancaire espagnol pour transférer les fonds d'achat et mettre en place les prélèvements automatiques pour vos futures factures et impôts. Nous vous accompagnons pour ouvrir votre compte rapidement et à distance via nos partenaires bancaires.",
+        'en-ca': {
+          title: "Open Bank Account",
+          desc: "You will need a Spanish bank account to transfer purchase funds and set up direct debits for future utility bills and taxes. We assist you in opening the account quickly and remotely through our banking partners — easy to do from Canada.",
           highlights: [
-            { icon: "🏦", text: "Partenaire Banco UCI" },
-            { icon: "📱", text: "Ouverture à distance" },
-            { icon: "✅", text: "Sans déplacement" }
+            { icon: "🏦", text: "Banco UCI partner" },
+            { icon: "📱", text: "Remote setup" },
+            { icon: "✅", text: "No travel needed" }
           ]
         }
       },
@@ -473,7 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ]
         },
         fr: {
-          title: "Définir votre Stratégie",
+          title: "Define Your Strategy",
           desc: "Nous analysons vos objectifs : investissement à haut rendement ou résidence de vacances. Nous élaborons un plan adapté à votre profil financier et personnel pour optimiser la fiscalité et le rendement.",
           highlights: [
             { icon: "📊", text: "Plan personnalisé" },
@@ -481,13 +481,13 @@ document.addEventListener('DOMContentLoaded', () => {
             { icon: "🏖", text: "Investissement ou vacances" }
           ]
         },
-        'fr-ca': {
-          title: "Définir votre Stratégie",
-          desc: "Nous analysons vos objectifs : placement immobilier à haut rendement ou résidence de vacances. Nous concevons un plan sur mesure adapté à votre profil financier et personnel pour optimiser la fiscalité et le retour sur investissement.",
+        'en-ca': {
+          title: "Define Your Strategy",
+          desc: "We analyse your goals: whether you want a high-yield investment property or a holiday home. We design a plan tailored to your financial and personal profile to optimise tax efficiency and returns.",
           highlights: [
-            { icon: "📊", text: "Plan sur mesure" },
-            { icon: "💰", text: "Optimisation fiscale" },
-            { icon: "🏖", text: "Placement ou vacances" }
+            { icon: "📊", text: "Personalised plan" },
+            { icon: "💰", text: "Tax optimisation" },
+            { icon: "🏖", text: "Investment or vacation" }
           ]
         }
       },
@@ -515,15 +515,15 @@ document.addEventListener('DOMContentLoaded', () => {
           desc: "Nous sélectionnons les meilleures propriétés sur la Costa Blanca selon vos critères. Nous accédons à la base de données complète RE/MAX et aux biens hors marché pour vous garantir des visites ciblées et qualifiées.",
           highlights: [
             { icon: "🏠", text: "Base RE/MAX" },
-            { icon: "🔒", text: "Accès hors marché" },
-            { icon: "🎯", text: "Pré-qualifiées" }
+            { icon: "🔒", text: "Off-market access" },
+            { icon: "🎯", text: "Pre-qualified" }
           ]
         },
-        'fr-ca': {
-          title: "Sélection de Propriétés",
-          desc: "Nous sélectionnons les meilleures propriétés sur la Costa Blanca en fonction de vos critères. Nous accédons à la base de données complète RE/MAX et aux inscriptions hors marché pour vous garantir des visites ciblées et pré-qualifiées.",
+        'en-ca': {
+          title: "Property Selection",
+          desc: "We select the best properties on the Costa Blanca based on your criteria. We access the full RE/MAX database and off-market listings to guarantee you targeted, pre-qualified viewings.",
           highlights: [
-            { icon: "🏠", text: "Base de données RE/MAX" },
+            { icon: "🏠", text: "RE/MAX Database" },
             { icon: "🔒", text: "Accès hors marché" },
             { icon: "🎯", text: "Pré-qualifiées" }
           ]
@@ -554,15 +554,15 @@ document.addEventListener('DOMContentLoaded', () => {
           highlights: [
             { icon: "⚖️", text: "Vérification juridique" },
             { icon: "📋", text: "Contrôle cadastral" },
-            { icon: "🛡", text: "Zéro risque" }
+            { icon: "🛡", text: "Zero risk" }
           ]
         },
-        'fr-ca': {
-          title: "Diligence Raisonnable",
-          desc: "Une étape cruciale pour un achat sécuritaire. Fuster & Associates effectue une étude exhaustive de l'état du titre de propriété, des hypothèques, dettes, conformité urbanistique et permis, pour que vous achetiez en toute tranquillité et sans risque.",
+        'en-ca': {
+          title: "Due Diligence",
+          desc: "A crucial step for a safe purchase. Fuster & Associates performs an exhaustive study of the property's registry status, liens, debts, urban legality, and licences so you buy with total peace of mind and zero risk.",
           highlights: [
             { icon: "⚖️", text: "Vérification juridique" },
-            { icon: "📋", text: "Contrôle du titre" },
+            { icon: "📋", text: "Registry check" },
             { icon: "🛡", text: "Zéro risque" }
           ]
         }
@@ -595,13 +595,13 @@ document.addEventListener('DOMContentLoaded', () => {
             { icon: "❄️", text: "Prix gelé" }
           ]
         },
-        'fr-ca': {
-          title: "Dépôt de Réservation",
-          desc: "Dépôt de réservation pour retirer la propriété du marché et bloquer le prix convenu. Cette somme est conservée en fiducie et sera déduite du prix final lors de la signature de l'acte notarié.",
+        'en-ca': {
+          title: "Reservation",
+          desc: "A reservation deposit (between €3,000 and €10,000) formally takes the property off the market and locks in the agreed price. This amount is held in trust and will be deducted from the final purchase price at completion.",
           highlights: [
-            { icon: "💶", text: "3.000 € – 10.000 €" },
-            { icon: "🔐", text: "Fonds en fiducie" },
-            { icon: "❄️", text: "Prix bloqué" }
+            { icon: "💶", text: "€3,000 – €10,000" },
+            { icon: "🔐", text: "Funds in trust" },
+            { icon: "❄️", text: "Price locked" }
           ]
         }
       },
@@ -629,15 +629,15 @@ document.addEventListener('DOMContentLoaded', () => {
           desc: "Signature de la promesse de vente (Contrato de Arras) qui détaille toutes les conditions de la transaction et requiert un acompte de 10%. Ce contrat lie juridiquement les deux parties et fixe les garanties et les délais de réalisation.",
           highlights: [
             { icon: "📝", text: "Promesse de vente" },
-            { icon: "💰", text: "Acompte de 10%" },
-            { icon: "⚖️", text: "Juridiquement contraignant" }
+            { icon: "💰", text: "10% deposit" },
+            { icon: "⚖️", text: "Legally binding" }
           ]
         },
-        'fr-ca': {
-          title: "Promesse d'Achat",
-          desc: "Signature de la promesse d'achat (Contrato de Arras) qui détaille toutes les conditions de la transaction et exige un acompte de 10%. Ce contrat lie juridiquement les deux parties et établit les garanties et les délais de conclusion.",
+        'en-ca': {
+          title: "Purchase Agreement",
+          desc: "Signing the Purchase Agreement (Contrato de Arras) which details all the conditions of the sale and requires a 10% deposit. This contract legally binds both parties and establishes guarantees and completion dates.",
           highlights: [
-            { icon: "📝", text: "Promesse d'achat" },
+            { icon: "📝", text: "Purchase Agreement" },
             { icon: "💰", text: "Acompte de 10%" },
             { icon: "⚖️", text: "Juridiquement contraignant" }
           ]
@@ -671,13 +671,13 @@ document.addEventListener('DOMContentLoaded', () => {
             { icon: "🌐", text: "À distance via POA" }
           ]
         },
-        'fr-ca': {
-          title: "Acte Notarié",
-          desc: "La signature finale devant un notaire public espagnol où le titre de propriété est transféré et le solde du prix est payé. Si vous ne pouvez pas vous déplacer en Espagne, vous pouvez accorder une procuration (POA) à notre cabinet juridique pour tout signer à distance, depuis le Canada.",
+        'en-ca': {
+          title: "Completion",
+          desc: "The final signing before a Public Notary where the title is transferred and the remaining payment is made. If you cannot travel to Spain, you can grant a Power of Attorney (POA) to our law firm to sign 100% remotely from Canada.",
           highlights: [
             { icon: "🔑", text: "Clés en main" },
             { icon: "🏰", text: "Notaire public" },
-            { icon: "🌐", text: "À distance depuis le Canada" }
+            { icon: "🌐", text: "Remote from Canada" }
           ]
         }
       }
@@ -686,7 +686,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updatePipeline(stepNum) {
       currentStep = stepNum;
       const body = document.body;
-      const lang = body.classList.contains('lang-es') ? 'es' : body.classList.contains('lang-fr-ca') ? 'fr-ca' : body.classList.contains('lang-fr') ? 'fr' : 'en';
+      const lang = body.classList.contains('lang-es') ? 'es' : body.classList.contains('lang-en-ca') ? 'en-ca' : body.classList.contains('lang-fr') ? 'fr' : 'en';
       const details = stepDetails[stepNum][lang] || stepDetails[stepNum]['en'];
       
       // Update node states
@@ -713,7 +713,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Update step badge
       if (detailsStepBadge) {
-        const stepLabels = { en: 'Step', es: 'Paso', fr: 'Étape', 'fr-ca': 'Étape' };
+        const stepLabels = { en: 'Step', es: 'Paso', fr: 'Étape', 'en-ca': 'Step' };
         detailsStepBadge.textContent = `${stepLabels[lang] || 'Step'} ${stepNum}`;
       }
       
@@ -876,7 +876,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       const bodyEl = document.body;
       const lang = bodyEl.classList.contains('lang-es') ? 'es'
-                 : bodyEl.classList.contains('lang-fr-ca') ? 'fr-ca'
+                 : bodyEl.classList.contains('lang-en-ca') ? 'en-ca'
                  : bodyEl.classList.contains('lang-fr') ? 'fr'
                  : 'en';
       
@@ -903,23 +903,23 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         fr: {
           intro: "Veuillez saisir vos coordonnées pour télécharger gratuitement le Guide Complet d'Achat en Espagne.",
-          firstName: 'Prénom', firstPlaceholder: 'ex. Jean',
+          firstName: 'First Name', firstPlaceholder: 'e.g. John',
           lastName: 'Nom', lastPlaceholder: 'ex. Dupont',
           email: 'Adresse e-mail', phone: 'Numéro de téléphone',
           phonePlaceholder: '+33 6 12 34 56 78',
-          btn: 'Télécharger le Guide Complet (PDF)',
-          modalTitle: "Télécharger le Guide de l'Acheteur",
-          toast: 'Merci ! Redirection vers le téléchargement...'
+          btn: 'Download Full Guide (PDF)',
+          modalTitle: "Download Buyer's Guide (Canada)",
+          toast: 'Thank you! Redirecting to download...'
         },
-        'fr-ca': {
-          intro: "Veuillez entrer vos coordonnées pour télécharger gratuitement le Guide Complet d'Achat en Espagne.",
-          firstName: 'Prénom', firstPlaceholder: 'ex. Jean',
-          lastName: 'Nom de famille', lastPlaceholder: 'ex. Tremblay',
-          email: 'Adresse courriel', phone: 'Numéro de téléphone',
-          phonePlaceholder: '+1 (514) 555-0199',
-          btn: 'Télécharger le Guide Complet (PDF)',
-          modalTitle: "Télécharger le Guide de l'Acheteur",
-          toast: 'Merci ! Redirection vers le téléchargement...'
+        'en-ca': {
+          intro: 'Please enter your details to download the Complete Guide to Buying in Spain for free.',
+          firstName: 'First Name', firstPlaceholder: 'e.g. John',
+          lastName: 'Last Name', lastPlaceholder: 'e.g. MacDonald',
+          email: 'Email Address', phone: 'Phone Number',
+          phonePlaceholder: 'e.g. +1 (416) 555-0199',
+          btn: 'Download Full Guide (PDF)',
+          modalTitle: "Download Buyer's Guide (Canada)",
+          toast: 'Thank you! Redirecting to download...'
         }
       };
       const s = t[lang] || t['en'];

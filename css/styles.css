@@ -105,22 +105,22 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
 }
 
-/* --- Language Toggle (4 idiomas) --- */
+/* --- Language Toggle (4 idiomas: EN, ES, FR-Canada, EN-CA) --- */
 body.lang-en .lang-es,
 body.lang-en .lang-fr,
-body.lang-en .lang-fr-ca { display: none; }
+body.lang-en .lang-en-ca { display: none; }
 
 body.lang-es .lang-en,
 body.lang-es .lang-fr,
-body.lang-es .lang-fr-ca { display: none; }
+body.lang-es .lang-en-ca { display: none; }
 
 body.lang-fr .lang-en,
 body.lang-fr .lang-es,
-body.lang-fr .lang-fr-ca { display: none; }
+body.lang-fr .lang-en-ca { display: none; }
 
-body.lang-fr-ca .lang-en,
-body.lang-fr-ca .lang-es,
-body.lang-fr-ca .lang-fr { display: none; }
+body.lang-en-ca .lang-en,
+body.lang-en-ca .lang-es,
+body.lang-en-ca .lang-fr { display: none; }
 
 /* --- Utilities --- */
 .container {
