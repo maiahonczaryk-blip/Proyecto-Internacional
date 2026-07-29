@@ -5980,80 +5980,87 @@ body.nav-open {
    =========================================== */
 @media (max-width: 768px) {
 
-  /* Drawer: slides in from left */
+  /* Drawer: slides in from left — !important needed to override
+     older .nav-links rules at lines ~2284 and ~2701 */
   #public-nav.nav-links {
-    display: flex !important; /* Always in DOM, controlled by transform */
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: min(300px, 85vw);
-    flex-direction: column;
-    align-items: flex-start;
-    background: #ffffff;
-    padding: 80px 28px 40px;
-    gap: 4px;
-    z-index: 999;
-    transform: translateX(-100%);
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 8px 0 40px rgba(0, 0, 0, 0.15);
-    overflow-y: auto;
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: auto !important;
+    bottom: 0 !important;
+    width: 280px !important;
+    max-width: 85vw !important;
+    height: 100% !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    background: #ffffff !important;
+    padding: 84px 24px 40px !important;
+    gap: 2px !important;
+    z-index: 999 !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 6px 0 32px rgba(0, 0, 0, 0.18) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
-    border-right: 1px solid var(--border-subtle);
+    border-right: 1px solid var(--border-subtle) !important;
+    border-bottom: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 
   #public-nav.nav-links.active {
-    transform: translateX(0);
+    transform: translateX(0) !important;
   }
 
   /* Nav links inside drawer: full-width tap targets */
   #public-nav.nav-links a {
-    display: flex;
+    display: flex !important;
     align-items: center;
-    width: 100%;
-    padding: 14px 16px;
-    font-size: 1rem;
+    width: 100% !important;
+    padding: 13px 14px !important;
+    font-size: 0.97rem !important;
     font-weight: 500;
-    color: var(--text-primary);
+    color: var(--text-primary) !important;
     border-radius: 10px;
-    transition: background 0.2s, color 0.2s;
-    gap: 10px;
+    transition: background 0.18s, color 0.18s;
+    gap: 8px;
     text-decoration: none;
+    white-space: nowrap;
+    box-sizing: border-box;
   }
 
   #public-nav.nav-links a:hover,
   #public-nav.nav-links a:active {
-    background: rgba(0, 67, 255, 0.06);
-    color: var(--blue);
+    background: rgba(0, 67, 255, 0.07) !important;
+    color: var(--blue) !important;
   }
 
-  /* CTA buttons in drawer: full width */
-  #public-nav.nav-links a.btn {
-    width: 100%;
-    justify-content: center;
-    margin-top: 8px;
-    padding: 13px 20px;
-    font-size: 0.9rem;
+  /* Login button: outlined style */
+  #public-nav.nav-links a.btn-outline.nav-cta {
+    margin-top: 14px !important;
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 12px 16px !important;
+    font-size: 0.9rem !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--border-light) !important;
+    color: var(--text-primary) !important;
+    background: transparent !important;
   }
 
-  /* Divider before CTA buttons */
-  #public-nav.nav-links a.btn-outline {
-    margin-top: 16px;
-    border-top: 1px solid var(--border-subtle);
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-    border-bottom: 1px solid var(--border-subtle);
-    padding-top: 20px;
-    padding-bottom: 16px;
-  }
-
-  #public-nav.nav-links a.btn-primary {
-    background: var(--gradient-red);
-    color: #fff;
-    border-radius: 10px;
-    margin-top: 8px;
-    border: none;
+  /* Join as Partner button: red fill */
+  #public-nav.nav-links a.btn-primary.nav-cta {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 13px 16px !important;
+    font-size: 0.9rem !important;
+    border-radius: 10px !important;
+    background: var(--gradient-red) !important;
+    color: #fff !important;
+    border: none !important;
+    margin-top: 6px !important;
   }
 
   /* Navbar: always solid white on mobile */
