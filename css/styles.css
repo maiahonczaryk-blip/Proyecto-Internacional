@@ -5836,41 +5836,41 @@ body.lang-en-ca .lang-fr { display: none; }
     z-index: 2;
   }
 
-  /* Hero text: white over dark overlay */
-  .hero-title {
+  /* Hero text: white over dark overlay — scoped to .hero only */
+  .hero .hero-title {
     color: #ffffff !important;
   }
 
-  .hero-badge {
+  .hero .hero-badge {
     color: rgba(255,255,255,0.9) !important;
     border-color: rgba(255,255,255,0.25) !important;
     background: rgba(255,255,255,0.08) !important;
   }
 
-  .hero-subtitle {
+  .hero .hero-subtitle {
     color: rgba(255,255,255,0.82) !important;
   }
 
-  .hero-stat-value {
+  .hero .hero-stat-value {
     color: #ffffff !important;
   }
 
-  .hero-stat-label {
+  .hero .hero-stat-label {
     color: rgba(255,255,255,0.70) !important;
   }
 
-  .hero-stat::before {
+  .hero .hero-stat::before {
     background: rgba(255,255,255,0.5) !important;
   }
 
   /* Outline button in hero: white border on dark bg */
-  .hero-ctas .btn-outline {
+  .hero .hero-ctas .btn-outline {
     color: #ffffff !important;
     border-color: rgba(255,255,255,0.45) !important;
     background: rgba(255,255,255,0.08) !important;
   }
 
-  .hero-ctas .btn-outline:hover {
+  .hero .hero-ctas .btn-outline:hover {
     background: rgba(255,255,255,0.18) !important;
     border-color: rgba(255,255,255,0.7) !important;
   }
@@ -6018,18 +6018,19 @@ body.nav-open {
     opacity: 0.75;
   }
 
-  /* Center "Guide" tab: highlighted pill */
+  /* Guide tab: same as other inactive tabs — only red on tap */
   .bnav-item.bnav-center {
-    color: #dc2626;
+    color: #9ca3af;
   }
 
   .bnav-item.bnav-center svg {
-    stroke: #dc2626;
+    stroke: currentColor;
   }
 
   .bnav-item.bnav-center:active {
-    color: #b91c1c;
+    color: #dc2626;
   }
+
 
   /* Only show the correct language label */
   .bnav-item span {
@@ -6105,15 +6106,14 @@ body.nav-open {
     padding: 14px 24px;
   }
 
-  /* Stats: grid 2×2 on mobile */
-  .hero-stats {
+  /* Stats: grid 2×2 on mobile — ONLY inside hero */
+  .hero .hero-stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
-    flex-wrap: wrap;
   }
 
-  .hero-stat {
+  .hero .hero-stat {
     text-align: center;
     padding-left: 0;
     background: rgba(255,255,255,0.08);
@@ -6122,17 +6122,41 @@ body.nav-open {
     padding: 14px 12px;
   }
 
-  .hero-stat::before {
+  .hero .hero-stat::before {
     display: none !important;
   }
 
-  .hero-stat-value {
+  .hero .hero-stat-value {
     font-size: 1.5rem;
   }
 
-  .hero-stat-label {
+  .hero .hero-stat-label {
     font-size: 0.7rem;
     letter-spacing: 0.5px;
+  }
+
+  /* Stats outside .hero (e.g. Realtors section): normal dark display */
+  section:not(.hero) .hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px 28px;
+  }
+
+  section:not(.hero) .hero-stat {
+    text-align: center;
+    flex: 1 1 120px;
+    padding: 12px 8px;
+  }
+
+  section:not(.hero) .hero-stat-value {
+    font-size: 1.6rem;
+    color: var(--text-primary);
+  }
+
+  section:not(.hero) .hero-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
   }
 }
 
