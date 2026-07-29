@@ -5794,82 +5794,87 @@ body.lang-en-ca .lang-fr { display: none; }
 
 /* ===========================================
    1. HERO — Full-cover image + text overlay
+   MOBILE ONLY: desktop keeps original design
    =========================================== */
 
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
+@media (max-width: 768px) {
 
-.hero-bg img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 30%;
-  display: block;
-}
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
 
-/* Dark gradient overlay so text is readable */
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(
-    160deg,
-    rgba(0, 10, 40, 0.70) 0%,
-    rgba(0, 20, 60, 0.50) 50%,
-    rgba(0, 10, 30, 0.35) 100%
-  );
-  pointer-events: none;
-}
+  .hero-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+    display: block;
+  }
 
-/* All hero content above the image+overlay */
-.hero .container {
-  position: relative;
-  z-index: 2;
-}
+  /* Dark gradient overlay so text is readable on mobile */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      160deg,
+      rgba(0, 10, 40, 0.70) 0%,
+      rgba(0, 20, 60, 0.50) 50%,
+      rgba(0, 10, 30, 0.35) 100%
+    );
+    pointer-events: none;
+  }
 
-/* Hero text: white over dark overlay */
-.hero-title {
-  color: #ffffff !important;
-}
+  /* All hero content above the image+overlay */
+  .hero .container {
+    position: relative;
+    z-index: 2;
+  }
 
-.hero-badge {
-  color: rgba(255,255,255,0.9) !important;
-  border-color: rgba(255,255,255,0.25) !important;
-  background: rgba(255,255,255,0.08) !important;
-}
+  /* Hero text: white over dark overlay */
+  .hero-title {
+    color: #ffffff !important;
+  }
 
-.hero-subtitle {
-  color: rgba(255,255,255,0.82) !important;
-}
+  .hero-badge {
+    color: rgba(255,255,255,0.9) !important;
+    border-color: rgba(255,255,255,0.25) !important;
+    background: rgba(255,255,255,0.08) !important;
+  }
 
-.hero-stat-value {
-  color: #ffffff !important;
-}
+  .hero-subtitle {
+    color: rgba(255,255,255,0.82) !important;
+  }
 
-.hero-stat-label {
-  color: rgba(255,255,255,0.70) !important;
-}
+  .hero-stat-value {
+    color: #ffffff !important;
+  }
 
-.hero-stat::before {
-  background: rgba(255,255,255,0.5) !important;
-}
+  .hero-stat-label {
+    color: rgba(255,255,255,0.70) !important;
+  }
 
-/* Outline button in hero: white border on dark bg */
-.hero-ctas .btn-outline {
-  color: #ffffff !important;
-  border-color: rgba(255,255,255,0.45) !important;
-  background: rgba(255,255,255,0.08) !important;
-}
+  .hero-stat::before {
+    background: rgba(255,255,255,0.5) !important;
+  }
 
-.hero-ctas .btn-outline:hover {
-  background: rgba(255,255,255,0.18) !important;
-  border-color: rgba(255,255,255,0.7) !important;
+  /* Outline button in hero: white border on dark bg */
+  .hero-ctas .btn-outline {
+    color: #ffffff !important;
+    border-color: rgba(255,255,255,0.45) !important;
+    background: rgba(255,255,255,0.08) !important;
+  }
+
+  .hero-ctas .btn-outline:hover {
+    background: rgba(255,255,255,0.18) !important;
+    border-color: rgba(255,255,255,0.7) !important;
+  }
+
 }
 
 
