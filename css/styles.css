@@ -5919,7 +5919,6 @@ body.nav-open {
    =========================================== */
 @media (max-width: 768px) {
 
-  /* Ensure it's always visible */
   .mobile-menu-btn {
     display: flex !important;
     flex-direction: column;
@@ -5933,8 +5932,9 @@ body.nav-open {
     border: 1px solid var(--border-subtle);
     border-radius: 8px;
     cursor: pointer;
-    z-index: 1001;
+    z-index: 200;
     position: relative;
+    flex-shrink: 0;
   }
 
   .mobile-menu-btn span {
@@ -5943,7 +5943,7 @@ body.nav-open {
     height: 2px;
     background: var(--text-primary);
     border-radius: 2px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.28s ease;
     position: absolute;
   }
 
@@ -5951,7 +5951,6 @@ body.nav-open {
   .mobile-menu-btn span:nth-child(2) { top: 19px; }
   .mobile-menu-btn span:nth-child(3) { top: 26px; }
 
-  /* Animate to X when active */
   .mobile-menu-btn.active span:nth-child(1) {
     top: 19px;
     transform: rotate(45deg);
@@ -5965,9 +5964,108 @@ body.nav-open {
     transform: rotate(-45deg);
   }
 
-  /* Hide sidebar-toggle on public pages (only show mobile-menu-btn) */
   .sidebar-toggle {
     display: none !important;
+  }
+}
+
+
+/* ===========================================
+   5. MOBILE DROPDOWN NAVIGATION
+   =========================================== */
+@media (max-width: 768px) {
+
+  /* Navbar stays solid white */
+  .navbar {
+    background: #ffffff !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08) !important;
+    padding: 10px 0 !important;
+    position: fixed !important;
+    z-index: 100 !important;
+  }
+
+  .navbar .container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .nav-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-shrink: 0;
+  }
+
+  /* ── Dropdown panel ── */
+  #public-nav.nav-links {
+    display: none !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    flex-direction: column !important;
+    background: #ffffff !important;
+    border-top: 1px solid var(--border-subtle) !important;
+    border-bottom: 2px solid var(--border-subtle) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.10) !important;
+    padding: 12px 16px 20px !important;
+    gap: 2px !important;
+    z-index: 99 !important;
+    transform: none !important;
+    transition: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    overflow: visible !important;
+  }
+
+  #public-nav.nav-links.active {
+    display: flex !important;
+  }
+
+  /* Each link: tall tap target */
+  #public-nav.nav-links a {
+    display: block !important;
+    width: 100% !important;
+    padding: 13px 12px !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    color: var(--text-primary) !important;
+    background: transparent !important;
+    border-radius: 8px !important;
+    text-decoration: none !important;
+    line-height: 1.2 !important;
+    box-sizing: border-box !important;
+    border: none !important;
+  }
+
+  #public-nav.nav-links a:active {
+    background: rgba(0, 67, 255, 0.06) !important;
+  }
+
+  /* Login CTA */
+  #public-nav.nav-links a.btn-outline.nav-cta {
+    margin-top: 10px !important;
+    text-align: center !important;
+    border: 1.5px solid var(--border-light) !important;
+    border-radius: 10px !important;
+    padding: 13px 12px !important;
+    color: var(--text-primary) !important;
+    background: transparent !important;
+  }
+
+  /* Join as Partner CTA */
+  #public-nav.nav-links a.btn-primary.nav-cta {
+    margin-top: 6px !important;
+    text-align: center !important;
+    border-radius: 10px !important;
+    padding: 13px 12px !important;
+    background: var(--red, #cc1e12) !important;
+    color: #ffffff !important;
+    border: none !important;
   }
 }
 
