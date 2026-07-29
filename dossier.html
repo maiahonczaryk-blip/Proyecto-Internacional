@@ -117,25 +117,35 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
 }
 
 .btn-lang {
-  font-size: 18px;
-  line-height: 1;
-  border: 1.5px solid rgba(255,255,255,0.4);
+  border: 1.5px solid rgba(255,255,255,0.35);
   background: transparent;
   color: var(--white);
   font-family: 'Montserrat', sans-serif;
   font-weight: 600;
-  font-size: 12px;
-  padding: 5px 14px;
-  border-radius: 4px;
+  font-size: 20px;
+  line-height: 1;
+  padding: 4px 10px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.25s;
-  letter-spacing: 0.5px;
+  transition: all 0.22s;
+  letter-spacing: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.btn-lang:hover, .btn-lang.active {
+.btn-lang:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.7);
+  transform: scale(1.08);
+}
+
+.btn-lang.active {
   background: var(--remax-red);
   border-color: var(--remax-red);
-  color: var(--white);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  transform: scale(1.05);
 }
 
 .btn-action {
@@ -1478,6 +1488,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
     <div class="controls-brand">
       <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX Inmomás" style="filter:brightness(0) invert(1);">
       <span>
+        <span class="lang-es">Guía de Inversión y Compra</span>
         <span class="lang-fr">Guide d'Investissement et d'Achat</span>
         <span class="lang-en">Investment & Buying Guide</span>
         <span class="lang-en-ca">Investment & Buying Guide</span>
@@ -1492,14 +1503,12 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <span class="lang-es">📥 Descargar PDF</span>
         <span class="lang-en">📥 Download PDF</span>
         <span class="lang-fr">📥 Télécharger PDF</span>
-        <span class="lang-en">📥 Download PDF</span>
         <span class="lang-en-ca">📥 Download PDF</span>
       </button>
       <button class="btn-action" onclick="window.print()">
         <span class="lang-es">🖨️ Imprimir</span>
         <span class="lang-en">🖨️ Print</span>
         <span class="lang-fr">🖨️ Imprimer</span>
-        <span class="lang-en">🖨️ Print</span>
         <span class="lang-en-ca">🖨️ Print</span>
       </button>
     </div>
@@ -1542,7 +1551,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
     </div>
     <div class="cover-bottom">
       <div class="cover-partners">
-        <img src="logo fuster.png" alt="Fuster & Associates">
+        <img src="logo fuster.png" alt="Fuster &amp; Associates" style="filter:none;background:white;padding:3px 8px;border-radius:4px;opacity:1;">
         <img src="Logo_UCI.png" alt="Banco UCI">
         <img src="Inmomas-holidays-Op-3-color-e1752073650140.png" alt="Inmomás Holidays">
       </div>
@@ -1776,7 +1785,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
       <div class="advantage-card">
         <div class="advantage-icon">🏖️</div>
         <div class="advantage-title">
-          <span class="lang-fr">Playas Bandera Azul</span>
+          <span class="lang-es">Playas Bandera Azul</span>
+        <span class="lang-fr">Playas Bandera Azul</span>
           <span class="lang-en">Blue Flag Beaches</span>
         <span class="lang-en-ca">Blue Flag Beaches</span>
         </div>
@@ -1807,7 +1817,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
       <div class="advantage-card">
         <div class="advantage-icon">⛳</div>
         <div class="advantage-title">
-          <span class="lang-fr">Golf y Deportes</span>
+          <span class="lang-es">Golf y Deportes</span>
+        <span class="lang-fr">Golf y Deportes</span>
           <span class="lang-en">Golf &amp; Sports</span>
         <span class="lang-en-ca">Golf &amp; Sports</span>
         </div>
@@ -1837,7 +1848,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
       <div class="advantage-card">
         <div class="advantage-icon">✈️</div>
         <div class="advantage-title">
-          <span class="lang-fr">Conectividad Internacional</span>
+          <span class="lang-es">Conectividad Internacional</span>
+        <span class="lang-fr">Conectividad Internacional</span>
           <span class="lang-en">International Connectivity</span>
         <span class="lang-en-ca">International Connectivity</span>
         </div>
@@ -2473,7 +2485,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <span class="lang-en-ca">Digital Nomad Visa</span>
             </div>
             <div class="visa-subtitle">
-              <span class="lang-fr">Para trabajadores remotos</span>
+              <span class="lang-es">Para trabajadores remotos</span>
+        <span class="lang-fr">Para trabajadores remotos</span>
               <span class="lang-en">For remote workers</span>
         <span class="lang-en-ca">For remote workers</span>
             </div>
@@ -2481,7 +2494,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         </div>
         <div class="visa-detail">
           <span class="visa-detail-label">
-            <span class="lang-fr">Dirigido a</span>
+            <span class="lang-es">Dirigido a</span>
+        <span class="lang-fr">Dirigido a</span>
             <span class="lang-en">Target</span>
         <span class="lang-en-ca">Target</span>
           </span>
@@ -2519,19 +2533,22 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         </div>
         <div class="visa-detail">
           <span class="visa-detail-label">
-            <span class="lang-fr">Beneficio fiscal</span>
+            <span class="lang-es">Beneficio fiscal</span>
+        <span class="lang-fr">Beneficio fiscal</span>
             <span class="lang-en">Tax benefit</span>
         <span class="lang-en-ca">Tax benefit</span>
           </span>
           <span class="visa-detail-value" style="color:var(--remax-red);">
-            <span class="lang-fr">Ley Beckham — tipo fijo 24%</span>
+            <span class="lang-es">Ley Beckham — tipo fijo 24%</span>
+        <span class="lang-fr">Ley Beckham — tipo fijo 24%</span>
             <span class="lang-en">Beckham Law — flat 24% rate</span>
         <span class="lang-en-ca">Beckham Law — flat 24% rate</span>
           </span>
         </div>
         <div class="visa-detail">
           <span class="visa-detail-label">
-            <span class="lang-fr">Requisito laboral</span>
+            <span class="lang-es">Requisito laboral</span>
+        <span class="lang-fr">Requisito laboral</span>
             <span class="lang-en">Work requirement</span>
         <span class="lang-en-ca">Work requirement</span>
           </span>
@@ -2544,12 +2561,14 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         </div>
         <div class="visa-detail">
           <span class="visa-detail-label">
-            <span class="lang-fr">Familia</span>
+            <span class="lang-es">Familia</span>
+        <span class="lang-fr">Familia</span>
             <span class="lang-en">Family</span>
         <span class="lang-en-ca">Family</span>
           </span>
           <span class="visa-detail-value">
-            <span class="lang-fr">Inclut conjoint et enfants</span>
+            <span class="lang-es">Incluye cónyuge e hijos</span>
+        <span class="lang-fr">Inclut conjoint et enfants</span>
             <span class="lang-en">Includes spouse &amp; children</span>
         <span class="lang-en-ca">Includes spouse &amp; children</span>
           </span>
@@ -2562,12 +2581,14 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
           <div class="visa-icon">🌅</div>
           <div>
             <div class="visa-type">
-              <span class="lang-fr">Visa No Lucrativa</span>
+              <span class="lang-es">Visa No Lucrativa</span>
+        <span class="lang-fr">Visa No Lucrativa</span>
               <span class="lang-en">Non-Lucrative Visa</span>
         <span class="lang-en-ca">Non-Lucrative Visa</span>
             </div>
             <div class="visa-subtitle">
-              <span class="lang-fr">Para jubilados / renta pasiva</span>
+              <span class="lang-es">Para jubilados / renta pasiva</span>
+        <span class="lang-fr">Para jubilados / renta pasiva</span>
               <span class="lang-en">For retirees / passive income</span>
         <span class="lang-en-ca">For retirees / passive income</span>
             </div>
@@ -2580,7 +2601,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <span class="lang-en-ca">Target</span>
           </span>
           <span class="visa-detail-value">
-            <span class="lang-fr">Jubilados / inversores pasivos</span>
+            <span class="lang-es">Jubilados / inversores pasivos</span>
+        <span class="lang-fr">Jubilados / inversores pasivos</span>
             <span class="lang-en">Retirees / passive investors</span>
         <span class="lang-en-ca">Retirees / passive investors</span>
           </span>
@@ -2612,7 +2634,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         </div>
         <div class="visa-detail">
           <span class="visa-detail-label">
-            <span class="lang-fr">Trabajo</span>
+            <span class="lang-es">Trabajo</span>
+        <span class="lang-fr">Trabajo</span>
             <span class="lang-en">Employment</span>
         <span class="lang-en-ca">Employment</span>
           </span>
@@ -2625,12 +2648,14 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         </div>
         <div class="visa-detail">
           <span class="visa-detail-label">
-            <span class="lang-fr">Seguro médico</span>
+            <span class="lang-es">Seguro médico</span>
+        <span class="lang-fr">Seguro médico</span>
             <span class="lang-en">Health insurance</span>
         <span class="lang-en-ca">Health insurance</span>
           </span>
           <span class="visa-detail-value">
-            <span class="lang-fr">Privado obligatorio (sin copago)</span>
+            <span class="lang-es">Privado obligatorio (sin copago)</span>
+        <span class="lang-fr">Privado obligatorio (sin copago)</span>
             <span class="lang-en">Private required (no co-pay)</span>
         <span class="lang-en-ca">Private required (no co-pay)</span>
           </span>
@@ -2653,7 +2678,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
     <!-- Golden Visa Alert -->
     <div class="alert-box mb-12">
       <div class="alert-box-title">
-        ⚠️ <span class="lang-fr">Actualización Golden Visa</span>
+        ⚠️ <span class="lang-es">Actualización Golden Visa</span>
+        <span class="lang-fr">Actualización Golden Visa</span>
         <span class="lang-en">Golden Visa Update</span>
         <span class="lang-en-ca">Golden Visa Update</span>
       </div>
@@ -2682,12 +2708,14 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
 
     <div class="card card-dark" style="text-align:center;padding:14px;">
       <p style="font-size:8.5pt;margin-bottom:4px;">
+        <span class="lang-es">Todo el proceso de visado gestionado por</span>
         <span class="lang-fr">Todo el proceso de visado gestionado por</span>
         <span class="lang-en">All visa processing managed by</span>
         <span class="lang-en-ca">All visa processing managed by</span>
       </p>
       <p style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:12pt;color:var(--accent-gold);">Fuster & Associates</p>
       <p style="font-size:7.5pt;color:rgba(255,255,255,0.5);margin-top:2px;">
+        <span class="lang-es">Abogados especializados en inmigración y derecho inmobiliario</span>
         <span class="lang-fr">Abogados especializados en inmigración y derecho inmobiliario</span>
         <span class="lang-en">Attorneys specialized in immigration and real estate law</span>
         <span class="lang-en-ca">Attorneys specialized in immigration and real estate law</span>
@@ -2708,6 +2736,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
   <div class="page-inner">
     <div class="page-header">
       <span class="page-header-title">
+        <span class="lang-es">Fiscalidad</span>
         <span class="lang-fr">Fiscalidad</span>
         <span class="lang-en">Taxation</span>
         <span class="lang-en-ca">Taxation</span>
@@ -2717,12 +2746,14 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
 
     <div class="section-num">06</div>
     <div class="section-label">
-      <span class="lang-fr">Costes de Adquisición</span>
+      <span class="lang-es">Costes de Adquisición</span>
+        <span class="lang-fr">Costes de Adquisición</span>
       <span class="lang-en">Acquisition Costs</span>
         <span class="lang-en-ca">Acquisition Costs</span>
     </div>
     <h2 class="section-title">
-      <span class="lang-fr">Fiscalidad y Costes<br>de Adquisición</span>
+      <span class="lang-es">Fiscalidad y Costes<br>de Adquisición</span>
+        <span class="lang-fr">Fiscalidad y Costes<br>de Adquisición</span>
       <span class="lang-en">Taxation &amp;<br>Acquisition Costs</span>
         <span class="lang-en-ca">Taxation &amp;<br>Acquisition Costs</span>
     </h2>
@@ -2737,6 +2768,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
     <!-- Purchase cost stacked bar -->
     <div class="card card-bordered mb-12">
       <h4 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:10pt;color:var(--dark-blue);margin-bottom:8px;">
+        <span class="lang-es">📊 Desglose de Costes de Compra (Propiedad de Reventa)</span>
         <span class="lang-fr">📊 Desglose de Costes de Compra (Propiedad de Reventa)</span>
         <span class="lang-en">📊 Purchase Cost Breakdown (Resale Property)</span>
         <span class="lang-en-ca">📊 Purchase Cost Breakdown (Resale Property)</span>
@@ -2745,7 +2777,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <div class="tax-segment" style="flex:10;background:var(--remax-red);">ITP 10%</div>
         <div class="tax-segment" style="flex:1.5;background:var(--remax-blue);">AJD 1.5%</div>
         <div class="tax-segment" style="flex:1.5;background:var(--bridge-blue);">
-          <span class="lang-fr">Not. 1.5%</span>
+          <span class="lang-es">Not. 1.5%</span>
+        <span class="lang-fr">Not. 1.5%</span>
           <span class="lang-en">Not. 1.5%</span>
         <span class="lang-en-ca">Not. 1.5%</span>
         </div>
@@ -2755,7 +2788,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <div class="tax-legend-item">
           <div class="tax-legend-dot" style="background:var(--remax-red);"></div>
           <span>
-            <span class="lang-fr"><strong>ITP</strong> — Impuesto de Transmisiones Patrimoniales (10%)</span>
+            <span class="lang-es"><strong>ITP</strong> — Impuesto de Transmisiones Patrimoniales (10%)</span>
+        <span class="lang-fr"><strong>ITP</strong> — Impuesto de Transmisiones Patrimoniales (10%)</span>
             <span class="lang-en"><strong>ITP</strong> — Property Transfer Tax (10%)</span>
         <span class="lang-en-ca"><strong>ITP</strong> — Property Transfer Tax (10%)</span>
           </span>
@@ -2763,7 +2797,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <div class="tax-legend-item">
           <div class="tax-legend-dot" style="background:var(--remax-blue);"></div>
           <span>
-            <span class="lang-fr"><strong>AJD</strong> — Actos Jurídicos Documentados (1.5%)</span>
+            <span class="lang-es"><strong>AJD</strong> — Actos Jurídicos Documentados (1.5%)</span>
+        <span class="lang-fr"><strong>AJD</strong> — Actos Jurídicos Documentados (1.5%)</span>
             <span class="lang-en"><strong>AJD</strong> — Documented Legal Acts Tax (1.5%)</span>
         <span class="lang-en-ca"><strong>AJD</strong> — Documented Legal Acts Tax (1.5%)</span>
           </span>
@@ -2771,7 +2806,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <div class="tax-legend-item">
           <div class="tax-legend-dot" style="background:var(--bridge-blue);"></div>
           <span>
-            <span class="lang-fr"><strong>Notaría</strong> — Honorarios notariales y registro (~1.5%)</span>
+            <span class="lang-es"><strong>Notaría</strong> — Honorarios notariales y registro (~1.5%)</span>
+        <span class="lang-fr"><strong>Notaría</strong> — Honorarios notariales y registro (~1.5%)</span>
             <span class="lang-en"><strong>Notary</strong> — Notary and registry fees (~1.5%)</span>
         <span class="lang-en-ca"><strong>Notary</strong> — Notary and registry fees (~1.5%)</span>
           </span>
@@ -2779,7 +2815,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <div class="tax-legend-item">
           <div class="tax-legend-dot" style="background:var(--accent-gold);"></div>
           <span>
-            <span class="lang-fr"><strong>Legal</strong> — Honorarios abogado (~1%)</span>
+            <span class="lang-es"><strong>Legal</strong> — Honorarios abogado (~1%)</span>
+        <span class="lang-fr"><strong>Legal</strong> — Honorarios abogado (~1%)</span>
             <span class="lang-en"><strong>Legal</strong> — Attorney fees (~1%)</span>
         <span class="lang-en-ca"><strong>Legal</strong> — Attorney fees (~1%)</span>
           </span>
@@ -2788,7 +2825,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
       <div style="margin-top:10px;background:var(--dark-blue);color:var(--white);padding:8px 14px;border-radius:4px;text-align:center;">
         <span style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:12pt;">~14%</span>
         <span style="font-size:8pt;margin-left:6px;">
-          <span class="lang-fr">del precio de compra en costes totales</span>
+          <span class="lang-es">del precio de compra en costes totales</span>
+        <span class="lang-fr">del precio de compra en costes totales</span>
           <span class="lang-en">of purchase price in total costs</span>
         <span class="lang-en-ca">of purchase price in total costs</span>
         </span>
@@ -2812,7 +2850,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
 
     <!-- Annual Taxes -->
     <h3 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:11pt;color:var(--dark-blue);margin-bottom:10px;">
-      <span class="lang-fr">📅 Impuestos Anuales Recurrentes</span>
+      <span class="lang-es">📅 Impuestos Anuales Recurrentes</span>
+        <span class="lang-fr">📅 Impuestos Anuales Recurrentes</span>
       <span class="lang-en">📅 Annual Recurring Taxes</span>
         <span class="lang-en-ca">📅 Annual Recurring Taxes</span>
     </h3>
@@ -2820,7 +2859,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
     <div class="grid-2col mb-12">
       <div class="tax-card">
         <h4>
-          <span class="lang-fr">IBI — Impuesto sobre Bienes Inmuebles</span>
+          <span class="lang-es">IBI — Impuesto sobre Bienes Inmuebles</span>
+        <span class="lang-fr">IBI — Impuesto sobre Bienes Inmuebles</span>
           <span class="lang-en">IBI — Property Tax (Municipal)</span>
         <span class="lang-en-ca">IBI — Property Tax (Municipal)</span>
         </h4>
@@ -2839,7 +2879,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
 
       <div class="tax-card">
         <h4>
-          <span class="lang-fr">IRNR — Impuesto de No Residentes</span>
+          <span class="lang-es">IRNR — Impuesto de No Residentes</span>
+        <span class="lang-fr">IRNR — Impuesto de No Residentes</span>
           <span class="lang-en">IRNR — Non-Resident Income Tax</span>
         <span class="lang-en-ca">IRNR — Non-Resident Income Tax</span>
         </h4>
@@ -3064,24 +3105,24 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
 
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
       <div class="office-card">
-        <div class="office-city">Elche</div>
-        <div class="office-address">Av. de Alicante, 62</div>
-        <div class="office-zip">03202</div>
-      </div>
-      <div class="office-card">
         <div class="office-city">Alicante</div>
-        <div class="office-address">Rambla de Méndez Núñez, 12</div>
-        <div class="office-zip">03002</div>
+        <div class="office-address">Carrer Doctor José Luis de la Vega, 2</div>
+        <div class="office-zip">03015 Alicante</div>
       </div>
       <div class="office-card">
         <div class="office-city">Benidorm</div>
-        <div class="office-address">Av. del Mediterráneo, 18</div>
-        <div class="office-zip">03503</div>
+        <div class="office-address">Avinguda País Valencià, 2</div>
+        <div class="office-zip">03509 Finestrat</div>
+      </div>
+      <div class="office-card">
+        <div class="office-city">Elche</div>
+        <div class="office-address">Carrer Conrado del Campo, 16</div>
+        <div class="office-zip">03204 Elx</div>
       </div>
       <div class="office-card">
         <div class="office-city">Jávea</div>
-        <div class="office-address">Ctra. del Cap de la Nau, 124</div>
-        <div class="office-zip">03730</div>
+        <div class="office-address">Ctra. Cap de la Nau Pla, 124, Local 5</div>
+        <div class="office-zip">03738 Xàbia</div>
       </div>
     </div>
 
