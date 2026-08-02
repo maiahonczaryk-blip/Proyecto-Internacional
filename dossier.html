@@ -1461,6 +1461,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
   .page-inner {
     min-height: unset;
     height: 100%;
+    overflow: hidden;
   }
 
   .card, .advantage-card, .visa-card, .timeline-step, .office-card, .partner-card, .day-card {
@@ -3235,6 +3236,47 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
     var hash = window.location.hash.replace('#', '').toLowerCase();
     if (VALID_LANGS.includes(hash)) applyLang(hash);
   });
+})();
+</script>
+
+
+<!-- ============================================================
+     AUTO-FIT PAGES FOR PRINT
+     Detects pages whose content overflows 297mm and applies
+     CSS zoom (which — unlike transform — affects real layout)
+     so Chrome's print engine never spills content to the next page.
+     ============================================================ -->
+<script>
+(function () {
+  'use strict';
+
+  function fitForPrint() {
+    var pages = document.querySelectorAll('.page');
+    pages.forEach(function (page) {
+      var inner = page.querySelector('.page-inner');
+      if (!inner) return;
+
+      // Reset previous zoom before measuring
+      inner.style.zoom = '';
+
+      var pageH  = page.getBoundingClientRect().height;  // ~1122 px for 297 mm
+      var innerH = inner.scrollHeight;                  // real content height
+
+      if (innerH > pageH + 1) {
+        // Scale content down so it fits exactly inside the page box
+        inner.style.zoom = (pageH / innerH).toFixed(6);
+      }
+    });
+  }
+
+  function resetAfterPrint() {
+    document.querySelectorAll('.page .page-inner').forEach(function (el) {
+      el.style.zoom = '';
+    });
+  }
+
+  window.addEventListener('beforeprint', fitForPrint);
+  window.addEventListener('afterprint',  resetAfterPrint);
 })();
 </script>
 
