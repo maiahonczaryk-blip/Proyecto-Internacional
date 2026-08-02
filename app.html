@@ -10,6 +10,12 @@
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="icon" type="image/png" href="Globo_CMYK.png">
+  <!-- EmailJS SDK — free email sending from the browser (200 emails/month) -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    // TODO: Replace 'YOUR_PUBLIC_KEY' with your key from emailjs.com → Account → General
+    (function() { emailjs.init({ publicKey: 'YOUR_PUBLIC_KEY' }); })();
+  </script>
 </head>
 <body class="lang-en">
 
@@ -31,6 +37,7 @@
       <a href="#admin/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
       <a href="#admin/users" class="sidebar-link"><span class="sidebar-link__icon">👥</span> Manage Users</a>
       <a href="#admin/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> Clients</a>
+      <a href="#admin/newsletter" class="sidebar-link"><span class="sidebar-link__icon">📧</span> <span class="lang-en">Newsletter</span><span class="lang-es">Newsletter</span></a>
     </nav>
 
     <!-- Agente Inmomás Sidebar Nav -->
@@ -183,6 +190,141 @@
           <p class="dashboard-subtitle"><span class="lang-en">Broker Inmomás CRM Overview — Assign local agents and monitor status</span><span class="lang-es">Control del CRM de Broker Inmomás — Asigna agentes locales y monitoriza el estado</span></p>
         </div>
         <div id="admin-clients-board" class="pipeline-board"></div>
+      </div>
+    </div>
+
+
+    <!-- ==================== VIEW: ADMIN NEWSLETTER ==================== -->
+    <div id="view-admin-newsletter" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1>📧 <span class="lang-en">Newsletter Campaigns</span><span class="lang-es">Campañas de Newsletter</span></h1>
+          <p class="dashboard-subtitle"><span class="lang-en">Compose and send email updates to your subscribed partners</span><span class="lang-es">Redacta y envía actualizaciones por email a tus socios suscritos</span></p>
+        </div>
+
+        <!-- Stats row -->
+        <div class="stat-cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 28px;">
+          <div class="stat-card stat-card--blue">
+            <div class="stat-card__icon stat-card__icon--blue">📧</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="nl-stat-total">0</div>
+              <div class="stat-card__label"><span class="lang-en">Total Subscribers</span><span class="lang-es">Suscriptores Totales</span></div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--green">
+            <div class="stat-card__icon stat-card__icon--green">🏢</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="nl-stat-brokers">0</div>
+              <div class="stat-card__label"><span class="lang-en">Broker Subscribers</span><span class="lang-es">Brokers Suscritos</span></div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--purple">
+            <div class="stat-card__icon stat-card__icon--purple">👤</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="nl-stat-realtors">0</div>
+              <div class="stat-card__label"><span class="lang-en">Realtor Subscribers</span><span class="lang-es">Realtors Suscritos</span></div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--blue">
+            <div class="stat-card__icon stat-card__icon--blue">📨</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="nl-stat-sent">0</div>
+              <div class="stat-card__label"><span class="lang-en">Campaigns Sent</span><span class="lang-es">Campañas Enviadas</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compose section -->
+        <div class="dashboard-grid-2col" style="grid-template-columns: 1.4fr 0.6fr; gap: 24px; align-items: start;">
+
+          <!-- Compose card -->
+          <div class="dashboard-section nl-compose-card">
+            <h2>✍️ <span class="lang-en">Compose Newsletter</span><span class="lang-es">Redactar Newsletter</span></h2>
+            <form id="nl-compose-form" onsubmit="return false;" style="margin-top: 20px;">
+
+              <div class="form-group" style="margin-bottom: 18px;">
+                <label for="nl-subject" style="font-weight: 600; margin-bottom: 8px; display: block;"><span class="lang-en">Subject Line</span><span class="lang-es">Asunto del Email</span></label>
+                <input type="text" id="nl-subject" class="form-control" placeholder="e.g. Project Update — August 2026" style="width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border-light); font-size: 0.95rem;" required>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 18px;">
+                <label for="nl-recipients" style="font-weight: 600; margin-bottom: 8px; display: block;">
+                  <span class="lang-en">Recipients</span><span class="lang-es">Destinatarios</span>
+                  <span id="nl-recipient-badge" class="nl-badge">0 <span class="lang-en">subscribers</span><span class="lang-es">suscriptores</span></span>
+                </label>
+                <select id="nl-recipients" class="form-control" style="width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border-light); font-size: 0.95rem;">
+                  <option value="all"><span class="lang-en">All Subscribers</span><span class="lang-es">Todos los Suscriptores</span></option>
+                  <option value="broker"><span class="lang-en">Brokers Only</span><span class="lang-es">Solo Brokers</span></option>
+                  <option value="realtor"><span class="lang-en">Realtors Only</span><span class="lang-es">Solo Realtors</span></option>
+                  <option value="agent_inmomas"><span class="lang-en">Agentes Inmomás Only</span><span class="lang-es">Solo Agentes Inmomás</span></option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 18px;">
+                <label for="nl-body" style="font-weight: 600; margin-bottom: 8px; display: block;"><span class="lang-en">Message Body</span><span class="lang-es">Cuerpo del Mensaje</span></label>
+                <textarea id="nl-body" rows="10" class="form-control" placeholder="Write your newsletter content here..." style="width: 100%; padding: 14px 16px; border-radius: 10px; border: 1px solid var(--border-light); font-size: 0.93rem; line-height: 1.7; resize: vertical; font-family: inherit;" required></textarea>
+              </div>
+
+              <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button type="button" id="nl-preview-btn" class="btn btn-outline" style="flex: 1; min-width: 140px;">
+                  👁 <span class="lang-en">Preview</span><span class="lang-es">Previsualizar</span>
+                </button>
+                <button type="submit" id="nl-send-btn" class="btn btn-primary" style="flex: 2; min-width: 200px;">
+                  🚀 <span class="lang-en">Send Newsletter</span><span class="lang-es">Enviar Newsletter</span>
+                </button>
+              </div>
+
+            </form>
+          </div>
+
+          <!-- Sidebar info card -->
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="dashboard-section" style="background: linear-gradient(135deg, rgba(0,67,255,0.06) 0%, rgba(139,92,246,0.06) 100%); border: 1px solid rgba(0,67,255,0.15);">
+              <h3 style="margin: 0 0 12px;">ℹ️ <span class="lang-en">How it works</span><span class="lang-es">Cómo funciona</span></h3>
+              <ul style="margin: 0; padding: 0 0 0 18px; color: var(--text-secondary); font-size: 0.88rem; line-height: 1.8;">
+                <li><span class="lang-en">Only partners who opted-in during registration receive emails</span><span class="lang-es">Solo reciben emails los socios que aceptaron durante el registro</span></li>
+                <li><span class="lang-en">Campaigns are saved in history for reference</span><span class="lang-es">Las campañas se guardan en el historial</span></li>
+                <li><span class="lang-en">Filter by role to target specific groups</span><span class="lang-es">Filtra por rol para dirigirte a grupos específicos</span></li>
+                <li><span class="lang-en">Email delivery via your connected service</span><span class="lang-es">Envío mediante el servicio conectado</span></li>
+              </ul>
+            </div>
+            <div class="dashboard-section" style="background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2);">
+              <h3 style="margin: 0 0 10px; color: #059669;">✅ <span class="lang-en">GDPR Compliant</span><span class="lang-es">Conforme al RGPD</span></h3>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.6;">
+                <span class="lang-en">All recipients have explicitly opted in to receive marketing communications. Consent records are stored with timestamp.</span>
+                <span class="lang-es">Todos los destinatarios han aceptado explícitamente recibir comunicaciones. El consentimiento queda registrado con marca de tiempo.</span>
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sent history -->
+        <div class="dashboard-section" style="margin-top: 28px;">
+          <h2>📋 <span class="lang-en">Campaign History</span><span class="lang-es">Historial de Campañas</span></h2>
+          <div id="nl-history-container" style="margin-top: 16px;">
+            <p style="color: var(--text-muted); text-align: center; padding: 32px;"><span class="lang-en">No campaigns sent yet.</span><span class="lang-es">No se han enviado campañas aún.</span></p>
+          </div>
+        </div>
+
+        <!-- Preview Modal -->
+        <div id="nl-preview-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:1000; display:none; align-items:center; justify-content:center; padding: 20px;">
+          <div style="background: white; border-radius: 16px; max-width: 620px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 36px; position: relative;">
+            <button onclick="document.getElementById('nl-preview-modal').style.display='none'" style="position:absolute; top:16px; right:16px; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-muted);">✕</button>
+            <div style="text-align:center; margin-bottom: 24px;">
+              <img src="LOGO_NUEVO_REMAX_Inmom%C3%A1s_RGB_AZUL-01.png" alt="RE/MAX Inmomás" style="height: 40px; margin-bottom: 16px;">
+              <h2 id="nl-preview-subject" style="font-size: 1.2rem; color: var(--text-primary); margin: 0;"></h2>
+            </div>
+            <hr style="border: none; border-top: 1px solid var(--border-light); margin: 20px 0;">
+            <div id="nl-preview-body" style="font-size: 0.95rem; line-height: 1.8; color: var(--text-secondary); white-space: pre-wrap;"></div>
+            <hr style="border: none; border-top: 1px solid var(--border-light); margin: 24px 0;">
+            <p style="font-size: 0.78rem; color: var(--text-muted); text-align: center; margin:0;">
+              <span class="lang-en">You are receiving this email because you opted in at RE/MAX Inmomás International. <a href="#" style="color: var(--text-muted);">Unsubscribe</a></span>
+              <span class="lang-es">Recibes este email porque te suscribiste en RE/MAX Inmomás International. <a href="#" style="color: var(--text-muted);">Darse de baja</a></span>
+            </p>
+          </div>
+        </div>
+
       </div>
     </div>
 

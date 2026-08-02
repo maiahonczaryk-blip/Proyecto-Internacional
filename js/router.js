@@ -29,6 +29,7 @@ App.router = (function() {
     'admin/dashboard': { view: 'view-admin-dashboard', role: 'admin',  sidebar: 'admin', title: 'Admin Dashboard' },
     'admin/users':     { view: 'view-admin-users',     role: 'admin',  sidebar: 'admin', title: 'Manage Users' },
     'admin/clients':   { view: 'view-admin-clients',   role: 'admin',  sidebar: 'admin', title: 'Clients' },
+    'admin/newsletter':{ view: 'view-admin-newsletter',role: 'admin',  sidebar: 'admin', title: 'Newsletter' },
 
     // Broker routes
     'broker/dashboard': { view: 'view-broker-dashboard', role: 'broker', sidebar: 'broker', title: 'Broker Dashboard' },
@@ -79,9 +80,20 @@ App.router = (function() {
       const link = e.target.closest('a[href^="#"]');
       if (link) {
         const hash = link.getAttribute('href').substring(1);
+        const scrollTo = link.getAttribute('data-scroll-to');
         if (routes[hash]) {
           e.preventDefault();
           navigateTo(hash);
+          
+          // If a scroll target is specified, scroll to it after the view renders
+          if (scrollTo) {
+            setTimeout(() => {
+              const target = document.getElementById(scrollTo);
+              if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }, 150);
+          }
           
           // On mobile, close sidebar after navigation
           if (window.innerWidth < 992) {
@@ -326,6 +338,7 @@ App.router = (function() {
       'admin/dashboard':   () => App.views.admin && App.views.admin.initDashboard(),
       'admin/users':       () => App.views.admin && App.views.admin.initUsers(),
       'admin/clients':     () => App.views.admin && App.views.admin.initClients(),
+      'admin/newsletter':  () => App.views.admin && App.views.admin.initNewsletter(),
       'broker/dashboard':  () => App.views.broker && App.views.broker.initDashboard(),
       'broker/team':       () => App.views.broker && App.views.broker.initTeam(),
       'broker/clients':    () => App.views.broker && App.views.broker.initClients(),

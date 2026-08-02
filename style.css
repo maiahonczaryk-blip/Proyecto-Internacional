@@ -1406,3 +1406,79 @@ h1, h2, h3, h4, h5, h6 {
     padding: 28px 24px;
   }
 }
+
+/* ======================================================
+   NEWSLETTER CONSENT & ADMIN NEWSLETTER PANEL
+   ====================================================== */
+
+/* Newsletter consent checkbox — visually distinct from the required terms checkbox */
+.newsletter-consent-group {
+  margin-top: 4px;
+}
+
+.checkbox-label--newsletter {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(0, 67, 255, 0.04) 0%, rgba(212, 168, 70, 0.06) 100%);
+  border: 1.5px solid rgba(0, 67, 255, 0.18);
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.checkbox-label--newsletter:hover {
+  border-color: rgba(0, 67, 255, 0.35);
+  background: linear-gradient(135deg, rgba(0, 67, 255, 0.07) 0%, rgba(212, 168, 70, 0.09) 100%);
+}
+
+.checkbox-label--newsletter input[type="checkbox"] {
+  margin-top: 3px;
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  accent-color: var(--primary, #0043FF);
+}
+
+.checkbox-label--newsletter span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checkbox-label--newsletter strong {
+  font-size: 0.92rem;
+  color: var(--text-primary, #1a1a2e);
+}
+
+.checkbox-label--newsletter small {
+  font-size: 0.78rem;
+  color: var(--text-muted, #71717a);
+  line-height: 1.5;
+}
+
+/* Newsletter subscriber count badge */
+.nl-badge {
+  display: inline-block;
+  background: rgba(0, 67, 255, 0.1);
+  color: var(--primary, #0043FF);
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 2px 10px;
+  margin-left: 10px;
+  vertical-align: middle;
+  transition: background 0.2s;
+}
+
+/* Compose card subtle highlight */
+.nl-compose-card {
+  border: 1.5px solid rgba(0, 67, 255, 0.12);
+  box-shadow: 0 4px 24px rgba(0, 67, 255, 0.06);
+}
+
+.nl-compose-card h2 {
+  color: var(--text-primary, #1a1a2e);
+  margin: 0 0 4px;
+}

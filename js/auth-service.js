@@ -140,6 +140,8 @@ App.auth = (function() {
         profileImage: null,
         agreementSigned: false,
         agreementSignedAt: null,
+        newsletterConsent: data.newsletterConsent || false,
+        newsletterConsentAt: data.newsletterConsent ? new Date().toISOString() : null,
         createdAt: new Date().toISOString()
       };
 
@@ -174,6 +176,8 @@ App.auth = (function() {
         profileImage: null,
         agreementSigned: false,
         agreementSignedAt: null,
+        newsletterConsent: data.newsletterConsent || false,
+        newsletterConsentAt: data.newsletterConsent ? new Date().toISOString() : null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -326,6 +330,8 @@ App.auth = (function() {
         profileImage: null,
         agreementSigned: false,
         agreementSignedAt: null,
+        newsletterConsent: data.newsletterConsent || false,
+        newsletterConsentAt: data.newsletterConsent ? new Date().toISOString() : null,
         createdAt: new Date().toISOString()
       };
 
@@ -372,6 +378,8 @@ App.auth = (function() {
         profileImage: firebaseUser.photoURL || null,
         agreementSigned: false,
         agreementSignedAt: null,
+        newsletterConsent: data.newsletterConsent || false,
+        newsletterConsentAt: data.newsletterConsent ? new Date().toISOString() : null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -1075,6 +1083,102 @@ App.auth = (function() {
     return true;
   }
 
+  /* ============================================
+     Newsletter Functions
+     ============================================ */
+
+  /**
+   * Returns all users that have consented to newsletter, optionally filtered by role.
+   * @param {string|null} roleFilter - 'broker', 'realtor', 'agent_inmomas', or null for all.
+   */
+  async function getNewsletterSubscribers(roleFilter) {
+    const users = await getAllUsers();
+    return users.filter(u => {
+      const hasConsent = u.newsletterConsent === true;
+      const isActive = u.status === 'active';
+      const matchesRole = !roleFilter || u.role === roleFilter;
+      return hasConsent && isActive && matchesRole;
+    });
+  }
+
+  /**
+   * Saves a newsletter campaign record.
+   * In demo mode: stored in App.demoData.newsletters (localStorage).
+   * In Firebase mode: saved to Firestore 'newsletters' collection.
+   * Also sends real emails via EmailJS if configured.
+   *
+   * @param {object} newsletterData - { subject, body, recipientRole, recipientCount, recipientEmails, sentBy }
+   *
+   * --- HOW TO ACTIVATE EMAILJS ---
+   * 1. Create a free account at https://www.emailjs.com (200 emails/month free)
+   * 2. Add your Email Service (Gmail, Outlook, etc.) → get SERVICE_ID
+   * 3. Create an Email Template with variables: {{to_email}}, {{subject}}, {{message}}, {{sent_by}}
+   *    → get TEMPLATE_ID
+   * 4. Account → General → copy Public Key → paste in app.html where it says 'YOUR_PUBLIC_KEY'
+   * 5. Fill in EMAILJS_SERVICE_ID and EMAILJS_TEMPLATE_ID below
+   */
+  async function saveNewsletter(newsletterData) {
+    // ── EmailJS configuration ─────────────────────────────────────────────
+    // TODO: Replace with your real IDs from https://www.emailjs.com
+    const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // e.g. 'service_abc123'
+    const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // e.g. 'template_xyz456'
+    const emailjsReady = (
+      typeof emailjs !== 'undefined' &&
+      EMAILJS_SERVICE_ID  !== 'YOUR_SERVICE_ID' &&
+      EMAILJS_TEMPLATE_ID !== 'YOUR_TEMPLATE_ID'
+    );
+    // ─────────────────────────────────────────────────────────────────────
+
+    const record = {
+      ...newsletterData,
+      sentAt: new Date().toISOString(),
+      status: emailjsReady ? 'sent' : 'simulated',
+      id: 'nl-' + Date.now()
+    };
+
+    // Send real emails via EmailJS (one per recipient)
+    if (emailjsReady && Array.isArray(newsletterData.recipientEmails)) {
+      const sendPromises = newsletterData.recipientEmails.map(email =>
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          to_email: email,
+          subject:  newsletterData.subject,
+          message:  newsletterData.body,
+          sent_by:  newsletterData.sentBy || 'RE/MAX Inmomás International'
+        }).catch(err => {
+          console.warn(`[EmailJS] Failed to send to ${email}:`, err);
+        })
+      );
+      await Promise.allSettled(sendPromises);
+    } else if (!emailjsReady) {
+      console.info('[Newsletter] EmailJS not configured — campaign saved as simulated. See saveNewsletter() comments to activate real sending.');
+    }
+
+    // Always save the campaign record (Firestore or demo store)
+    if (App.demoMode) {
+      if (!App.demoData.newsletters) App.demoData.newsletters = [];
+      App.demoData.newsletters.unshift(record);
+      saveDemoData();
+      return { success: true, record };
+    } else {
+      await App.db.collection('newsletters').doc(record.id).set(record);
+      return { success: true, record };
+    }
+  }
+
+  /**
+   * Returns the history of sent newsletters, newest first.
+   */
+  async function getNewsletterHistory() {
+    if (App.demoMode) {
+      return (App.demoData.newsletters || []).sort(
+        (a, b) => new Date(b.sentAt) - new Date(a.sentAt)
+      );
+    } else {
+      const snap = await App.db.collection('newsletters').orderBy('sentAt', 'desc').get();
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
+  }
+
   /* ---- Public API ---- */
   return {
     init,
@@ -1106,6 +1210,9 @@ App.auth = (function() {
     registerWithGoogle,
     addClientManually,
     addReferralClient,
-    addReferralUser
+    addReferralUser,
+    getNewsletterSubscribers,
+    saveNewsletter,
+    getNewsletterHistory
   };
 })();

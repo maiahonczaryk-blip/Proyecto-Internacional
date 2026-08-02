@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Beyond Borders · B2B Partner Pitch · RE/MAX Inmomás International</title>
+
+<!-- ─────────────────────────────────────────────────────
+     TIPOGRAFÍA OFICIAL: Montserrat = equivalente web de
+     Gotham Narrow (Black 900 / Bold 700 / Regular 400)
+──────────────────────────────────────────────────────── -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════════════════════════════════
+   RE/MAX BRAND GUARDIAN — CSS SYSTEM
+   Guia_Nueva_Marca_Logo_2025 · 100% Compliance
+   ─────────────────────────────────────────────────────────
+   PALETA OFICIAL (hexadecimales exactos del manual):
+   Primary Red     #ff1200
+   Primary Blue    #0043ff
+   Bridge Red      #AA1120
+   Bridge Blue     #0C2749
+   Dark Blue       #000e35
+   Cream           #f7f5ee
+   White           #ffffff
+   Dark Charcoal   #232323
+══════════════════════════════════════════════════════════ */
+:root {
+  /* ── RE/MAX Brand Colors (Manual Exacto) ── */
+  --red:          #ff1200;   /* Primary Red */
+  --blue:         #0043ff;   /* Primary Blue */
+  --bridge-red:   #AA1120;   /* Bridge Red */
+  --bridge-blue:  #0C2749;   /* Bridge Blue */
+  --dark-blue:    #000e35;   /* Dark Blue */
+  --cream:        #f7f5ee;   /* Cream — fondo principal de contenido */
+  --white:        #ffffff;   /* White */
+  --charcoal:     #232323;   /* Dark Charcoal Gray — único para párrafos */
+
+  /* ── Derivados funcionales ── */
+  --slate:        #556070;
+  --fog:          #8a96a8;
+  --line:         #dddad3;   /* Cream-tinted border */
+  --line-dark:    rgba(255,255,255,.12);
+  --overlay-bridge: rgba(12,39,73,.70);   /* Bridge Blue 70% — portada */
+  --slash-dark:   rgba(0,14,53,.08);      /* Grey Slash — Dark Blue 8% */
+
+  /* ── Accent Line (manual: 9pt ≈ 3–4px en pantalla) ── */
+  --accent-h:     3px;       /* Accent Line height */
+
+  /* ── Radius (conservadora — institucional) ── */
+  --r1: 4px;
+  --r2: 8px;
+  --r3: 14px;
+  --r4: 22px;
+  --rf: 999px;
+
+  /* ── Motion ── */
+  --ease: cubic-bezier(0.22,1,0.36,1);
+}
+
+/* ── RESET ───────────────────────────────────────────── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { font-size:16px; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+body {
+  font-family:'Montserrat', sans-serif;   /* Gotham Narrow equivalent */
+  background: var(--bridge-blue);
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ══════════════════════════════════════════════════════════
+   SLIDE ENGINE
+══════════════════════════════════════════════════════════ */
+.deck { position:relative; width:100vw; height:100vh; }
+.slide {
+  display:none; position:absolute; inset:0; overflow:hidden;
+  background: var(--cream);  /* Default: cream (not pure white) */
+}
+.slide.active {
+  display:flex;
+  animation: enter .45s var(--ease) both;
+}
+@keyframes enter {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:none; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   THE SLASH DESIGN (Elemento gráfico oficial RE/MAX 2025)
+   Franja diagonal superpuesta en diapositivas de contenido.
+   Color: Dark Blue (#000e35) al 8% de opacidad.
+══════════════════════════════════════════════════════════ */
+.slash-bg::after {
+  content: '';
+  position: absolute;
+  /* Slash: banda diagonal de esquina inferior-derecha */
+  bottom: -80px; right: -60px;
+  width: 420px; height: 600px;
+  background: var(--slash-dark);
+  transform: rotate(-22deg);
+  pointer-events: none;
+  z-index: 1;
+}
+.slash-bg-left::before {
+  content: '';
+  position: absolute;
+  top: -80px; left: -60px;
+  width: 280px; height: 500px;
+  background: var(--slash-dark);
+  transform: rotate(-22deg);
+  pointer-events: none;
+  z-index: 1;
+}
+/* Todos los hijos del slide sobre el slash */
+.slide > * { position:relative; z-index:2; }
+
+/* ══════════════════════════════════════════════════════════
+   ACCENT LINES (Guía: líneas horizontales 9pt sólidas)
+   Uso: separar encabezados, secciones, debajo de agentes.
+══════════════════════════════════════════════════════════ */
+.accent-red  { display:block; width:100%; height:var(--accent-h); background:var(--red);  border:none; }
+.accent-blue { display:block; width:100%; height:var(--accent-h); background:var(--blue); border:none; }
+.accent-gold { display:block; width:100%; height:var(--accent-h); background:#b8860b;      border:none; }
+.accent-w    { display:block; width:100%; height:var(--accent-h); background:rgba(255,255,255,.25); border:none; }
+
+/* Short accent (para debajo de headlines) */
+.aline { width:48px; height:var(--accent-h); border-radius:2px; display:block; }
+.aline-red  { background:var(--red); }
+.aline-blue { background:var(--blue); }
+.aline-gold { background:#b8860b; }
+.aline-white{ background:rgba(255,255,255,.5); }
+
+/* ══════════════════════════════════════════════════════════
+   TIPOGRAFÍA (Montserrat = Gotham Narrow oficial)
+   900 = Black (títulos, portada, destacados)
+   700 = Bold (nombres de agentes, datos de contacto)
+   400/500 = Regular/Medium (cuerpo texto)
+══════════════════════════════════════════════════════════ */
+
+/* Gotham Black equivalent */
+.t-black {
+  font-family:'Montserrat',sans-serif;
+  font-weight:900; text-transform:uppercase; letter-spacing:-.5px;
+}
+/* Gotham Bold equivalent */
+.t-bold {
+  font-family:'Montserrat',sans-serif;
+  font-weight:700;
+}
+/* Body */
+.t-body { font-weight:400; color:var(--charcoal); line-height:1.72; }
+
+.display-xl {
+  font-size: clamp(3.2rem,6.5vw,5.8rem);
+  font-weight:900; font-family:'Montserrat',sans-serif;
+  text-transform:uppercase; letter-spacing:-2px; line-height:.96;
+  color: var(--white);
+}
+.display-xl em { font-style:normal; color:var(--red); }
+
+.headline {
+  font-size:clamp(1.8rem,3.5vw,2.8rem);
+  font-weight:900; font-family:'Montserrat',sans-serif;
+  text-transform:uppercase; letter-spacing:-1px; line-height:1.02;
+}
+.headline.dark  { color:var(--charcoal); }
+.headline.white { color:var(--white); }
+.headline .red  { color:var(--red); }
+.headline .blue { color:var(--blue); }
+.headline .gold { color:#b8860b; }
+
+.title {
+  font-size:clamp(1.1rem,2vw,1.55rem);
+  font-weight:700; font-family:'Montserrat',sans-serif;
+  letter-spacing:-.3px; line-height:1.2;
+}
+.title.dark  { color:var(--charcoal); }
+.title.white { color:var(--white); }
+
+.eyebrow {
+  font-size:.58rem; font-weight:700; letter-spacing:3.5px;
+  text-transform:uppercase; font-family:'Montserrat',sans-serif;
+  display:flex; align-items:center; gap:10px; margin-bottom:14px;
+}
+.eyebrow::before { content:''; width:24px; height:2px; background:currentColor; flex-shrink:0; }
+
+.lead {
+  font-size:.9rem; font-weight:400; color:var(--charcoal);
+  line-height:1.78; font-family:'Montserrat',sans-serif;
+}
+.lead.white { color:rgba(255,255,255,.76); }
+.body-m {
+  font-size:.82rem; font-weight:400; color:var(--charcoal);
+  line-height:1.72; font-family:'Montserrat',sans-serif;
+}
+.body-m.white { color:rgba(255,255,255,.70); }
+.body-s {
+  font-size:.7rem; font-weight:400; color:var(--fog);
+  line-height:1.65; font-family:'Montserrat',sans-serif;
+}
+.body-s.white { color:rgba(255,255,255,.52); }
+
+/* ══════════════════════════════════════════════════════════
+   LAYOUT PRIMITIVES
+══════════════════════════════════════════════════════════ */
+.full { width:100%; height:100%; }
+.split     { display:grid; grid-template-columns:1fr 1fr; width:100%; height:100%; }
+.split-6040{ display:grid; grid-template-columns:60% 40%; width:100%; height:100%; }
+.split-4060{ display:grid; grid-template-columns:40% 60%; width:100%; height:100%; }
+.split-7030{ display:grid; grid-template-columns:70% 30%; width:100%; height:100%; }
+
+.panel {
+  position:relative; overflow:hidden;
+  display:flex; flex-direction:column; justify-content:center;
+  padding:56px 52px;
+}
+.panel-top { justify-content:flex-start; padding-top:80px; }
+.panel.cream  { background:var(--cream); }
+.panel.white  { background:var(--white); }
+.panel.bridge { background:var(--bridge-blue); }
+.panel.dark   { background:var(--dark-blue); }
+.panel.blue   { background:var(--blue); }
+
+.pad-main { padding:48px 64px 68px; }
+.gap-sm  { gap:10px; }
+.gap-md  { gap:18px; }
+.gap-lg  { gap:28px; }
+
+/* ══════════════════════════════════════════════════════════
+   LOGO TREATMENT (Reglas del manual)
+   ▸ NO dentro de cajas cuadradas cerradas
+   ▸ Clear space = padding mínimo = ½ altura de "X"
+   ▸ Flotar sobre fondo claro o transparente
+══════════════════════════════════════════════════════════ */
+.logo-float {
+  display:inline-flex; align-items:center;
+  /* Clear space: padding equivalente a ½ x-height del logo */
+  padding:8px 0;
+}
+.logo-float img { height:34px; width:auto; }
+.logo-float.sm img { height:24px; }
+.logo-float.lg img { height:52px; }
+
+/* Partner logos — flotan sin contenedor cuadrado */
+.partner-logos {
+  display:flex; align-items:center; gap:28px; flex-wrap:wrap;
+}
+.partner-logos img {
+  height:22px; width:auto;
+  filter:brightness(0) invert(1);  /* Sobre fondos oscuros */
+  opacity:.8;
+  padding:4px 0; /* Clear space mínimo */
+  transition:opacity .2s;
+}
+.partner-logos img:hover { opacity:1; }
+.partner-logos.light img {
+  filter:none; opacity:.85;
+}
+
+/* ══════════════════════════════════════════════════════════
+   CARD SYSTEM
+══════════════════════════════════════════════════════════ */
+.card {
+  background:var(--white); border:1px solid var(--line);
+  border-radius:var(--r3); padding:24px 22px;
+  transition:all .3s var(--ease);
+}
+.card:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(0,14,53,.10); }
+.card-cream { background:var(--cream); border:1px solid var(--line); border-radius:var(--r3); padding:22px 20px; }
+.card-bridge {
+  background:rgba(12,39,73,.85); border:1px solid rgba(255,255,255,.1);
+  border-radius:var(--r3); padding:24px 22px;
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+}
+.card-line-r { border-right:var(--accent-h) solid var(--red); padding-right:18px; }
+.card-line-b { border-left:var(--accent-h) solid var(--blue); padding-left:18px; }
+
+/* ══════════════════════════════════════════════════════════
+   TAG / BADGE
+══════════════════════════════════════════════════════════ */
+.tag {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:4px 12px; border-radius:var(--rf);
+  font-size:.58rem; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+  font-family:'Montserrat',sans-serif;
+}
+.tag-red    { background:rgba(255,18,0,.1);  color:var(--red);  border:1px solid rgba(255,18,0,.22); }
+.tag-blue   { background:rgba(0,67,255,.1);  color:var(--blue); border:1px solid rgba(0,67,255,.2); }
+.tag-bridge { background:rgba(12,39,73,.1);  color:var(--bridge-blue); border:1px solid rgba(12,39,73,.2); }
+.tag-gold   { background:rgba(184,134,11,.1);color:#8a6200; border:1px solid rgba(184,134,11,.22); }
+.tag-white  { background:rgba(255,255,255,.12);color:rgba(255,255,255,.88);border:1px solid rgba(255,255,255,.2); }
+.dot { width:5px; height:5px; border-radius:50%; background:currentColor; animation:blink 1.8s infinite; }
+@keyframes blink { 0%,100%{opacity:1;}50%{opacity:.18;} }
+
+/* ══════════════════════════════════════════════════════════
+   ROW ITEMS (Listas corporativas)
+══════════════════════════════════════════════════════════ */
+.row-list { background:var(--white); border:1px solid var(--line); border-radius:var(--r3); overflow:hidden; }
+.row-list.cream { background:var(--cream); }
+.row-item {
+  display:flex; align-items:flex-start; gap:16px;
+  padding:13px 20px; border-bottom:1px solid var(--line);
+  transition:background .18s;
+}
+.row-item:last-child { border-bottom:none; }
+.row-item:hover { background:rgba(0,67,255,.03); }
+.row-n {
+  min-width:30px; height:30px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.7rem; font-weight:800; color:var(--white); flex-shrink:0;
+  font-family:'Montserrat',sans-serif;
+}
+.row-n.blue   { background:var(--blue); }
+.row-n.red    { background:var(--red); }
+.row-n.gold   { background:#b8860b; }
+.row-n.bridge { background:var(--bridge-blue); }
+.row-t { font-size:.82rem; font-weight:700; color:var(--charcoal); line-height:1.2; }
+.row-t.white { color:var(--white); }
+.row-d { font-size:.68rem; color:var(--fog); margin-top:2px; line-height:1.4; }
+
+/* ══════════════════════════════════════════════════════════
+   METRIC / KPI
+══════════════════════════════════════════════════════════ */
+.kpi { display:flex; flex-direction:column; gap:5px; }
+.kpi-n {
+  font-size:clamp(2.4rem,4.5vw,3.8rem); font-weight:900;
+  line-height:1; letter-spacing:-2px; font-family:'Montserrat',sans-serif;
+}
+.kpi-n.red    { color:var(--red); }
+.kpi-n.blue   { color:var(--blue); }
+.kpi-n.white  { color:var(--white); }
+.kpi-n.gold   { color:#b8860b; }
+.kpi-n.green  { color:#15803d; }
+.kpi-l { font-size:.6rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--fog); line-height:1.4; font-family:'Montserrat',sans-serif; }
+.kpi-l.white  { color:rgba(255,255,255,.45); }
+
+/* ══════════════════════════════════════════════════════════
+   COMPARISON BLOCK
+══════════════════════════════════════════════════════════ */
+.cmp { display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--line); border-radius:var(--r3); overflow:hidden; }
+.cmp-l { padding:18px 20px; background:rgba(255,18,0,.04); border-right:1px solid var(--line); }
+.cmp-r { padding:18px 20px; background:rgba(0,67,255,.04); }
+.cmp-f { font-size:.58rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--fog); margin-bottom:7px; }
+.cmp-v { font-size:1.8rem; font-weight:900; line-height:1; letter-spacing:-1px; font-family:'Montserrat',sans-serif; }
+.cmp-v.neg { color:var(--red); }
+.cmp-v.pos { color:var(--blue); }
+.cmp-d { font-size:.64rem; color:var(--fog); margin-top:4px; }
+
+/* ══════════════════════════════════════════════════════════
+   AGENT CARDS
+   Regla manual: foto Clipped sobre bloque Bridge Blue,
+   cortada a la cintura, alineada en base.
+══════════════════════════════════════════════════════════ */
+.agent-card {
+  display:flex; flex-direction:column;
+  border-radius:var(--r4); overflow:hidden;
+  box-shadow:0 6px 24px rgba(0,14,53,.14);
+  transition:all .38s var(--ease);
+}
+.agent-card:hover { transform:translateY(-6px); box-shadow:0 16px 40px rgba(0,14,53,.2); }
+
+/* Foto Clipped — cortada por la cintura sobre Bridge Blue */
+.agent-photo-block {
+  background:var(--bridge-blue);  /* Bridge Blue exacto */
+  position:relative;
+  height:190px;                    /* Bloque de color */
+  overflow:hidden;
+  display:flex; align-items:flex-end; justify-content:center;
+}
+.agent-photo-block img {
+  /* Foto sin fondo, alineada en base del bloque */
+  height:180px; width:auto;
+  object-fit:contain; object-position:bottom center;
+  transition:transform .5s var(--ease);
+}
+.agent-card:hover .agent-photo-block img { transform:scale(1.04); }
+
+/* Accent line de 3px bajo la foto (regla manual) */
+.agent-photo-block::after {
+  content:''; position:absolute; bottom:0; left:0; right:0;
+  height:var(--accent-h); background:var(--red); z-index:3;
+}
+
+.agent-info {
+  background:var(--white); padding:14px 16px 16px;
+  flex:1;
+}
+.agent-flag { font-size:1rem; margin-bottom:2px; }
+.agent-name {
+  font-size:.84rem; font-weight:700; color:var(--charcoal);
+  font-family:'Montserrat',sans-serif; line-height:1.2; margin-bottom:2px;
+}
+.agent-role {
+  font-size:.56rem; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:var(--blue); font-family:'Montserrat',sans-serif; margin-bottom:2px;
+}
+.agent-from { font-size:.64rem; color:var(--fog); }
+
+/* ══════════════════════════════════════════════════════════
+   AGENDA LINE
+══════════════════════════════════════════════════════════ */
+.ag-line {
+  display:flex; align-items:center; gap:16px;
+  padding:12px 18px; background:var(--white);
+  border-radius:var(--r2); border:1px solid var(--line);
+  border-left:var(--accent-h) solid;   /* Accent line lateral */
+  margin-bottom:8px; transition:all .18s;
+}
+.ag-line:hover { transform:translateX(4px); box-shadow:0 3px 12px rgba(0,14,53,.08); }
+.ag-time { font-size:.58rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--fog); min-width:68px; }
+.ag-ico  { font-size:.95rem; }
+.ag-tit  { font-size:.82rem; font-weight:700; color:var(--charcoal); flex:1; }
+.ag-who  { font-size:.56rem; font-weight:600; text-transform:uppercase; letter-spacing:1.2px; color:var(--fog); }
+
+/* ══════════════════════════════════════════════════════════
+   FORMULA
+══════════════════════════════════════════════════════════ */
+.formula { display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; }
+.fbox {
+  background:var(--white); border:1px solid var(--line);
+  border-radius:var(--r3); padding:18px 22px; text-align:center; min-width:108px;
+  box-shadow:0 4px 14px rgba(0,14,53,.06);
+}
+.fbox.red   { background:rgba(255,18,0,.05);   border-color:rgba(255,18,0,.25); }
+.fbox.blue  { background:rgba(0,67,255,.05);   border-color:rgba(0,67,255,.22); }
+.fbox.green { background:rgba(21,128,61,.06);  border-color:rgba(21,128,61,.28); border-width:2px; }
+.fnum { font-size:2rem; font-weight:900; line-height:1; letter-spacing:-1px; font-family:'Montserrat',sans-serif; color:var(--charcoal); }
+.fnum.red   { color:var(--red); }
+.fnum.blue  { color:var(--blue); }
+.fnum.green { color:#15803d; }
+.flbl { font-size:.55rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--fog); margin-top:5px; font-family:'Montserrat',sans-serif; }
+.fop  { font-size:2.2rem; font-weight:200; color:var(--fog); flex-shrink:0; }
+
+/* ══════════════════════════════════════════════════════════
+   PROCESS TRACK
+══════════════════════════════════════════════════════════ */
+.track { display:flex; }
+.track-step {
+  flex:1; padding:22px 16px; text-align:center; background:var(--white);
+  border:1px solid var(--line); border-right:none; position:relative;
+  transition:.22s ease;
+}
+.track-step:first-child { border-radius:var(--r3) 0 0 var(--r3); }
+.track-step:last-child  { border-right:1px solid var(--line); border-radius:0 var(--r3) var(--r3) 0; }
+.track-step:hover       { background:rgba(0,67,255,.04); z-index:2; }
+.track-step::after { content:'›'; position:absolute; right:-11px; top:50%; transform:translateY(-50%); font-size:1.5rem; color:var(--fog); z-index:3; pointer-events:none; }
+.track-step:last-child::after { display:none; }
+.track-n { width:36px; height:36px; border-radius:50%; background:var(--blue); color:var(--white); font-size:.82rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 10px; font-family:'Montserrat',sans-serif; box-shadow:0 4px 14px rgba(0,67,255,.28); }
+.track-t { font-size:.65rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--charcoal); margin-bottom:5px; font-family:'Montserrat',sans-serif; }
+.track-b { font-size:.63rem; color:var(--fog); line-height:1.5; }
+
+/* ══════════════════════════════════════════════════════════
+   TABLE
+══════════════════════════════════════════════════════════ */
+.tbl { width:100%; border-collapse:collapse; border-radius:var(--r3); overflow:hidden; }
+.tbl thead { background:var(--bridge-blue); }
+.tbl th { padding:11px 16px; font-size:.62rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.82); text-align:left; font-family:'Montserrat',sans-serif; }
+.tbl td { padding:11px 16px; font-size:.8rem; color:var(--charcoal); border-bottom:1px solid var(--line); font-family:'Montserrat',sans-serif; }
+.tbl tbody tr:nth-child(even) td { background:var(--cream); }
+.tbl tbody tr:hover td { background:rgba(0,67,255,.04); }
+.t-blue  { color:var(--blue); font-weight:700; }
+.t-gold  { color:#8a6200; font-weight:700; }
+.t-green { color:#15803d; font-weight:800; }
+
+/* ══════════════════════════════════════════════════════════
+   POLL BOX
+══════════════════════════════════════════════════════════ */
+.poll { background:var(--white); border:1px solid var(--line); border-radius:var(--r3); padding:22px 20px; }
+.poll-q { font-size:.84rem; font-weight:700; color:var(--charcoal); margin-bottom:12px; font-family:'Montserrat',sans-serif; }
+.poll-o {
+  height:34px; border-radius:var(--rf); background:var(--cream); border:1px solid var(--line);
+  display:flex; align-items:center; padding:0 16px;
+  font-size:.74rem; font-weight:500; color:var(--charcoal);
+  margin-bottom:7px; cursor:pointer; transition:all .18s; font-family:'Montserrat',sans-serif;
+}
+.poll-o:hover { background:rgba(0,67,255,.07); border-color:rgba(0,67,255,.22); color:var(--blue); }
+
+/* ══════════════════════════════════════════════════════════
+   QA CARDS
+══════════════════════════════════════════════════════════ */
+.qa { padding:15px 18px; background:var(--white); border-radius:var(--r2); border:1px solid var(--line); transition:.2s; }
+.qa:hover { border-color:rgba(0,67,255,.25); box-shadow:0 4px 16px rgba(0,14,53,.08); }
+.qa-q { font-size:.74rem; font-weight:700; color:var(--blue); margin-bottom:4px; font-family:'Montserrat',sans-serif; }
+.qa-a { font-size:.7rem; color:var(--charcoal); line-height:1.62; }
+
+/* ══════════════════════════════════════════════════════════
+   FIXED UI CHROME
+══════════════════════════════════════════════════════════ */
+#chrome-logo {
+  position:fixed; top:16px; left:20px; z-index:900;
+  /* Clear space = ½ x-height = 8px padding mínimo */
+  padding:8px 8px;
+  pointer-events:none; transition:.3s var(--ease);
+}
+#chrome-logo img { height:30px; width:auto; }
+
+#chrome-badge {
+  position:fixed; top:16px; right:20px; z-index:900;
+  display:flex; align-items:center; gap:7px;
+  padding:5px 14px; border-radius:var(--rf);
+  background:rgba(255,255,255,.94); backdrop-filter:blur(12px);
+  border:1px solid var(--line); box-shadow:0 2px 8px rgba(0,14,53,.08);
+  font-size:.58rem; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:var(--charcoal); transition:.3s var(--ease); font-family:'Montserrat',sans-serif;
+}
+#chrome-badge.inv { background:rgba(0,14,53,.5); border-color:rgba(255,255,255,.15); color:rgba(255,255,255,.82); }
+
+/* ══════════════════════════════════════════════════════════
+   NAV BAR
+══════════════════════════════════════════════════════════ */
+#nav {
+  position:fixed; bottom:0; left:0; right:0; z-index:1000;
+  height:50px; display:flex; align-items:center; justify-content:space-between;
+  padding:0 28px;
+  background:rgba(247,245,238,.97); backdrop-filter:blur(16px);
+  border-top:var(--accent-h) solid var(--blue);  /* Accent line en nav */
+}
+.nbtn {
+  display:flex; align-items:center; gap:5px;
+  padding:7px 18px; border-radius:var(--rf);
+  background:transparent; border:1.5px solid var(--line);
+  font-family:'Montserrat',sans-serif; font-size:.64rem; font-weight:700;
+  color:var(--charcoal); cursor:pointer; text-transform:uppercase; letter-spacing:.8px;
+  transition:all .2s;
+}
+.nbtn:hover { background:var(--blue); color:var(--white); border-color:var(--blue); }
+.nbtn svg { width:12px; height:12px; }
+.n-center { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.n-count { font-size:.64rem; font-weight:700; color:var(--fog); letter-spacing:1px; font-family:'Montserrat',sans-serif; }
+.n-track { width:190px; height:2px; background:var(--line); border-radius:2px; overflow:hidden; }
+.n-fill  { height:100%; background:linear-gradient(90deg,var(--red),var(--blue)); transition:width .4s var(--ease); }
+.n-name  { font-size:.48rem; color:var(--fog); letter-spacing:2px; text-transform:uppercase; font-family:'Montserrat',sans-serif; max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 01 · WAITING ROOM
+══════════════════════════════════════════════════════════ -->
+<div class="slide slash-bg" data-name="Waiting Room">
+  <div style="display:grid;grid-template-columns:38% 62%;height:100%;">
+
+    <!-- Panel izquierdo: Bridge Blue identity -->
+    <div class="panel bridge" style="justify-content:space-between;padding:56px 48px;">
+      <!-- Logo flotando — sin caja cuadrada, clear space aplicado -->
+      <div class="logo-float lg">
+        <img src="../LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX Inmomás International"
+             style="height:48px;filter:brightness(0) invert(1);">
+      </div>
+
+      <!-- Accent line separadora bajo logo -->
+      <hr class="accent-red" style="margin:0;">
+
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:32px 0;">
+        <div class="eyebrow" style="color:rgba(255,255,255,.38);margin-bottom:16px;">International Partner Program</div>
+        <div class="display-xl" style="font-size:clamp(2.6rem,5vw,4rem);margin-bottom:16px;">
+          Beyond<br><em>Borders</em>
+        </div>
+        <hr class="accent-red" style="width:56px;height:3px;border:none;margin-bottom:18px;">
+        <div class="body-m white" style="max-width:300px;">The North American Realtor's Blueprint to Spain's Expat Boom</div>
+      </div>
+
+      <!-- Partner logos — flotando, sin cajas -->
+      <div>
+        <div style="font-size:.52rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:12px;font-family:'Montserrat',sans-serif;">Strategic Partners</div>
+        <div class="partner-logos" style="gap:20px;">
+          <img src="../logo fuster.png" alt="Fuster & Associates" style="height:18px;">
+          <img src="../Logo_UCI.png" alt="UCI" style="height:18px;">
+          <img src="../smbiotica-logo.png" alt="Smbiotica" style="height:16px;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel derecho: polls -->
+    <div class="panel cream" style="gap:20px;padding:56px 52px;">
+      <div>
+        <div class="eyebrow" style="color:var(--fog);">While You Wait</div>
+        <div class="title dark" style="margin-bottom:6px;font-size:1.2rem;">Answer in the chat 👇</div>
+        <hr class="accent-blue" style="width:48px;height:3px;border:none;margin-bottom:20px;">
+      </div>
+      <div class="poll">
+        <div class="poll-q">📍 Where are you joining from today?</div>
+        <div class="poll-o">🇺🇸 United States</div>
+        <div class="poll-o">🇨🇦 Canada</div>
+        <div class="poll-o">🌍 Other / International</div>
+      </div>
+      <div class="poll">
+        <div class="poll-q">💼 How often do clients mention Spain or Europe?</div>
+        <div class="poll-o">Never came up</div>
+        <div class="poll-o">1–3 times in the last year</div>
+        <div class="poll-o">4+ times — it comes up regularly</div>
+      </div>
+      <div style="font-size:.64rem;color:var(--fog);text-align:center;font-family:'Montserrat',sans-serif;">Starting shortly · Please confirm your audio is on</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 02 · HERO COVER (Rediseño total — Reglas del manual)
+     ─────────────────────────────────────────────────────────
+     ✅ Full-bleed photo + Bridge Blue overlay 70%
+     ✅ Logo flotando con clear space
+     ✅ Slash Design en CSS (diagonal azul derecha)
+     ✅ Título Display 900 / Blanco / Uppercase
+     ✅ Accent Line 3px rojo separando título y subtítulo
+     ✅ Partner logos flotando sin cajas cuadradas
+══════════════════════════════════════════════════════════ -->
+<div class="slide" data-name="Beyond Borders" style="background:var(--dark-blue);">
+
+  <!-- Foto full-bleed -->
+  <div style="position:absolute;inset:0;z-index:0;
+    background-image:url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=85');
+    background-size:cover;background-position:center;">
+  </div>
+
+  <!-- Bridge Blue overlay 70% — oficial -->
+  <div style="position:absolute;inset:0;z-index:1;
+    background:var(--overlay-bridge);">
+  </div>
+
+  <!-- SLASH DESIGN — franja diagonal en Primary Blue, esquina inferior derecha -->
+  <div style="
+    position:absolute;z-index:2;
+    bottom:-120px;right:-80px;
+    width:480px;height:700px;
+    background:var(--blue);
+    opacity:.16;
+    transform:rotate(-22deg);
+    pointer-events:none;">
+  </div>
+  <!-- Segundo slash más delgado -->
+  <div style="
+    position:absolute;z-index:2;
+    bottom:-100px;right:60px;
+    width:120px;height:700px;
+    background:var(--red);
+    opacity:.22;
+    transform:rotate(-22deg);
+    pointer-events:none;">
+  </div>
+
+  <!-- Contenido principal -->
+  <div style="position:relative;z-index:3;width:100%;height:100%;
+    display:flex;flex-direction:column;padding:0 80px 68px;">
+
+    <!-- Logo en esquina superior — flotando, con clear space -->
+    <div style="flex-shrink:0;padding-top:28px;margin-bottom:auto;">
+      <div class="logo-float">
+        <img src="../LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png"
+             alt="RE/MAX Inmomás International"
+             style="height:40px;filter:brightness(0) invert(1);">
+      </div>
+    </div>
+
+    <!-- Bloque central de texto -->
+    <div style="max-width:760px;">
+      <div class="tag tag-white" style="margin-bottom:28px;">
+        <span class="dot"></span> Live B2B Realtor Masterclass · Costa Blanca, Spain
+      </div>
+
+      <!-- Título Display — Montserrat 900 (Gotham Black) — Mayúsculas -->
+      <div class="display-xl" style="margin-bottom:0;text-transform:uppercase;letter-spacing:-3px;">
+        Beyond<br><em>Borders</em>
+      </div>
+
+      <!-- ACCENT LINE ROJA 9pt — separa título y subtítulo (regla del manual) -->
+      <div style="display:flex;align-items:center;gap:0;margin:20px 0 20px;">
+        <hr style="width:100%;max-width:480px;height:3px;border:none;background:var(--red);display:block;">
+      </div>
+
+      <!-- Subtítulo — Montserrat 400 — claro -->
+      <div style="font-size:1.05rem;font-weight:400;color:rgba(255,255,255,.82);
+        font-family:'Montserrat',sans-serif;line-height:1.65;max-width:560px;margin-bottom:10px;">
+        The North American Realtor's Blueprint to Spain's Expat Boom
+      </div>
+      <div style="font-size:.88rem;font-weight:600;color:rgba(255,255,255,.55);
+        font-family:'Montserrat',sans-serif;max-width:520px;line-height:1.6;margin-bottom:40px;">
+        Earn a <strong style="color:#ffd04a;font-weight:800;">25% referral fee</strong> every time a client chooses Spain — no new licensing, no extra work.
+      </div>
+
+      <!-- Partner logos — flotando sobre fondo oscuro, sin cajas cuadradas -->
+      <div class="partner-logos" style="gap:32px;align-items:center;">
+        <img src="../LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX Inmomás" style="height:26px;">
+        <div style="width:1px;height:24px;background:rgba(255,255,255,.18);flex-shrink:0;"></div>
+        <img src="../logo fuster.png" alt="Fuster & Associates" style="height:20px;">
+        <img src="../Logo_UCI.png" alt="UCI" style="height:20px;">
+        <img src="../Inmomas-holidays-Op-3-color-e1752073650140.png" alt="Inmomás Holidays" style="height:20px;">
+      </div>
+      <div style="margin-top:22px;font-size:.54rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+        color:rgba(255,255,255,.25);font-family:'Montserrat',sans-serif;">
+        30+ Years · 115+ Agents · 4 Offices · A Realtor-to-Realtor Conversation
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 03 · MEET THE TEAM
+     Foto "Clipped" alineada en base sobre Bridge Blue (#0C2749)
+══════════════════════════════════════════════════════════ -->
+<div class="slide slash-bg" data-name="Meet the Team" style="background:var(--cream);">
+  <div style="height:100%;display:flex;flex-direction:column;padding:48px 64px 68px;">
+
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px;">
+      <div>
+        <div class="eyebrow" style="color:var(--red);">Our People</div>
+        <div class="headline dark">American &amp; Canadian Realtors<br><span class="red">Living in Spain</span></div>
+      </div>
+      <div style="max-width:340px;text-align:right;">
+        <div class="body-m" style="color:var(--fog);">We are not executives. We are Realtors — just like you — who made the move. We guide your clients because we walked the path.</div>
+      </div>
+    </div>
+    <!-- Accent line roja bajo headline -->
+    <hr class="accent-red" style="width:100%;margin-bottom:26px;">
+
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;flex:1;">
+
+      <div class="agent-card">
+        <div class="agent-photo-block">
+          <img src="../Agentes Inmomás/Angel Luis Rodriguez .png" alt="Angel Luis Rodriguez">
+        </div>
+        <div class="agent-info">
+          <div class="agent-flag">🇪🇸</div>
+          <div class="agent-name">Angel Luis Rodríguez</div>
+          <div class="agent-role">Senior Specialist</div>
+          <div class="agent-from">Costa Blanca</div>
+        </div>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-photo-block">
+          <img src="../Agentes Inmomás/Denise McNeal .png" alt="Denise McNeal">
+        </div>
+        <div class="agent-info">
+          <div class="agent-flag">🇺🇸</div>
+          <div class="agent-name">Denise McNeal</div>
+          <div class="agent-role">Relocation Advisor</div>
+          <div class="agent-from">From United States</div>
+        </div>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-photo-block">
+          <img src="../Agentes Inmomás/Giancarlo Agudelo .png" alt="Giancarlo Agudelo">
+        </div>
+        <div class="agent-info">
+          <div class="agent-flag">🇨🇦</div>
+          <div class="agent-name">Giancarlo Agudelo</div>
+          <div class="agent-role">Investment Consultant</div>
+          <div class="agent-from">From Canada</div>
+        </div>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-photo-block">
+          <img src="../Agentes Inmomás/James e Isabelle.webp" alt="James & Isabelle">
+        </div>
+        <div class="agent-info">
+          <div class="agent-flag">🇨🇦</div>
+          <div class="agent-name">James &amp; Isabelle</div>
+          <div class="agent-role">Buyer Experience</div>
+          <div class="agent-from">From Canada</div>
+        </div>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-photo-block">
+          <img src="../Agentes Inmomás/Sepehr Seyed Hosseini.png" alt="Sepehr Seyed">
+        </div>
+        <div class="agent-info">
+          <div class="agent-flag">🌐</div>
+          <div class="agent-name">Sepehr Seyed Hosseini</div>
+          <div class="agent-role">International Advisor</div>
+          <div class="agent-from">Multilingual Team</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 04 · AGENDA
+══════════════════════════════════════════════════════════ -->
+<div class="slide" data-name="Today's Agenda" style="background:var(--cream);">
+  <div style="display:grid;grid-template-columns:38% 62%;height:100%;">
+
+    <div class="panel bridge slash-bg-left" style="justify-content:space-between;padding:56px 48px;">
+      <div>
+        <div class="eyebrow" style="color:rgba(255,255,255,.38);">Block 1 · Opening</div>
+        <div class="headline white" style="margin-bottom:0;">Today's<br><span style="color:#ffd04a;">Playbook</span></div>
+        <hr class="accent-red" style="width:56px;height:3px;border:none;margin:16px 0;">
+        <div class="body-m white" style="margin-bottom:28px;">55 minutes. 5 blocks. Everything you need to convert European interest into closed commissions.</div>
+        <div style="padding:18px 20px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:var(--r3);border-left:var(--accent-h) solid var(--red);">
+          <div style="font-size:.58rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px;font-family:'Montserrat',sans-serif;">Drop in the chat 👇</div>
+          <div style="font-size:.84rem;color:var(--white);font-weight:500;line-height:1.6;font-family:'Montserrat',sans-serif;">One client who has mentioned Spain. We'll follow up personally — no pressure.</div>
+        </div>
+      </div>
+      <div class="logo-float"><img src="../LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX Inmomás" style="height:26px;filter:brightness(0) invert(1);opacity:.35;"></div>
+    </div>
+
+    <div class="panel cream" style="padding:56px 52px;gap:0;justify-content:center;">
+      <div class="ag-line" style="border-left-color:var(--red);">
+        <div class="ag-time">00–08 min</div><div class="ag-ico">🙋</div>
+        <div><div class="ag-tit"><strong>Opening &amp; Who We Are</strong> — Realtor testimonials from Spain</div><div class="ag-who">RE/MAX Team</div></div>
+      </div>
+      <div class="ag-line" style="border-left-color:#b8860b;">
+        <div class="ag-time">08–20 min</div><div class="ag-ico">📊</div>
+        <div><div class="ag-tit"><strong>The North American Exodus</strong> — Data + 5 Forces driving the move</div><div class="ag-who">RE/MAX Team</div></div>
+      </div>
+      <div class="ag-line" style="border-left-color:var(--blue);">
+        <div class="ag-time">20–35 min</div><div class="ag-ico">🤝</div>
+        <div><div class="ag-tit"><strong>The 360° Ecosystem</strong> — Legal · Finance · Rentals · Marketing · VIP Tour</div><div class="ag-who">Partner Speakers</div></div>
+      </div>
+      <div class="ag-line" style="border-left-color:#15803d;">
+        <div class="ag-time">35–43 min</div><div class="ag-ico">💰</div>
+        <div><div class="ag-tit"><strong>Your 25% Formula</strong> — Commission math, real earnings, 4-step process</div><div class="ag-who">RE/MAX Team</div></div>
+      </div>
+      <div class="ag-line" style="border-left-color:var(--charcoal);">
+        <div class="ag-time">43–55 min</div><div class="ag-ico">🖥️</div>
+        <div><div class="ag-tit"><strong>Portal Demo + Q&amp;A</strong> — Register in 2 minutes</div><div class="ag-who">RE/MAX Team</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 05 · THE MEGATREND
+══════════════════════════════════════════════════════════ -->
+<div class="slide" data-name="The North American Exodus" style="background:var(--dark-blue);">
+  <div style="position:absolute;inset:0;
+    background-image:url('https://images.unsplash.com/photo-1504512485720-7d83a16ee930?w=1920&q=80');
+    background-size:cover;background-position:center;z-index:0;"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,14,53,.92);z-index:1;"></div>
+  <!-- Slash derecho en azul -->
+  <div style="position:absolute;bottom:-100px;right:-60px;width:300px;height:800px;background:var(--blue);opacity:.12;transform:rotate(-22deg);z-index:2;pointer-events:none;"></div>
+
+  <div style="position:relative;z-index:3;width:100%;height:100%;display:flex;flex-direction:column;padding:56px 72px;justify-content:center;">
+    <div class="tag tag-white" style="margin-bottom:22px;">Block 2 · The Megatrend</div>
+    <div style="font-size:clamp(1.4rem,2.8vw,2.2rem);font-weight:400;color:rgba(255,255,255,.65);line-height:1.5;max-width:780px;font-family:'Montserrat',sans-serif;margin-bottom:8px;">Every one of you has heard a client say it:</div>
+    <div style="font-size:clamp(1.8rem,3.5vw,3rem);font-weight:900;color:var(--white);line-height:1.1;letter-spacing:-1px;font-family:'Montserrat',sans-serif;text-transform:uppercase;max-width:780px;margin-bottom:12px;">"I've always wanted to move to Europe…"</div>
+
+    <!-- Accent line roja -->
+    <hr style="width:100%;max-width:560px;height:3px;border:none;background:var(--red);margin-bottom:20px;">
+
+    <div style="font-size:clamp(1.1rem,2vw,1.6rem);font-weight:700;color:#ffd04a;font-family:'Montserrat',sans-serif;max-width:640px;margin-bottom:44px;">Today you stop watching that lead disappear.</div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.08);border-radius:var(--r3);overflow:hidden;max-width:900px;">
+      <div style="background:rgba(0,14,53,.75);backdrop-filter:blur(10px);padding:26px 20px;">
+        <div class="kpi-n white">+45M</div>
+        <div class="kpi-l white">Americans considering living abroad</div>
+      </div>
+      <div style="background:rgba(0,14,53,.75);backdrop-filter:blur(10px);padding:26px 20px;">
+        <div class="kpi-n" style="color:#ffd04a;">+8M</div>
+        <div class="kpi-l white">Canadians researching international relocation</div>
+      </div>
+      <div style="background:rgba(0,14,53,.75);backdrop-filter:blur(10px);padding:26px 20px;">
+        <div class="kpi-n white">#1</div>
+        <div class="kpi-l white">Spain — top destination for North Americans in Europe</div>
+      </div>
+      <div style="background:rgba(0,14,53,.75);backdrop-filter:blur(10px);padding:26px 20px;">
+        <div class="kpi-n red">340%</div>
+        <div class="kpi-l white">"Buy property Spain" searches from US &amp; Canada</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 06 · WHY SPAIN — 5 FORCES
+══════════════════════════════════════════════════════════ -->
+<div class="slide slash-bg" data-name="Why Spain? — 5 Forces" style="background:var(--cream);">
+  <div style="display:grid;grid-template-columns:45% 55%;height:100%;">
+
+    <div class="panel blue" style="position:relative;overflow:hidden;">
+      <div style="position:absolute;width:350px;height:350px;border-radius:50%;top:-120px;right:-120px;background:rgba(255,255,255,.06);pointer-events:none;"></div>
+      <div class="eyebrow" style="color:rgba(255,255,255,.4);">Block 2 · Why Spain</div>
+      <div class="headline white" style="margin-bottom:0;">Why<br><span style="color:#ffd04a;">Spain?</span></div>
+      <hr class="accent-w" style="width:56px;height:3px;border:none;margin:14px 0 18px;">
+      <div class="lead white" style="margin-bottom:28px;">Lower cost, better healthcare, superior climate, legal pathways and stronger lifestyle appeal — all on one coastline.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.14);border-radius:var(--r3);overflow:hidden;">
+        <div style="background:rgba(0,0,0,.18);padding:16px 14px;"><div style="font-size:.56rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:5px;font-family:'Montserrat',sans-serif;">Healthcare</div><div style="font-size:1.4rem;font-weight:900;color:var(--white);font-family:'Montserrat',sans-serif;">€300</div><div style="font-size:.6rem;color:rgba(255,255,255,.45);">vs $2,800+ in US/CA monthly</div></div>
+        <div style="background:rgba(0,0,0,.18);padding:16px 14px;"><div style="font-size:.56rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:5px;font-family:'Montserrat',sans-serif;">Sunshine</div><div style="font-size:1.4rem;font-weight:900;color:var(--white);font-family:'Montserrat',sans-serif;">320+</div><div style="font-size:.6rem;color:rgba(255,255,255,.45);">sunny days per year</div></div>
+        <div style="background:rgba(0,0,0,.18);padding:16px 14px;"><div style="font-size:.56rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:5px;font-family:'Montserrat',sans-serif;">Safety</div><div style="font-size:1.4rem;font-weight:900;color:var(--white);font-family:'Montserrat',sans-serif;">Top 10</div><div style="font-size:.6rem;color:rgba(255,255,255,.45);">Global Peace Index ranking</div></div>
+        <div style="background:rgba(0,0,0,.18);padding:16px 14px;"><div style="font-size:.56rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:5px;font-family:'Montserrat',sans-serif;">Healthcare WHO</div><div style="font-size:1.4rem;font-weight:900;color:var(--white);font-family:'Montserrat',sans-serif;">#7</div><div style="font-size:.6rem;color:rgba(255,255,255,.45);">vs United States at #37</div></div>
+      </div>
+    </div>
+
+    <div class="panel cream" style="gap:12px;">
+      <div class="eyebrow" style="color:#8a6200;margin-bottom:14px;">The 5 Forces Driving the Move</div>
+      <div class="cmp" style="margin-bottom:14px;">
+        <div class="cmp-l"><div class="cmp-f">🏖️ Miami Beachfront</div><div class="cmp-v neg">$1.2M+</div><div class="cmp-d">2-bed ocean-view apartment</div></div>
+        <div class="cmp-r"><div class="cmp-f">🌊 Alicante Beachfront</div><div class="cmp-v pos">€320K</div><div class="cmp-d">Same lifestyle · 75% less cost</div></div>
+      </div>
+      <div class="row-list">
+        <div class="row-item"><div class="row-n gold">1</div><div><div class="row-t">Cost of Living</div><div class="row-d">40–60% lower than US/Canadian metro averages</div></div></div>
+        <div class="row-item"><div class="row-n gold">2</div><div><div class="row-t">Healthcare</div><div class="row-d">WHO ranked #7 globally · fraction of the cost</div></div></div>
+        <div class="row-item"><div class="row-n gold">3</div><div><div class="row-t">Safety</div><div class="row-d">Top 10 safest countries worldwide · Global Peace Index</div></div></div>
+        <div class="row-item"><div class="row-n gold">4</div><div><div class="row-t">Climate</div><div class="row-d">320+ sunny days · Costa Blanca Mediterranean lifestyle</div></div></div>
+        <div class="row-item"><div class="row-n gold">5</div><div><div class="row-t">Visa Pathways</div><div class="row-d">Non-Lucrative · Digital Nomad · Golden Visa</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 07 · BUYER PROFILES
+══════════════════════════════════════════════════════════ -->
+<div class="slide slash-bg" data-name="Your Client Is Already Looking" style="background:var(--white);">
+  <div style="height:100%;display:flex;flex-direction:column;padding:48px 64px 68px;">
+    <div style="margin-bottom:10px;">
+      <div class="eyebrow" style="color:#8a6200;">Block 2 · The Opportunity</div>
+      <div class="headline dark">Your Client Is Already <span class="red">Looking.</span><br>Will You Be Ready?</div>
+    </div>
+    <hr class="accent-red" style="margin-bottom:26px;">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px;flex:1;">
+
+      <div style="border-radius:var(--r4);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 4px 20px rgba(0,14,53,.10);">
+        <div style="height:160px;background-image:url('https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=600&q=80');background-size:cover;background-position:center;position:relative;">
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(0,14,53,.75) 100%);"></div>
+          <div style="position:absolute;bottom:14px;left:18px;"><div class="tag tag-red">Profile #1</div></div>
+        </div>
+        <div style="padding:22px 20px;flex:1;background:var(--white);">
+          <div class="title dark" style="font-size:1rem;margin-bottom:7px;">The Pre-Retiree</div>
+          <div class="body-m" style="margin-bottom:12px;">55–65 yrs · High home equity · Tired of high taxes &amp; medical costs</div>
+          <hr class="accent-red" style="width:32px;height:2px;border:none;margin-bottom:8px;">
+          <div style="font-size:.72rem;font-weight:700;color:var(--red);font-family:'Montserrat',sans-serif;">Wants → Lifestyle + rental income</div>
+        </div>
+      </div>
+
+      <div style="border-radius:var(--r4);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 4px 20px rgba(0,14,53,.10);">
+        <div style="height:160px;background-image:url('https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=600&q=80');background-size:cover;background-position:center;position:relative;">
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(0,14,53,.75) 100%);"></div>
+          <div style="position:absolute;bottom:14px;left:18px;"><div class="tag tag-blue">Profile #2</div></div>
+        </div>
+        <div style="padding:22px 20px;flex:1;background:var(--white);">
+          <div class="title dark" style="font-size:1rem;margin-bottom:7px;">The Remote Worker</div>
+          <div class="body-m" style="margin-bottom:12px;">Canadian, 35–50 · Fleeing winters · Digital Nomad Visa candidate</div>
+          <hr class="accent-blue" style="width:32px;height:2px;border:none;margin-bottom:8px;">
+          <div style="font-size:.72rem;font-weight:700;color:var(--blue);font-family:'Montserrat',sans-serif;">Wants → Fast mortgage + residency</div>
+        </div>
+      </div>
+
+      <div style="border-radius:var(--r4);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 4px 20px rgba(0,14,53,.10);">
+        <div style="height:160px;background-image:url('https://images.unsplash.com/photo-1460317442991-0ec209397118?w=600&q=80');background-size:cover;background-position:center;position:relative;">
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(0,14,53,.75) 100%);"></div>
+          <div style="position:absolute;bottom:14px;left:18px;"><div class="tag tag-gold">Profile #3</div></div>
+        </div>
+        <div style="padding:22px 20px;flex:1;background:var(--white);">
+          <div class="title dark" style="font-size:1rem;margin-bottom:7px;">The Investor</div>
+          <div class="body-m" style="margin-bottom:12px;">US high-net-worth · Golden Visa €500K+ · Euro portfolio diversification</div>
+          <hr class="accent-gold" style="width:32px;height:2px;border:none;margin-bottom:8px;">
+          <div style="font-size:.72rem;font-weight:700;color:#8a6200;font-family:'Montserrat',sans-serif;">Wants → 5–8% rental yield</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 08 · THE 360° ECOSYSTEM
+══════════════════════════════════════════════════════════ -->
+<div class="slide" data-name="The 360° Ecosystem" style="background:var(--dark-blue);">
+  <div style="position:absolute;bottom:-80px;right:-60px;width:380px;height:620px;background:var(--blue);opacity:.14;transform:rotate(-22deg);pointer-events:none;"></div>
+
+  <div style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;padding:48px 64px 68px;">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px;">
+      <div>
+        <div class="eyebrow" style="color:rgba(255,255,255,.3);">Block 3 · Our Ecosystem</div>
+        <div class="headline white">The <span style="color:#ffd04a;">360°</span> Safety Net</div>
+      </div>
+      <div style="max-width:340px;text-align:right;font-size:.82rem;color:rgba(255,255,255,.45);line-height:1.6;font-family:'Montserrat',sans-serif;">"What if something goes wrong?" — We built an ecosystem so your client never faces that question alone.</div>
+    </div>
+    <hr class="accent-red" style="margin-bottom:26px;">
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;flex:1;">
+
+      <div class="card-bridge" style="border-top:var(--accent-h) solid var(--blue);display:flex;flex-direction:column;gap:14px;">
+        <div style="font-size:1.8rem;">⚖️</div>
+        <div>
+          <div class="eyebrow" style="color:rgba(255,255,255,.3);font-size:.52rem;margin-bottom:4px;">Legal Security</div>
+          <div style="font-size:.92rem;font-weight:800;color:var(--white);margin-bottom:6px;font-family:'Montserrat',sans-serif;">Fuster &amp; Associates</div>
+          <div class="body-s white">NIE · Due diligence · Contracts · Non-Lucrative · Digital Nomad · Golden Visa</div>
+        </div>
+        <div style="margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);font-size:.64rem;color:var(--blue);font-weight:700;font-family:'Montserrat',sans-serif;">30+ years · 98% visa success</div>
+      </div>
+
+      <div class="card-bridge" style="border-top:var(--accent-h) solid var(--red);display:flex;flex-direction:column;gap:14px;">
+        <div style="font-size:1.8rem;">🏦</div>
+        <div>
+          <div class="eyebrow" style="color:rgba(255,255,255,.3);font-size:.52rem;margin-bottom:4px;">Non-Resident Finance</div>
+          <div style="font-size:.92rem;font-weight:800;color:var(--white);margin-bottom:6px;font-family:'Montserrat',sans-serif;">UCI</div>
+          <div class="body-s white">Mortgages for US &amp; CA buyers · Up to 70% LTV · Pre-approval in 48h · English advisors</div>
+        </div>
+        <div style="margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);font-size:.64rem;color:var(--red);font-weight:700;font-family:'Montserrat',sans-serif;">~3.2% vs 6.8%+ in the US</div>
+      </div>
+
+      <div class="card-bridge" style="border-top:var(--accent-h) solid #b8860b;display:flex;flex-direction:column;gap:14px;">
+        <div style="font-size:1.8rem;">🏡</div>
+        <div>
+          <div class="eyebrow" style="color:rgba(255,255,255,.3);font-size:.52rem;margin-bottom:4px;">Property Management</div>
+          <div style="font-size:.92rem;font-weight:800;color:var(--white);margin-bottom:6px;font-family:'Montserrat',sans-serif;">Inmomás Holidays</div>
+          <div class="body-s white">Rental license · Airbnb · Booking · VRBO · Full guest management</div>
+        </div>
+        <div style="margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);font-size:.64rem;color:#ffd04a;font-weight:700;font-family:'Montserrat',sans-serif;">5–8% net rental yield</div>
+      </div>
+
+      <div class="card-bridge" style="border-top:var(--accent-h) solid rgba(255,255,255,.3);display:flex;flex-direction:column;gap:14px;">
+        <div style="font-size:1.8rem;">📱</div>
+        <div>
+          <div class="eyebrow" style="color:rgba(255,255,255,.3);font-size:.52rem;margin-bottom:4px;">Digital Marketing</div>
+          <div style="font-size:.92rem;font-weight:800;color:var(--white);margin-bottom:6px;font-family:'Montserrat',sans-serif;">Smbiotica</div>
+          <div class="body-s white">Co-branded pages · Bilingual email sequences · Social content · Territory leads</div>
+        </div>
+        <div style="margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);font-size:.64rem;color:rgba(255,255,255,.42);font-weight:700;font-family:'Montserrat',sans-serif;">Marketing kit — ready today</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 09 · FUSTER & ASSOCIATES
+══════════════════════════════════════════════════════════ -->
+<div class="slide slash-bg" data-name="Fuster & Associates — Legal" style="background:var(--cream);">
+  <div class="split" style="height:100%;">
+    <div class="panel cream" style="border-right:1px solid var(--line);">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+        <div style="width:44px;height:44px;background:var(--blue);border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">⚖️</div>
+        <div><div style="font-size:.54rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--fog);font-family:'Montserrat',sans-serif;">Partner Speaker · Legal</div><div class="title dark">Fuster <span style="color:var(--blue);">&amp;</span> Associates</div></div>
+        <div class="tag tag-blue" style="margin-left:auto;">30+ Years</div>
+      </div>
+      <hr class="accent-blue" style="margin-bottom:18px;">
+      <div style="padding:18px 20px;background:var(--white);border-radius:var(--r3);border:1px solid var(--line);margin-bottom:18px;font-size:.88rem;font-style:italic;color:var(--charcoal);line-height:1.78;font-family:'Montserrat',sans-serif;">"We handle everything your client needs to buy in Spain with complete legal security — in English, from day one."</div>
+      <div class="row-list">
+        <div class="row-item"><div class="row-n blue">1</div><div><div class="row-t">NIE Number</div><div class="row-d">Spanish tax ID — processed in days, not weeks</div></div></div>
+        <div class="row-item"><div class="row-n blue">2</div><div><div class="row-t">Full Due Diligence</div><div class="row-d">Title deed, debts, urban compliance — zero surprises</div></div></div>
+        <div class="row-item"><div class="row-n blue">3</div><div><div class="row-t">Purchase Contracts</div><div class="row-d">Drafted and reviewed in English — legally watertight</div></div></div>
+        <div class="row-item"><div class="row-n blue">4</div><div><div class="row-t">Residency Visas</div><div class="row-d">Non-Lucrative · Digital Nomad · Golden Visa — 98% success</div></div></div>
+      </div>
+    </div>
+    <div class="panel white" style="gap:14px;justify-content:center;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="text-align:center;padding:22px;background:var(--cream);border:1px solid var(--line);border-radius:var(--r3);border-top:var(--accent-h) solid var(--blue);">
+          <div class="kpi-n blue" style="font-size:2.8rem;">30+</div><div class="kpi-l">Years protecting international buyers</div>
+        </div>
+        <div style="text-align:center;padding:22px;background:var(--cream);border:1px solid var(--line);border-radius:var(--r3);border-top:var(--accent-h) solid var(--blue);">
+          <div class="kpi-n blue" style="font-size:2.8rem;">98%</div><div class="kpi-l">Visa application success rate</div>
+        </div>
+      </div>
+      <div style="padding:20px 22px;background:var(--cream);border:1px solid var(--line);border-radius:var(--r3);">
+        <div style="font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#8a6200;margin-bottom:12px;font-family:'Montserrat',sans-serif;">Three Visa Pathways</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 12px;background:var(--white);border-radius:var(--r2);border:1px solid var(--line);border-left:var(--accent-h) solid #b8860b;"><span>🌟</span><div><div style="font-size:.78rem;font-weight:700;color:var(--charcoal);font-family:'Montserrat',sans-serif;">Golden Visa</div><div class="body-s">€500K+ investment → Full EU family residency</div></div></div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 12px;background:var(--white);border-radius:var(--r2);border:1px solid var(--line);border-left:var(--accent-h) solid var(--blue);"><span>💻</span><div><div style="font-size:.78rem;font-weight:700;color:var(--charcoal);font-family:'Montserrat',sans-serif;">Digital Nomad Visa</div><div class="body-s">Remote income → 5-year permit · 15% flat tax</div></div></div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 12px;background:var(--white);border-radius:var(--r2);border:1px solid var(--line);border-left:var(--accent-h) solid var(--red);"><span>🌅</span><div><div style="font-size:.78rem;font-weight:700;color:var(--charcoal);font-family:'Montserrat',sans-serif;">Non-Lucrative Visa</div><div class="body-s">Passive income → Retirement visa</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 10 · UCI FINANCING
+══════════════════════════════════════════════════════════ -->
+<div class="slide slash-bg" data-name="UCI — Non-Resident Financing" style="background:var(--cream);">
+  <div class="split" style="height:100%;">
+    <div class="panel white" style="border-right:1px solid var(--line);">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+        <div style="width:44px;height:44px;background:var(--red);border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">🏦</div>
+        <div><div style="font-size:.54rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--fog);font-family:'Montserrat',sans-serif;">Partner Speaker · Finance</div><div class="title dark">UCI — <span style="color:var(--red);">Non-Resident Mortgages</span></div></div>
+      </div>
+      <hr class="accent-red" style="margin-bottom:18px;">
+      <div style="padding:18px 20px;background:var(--cream);border-radius:var(--r3);border:1px solid var(--line);margin-bottom:18px;font-size:.88rem;font-style:italic;color:var(--charcoal);line-height:1.78;font-family:'Montserrat',sans-serif;">"The biggest myth? That foreigners can't get a mortgage in Spain. We eliminate that barrier every single day."</div>
+      <div class="row-list cream">
+        <div class="row-item"><div class="row-n red">✓</div><div><div class="row-t">Up to 70% LTV for US &amp; Canadian buyers</div></div></div>
+        <div class="row-item"><div class="row-n red">✓</div><div><div class="row-t">Income verified via US / Canadian tax returns</div></div></div>
+        <div class="row-item"><div class="row-n red">✓</div><div><div class="row-t">Pre-approval in 48 hours</div><div class="row-d">Shop with confidence from day one</div></div></div>
+        <div class="row-item"><div class="row-n red">✓</div><div><div class="row-t">English-speaking advisors throughout</div></div></div>
+      </div>
+    </div>
+    <div class="panel cream" style="gap:14px;justify-content:center;">
+      <div class="cmp" style="margin-bottom:4px;">
+        <div class="cmp-l"><div class="cmp-f">🇺🇸 US 30yr Fixed</div><div class="cmp-v neg">6.8%+</div><div class="cmp-d">Current average rate</div></div>
+        <div class="cmp-r"><div class="cmp-f">🇪🇸 Spain Fixed (UCI)</div><div class="cmp-v pos">~3.2%</div><div class="cmp-d">Non-resident mortgage rate</div></div>
+      </div>
+      <div style="padding:18px 20px;background:rgba(0,67,255,.06);border:1px solid rgba(0,67,255,.16);border-radius:var(--r3);border-left:var(--accent-h) solid var(--blue);">
+        <div style="font-size:.9rem;font-weight:800;color:var(--charcoal);margin-bottom:4px;font-family:'Montserrat',sans-serif;">Half the rate. Twice the purchasing power.</div>
+        <div class="body-m">Clients who say "I can't afford Spain" often discover they can — at better financing terms than home.</div>
+      </div>
+      <div style="text-align:center;padding:28px;background:var(--white);border:1px solid var(--line);border-radius:var(--r3);border-top:var(--accent-h) solid var(--blue);">
+        <div class="kpi-n blue" style="font-size:4.2rem;">48h</div>
+        <div class="kpi-l">From application to mortgage pre-approval</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 11 · VIP PROPERTY TOUR
+══════════════════════════════════════════════════════════ -->
+<div class="slide" data-name="VIP Property Tour" style="background:var(--dark-blue);">
+  <div style="position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1920&q=80');background-size:cover;background-position:center;z-index:0;"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,14,53,.88);z-index:1;"></div>
+  <div style="position:absolute;bottom:-100px;right:-60px;width:300px;height:800px;background:var(--blue);opacity:.15;transform:rotate(-22deg);z-index:2;pointer-events:none;"></div>
+
+  <div style="position:relative;z-index:3;width:100%;height:100%;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:56px 72px;">
+    <div>
+      <div class="tag tag-white" style="margin-bottom:20px;">Block 3 · The Closer</div>
+      <div class="headline white" style="margin-bottom:0;">The Experience That<br><span style="color:#ffd04a;">Closes the Sale</span></div>
+      <hr class="accent-red" style="width:56px;height:3px;border:none;margin:14px 0 18px;">
+      <div style="font-size:.88rem;color:rgba(255,255,255,.65);font-style:italic;line-height:1.75;margin-bottom:26px;font-family:'Montserrat',sans-serif;">"Digital is not enough. When your client feels the Mediterranean sun, dines with expats, sits with the lawyer and hears 'everything is handled' — that's when they decide."</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:14px;padding:11px 16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--r2);border-left:var(--accent-h) solid var(--red);"><span>✈️</span><div style="font-size:.78rem;font-weight:600;color:var(--white);font-family:'Montserrat',sans-serif;"><strong>Day 1:</strong> Airport pickup + Welcome dinner with expat community</div></div>
+        <div style="display:flex;align-items:center;gap:14px;padding:11px 16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--r2);border-left:var(--accent-h) solid #b8860b;"><span>🏡</span><div style="font-size:.78rem;font-weight:600;color:var(--white);font-family:'Montserrat',sans-serif;"><strong>Days 2–3:</strong> Curated property visits across Costa Blanca</div></div>
+        <div style="display:flex;align-items:center;gap:14px;padding:11px 16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--r2);border-left:var(--accent-h) solid var(--blue);"><span>⚖️</span><div style="font-size:.78rem;font-weight:600;color:var(--white);font-family:'Montserrat',sans-serif;"><strong>Day 3:</strong> Meeting with Fuster legal + UCI mortgage advisor</div></div>
+        <div style="display:flex;align-items:center;gap:14px;padding:11px 16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--r2);border-left:var(--accent-h) solid rgba(255,255,255,.3);"><span>🌊</span><div style="font-size:.78rem;font-weight:600;color:var(--white);font-family:'Montserrat',sans-serif;"><strong>Days 4–5:</strong> Lifestyle — beach, gastronomy, expat community</div></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="text-align:center;padding:40px 24px;background:rgba(255,255,255,.06);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);border-radius:var(--r4);border-top:var(--accent-h) solid #ffd04a;">
+        <div style="font-size:5.5rem;font-weight:900;color:#ffd04a;line-height:1;letter-spacing:-3px;font-family:'Montserrat',sans-serif;text-transform:uppercase;">70%+</div>
+        <div style="font-size:.58rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:8px;font-family:'Montserrat',sans-serif;">Close Rate · VIP Tour Participants</div>
+      </div>
+      <div style="text-align:center;padding:20px;background:rgba(255,255,255,.06);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.1);border-radius:var(--r3);">
+        <div style="font-size:.92rem;font-weight:700;color:var(--white);margin-bottom:4px;font-family:'Montserrat',sans-serif;">You make the introduction.</div>
+        <div style="font-size:.96rem;font-weight:900;color:#ffd04a;font-family:'Montserrat',sans-serif;">Spain does the closing.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 12 · COMMISSION FORMULA
+══════════════════════════════════════════════════════════ -->
+<div class="slide slash-bg" data-name="Your 25% — The Formula" style="background:var(--white);">
+  <div style="height:100%;display:flex;flex-direction:column;padding:48px 80px 68px;justify-content:center;">
+    <div class="eyebrow" style="color:#15803d;margin-bottom:8px;">Block 4 · The Commission Formula</div>
+    <div class="headline dark" style="margin-bottom:0;">Your <span style="color:#b8860b;">25%</span> — The Mathematics<br>of Referral Wealth</div>
+    <hr class="accent-red" style="width:100%;margin-bottom:26px;">
+    <div class="formula" style="margin-bottom:22px;">
+      <div class="fbox"><div class="fnum">€350K</div><div class="flbl">Property value</div></div>
+      <div class="fop">×</div>
+      <div class="fbox red"><div class="fnum red">5%</div><div class="flbl">Buyer-side fee</div></div>
+      <div class="fop">×</div>
+      <div class="fbox blue"><div class="fnum blue">25%</div><div class="flbl">Your referral share</div></div>
+      <div class="fop">=</div>
+      <div class="fbox green"><div class="fnum green" style="font-size:2.4rem;">€4,375</div><div class="flbl">Your fee. One referral.</div></div>
+    </div>
+    <div style="max-width:820px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+      <div style="padding:20px 22px;background:var(--cream);border-radius:var(--r3);border:1px solid var(--line);border-left:var(--accent-h) solid var(--blue);">
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--fog);margin-bottom:7px;font-family:'Montserrat',sans-serif;">What the 5% covers</div>
+        <div class="body-m">Property search · Legal coordination · Financing · Negotiation · Closing · Post-sale support. One integrated fee, professionally managed.</div>
+      </div>
+      <div style="padding:20px 22px;background:rgba(21,128,61,.05);border:1px solid rgba(21,128,61,.18);border-radius:var(--r3);border-left:var(--accent-h) solid #15803d;">
+        <div style="font-size:.84rem;font-weight:800;color:var(--charcoal);margin-bottom:5px;font-family:'Montserrat',sans-serif;">How many hours to earn $7,500 in your market?</div>
+        <div style="font-size:1rem;font-weight:700;color:var(--blue);margin-bottom:4px;font-family:'Montserrat',sans-serif;">With us: 5 minutes. One form.</div>
+        <div class="body-s">Zero licensing · Zero driving · Zero upfront cost · Protected by signed referral agreement</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 13 · REAL EARNINGS TABLE
+══════════════════════════════════════════════════════════ -->
+<div class="slide slash-bg" data-name="Real Earnings Table" style="background:var(--cream);">
+  <div class="split-6040" style="height:100%;">
+    <div class="panel white" style="border-right:1px solid var(--line);">
+      <div class="eyebrow" style="color:#15803d;margin-bottom:8px;">Block 4 · Real Numbers</div>
+      <div class="headline dark" style="margin-bottom:0;">What You <span style="color:#b8860b;">Actually Earn</span></div>
+      <hr class="accent-red" style="margin-bottom:18px;">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Value</th>
+            <th style="background:rgba(184,134,11,.75);">Fee 5%</th>
+            <th style="background:rgba(21,128,61,.8);">Your 25%</th>
+            <th style="background:rgba(21,128,61,.8);">USD</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>🏖️ Beach Apartment</td><td class="t-blue">€350K</td><td class="t-gold">€17,500</td><td class="t-green">€4,375</td><td class="t-green">~$4,750</td></tr>
+          <tr><td>🏡 Premium Villa</td><td class="t-blue">€600K</td><td class="t-gold">€30,000</td><td class="t-green">€7,500</td><td class="t-green">~$8,150</td></tr>
+          <tr><td>🌟 Golden Visa Villa</td><td class="t-blue">€800K</td><td class="t-gold">€40,000</td><td class="t-green">€10,000</td><td class="t-green">~$10,850</td></tr>
+          <tr><td>💎 Luxury Estate</td><td class="t-blue">€1.2M</td><td class="t-gold">€60,000</td><td class="t-green">€15,000</td><td class="t-green">~$16,300</td></tr>
+        </tbody>
+      </table>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+        <div style="padding:12px 14px;background:var(--cream);border:1px solid var(--line);border-radius:var(--r2);font-size:.68rem;color:var(--charcoal);font-family:'Montserrat',sans-serif;"><strong>Payment:</strong> Upon closing only. Zero risk.</div>
+        <div style="padding:12px 14px;background:var(--cream);border:1px solid var(--line);border-radius:var(--r2);font-size:.68rem;color:var(--charcoal);font-family:'Montserrat',sans-serif;"><strong>Transfer:</strong> International wire in USD or CAD.</div>
+      </div>
+    </div>
+    <div class="panel cream" style="gap:14px;justify-content:center;">
+      <div style="font-size:.58rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--fog);margin-bottom:4px;font-family:'Montserrat',sans-serif;">Commission Scheme</div>
+      <img src="../Esquema comisional.png" alt="Commission Scheme" style="width:100%;border-radius:var(--r3);border:1px solid var(--line);box-shadow:0 8px 28px rgba(0,14,53,.12);">
+      <div style="padding:16px 18px;background:rgba(21,128,61,.05);border:1px solid rgba(21,128,61,.18);border-radius:var(--r3);border-left:var(--accent-h) solid #15803d;">
+        <div style="font-size:.84rem;font-weight:800;color:var(--charcoal);margin-bottom:3px;font-family:'Montserrat',sans-serif;">A parallel income stream.</div>
+        <div class="body-s">Activates every time a client mentions Europe. No changes to your existing business.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 14 · 4-STEP PROCESS
+══════════════════════════════════════════════════════════ -->
+<div class="slide slash-bg" data-name="How It Works — 4 Steps" style="background:var(--white);">
+  <div style="height:100%;display:flex;flex-direction:column;padding:48px 72px 68px;justify-content:center;">
+    <div class="eyebrow" style="color:#15803d;margin-bottom:8px;">Block 4 · The Process</div>
+    <div class="headline dark" style="margin-bottom:0;">Your Entire <span class="red">Role</span> — 4 Steps</div>
+    <hr class="accent-red" style="margin-bottom:28px;">
+    <div class="track" style="margin-bottom:28px;box-shadow:0 8px 32px rgba(0,14,53,.08);border-radius:var(--r3);">
+      <div class="track-step"><div class="track-n">1</div><div class="track-t">The Trigger</div><div class="track-b">Client mentions Spain, Europe, or relocating abroad.</div><div class="track-arrow">›</div></div>
+      <div class="track-step"><div class="track-n">2</div><div class="track-t">Register</div><div class="track-b">Partner portal. Client name + email. 2 minutes total.</div><div class="track-arrow">›</div></div>
+      <div class="track-step"><div class="track-n">3</div><div class="track-t">We Handle It</div><div class="track-b">Bilingual team contacts client in 24h. You track live.</div><div class="track-arrow">›</div></div>
+      <div class="track-step"><div class="track-n">4</div><div class="track-t">You Get Paid</div><div class="track-b">Deal closes. Agreement executes. Wire to your account.</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:860px;">
+      <div style="padding:16px 18px;background:rgba(0,67,255,.05);border:1px solid rgba(0,67,255,.14);border-radius:var(--r3);border-left:var(--accent-h) solid var(--blue);"><div style="font-size:.78rem;font-weight:800;color:var(--charcoal);margin-bottom:3px;font-family:'Montserrat',sans-serif;">✅ Zero new licensing</div><div class="body-s">International referrals = B2B service agreements</div></div>
+      <div style="padding:16px 18px;background:rgba(0,67,255,.05);border:1px solid rgba(0,67,255,.14);border-radius:var(--r3);border-left:var(--accent-h) solid var(--blue);"><div style="font-size:.78rem;font-weight:800;color:var(--charcoal);margin-bottom:3px;font-family:'Montserrat',sans-serif;">✅ Real-time tracking</div><div class="body-s">Kanban dashboard — no follow-up emails needed</div></div>
+      <div style="padding:16px 18px;background:rgba(255,18,0,.04);border:1px solid rgba(255,18,0,.14);border-radius:var(--r3);border-left:var(--accent-h) solid var(--red);"><div style="font-size:.78rem;font-weight:800;color:var(--charcoal);margin-bottom:3px;font-family:'Montserrat',sans-serif;">✅ Signed agreement</div><div class="body-s">Digital referral contract protects you legally</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 15 · CALL TO ACTION
+══════════════════════════════════════════════════════════ -->
+<div class="slide" data-name="Call to Action" style="background:var(--dark-blue);">
+  <div style="position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80');background-size:cover;background-position:center;z-index:0;"></div>
+  <div style="position:absolute;inset:0;background:var(--overlay-bridge);z-index:1;"></div>
+  <!-- Slash diagonal derecha -->
+  <div style="position:absolute;bottom:-100px;right:-70px;width:420px;height:700px;background:var(--blue);opacity:.18;transform:rotate(-22deg);z-index:2;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:-80px;right:80px;width:100px;height:700px;background:var(--red);opacity:.2;transform:rotate(-22deg);z-index:2;pointer-events:none;"></div>
+
+  <div style="position:relative;z-index:3;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:64px 80px 72px;">
+    <div class="tag tag-white" style="margin-bottom:22px;"><span class="dot"></span> Block 5 · Your Next Step</div>
+    <div class="display-xl" style="font-size:clamp(2.4rem,4.5vw,4rem);margin-bottom:0;">Your Next <em>3 Steps</em></div>
+    <hr style="width:100%;max-width:320px;height:3px;border:none;background:var(--red);margin:18px auto 16px;">
+    <div style="font-size:.88rem;color:rgba(255,255,255,.48);margin-bottom:36px;font-family:'Montserrat',sans-serif;">Before you close this tab. Before you go back to your day.</div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:860px;width:100%;margin-bottom:36px;">
+      <div style="background:rgba(255,255,255,.08);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.12);border-radius:var(--r4);padding:26px 20px;border-top:var(--accent-h) solid var(--red);text-align:left;">
+        <div style="font-size:1.5rem;margin-bottom:12px;">1️⃣</div>
+        <div style="font-size:.88rem;font-weight:800;color:var(--white);margin-bottom:6px;font-family:'Montserrat',sans-serif;text-transform:uppercase;">Register as Partner</div>
+        <div class="body-s white">Scan the QR or visit the portal. 2 minutes. Zero cost.</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.12);border-radius:var(--r4);padding:26px 20px;border-top:var(--accent-h) solid var(--blue);text-align:left;">
+        <div style="font-size:1.5rem;margin-bottom:12px;">2️⃣</div>
+        <div style="font-size:.88rem;font-weight:800;color:var(--white);margin-bottom:6px;font-family:'Montserrat',sans-serif;text-transform:uppercase;">Download Your Kit</div>
+        <div class="body-s white">Bilingual toolkit — landing page, email sequences, 5 social posts. Co-branded with your name.</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.12);border-radius:var(--r4);padding:26px 20px;border-top:var(--accent-h) solid #ffd04a;text-align:left;">
+        <div style="font-size:1.5rem;margin-bottom:12px;">3️⃣</div>
+        <div style="font-size:.88rem;font-weight:800;color:var(--white);margin-bottom:6px;font-family:'Montserrat',sans-serif;text-transform:uppercase;">Drop a Name in Chat</div>
+        <div class="body-s white">One client who mentioned Spain. We follow up personally. No pressure ever.</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:22px;">
+      <button style="padding:13px 28px;border-radius:var(--rf);background:var(--red);color:var(--white);font-family:'Montserrat',sans-serif;font-size:.82rem;font-weight:700;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:1px;box-shadow:0 4px 18px rgba(255,18,0,.4);">🌐 inmomas-international.com/partners</button>
+      <button style="padding:12px 26px;border-radius:var(--rf);background:rgba(255,255,255,.12);color:var(--white);font-family:'Montserrat',sans-serif;font-size:.8rem;font-weight:600;border:1.5px solid rgba(255,255,255,.28);cursor:pointer;backdrop-filter:blur(8px);">📲 WhatsApp: +34 [número]</button>
+    </div>
+    <div style="font-size:.84rem;color:rgba(255,255,255,.5);max-width:440px;line-height:1.65;font-family:'Montserrat',sans-serif;">"You just extended your business to Europe.<br><strong style="color:#ffd04a;">Welcome to the team. Bienvenidos al equipo.</strong>"</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 16 · Q&A
+══════════════════════════════════════════════════════════ -->
+<div class="slide slash-bg" data-name="Live Q&A" style="background:var(--white);">
+  <div style="height:100%;display:flex;flex-direction:column;padding:48px 64px 68px;">
+    <div style="margin-bottom:10px;">
+      <div class="eyebrow" style="color:var(--blue);">Block 5 · Q&amp;A</div>
+      <div class="headline dark">The Questions <span class="blue">You're Thinking</span></div>
+    </div>
+    <hr class="accent-blue" style="margin-bottom:24px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="qa"><div class="qa-q">💬 Do I need to be licensed in Spain to receive a referral fee?</div><div class="qa-a">No. The fee is paid as a B2B service agreement — not a commission split. International referrals are standard practice. Most brokerages permit this. We provide documentation to confirm.</div></div>
+        <div class="qa"><div class="qa-q">💬 What if my client decides NOT to buy?</div><div class="qa-a">Zero cost to you. Zero risk. The referral fee is paid only upon successful closing. No retainers, no upfront fees — ever.</div></div>
+        <div class="qa"><div class="qa-q">💬 How does my client pay in euros from the US?</div><div class="qa-a">Via international currency specialists (Wise, OFX) or UCI financing. We guide clients step by step — no surprises on currency conversion.</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="qa"><div class="qa-q">💬 What taxes does a buyer pay in Spain?</div><div class="qa-a">Resale: ITP transfer tax 8–10% (varies by region). New builds: 10% VAT + 1.5% stamp duty. All factored into client budgets from day one.</div></div>
+        <div class="qa"><div class="qa-q">💬 Can Canadian clients get the Golden Visa?</div><div class="qa-a">Absolutely. €500K+ investment = full EU family residency. Fuster &amp; Associates handles the complete application. 3–6 months processing. 98% success rate.</div></div>
+        <div class="qa"><div class="qa-q">💬 How do I know my client is legally protected?</div><div class="qa-a">Fuster &amp; Associates conducts full due diligence on every property: title deed, debts, urban compliance. Every purchase goes through an independent notary.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 17 · CLOSING
+══════════════════════════════════════════════════════════ -->
+<div class="slide" data-name="Thank You — Bienvenidos" style="background:var(--dark-blue);">
+  <div style="position:absolute;bottom:-80px;right:-60px;width:360px;height:620px;background:var(--blue);opacity:.12;transform:rotate(-22deg);pointer-events:none;"></div>
+  <div style="position:absolute;top:-80px;left:-60px;width:260px;height:500px;background:var(--red);opacity:.08;transform:rotate(-22deg);pointer-events:none;"></div>
+
+  <div style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 80px 72px;">
+    <!-- Logo grande flotando — clear space aplicado -->
+    <div class="logo-float" style="margin-bottom:24px;justify-content:center;">
+      <img src="../LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX Inmomás International" style="height:52px;filter:brightness(0) invert(1);">
+    </div>
+    <hr class="accent-red" style="width:80px;height:3px;border:none;margin-bottom:32px;">
+    <div style="font-size:clamp(1.4rem,2.8vw,2.2rem);font-weight:300;color:rgba(255,255,255,.58);line-height:1.5;max-width:680px;font-family:'Montserrat',sans-serif;margin-bottom:6px;">"Spain is not just a destination.</div>
+    <div style="font-size:clamp(1.8rem,3.6vw,3rem);font-weight:900;color:var(--white);line-height:1.05;letter-spacing:-1px;font-family:'Montserrat',sans-serif;text-transform:uppercase;max-width:680px;margin-bottom:6px;">It Is a Life and Business Opportunity</div>
+    <div style="font-size:clamp(1.1rem,2vw,1.6rem);font-weight:300;color:rgba(255,255,255,.45);font-family:'Montserrat',sans-serif;margin-bottom:44px;">— and today, it became part of your portfolio."</div>
+
+    <hr class="accent-w" style="width:60px;height:2px;border:none;margin-bottom:36px;">
+
+    <!-- Partner logos flotando — sin cajas cuadradas -->
+    <div class="partner-logos" style="gap:28px;justify-content:center;margin-bottom:28px;">
+      <img src="../logo fuster.png" alt="Fuster & Associates" style="height:20px;">
+      <img src="../Logo_UCI.png" alt="UCI" style="height:20px;">
+      <img src="../Inmomas-holidays-Op-3-color-e1752073650140.png" alt="Inmomás Holidays" style="height:20px;">
+      <img src="../smbiotica-logo.png" alt="Smbiotica" style="height:18px;">
+    </div>
+
+    <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center;font-size:.72rem;color:rgba(255,255,255,.35);font-family:'Montserrat',sans-serif;margin-bottom:18px;">
+      <span>🌐 inmomas-international.com</span>
+      <span>📧 international@inmomas.com</span>
+      <span>📲 WhatsApp: +34 [número]</span>
+    </div>
+    <div style="font-size:.54rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.18);font-family:'Montserrat',sans-serif;">Bienvenidos al Equipo · International Partner Program · Costa Blanca · Spain · 2026</div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<!-- ══════════════════════════════════════════════════════════
+     FIXED CHROME
+══════════════════════════════════════════════════════════ -->
+<div id="chrome-logo">
+  <img src="../LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX Inmomás" id="logoimg">
+</div>
+<div id="chrome-badge"><span class="dot" style="background:var(--red);"></span><span>B2B Realtor Webinar · 2026</span></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     NAV
+══════════════════════════════════════════════════════════ -->
+<div id="nav">
+  <button class="nbtn" onclick="go(-1)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back
+  </button>
+  <div class="n-center">
+    <span class="n-count" id="cnt">1 / 17</span>
+    <div class="n-track"><div class="n-fill" id="fill" style="width:5.9%;"></div></div>
+    <span class="n-name" id="snm">Waiting Room</span>
+  </div>
+  <button class="nbtn" onclick="go(1)">
+    Next
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let cur = 0;
+const N = slides.length;
+
+// Slides dark (logo invertido)
+const dark = new Set([1, 3, 4, 7, 10, 14, 16]);
+
+function show(n) {
+  slides[cur].classList.remove('active');
+  cur = ((n % N) + N) % N;
+  slides[cur].classList.add('active');
+
+  document.getElementById('cnt').textContent  = (cur+1) + ' / ' + N;
+  document.getElementById('fill').style.width = ((cur+1)/N*100) + '%';
+  document.getElementById('snm').textContent  = slides[cur].dataset.name || '';
+
+  const inv = dark.has(cur);
+  const li  = document.getElementById('logoimg');
+  const bd  = document.getElementById('chrome-badge');
+  if (inv) {
+    li.style.filter = 'brightness(0) invert(1)';
+    bd.classList.add('inv');
+  } else {
+    li.style.filter = 'none';
+    bd.classList.remove('inv');
+  }
+}
+
+function go(d) { show(cur + d); }
+
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ') { e.preventDefault(); go(1); }
+  if (e.key==='ArrowLeft' ||e.key==='ArrowUp')                 { e.preventDefault(); go(-1); }
+  if (e.key==='Home') show(0);
+  if (e.key==='End')  show(N-1);
+  if (e.key==='f'||e.key==='F') document.documentElement.requestFullscreen?.();
+  if (e.key==='Escape') document.exitFullscreen?.();
+});
+let tx=0;
+document.addEventListener('touchstart', e=>{ tx=e.touches[0].clientX; }, {passive:true});
+document.addEventListener('touchend',   e=>{ const d=tx-e.changedTouches[0].clientX; if(Math.abs(d)>50) go(d>0?1:-1); });
+
+show(0);
+</script>
+</body>
+</html>

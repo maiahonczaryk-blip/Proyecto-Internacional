@@ -927,6 +927,184 @@
   }
 
   /* ── Utility: safely set text content ── */
+  /* ============================================
+     initNewsletter()
+     Loads subscriber stats, wires compose form,
+     preview modal, send handler, and history.
+     ============================================ */
+  async function initNewsletter() {
+    try {
+      // 1. Load all subscriber groups
+      const [allSubs, brokerSubs, realtorSubs, agentSubs, history] = await Promise.all([
+        App.auth.getNewsletterSubscribers(null),
+        App.auth.getNewsletterSubscribers('broker'),
+        App.auth.getNewsletterSubscribers('realtor'),
+        App.auth.getNewsletterSubscribers('agent_inmomas'),
+        App.auth.getNewsletterHistory()
+      ]);
+
+      const subscriberMap = {
+        all: allSubs,
+        broker: brokerSubs,
+        realtor: realtorSubs,
+        agent_inmomas: agentSubs
+      };
+
+      // 2. Update stat cards
+      setTextById('nl-stat-total',   allSubs.length);
+      setTextById('nl-stat-brokers', brokerSubs.length);
+      setTextById('nl-stat-realtors', realtorSubs.length);
+      setTextById('nl-stat-sent',    history.length);
+
+      // 3. Init recipient badge
+      const recipientSelect = document.getElementById('nl-recipients');
+      const recipientBadge  = document.getElementById('nl-recipient-badge');
+
+      function updateBadge() {
+        const role = recipientSelect ? recipientSelect.value : 'all';
+        const count = (subscriberMap[role] || []).length;
+        if (recipientBadge) {
+          recipientBadge.textContent = count + ' subscriber' + (count !== 1 ? 's' : '');
+        }
+      }
+      updateBadge();
+      if (recipientSelect) recipientSelect.addEventListener('change', updateBadge);
+
+      // 4. Preview button
+      const previewBtn   = document.getElementById('nl-preview-btn');
+      const previewModal = document.getElementById('nl-preview-modal');
+      const previewSubj  = document.getElementById('nl-preview-subject');
+      const previewBody  = document.getElementById('nl-preview-body');
+
+      if (previewBtn && previewModal) {
+        previewBtn.addEventListener('click', () => {
+          const subj = (document.getElementById('nl-subject') || {}).value || '';
+          const body = (document.getElementById('nl-body') || {}).value || '';
+          if (!subj && !body) {
+            App.utils.showToast('Add a subject and body first.', 'error');
+            return;
+          }
+          if (previewSubj) previewSubj.textContent = subj;
+          if (previewBody) previewBody.textContent = body;
+          previewModal.style.display = 'flex';
+        });
+      }
+
+      // 5. Close preview modal on backdrop click
+      if (previewModal) {
+        previewModal.addEventListener('click', (e) => {
+          if (e.target === previewModal) previewModal.style.display = 'none';
+        });
+      }
+
+      // 6. Send form submit
+      const form = document.getElementById('nl-compose-form');
+      if (form) {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const subject = (document.getElementById('nl-subject') || {}).value || '';
+          const body    = (document.getElementById('nl-body') || {}).value || '';
+          const recipientRole = recipientSelect ? recipientSelect.value : 'all';
+          const recipients    = subscriberMap[recipientRole] || [];
+
+          if (!subject || !body) {
+            App.utils.showToast('Please fill in the subject and body.', 'error');
+            return;
+          }
+          if (recipients.length === 0) {
+            App.utils.showToast('No subscribers in this group.', 'error');
+            return;
+          }
+
+          const sendBtn = document.getElementById('nl-send-btn');
+          if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'Sending...'; }
+
+          try {
+            const currentUser = App.auth.getCurrentUser();
+            await App.auth.saveNewsletter({
+              subject,
+              body,
+              recipientRole,
+              recipientCount: recipients.length,
+              recipientEmails: recipients.map(u => u.email),
+              sentBy: currentUser ? (currentUser.firstName + ' ' + currentUser.lastName).trim() : 'Admin'
+            });
+
+            App.utils.showToast(`🚀 Newsletter sent to ${recipients.length} subscriber${recipients.length !== 1 ? 's' : ''}!`, 'success');
+
+            // Reset form
+            form.reset();
+            updateBadge();
+
+            // Refresh history and stat
+            const updatedHistory = await App.auth.getNewsletterHistory();
+            renderNewsletterHistory(updatedHistory);
+            setTextById('nl-stat-sent', updatedHistory.length);
+          } catch (err) {
+            App.utils.showToast('Error sending newsletter: ' + err.message, 'error');
+          } finally {
+            if (sendBtn) {
+              sendBtn.disabled = false;
+              sendBtn.innerHTML = '🚀 <span class="lang-en">Send Newsletter</span><span class="lang-es">Enviar Newsletter</span>';
+            }
+          }
+        });
+      }
+
+      // 7. Render history
+      renderNewsletterHistory(history);
+
+    } catch (err) {
+      console.error('[Newsletter] Error loading newsletter view:', err);
+    }
+  }
+
+  /* ── Renders the campaign history table ── */
+  function renderNewsletterHistory(history) {
+    const container = document.getElementById('nl-history-container');
+    if (!container) return;
+
+    if (!history || history.length === 0) {
+      container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 32px;"><span class="lang-en">No campaigns sent yet.</span><span class="lang-es">No se han enviado campañas aún.</span></p>';
+      return;
+    }
+
+    const roleLabel = { all: 'All', broker: 'Brokers', realtor: 'Realtors', agent_inmomas: 'Agents' };
+
+    const rows = history.map(nl => {
+      const date = new Date(nl.sentAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const role = roleLabel[nl.recipientRole] || nl.recipientRole || 'All';
+      return `
+        <tr>
+          <td style="padding: 14px 16px; font-weight: 600; color: var(--text-primary);">${nl.subject || '(No subject)'}</td>
+          <td style="padding: 14px 16px; color: var(--text-secondary);">${role}</td>
+          <td style="padding: 14px 16px; text-align: center;">
+            <span style="background: rgba(0,67,255,0.08); color: var(--primary); font-weight: 700; border-radius: 20px; padding: 4px 12px; font-size: 0.85rem;">${nl.recipientCount || 0}</span>
+          </td>
+          <td style="padding: 14px 16px; color: var(--text-muted); font-size: 0.85rem;">${date}</td>
+          <td style="padding: 14px 16px;">
+            <span style="background: rgba(16,185,129,0.12); color: #059669; border-radius: 20px; padding: 4px 12px; font-size: 0.8rem; font-weight: 600;">✓ Sent</span>
+          </td>
+        </tr>`;
+    }).join('');
+
+    container.innerHTML = `
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--border-light);">
+              <th style="padding: 12px 16px; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600;"><span class="lang-en">Subject</span><span class="lang-es">Asunto</span></th>
+              <th style="padding: 12px 16px; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600;"><span class="lang-en">Recipients</span><span class="lang-es">Destinatarios</span></th>
+              <th style="padding: 12px 16px; text-align: center; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600;">#</th>
+              <th style="padding: 12px 16px; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600;"><span class="lang-en">Sent At</span><span class="lang-es">Enviado</span></th>
+              <th style="padding: 12px 16px; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600;"><span class="lang-en">Status</span><span class="lang-es">Estado</span></th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+
   function setTextById(id, text) {
     const el = document.getElementById(id);
     if (el) el.textContent = text;
@@ -939,6 +1117,7 @@
     initDashboard,
     initUsers,
     initClients,
+    initNewsletter,
     handleApprove,
     approveWithRole,
     handleReject,

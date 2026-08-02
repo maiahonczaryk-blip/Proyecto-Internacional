@@ -522,6 +522,7 @@ App.views.auth = {
           country: newForm.querySelector('#register-country').value,
           agencyName: agencyNameInput ? agencyNameInput.value : '',
           brokerId: brokerSelect ? brokerSelect.value : '',
+          newsletterConsent: newForm.querySelector('#register-newsletter')?.checked || false,
         };
         
         try {
@@ -561,6 +562,7 @@ App.views.auth = {
             country: newForm.querySelector('#register-country').value,
             agencyName: agencyNameInput ? agencyNameInput.value : '',
             brokerId: brokerSelect ? brokerSelect.value : '',
+            newsletterConsent: newForm.querySelector('#register-newsletter')?.checked || false,
           };
 
           try {
