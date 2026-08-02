@@ -26,6 +26,23 @@
 
 <body class="lang-en">
 
+   <!-- ── WEBINAR ANNOUNCEMENT BANNER ── -->
+  <div id="webinar-top-banner" style="background:linear-gradient(90deg,#04081a 0%,#003f99 35%,#880000 65%,#04081a 100%);padding:10px 16px;text-align:center;position:fixed;top:0;left:0;right:0;z-index:1001;height:40px;display:flex;align-items:center;justify-content:center;">
+    <div style="display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:#ff4444;box-shadow:0 0 7px #ff4444;animation:webinar-pulse 1.5s ease-in-out infinite;flex-shrink:0;"></span>
+        <span style="color:rgba(255,255,255,.65);font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;">Live Webinar</span>
+      </div>
+      <span style="color:#fff;font-size:.85rem;font-weight:600;">&#x1F399;&#xFE0F; <strong>Beyond Borders</strong> &nbsp;&middot;&nbsp; August 13 &nbsp;&middot;&nbsp; 11 AM EDT &nbsp;/&nbsp; 5 PM Spain &nbsp;&middot;&nbsp; Free for US &amp; Canadian Realtors</span>
+      <a href="#webinar"
+         style="display:inline-flex;align-items:center;gap:5px;background:#fff;color:#003f99;padding:5px 16px;border-radius:50px;font-weight:800;font-size:.78rem;text-decoration:none;white-space:nowrap;transition:transform .15s,opacity .15s;"
+         onmouseover="this.style.opacity='.88';this.style.transform='scale(1.04)'"
+         onmouseout="this.style.opacity='1';this.style.transform=''">
+        Reserve My Spot &rarr;
+      </a>
+    </div>
+  </div>
+
   <!-- ===================== MAIN NAVIGATION ===================== -->
   <nav class="navbar" id="navbar">
     <div class="container">
@@ -141,24 +158,6 @@
 
     <!-- ==================== VIEW: HOME ==================== -->
     <div id="view-home" class="app-view">
-
-      <!-- ── WEBINAR ANNOUNCEMENT BANNER ── -->
-      <div style="background:linear-gradient(90deg,#0a1535 0%,#003f99 35%,#880000 65%,#0a1535 100%);padding:14px 24px;text-align:center;position:relative;overflow:hidden;">
-        <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.02) 0px,rgba(255,255,255,.02) 1px,transparent 1px,transparent 60px);pointer-events:none;"></div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;position:relative;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="width:9px;height:9px;border-radius:50%;background:#ff4444;box-shadow:0 0 8px #ff4444;animation:webinar-pulse 1.5s ease-in-out infinite;flex-shrink:0;"></span>
-            <span style="color:rgba(255,255,255,.7);font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;">LIVE WEBINAR</span>
-          </div>
-          <span style="color:#fff;font-size:.88rem;font-weight:600;">🎙️ <strong>Beyond Borders</strong> &nbsp;·&nbsp; August 13 &nbsp;·&nbsp; 11 AM EDT / 5 PM Spain &nbsp;·&nbsp; Free for US &amp; Canadian Realtors</span>
-          <a href="#webinar"
-             style="display:inline-flex;align-items:center;gap:6px;background:#fff;color:#003f99;padding:7px 18px;border-radius:50px;font-weight:800;font-size:.8rem;text-decoration:none;white-space:nowrap;transition:transform .2s,box-shadow .2s;box-shadow:0 2px 12px rgba(0,0,0,.25);"
-             onmouseover="this.style.transform='scale(1.04)';this.style.boxShadow='0 4px 18px rgba(0,0,0,.35)';"
-             onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.25)';">
-            Reserve My Spot →
-          </a>
-        </div>
-      </div>
 
       <!-- HERO -->
       <section class="hero" id="hero">
