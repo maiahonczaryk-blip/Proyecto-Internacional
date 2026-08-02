@@ -1,5 +1,5 @@
 /* ============================================
-   RE/MAX Inmomás — Public Views (Referral + Intake)
+   RE/MAX Inmomás — Public Views (Referral + Intake + Webinar)
    ============================================ */
 App.views = App.views || {};
 App.views.public = {
@@ -327,5 +327,172 @@ App.views.public = {
         }
       });
     }
+  },
+
+  /* ============================================
+     WEBINAR REGISTRATION FORM — Beyond Borders
+     August 13, 2026 | For US & Canadian Realtors
+     ============================================ */
+  initWebinarRegister: function() {
+    // ---- US States ----
+    const US_STATES = [
+      'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut',
+      'Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa',
+      'Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan',
+      'Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire',
+      'New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio',
+      'Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota',
+      'Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia',
+      'Wisconsin','Wyoming'
+    ];
+    // ---- Canadian Provinces & Territories ----
+    const CA_PROVINCES = [
+      'Alberta','British Columbia','Manitoba','New Brunswick',
+      'Newfoundland and Labrador','Northwest Territories','Nova Scotia','Nunavut',
+      'Ontario','Prince Edward Island','Quebec','Saskatchewan','Yukon'
+    ];
+
+    // ---- Live Countdown ----
+    function startCountdown() {
+      const countdownEl = document.getElementById('webinar-countdown');
+      if (!countdownEl) return;
+      const TARGET = new Date('2026-08-13T11:00:00-04:00'); // 11am EDT = 17:00 Spain CEST
+
+      function tick() {
+        const now = new Date();
+        const diff = TARGET - now;
+        if (diff <= 0) {
+          countdownEl.innerHTML = '<span style="font-size:1.4rem;font-weight:700;color:#fff;">🎙️ The webinar is LIVE!</span>';
+          return;
+        }
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        const pad = n => String(n).padStart(2, '0');
+        countdownEl.innerHTML = `
+          <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;align-items:center;">
+            <div style="text-align:center;min-width:52px;">
+              <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${d}</div>
+              <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;">Days</div>
+            </div>
+            <div style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
+            <div style="text-align:center;min-width:52px;">
+              <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(h)}</div>
+              <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;">Hours</div>
+            </div>
+            <div style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
+            <div style="text-align:center;min-width:52px;">
+              <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(m)}</div>
+              <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;">Min</div>
+            </div>
+            <div style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
+            <div style="text-align:center;min-width:52px;">
+              <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(s)}</div>
+              <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;">Sec</div>
+            </div>
+          </div>`;
+      }
+      tick();
+      setInterval(tick, 1000);
+    }
+    startCountdown();
+
+    // ---- Country → State/Province dynamic list ----
+    const countrySelect = document.getElementById('webinar-country');
+    const stateSelect   = document.getElementById('webinar-state');
+
+    function populateStates(country) {
+      if (!stateSelect) return;
+      const list = country === 'Canada' ? CA_PROVINCES : US_STATES;
+      const label = country === 'Canada' ? 'Province / Territory' : 'State';
+      stateSelect.innerHTML = `<option value="">— Select ${label} —</option>` +
+        list.map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+
+    if (countrySelect && stateSelect) {
+      populateStates('United States'); // default
+      countrySelect.addEventListener('change', () => populateStates(countrySelect.value));
+    }
+
+    // ---- "How did you hear" → show/hide Referrer Name field ----
+    const hearSelect   = document.getElementById('webinar-how-heard');
+    const referrerWrap = document.getElementById('webinar-referrer-wrap');
+
+    if (hearSelect && referrerWrap) {
+      hearSelect.addEventListener('change', () => {
+        const show = hearSelect.value === 'agent';
+        referrerWrap.style.display = show ? '' : 'none';
+        const inp = document.getElementById('webinar-referrer-name');
+        if (inp) inp.required = show;
+      });
+    }
+
+    // ---- Form submission ----
+    const form = document.getElementById('webinar-register-form');
+    if (!form || form.dataset.listenerAttached) return;
+    form.dataset.listenerAttached = 'true';
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('webinar-submit-btn');
+      if (btn) { btn.disabled = true; btn.innerHTML = '<span style="opacity:.7">Registering…</span>'; }
+
+      try {
+        const get = id => (document.getElementById(id)?.value || '').trim();
+        const firstName    = get('webinar-firstName');
+        const lastName     = get('webinar-lastName');
+        const phone        = get('webinar-phone');
+        const email        = get('webinar-email');
+        const agency       = get('webinar-agency');
+        const country      = get('webinar-country');
+        const state        = get('webinar-state');
+        const howHeard     = get('webinar-how-heard');
+        const referrerName = get('webinar-referrer-name');
+        const gdpr         = document.getElementById('webinar-gdpr')?.checked;
+
+        if (!firstName || !lastName || !phone || !email || !agency || !country || !state || !howHeard) {
+          App.utils.showToast('Please fill in all required fields.', 'error');
+          if (btn) { btn.disabled = false; btn.textContent = 'Register Now'; }
+          return;
+        }
+        if (!gdpr) {
+          App.utils.showToast('Please accept the data protection policy to continue.', 'error');
+          if (btn) { btn.disabled = false; btn.textContent = 'Register Now'; }
+          return;
+        }
+        if (howHeard === 'agent' && !referrerName) {
+          App.utils.showToast('Please enter the name of the agent who referred you.', 'error');
+          if (btn) { btn.disabled = false; btn.textContent = 'Register Now'; }
+          return;
+        }
+
+        await App.auth.saveWebinarRegistration({
+          firstName, lastName, phone, email, agency, country, state,
+          howHeard,
+          referrerName: howHeard === 'agent' ? referrerName : '',
+          webinar: 'Beyond Borders',
+          webinarDate: '2026-08-13',
+          gdprConsent: true
+        });
+
+        // Show success panel
+        const successPanel = document.getElementById('webinar-success-panel');
+        const formPanel    = document.getElementById('webinar-form-panel');
+        if (successPanel && formPanel) {
+          formPanel.style.display = 'none';
+          successPanel.style.display = 'flex';
+        } else {
+          App.utils.showToast('🎉 You are registered! See you on August 13th.', 'success');
+          form.reset();
+        }
+
+      } catch (err) {
+        console.error('[Webinar] Registration error:', err);
+        App.utils.showToast('Error submitting registration: ' + err.message, 'error');
+        if (btn) { btn.disabled = false; btn.textContent = 'Register Now'; }
+      }
+    });
   }
+
 };

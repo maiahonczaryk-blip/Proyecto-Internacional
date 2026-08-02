@@ -21,6 +21,7 @@ App.router = (function() {
     'pending':        { view: 'view-pending',        role: null,      sidebar: false, title: 'Application Pending' },
     'intake':         { view: 'view-intake',         role: null,      sidebar: false, title: 'VIP Client Intake' },
     'referral':       { view: 'view-referral-form',   role: null,      sidebar: false, title: 'Referral Form' },
+    'webinar':        { view: 'view-webinar-register', role: null,      sidebar: false, title: 'Beyond Borders Webinar' },
 
     // Profile route
     'profile':        { view: 'view-profile',        role: 'authenticated', sidebar: 'user',  title: 'My Profile' },
@@ -30,6 +31,7 @@ App.router = (function() {
     'admin/users':     { view: 'view-admin-users',     role: 'admin',  sidebar: 'admin', title: 'Manage Users' },
     'admin/clients':   { view: 'view-admin-clients',   role: 'admin',  sidebar: 'admin', title: 'Clients' },
     'admin/newsletter':{ view: 'view-admin-newsletter',role: 'admin',  sidebar: 'admin', title: 'Newsletter' },
+    'admin/webinar':   { view: 'view-admin-webinar',   role: 'admin',  sidebar: 'admin', title: 'Webinar Registrations' },
 
     // Broker routes
     'broker/dashboard': { view: 'view-broker-dashboard', role: 'broker', sidebar: 'broker', title: 'Broker Dashboard' },
@@ -361,6 +363,8 @@ App.router = (function() {
       'admin/users':       () => App.views.admin && App.views.admin.initUsers(),
       'admin/clients':     () => App.views.admin && App.views.admin.initClients(),
       'admin/newsletter':  () => App.views.admin && App.views.admin.initNewsletter(),
+      'admin/webinar':    () => App.views.admin && App.views.admin.initWebinar(),
+      'webinar':          () => App.views.public && App.views.public.initWebinarRegister(),
       'broker/dashboard':  () => App.views.broker && App.views.broker.initDashboard(),
       'broker/team':       () => App.views.broker && App.views.broker.initTeam(),
       'broker/clients':    () => App.views.broker && App.views.broker.initClients(),

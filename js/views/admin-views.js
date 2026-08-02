@@ -1171,6 +1171,123 @@
   }
 
   /* ============================================
+     initWebinar()
+     Shows all Beyond Borders webinar registrations
+     in a table. Admin can export to Excel (CSV).
+     ============================================ */
+  async function initWebinar() {
+    try {
+      const registrations = await App.auth.getWebinarRegistrations();
+
+      // Update stat
+      setTextById('admin-stat-webinar', registrations.length);
+
+      // Render table
+      renderWebinarTable(registrations);
+
+    } catch (err) {
+      console.error('[Admin] initWebinar error:', err);
+      App.utils.showToast('Error loading webinar registrations.', 'error');
+    }
+  }
+
+  function renderWebinarTable(registrations) {
+    const tbody = document.getElementById('webinar-registrations-tbody');
+    if (!tbody) return;
+
+    if (registrations.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2rem;color:#6b7280;">No registrations yet.</td></tr>`;
+      return;
+    }
+
+    const HOW_LABELS = {
+      social: 'Social Media',
+      remax: 'RE/MAX Network',
+      agent: 'Agent Referral',
+      email: 'Email / Newsletter',
+      event: 'Event / Conference',
+      other: 'Other'
+    };
+
+    tbody.innerHTML = registrations.map(r => {
+      const date = App.utils.formatDate(r.createdAt);
+      const how  = HOW_LABELS[r.howHeard] || r.howHeard || '—';
+      const ref  = r.referrerName ? App.utils.escapeHtml(r.referrerName) : '—';
+      return `
+        <tr>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;color:var(--text-muted);">${date}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-weight:600;">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">${App.utils.escapeHtml(r.email)}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">${App.utils.escapeHtml(r.phone || '—')}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">${App.utils.escapeHtml(r.agency || '—')}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">
+            <span style="background:rgba(0,67,255,.07);color:var(--primary);border-radius:20px;padding:3px 10px;font-size:.8rem;font-weight:600;">${App.utils.escapeHtml(r.country || '—')}</span>
+          </td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.85rem;">${App.utils.escapeHtml(r.state || '—')}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${how}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${ref}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  function exportWebinarToExcel() {
+    App.auth.getWebinarRegistrations().then(registrations => {
+      if (registrations.length === 0) {
+        App.utils.showToast('No registrations to export.', 'error');
+        return;
+      }
+
+      const HOW_LABELS = {
+        social: 'Social Media',
+        remax: 'RE/MAX Network',
+        agent: 'Agent Referral',
+        email: 'Email / Newsletter',
+        event: 'Event / Conference',
+        other: 'Other'
+      };
+
+      const headers = [
+        'Date','First Name','Last Name','Email','Phone',
+        'Agency','Country','State / Province',
+        'How They Heard','Referring Agent','GDPR Consent'
+      ];
+
+      const rows = registrations.map(r => [
+        r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-US') : '',
+        r.firstName || '',
+        r.lastName || '',
+        r.email || '',
+        r.phone || '',
+        r.agency || '',
+        r.country || '',
+        r.state || '',
+        HOW_LABELS[r.howHeard] || r.howHeard || '',
+        r.referrerName || '',
+        r.gdprConsent ? 'Yes' : 'No'
+      ]);
+
+      const escape = v => '"' + String(v).replace(/"/g, '""') + '"';
+      const csvContent = '\uFEFF' + // BOM for Excel UTF-8
+        [headers, ...rows].map(row => row.map(escape).join(',')).join('\r\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url;
+      a.download = `Beyond-Borders-Webinar-Registrations-${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      App.utils.showToast(`✅ Exported ${registrations.length} registrations to Excel.`, 'success');
+    }).catch(err => {
+      console.error('[Admin] Export error:', err);
+      App.utils.showToast('Error exporting data.', 'error');
+    });
+  }
+
+  /* ============================================
      Public API — register on App.views.admin
      ============================================ */
   App.views.admin = {
@@ -1178,6 +1295,8 @@
     initUsers,
     initClients,
     initNewsletter,
+    initWebinar,
+    exportWebinarToExcel,
     handleApprove,
     approveWithRole,
     handleReject,
@@ -1193,3 +1312,4 @@
   };
 
 })();
+

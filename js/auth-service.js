@@ -838,6 +838,33 @@ App.auth = (function() {
     }
   }
 
+  /* ---- Webinar Registrations ---- */
+  async function saveWebinarRegistration(data) {
+    const payload = {
+      ...data,
+      createdAt: new Date().toISOString()
+    };
+    if (App.demoMode) {
+      if (!App.demoData.webinar_registrations) App.demoData.webinar_registrations = [];
+      payload.id = 'wreg-' + Date.now();
+      App.demoData.webinar_registrations.push(payload);
+      saveDemoData();
+      return payload.id;
+    } else {
+      const docRef = await App.db.collection('webinar_registrations').add(payload);
+      return docRef.id;
+    }
+  }
+
+  async function getWebinarRegistrations() {
+    if (App.demoMode) {
+      return App.demoData.webinar_registrations || [];
+    } else {
+      const snapshot = await App.db.collection('webinar_registrations').orderBy('createdAt', 'desc').get();
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    }
+  }
+
   async function deleteDossierLead(leadId) {
     if (!leadId) throw new Error('Lead ID is required.');
 
@@ -1229,6 +1256,8 @@ App.auth = (function() {
     addReferralUser,
     getNewsletterSubscribers,
     saveNewsletter,
-    getNewsletterHistory
+    getNewsletterHistory,
+    saveWebinarRegistration,
+    getWebinarRegistrations
   };
 })();
