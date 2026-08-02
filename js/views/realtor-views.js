@@ -578,79 +578,59 @@
   /* ── Full Agreement Text ── */
   function getAgreementText() {
     return `
-      <h3 style="text-align: center; margin-bottom: 1.5rem; font-size: 1rem;">
-        INTERNATIONAL REFERRAL COLLABORATION AGREEMENT
+      <h3 style="text-align: center; margin-bottom: 0.5rem; font-size: 1.1rem; color: #003da5; font-weight: 800; font-family: 'Montserrat', sans-serif;">
+        INTERNATIONAL REFERRAL & COLLABORATION AGREEMENT
       </h3>
-      <p style="text-align: center; margin-bottom: 1.5rem; color: #6b7280; font-size: 0.8rem;">
-        Between RE/MAX Inmomás (Spain) and the Referring Agent
+      <h3 style="text-align: center; margin-bottom: 1rem; font-size: 1rem; color: #e11b22; font-weight: 800; font-family: 'Montserrat', sans-serif;">
+        ACUERDO INTERNACIONAL DE REFERIDO Y COLABORACIÓN
+      </h3>
+      <p style="text-align: center; margin-bottom: 1.5rem; color: #6b7280; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+        B2B Broker-to-Broker Cooperation Framework / Marco de Colaboración de Corredor a Corredor
       </p>
 
-      <p><strong>CLAUSE 1 — PARTIES</strong></p>
-      <p>This Collaboration Agreement ("Agreement") is entered into between:</p>
-      <p><strong>a) RE/MAX Inmomás</strong>, a licensed real estate agency operating under the RE/MAX franchise in Spain,
-      with offices in Alicante, Elche, Santa Pola, and Gran Alacant, Costa Blanca, represented by its
-      management team (hereinafter "RE/MAX Inmomás").</p>
-      <p><strong>b) The Referring Agent</strong>, the individual or agency signing this agreement, who operates as a licensed
-      real estate professional in their country of origin (hereinafter "The Agent").</p>
+      <p><strong>1. PARTIES & RELATIONSHIP / PARTES Y RELACIÓN</strong></p>
+      <p><strong>EN:</strong> This Agreement is entered into between <strong>Megagestión Servicios Inmobiliarios Spain</strong>, represented by its Managing Broker <strong>José Martínez Sánchez</strong> (hereinafter "Receiving Broker"), and the registered brokerage representing the signing professional (hereinafter "Referring Broker"). This represents a B2B marketing agreement. The Referring Broker certifies active licensure in their home country (US/Canada). No Spanish real estate licensing is required for the Referring Broker or the Referring Agent.</p>
+      <p><strong>ES:</strong> Este Acuerdo se suscribe entre <strong>Megagestión Servicios Inmobiliarios España</strong>, representada por su Broker **José Martínez Sánchez** (en adelante "Corredor Receptor"), y la agencia inmobiliaria que representa al profesional firmante (en adelante "Corredor Referente"). Este representa un acuerdo comercial B2B. El Corredor Referente certifica que posee licencia activa en su país de origen (EE. UU./Canadá). No se requiere licencia española para el Corredor Referente ni para el Agente Referente.</p>
 
-      <p><strong>CLAUSE 2 — PURPOSE AND SCOPE</strong></p>
-      <p>The purpose of this Agreement is to establish the terms under which The Agent may refer potential
-      international buyers to RE/MAX Inmomás for the purchase of real estate property in Spain, specifically
-      within the Costa Blanca and Alicante province regions.</p>
-      <p>RE/MAX Inmomás shall manage the entire buying process in Spain, including but not limited to:
-      property showings, legal coordination, mortgage facilitation, tax advisory, and after-sale support.</p>
+      <p><strong>2. INVOLVED AGENTS / AGENTES INVOLUCRADOS</strong></p>
+      <p>• <strong>Referring Agent (US/Canada) / Agente Inmobiliario Referente:</strong> [To be completed in fields / A completar en campos]<br>
+      • <strong>Receiving Agent (Local Spain) / Agente Inmobiliario Receptor (España):</strong> [To be completed in fields / A completar en campos]</p>
 
-      <p><strong>CLAUSE 3 — REFERRAL PROCESS</strong></p>
-      <p>3.1. The Agent shall refer prospective buyers exclusively through the platform's referral link system,
-      which automatically attributes each lead to the referring agent.</p>
-      <p>3.2. A referral is considered valid when the referred client registers through The Agent's unique
-      referral link and is subsequently identified in the RE/MAX Inmomás CRM system.</p>
-      <p>3.3. The referral attribution is permanent — once a client is linked to The Agent, all future
-      transactions with that client shall be credited to The Agent.</p>
+      <p><strong>3. COMMISSION STRUCTURE / ESTRUCTURA DE COMISIÓN</strong></p>
+      <p><strong>EN:</strong> Upon successful closing of a property acquisition in Spain by the referred client (the "Prospect"), the Receiving Broker shall pay the Referring Broker a referral fee of <strong>25% (twenty-five percent)</strong> of the gross buyer-side commission received by the Receiving Broker for that transaction.</p>
+      <p><strong>ES:</strong> Al cierre exitoso de la compra de un inmueble en España por parte del cliente referido (el "Cliente"), el Corredor Receptor pagará al Corredor Referente una comisión del **25% (veinticinco por ciento)** de la comisión bruta del lado del comprador cobrada por el Corredor Receptor.</p>
+      
+      <div style="background-color: #f3f4f6; border-left: 4px solid #003da5; padding: 10px 15px; margin: 15px 0; font-size: 0.8rem; border-radius: 0 6px 6px 0;">
+        <strong>💡 Example / Ejemplo:</strong><br>
+        • Purchase Price / Precio de compra: <strong>€400,000</strong><br>
+        • Gross buyer commission (5%) / Comisión bruta (5%): <strong>€20,000</strong><br>
+        • Referring Broker payout (25%) / Pago al Corredor Referente: <strong>€5,000 EUR</strong> (wire/transferencia)
+      </div>
 
-      <p><strong>CLAUSE 4 — COMMISSION STRUCTURE</strong></p>
-      <p>4.1. Upon the successful completion of a property sale involving a referred client, The Agent
-      shall receive <strong>twenty-five percent (25%)</strong> of the buyer-side commission earned by RE/MAX Inmomás.</p>
-      <p>4.2. Example: If the property sale price is €300,000 and the buyer-side commission is 5% (€15,000),
-      The Agent's referral fee would be 25% × €15,000 = <strong>€3,750</strong>.</p>
-      <p>4.3. Commission payments shall be processed within thirty (30) business days following the
-      completion of the sale and receipt of all commissions by RE/MAX Inmomás.</p>
-      <p>4.4. Payments shall be made via international bank transfer to the account designated by The Agent.</p>
+      <p><strong>4. AGENT PROTECTION & COMPENSATION / PROTECCIÓN Y PAGO DEL AGENTE</strong></p>
+      <p><strong>EN:</strong> All referral fees are paid Broker-to-Broker. The Referring Broker is solely responsible for distributing commission splits to the individual Referring Agent. The Receiving Broker is responsible for distributing splits to the local Spain Receiving Agent.</p>
+      <p><strong>ES:</strong> Todos los honorarios de referido se pagan estrictamente de Corredor a Corredor. El Corredor Referente es el único responsable de distribuir la comisión al Agente Referente individual. El Corredor Receptor es responsable de distribuir la comisión al Agente Receptor local asignado en España.</p>
 
-      <p><strong>CLAUSE 5 — OBLIGATIONS OF THE AGENT</strong></p>
-      <p>5.1. The Agent agrees to present RE/MAX Inmomás services honestly and accurately to potential clients.</p>
-      <p>5.2. The Agent shall not make any representations, warranties, or commitments on behalf of RE/MAX Inmomás.</p>
-      <p>5.3. The Agent shall maintain all required licenses and professional certifications in their jurisdiction.</p>
-      <p>5.4. The Agent shall comply with all applicable laws and regulations in their country of operation.</p>
+      <p><strong>5. LOCK PERIOD & REGISTRY / REGISTRO Y VIGENCIA</strong></p>
+      <p><strong>EN:</strong> The referral is protected for <strong>24 months</strong> from registration. The Referring Broker is entitled to the fee for any purchase completed by the Prospect in Spain during this timeframe.</p>
+      <p><strong>ES:</strong> El referido está protegido por **24 meses** a partir del registro. El Corredor Referente tiene derecho a la comisión por cualquier compra completada por el Cliente en España durante este período.</p>
 
-      <p><strong>CLAUSE 6 — OBLIGATIONS OF RE/MAX INMOMÁS</strong></p>
-      <p>6.1. RE/MAX Inmomás shall provide professional, transparent, and high-quality service to all referred clients.</p>
-      <p>6.2. RE/MAX Inmomás shall keep The Agent informed of the status of referred clients through the platform dashboard.</p>
-      <p>6.3. RE/MAX Inmomás shall process commission payments in a timely manner as specified in Clause 4.</p>
+      <p><strong>6. SETTLEMENT & TAX COMPLIANCE / LIQUIDACIÓN Y CUMPLIMIENTO FISCAL</strong></p>
+      <p><strong>EN:</strong> Paid via bank wire within 30 business days of closing and fund receipt in Spain. US-based brokerages must provide Form **W-8BEN-E** (or Canadian equivalent) and a commercial invoice prior to payment execution to prevent local Spain tax withholding.</p>
+      <p><strong>ES:</strong> Se liquida mediante transferencia bancaria dentro de los 30 días hábiles posteriores al cierre y cobro de la comisión en España. Las agencias de EE. UU. deben entregar el formulario **W-8BEN-E** (o equivalente canadiense) y una factura comercial antes del pago para evitar retenciones de impuestos en España.</p>
 
-      <p><strong>CLAUSE 7 — CONFIDENTIALITY</strong></p>
-      <p>Both parties agree to maintain the confidentiality of all client information, transaction details,
-      and business practices disclosed during the course of this collaboration. This obligation survives
-      the termination of this Agreement.</p>
+      <p><strong>7. GOVERNING LAW & JURISDICTION / LEY APLICABLE Y JURISDICCIÓN</strong></p>
+      <p><strong>EN:</strong> Governed by the laws of Spain. Any disputes shall be submitted exclusively to the Courts of Alicante, Spain.</p>
+      <p><strong>ES:</strong> Se rige por las leyes de España. Cualquier controversia se someterá exclusivamente a la jurisdicción de los Tribunales de Alicante, España.</p>
 
-      <p><strong>CLAUSE 8 — DURATION AND TERMINATION</strong></p>
-      <p>8.1. This Agreement shall remain in effect for an initial period of twelve (12) months from the
-      date of signature, automatically renewing for successive twelve-month periods unless either party
-      provides sixty (60) days' written notice of termination.</p>
-      <p>8.2. Termination shall not affect commission rights on referrals made prior to the termination date.</p>
-      <p>8.3. Either party may terminate this Agreement immediately in the event of a material breach by the other party.</p>
-
-      <p><strong>CLAUSE 9 — GOVERNING LAW AND JURISDICTION</strong></p>
-      <p>This Agreement shall be governed by and construed in accordance with the laws of Spain.
-      Any disputes arising from this Agreement shall be subject to the exclusive jurisdiction of
-      the courts of Alicante, Spain.</p>
-
-      <p style="margin-top: 2rem; text-align: center; color: #6b7280; font-size: 0.8rem;">
-        — End of Agreement —<br>
-        RE/MAX Inmomás · Alicante, Costa Blanca, Spain
+      <p style="margin-top: 2rem; text-align: center; color: #9ca3af; font-size: 0.75rem; font-weight: 500;">
+        — End of Agreement / Fin del Acuerdo —<br>
+        Megagestión Servicios Inmobiliarios · Spain Alliance Program
       </p>
     `;
   }
+
+
 
   /* ── Document Upload Section ── */
   function renderUploadSection() {

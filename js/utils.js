@@ -395,8 +395,8 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
             ${colClients.length}
           </span>
         </div>
-        <div style="padding: 12px; flex: 1; min-height: 200px;">
-          ${cards || `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 2rem 1rem; border: 2px dashed rgba(0,0,0,0.05); border-radius: 8px;">Arrastra clientes aquí</div>`}
+        <div class="pipeline-column__cards">
+          ${cards || `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 2rem 1rem; border: 2px dashed rgba(0,0,0,0.05); border-radius: 8px; margin: 12px 0;">Arrastra clientes aquí</div>`}
         </div>
       </div>
     `;

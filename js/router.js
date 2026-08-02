@@ -124,6 +124,28 @@ App.router = (function() {
       });
     }
 
+    // Sync sidebar layout on window resize
+    window.addEventListener('resize', () => {
+      const activeHash = window.location.hash.substring(1) || 'home';
+      const queryIdx = activeHash.indexOf('?');
+      const routeKey = queryIdx >= 0 ? activeHash.substring(0, queryIdx) : activeHash;
+      const route = routes[routeKey];
+      if (route && route.sidebar) {
+        const sidebar = document.getElementById('dashboard-sidebar');
+        if (sidebar) {
+          if (window.innerWidth >= 992) {
+            sidebar.classList.add('active');
+          } else {
+            // Only close if backdrop is not active (user hasn't explicitly opened the sidebar)
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (backdrop && !backdrop.classList.contains('active')) {
+              sidebar.classList.remove('active');
+            }
+          }
+        }
+      }
+    });
+
     // Handle initial route
     handleRouteChange();
   }
