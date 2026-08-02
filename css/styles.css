@@ -310,7 +310,7 @@ body.lang-en-ca .lang-fr { display: none; }
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 18px;
 }
 
 .nav-links a {
