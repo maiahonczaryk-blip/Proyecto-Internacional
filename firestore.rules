@@ -29,5 +29,11 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if isAuthenticated();
     }
+
+    // Webinar registrations: Anyone can register (public form), only authenticated users can read/delete
+    match /webinar_registrations/{regId} {
+      allow create: if true;
+      allow read, update, delete: if isAuthenticated();
+    }
   }
 }
