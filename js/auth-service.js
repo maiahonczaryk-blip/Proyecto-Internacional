@@ -838,6 +838,21 @@ App.auth = (function() {
     }
   }
 
+  async function deleteDossierLead(leadId) {
+    if (!leadId) throw new Error('Lead ID is required.');
+
+    if (App.demoMode) {
+      if (!App.demoData.dossier_leads) App.demoData.dossier_leads = [];
+      const idx = App.demoData.dossier_leads.findIndex(l => l.id === leadId);
+      if (idx === -1) throw new Error('Lead not found.');
+      App.demoData.dossier_leads.splice(idx, 1);
+      saveDemoData();
+    } else {
+      await App.db.collection('dossier_leads').doc(leadId).delete();
+    }
+    return true;
+  }
+
   /* ---- Assign Lead To Agent ---- */
   async function assignLeadToAgent(leadId, agentId, agentName) {
     if (App.demoMode) {
@@ -1206,6 +1221,7 @@ App.auth = (function() {
     saveDemoData,
     saveDossierLead,
     getDossierLeads,
+    deleteDossierLead,
     loginWithGoogle,
     registerWithGoogle,
     addClientManually,

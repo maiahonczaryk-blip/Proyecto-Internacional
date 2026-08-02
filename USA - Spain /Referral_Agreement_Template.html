@@ -86,7 +86,6 @@
       font-weight: 500;
     }
 
-    /* Form Fields Grid */
     .field-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -121,9 +120,7 @@
       font-size: 10.5px;
     }
 
-    .form-row:last-child {
-      margin-bottom: 0;
-    }
+    .form-row:last-child { margin-bottom: 0; }
 
     .form-label {
       width: 170px;
@@ -138,10 +135,7 @@
       min-height: 14px;
     }
 
-    /* Clauses styling */
-    .clauses {
-      margin-bottom: 25px;
-    }
+    .clauses { margin-bottom: 25px; }
 
     .clause {
       margin-bottom: 15px;
@@ -170,51 +164,6 @@
       display: block;
     }
 
-    /* Checkbox list */
-    .checkbox-container {
-      margin: 12px 0;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 12px;
-    }
-
-    .checkbox-item {
-      display: flex;
-      align-items: flex-start;
-      margin-bottom: 10px;
-      font-size: 10.5px;
-    }
-
-    .checkbox-item:last-child {
-      margin-bottom: 0;
-    }
-
-    .checkbox-box {
-      width: 14px;
-      height: 14px;
-      border: 2px solid var(--remax-blue);
-      border-radius: 3px;
-      margin-right: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      margin-top: 2px;
-      font-weight: bold;
-      color: var(--remax-blue);
-    }
-
-    .checkbox-box.checked::after {
-      content: "✓";
-      font-size: 12px;
-      line-height: 1;
-    }
-
-    .checkbox-label {
-      line-height: 1.35;
-    }
-
-    /* Example Box */
     .example-box {
       background-color: #f0f4f8;
       border-left: 4px solid var(--remax-blue);
@@ -224,16 +173,9 @@
       border-radius: 0 6px 6px 0;
     }
 
-    .example-box p {
-      margin: 0 0 4px 0;
-      font-weight: 700;
-    }
-    .example-box span {
-      display: block;
-      color: #555;
-    }
+    .example-box p { margin: 0 0 4px 0; font-weight: 700; }
+    .example-box span { display: block; color: #555; }
 
-    /* Signatures Section */
     .signature-section {
       margin-top: 30px;
       page-break-inside: avoid;
@@ -245,15 +187,12 @@
       gap: 30px;
     }
 
-    .sig-block {
-      margin-top: 15px;
-    }
+    .sig-block { margin-top: 15px; }
 
     .sig-line {
       border-bottom: 1px solid var(--charcoal);
       height: 40px;
       margin-bottom: 5px;
-      position: relative;
     }
 
     .sig-caption {
@@ -263,17 +202,9 @@
       font-weight: 600;
     }
 
-    .sig-info {
-      font-size: 10px;
-      margin-top: 5px;
-    }
+    .sig-info { font-size: 10px; margin-top: 5px; }
+    .sig-info span { display: block; margin-bottom: 3px; }
 
-    .sig-info span {
-      display: block;
-      margin-bottom: 3px;
-    }
-
-    /* Footer styling */
     footer {
       margin-top: 40px;
       border-top: 1px solid var(--border-color);
@@ -284,26 +215,55 @@
       page-break-inside: avoid;
     }
 
-    /* Print styles */
+    /* ── Annex page break ── */
+    .page-break {
+      page-break-before: always;
+      border-top: 3px double var(--remax-blue);
+      padding-top: 25px;
+      margin-top: 50px;
+    }
+
+    .annex-badge {
+      display: inline-block;
+      background: var(--remax-blue);
+      color: #fff;
+      padding: 4px 14px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .annex-number-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+    }
+
+    .annex-number-row span {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--remax-blue);
+    }
+
     @media print {
-      body {
-        padding: 0;
-        margin: 0;
-      }
-
-      .container {
-        max-width: 100%;
-      }
-
-      @page {
-        margin: 1.2cm;
-      }
+      body { padding: 0; margin: 0; }
+      .container { max-width: 100%; }
+      @page { margin: 1.2cm; }
+      .page-break { page-break-before: always; margin-top: 0; }
     }
   </style>
 </head>
 <body>
 
 <div class="container">
+
+  <!-- ═══════════════════════════════════════════
+       PAGE 1 — MASTER COLLABORATION AGREEMENT
+       ═══════════════════════════════════════════ -->
+
   <header>
     <div class="logo-container">
       <img src="remax_logo.png" alt="RE/MAX Inmomás Logo">
@@ -313,232 +273,148 @@
       </div>
     </div>
     <div class="doc-title">
-      <h2>Referral Agreement / Acuerdo de Referido</h2>
-      <p>B2B Broker-to-Broker Collaboration / Colaboración de Corredor a Corredor</p>
+      <h2>Master Referral Agreement</h2>
+      <p>Acuerdo Marco de Colaboración y Referidos</p>
     </div>
   </header>
 
-  <!-- Section 1: Transaction & Referral Parties -->
+  <!-- Broker Cards -->
   <div class="field-grid">
-    
-    <!-- Broker A - Referring Broker -->
+    <!-- Broker A -->
     <div class="field-card">
       <h3>Broker A (Referring Brokerage / Agencia Referente)</h3>
-      <div class="form-row">
-        <div class="form-label">Brokerage Name / Agencia:</div>
-        <div class="form-value"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">Broker of Record / Corredor:</div>
-        <div class="form-value"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">Office Address / Dirección:</div>
-        <div class="form-value"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">Broker License # / Licencia:</div>
-        <div class="form-value"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">Referring Agent / Agente Referente:</div>
-        <div class="form-value"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">Agent License # / Licencia Agente:</div>
-        <div class="form-value"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">Agent Contact / Contacto Agente:</div>
-        <div class="form-value"></div>
-      </div>
+      <div class="form-row"><div class="form-label">Brokerage Name / Agencia:</div><div class="form-value"></div></div>
+      <div class="form-row"><div class="form-label">Broker of Record / Corredor:</div><div class="form-value"></div></div>
+      <div class="form-row"><div class="form-label">Office Address / Dirección:</div><div class="form-value"></div></div>
+      <div class="form-row"><div class="form-label">Broker License # / Licencia:</div><div class="form-value"></div></div>
+      <div class="form-row"><div class="form-label">Contact Email / Correo:</div><div class="form-value"></div></div>
+      <div class="form-row"><div class="form-label">Contact Phone / Teléfono:</div><div class="form-value"></div></div>
     </div>
 
-    <!-- Broker B - Receiving Broker -->
+    <!-- Broker B -->
     <div class="field-card">
       <h3>Broker B (Receiving Brokerage / Agencia Receptora)</h3>
-      <div class="form-row">
-        <div class="form-label">Brokerage Name / Agencia:</div>
-        <div class="form-value">Megagestión Servicios Inmobiliarios</div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">Broker of Record / Corredor:</div>
-        <div class="form-value">José Martínez Sánchez</div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">Office Address / Dirección:</div>
-        <div class="form-value">Carrer Conrado del Campo 16, 03204, Elche (Alicante), Spain</div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">Corporate CIF (Tax ID) / NIF:</div>
-        <div class="form-value">B-54829767</div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">Contact Email / Correo:</div>
-        <div class="form-value">jose.martinez@remax.es</div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">Local Agent / Agente Local España:</div>
-        <div class="form-value"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">Office Phone / Teléfono:</div>
-        <div class="form-value">+34 966 665 651</div>
-      </div>
-    </div>
-
-    <!-- Prospect Info -->
-    <div class="field-card full-width">
-      <h3>Prospect / Cliente Referido</h3>
-      <div class="form-row">
-        <div class="form-label">Full Name / Nombre Completo:</div>
-        <div class="form-value"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">Email Address / Correo:</div>
-        <div class="form-value"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">Phone Number / Teléfono:</div>
-        <div class="form-value"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-label">Target Region / Región Destino:</div>
-        <div class="form-value">Alicante Province / Costa Blanca (Spain)</div>
-      </div>
+      <div class="form-row"><div class="form-label">Brokerage Name / Agencia:</div><div class="form-value">Megagestión Servicios Inmobiliarios</div></div>
+      <div class="form-row"><div class="form-label">Broker of Record / Corredor:</div><div class="form-value">José Martínez Sánchez</div></div>
+      <div class="form-row"><div class="form-label">Office Address / Dirección:</div><div class="form-value">Carrer Conrado del Campo 16, 03204, Elche (Alicante), Spain</div></div>
+      <div class="form-row"><div class="form-label">CIF (Tax ID) / NIF:</div><div class="form-value">B-54829767</div></div>
+      <div class="form-row"><div class="form-label">Contact Email / Correo:</div><div class="form-value">jose.martinez@remax.es</div></div>
+      <div class="form-row"><div class="form-label">Office Phone / Teléfono:</div><div class="form-value">+34 966 665 651</div></div>
     </div>
   </div>
 
-  <!-- Section 2: Compensation Options -->
+  <!-- Clauses -->
   <div class="clauses">
+
     <div class="clause">
-      <h4>Commission Split & Referral Fee / Split de Comisión y Honorarios de Referido</h4>
+      <h4>1. Purpose & Scope / Objeto y Alcance</h4>
       <p>
-        In consideration of the referral of Prospect, Broker B shall compensate Broker A in the amount of: / 
-        En contraprestación por la presentación del Cliente, el Corredor B compensará al Corredor A con el siguiente importe (Marque uno):
+        The purpose of this Master Agreement is to establish the general terms under which Broker A and its licensed real estate agents may refer prospective international buyers to Broker B for the purchase of real estate in Spain, specifically within the provinces of Alicante and the Costa Blanca region. This agreement covers <strong>all future referrals</strong> made by Broker A's agents during the term of this agreement. Individual client referrals shall be documented separately in the attached Annex.
       </p>
-      
-      <div class="checkbox-container">
-        <div class="checkbox-item">
-          <div class="checkbox-box"></div>
-          <div class="checkbox-label">
-            <strong>$ ______________ USD / CAD</strong> flat-rate referral service fee. / Tarifa plana por servicio de referido internacional.
-          </div>
-        </div>
-        
-        <div class="checkbox-item">
-          <div class="checkbox-box checked"></div>
-          <div class="checkbox-label">
-            <strong>25% (Twenty-Five Percent)</strong> of the gross purchase commission (buyer-side commission) received by Broker B on any completed real estate transaction involving the Prospect. / 
-            <strong>25% (Veinticinco Por Ciento)</strong> de la comisión bruta de compra (comisión del lado comprador) recibida por el Corredor B en cualquier transacción inmobiliaria completada que involucre al Cliente.
-          </div>
-        </div>
-
-        <div class="checkbox-item">
-          <div class="checkbox-box"></div>
-          <div class="checkbox-label">
-            <strong>________ %</strong> of the gross purchase commission received by Broker B on any completed real estate transaction involving the Prospect. / 
-            <strong>________ %</strong> de la comisión bruta de compra recibida por el Corredor B en cualquier transacción inmobiliaria que involucre al Cliente.
-          </div>
-        </div>
-      </div>
-
-      <div class="example-box">
-        <p>💡 Commission Split Example / Ejemplo de Split de Comisión (25%):</p>
-        <span>• Client buys a home for / Cliente compra casa por: <strong>€400,000</strong>.</span>
-        <span>• Broker B (Megagestión) collects standard 5% commission / cobra comisión estándar del 5%: <strong>€20,000</strong>.</span>
-        <span>• Broker A's referral payout (25% of €20,000) / Pago para Corredor A: <strong>€5,000 EUR</strong> (or USD/CAD equivalent via wire / o equivalente).</span>
-      </div>
+      <span class="lang-divider">
+        El objeto de este Acuerdo Marco es establecer las condiciones generales bajo las cuales el Corredor A y sus agentes inmobiliarios licenciados podrán referir compradores internacionales potenciales al Corredor B para la compra de inmuebles en España, específicamente en la provincia de Alicante y la zona de la Costa Blanca. Este acuerdo cubre <strong>todos los referidos futuros</strong> realizados por los agentes del Corredor A durante la vigencia del presente acuerdo. Cada referido individual se documentará por separado en el Anexo adjunto.
+      </span>
     </div>
-  </div>
 
-  <!-- Section 3: Detailed Terms & Conditions -->
-  <div class="clauses">
     <div class="clause">
-      <h4>1. B2B Broker-to-Broker Relationship / Relación Comercial B2B</h4>
+      <h4>2. B2B Relationship / Relación Comercial B2B</h4>
       <p>
         This agreement represents a business-to-business (B2B) marketing and referral contract. Broker A is a legally licensed brokerage in its jurisdiction of origin (United States or Canada) and Broker B is a licensed real estate entity in Spain. As this is an international service referral, Broker A and its agents do not require licensing or registration in Spain to receive this B2B service fee.
       </p>
       <span class="lang-divider">
-        Este acuerdo representa un contrato de marketing y referido de empresa a empresa (B2B). El Corredor A es una agencia legalmente autorizada en su jurisdicción de origen (EE. UU. o Canadá) y el Corredor B es una entidad inmobiliaria con licencia en España. Al tratarse de un servicio de referido internacional, el Corredor A y sus agentes no requieren licencia ni registro en España para percibir estos honorarios de servicio B2B.
+        Este acuerdo representa un contrato de marketing y referido de empresa a empresa (B2B). El Corredor A es una agencia legalmente autorizada en su jurisdicción de origen (EE. UU. o Canadá) y el Corredor B es una entidad inmobiliaria con licencia en España. Al tratarse de un servicio de referido internacional, el Corredor A y sus agentes no requieren licencia ni registro en España para percibir estos honorarios.
       </span>
     </div>
 
     <div class="clause">
-      <h4>2. Distribution to Involved Agents / Distribución a los Agentes Involucrados</h4>
+      <h4>3. Commission Structure / Estructura de Comisión</h4>
       <p>
-        Broker B shall wire the referral fee directly to the brokerage bank account of Broker A. Broker A is solely responsible for distributing the corresponding commission split to the Referring Real Estate Agent named above. Broker B is responsible for distributing commission splits to the local Spain Receiving Agent assigned to the transaction.
+        For every referred client whose property acquisition in Spain is successfully closed, Broker B shall pay Broker A a referral fee of <strong>25% (twenty-five percent)</strong> of the gross buyer-side commission received by Broker B on that transaction. This rate applies uniformly to all referrals made under this agreement unless modified in a specific Annex.
       </p>
       <span class="lang-divider">
-        El Corredor B transferirá los honorarios de referido directamente a la cuenta bancaria corporativa del Corredor A. El Corredor A es el único responsable de distribuir la comisión correspondiente al Agente Inmobiliario Referente aquí nombrado. El Corredor B es responsable de pagar la comisión correspondiente al Agente Receptor local en España asignado a la transacción.
+        Por cada cliente referido cuya adquisición de propiedad en España se cierre exitosamente, el Corredor B pagará al Corredor A una comisión de referido del <strong>25% (veinticinco por ciento)</strong> de la comisión bruta del lado comprador cobrada por el Corredor B en dicha transacción. Este porcentaje se aplica de manera uniforme a todos los referidos realizados bajo este acuerdo, salvo que se modifique en un Anexo específico.
+      </span>
+
+      <div class="example-box">
+        <p>💡 Example / Ejemplo (25% Split):</p>
+        <span>• Purchase price / Precio de compra: <strong>€400,000</strong></span>
+        <span>• Gross buyer commission (5%) / Comisión bruta (5%): <strong>€20,000</strong></span>
+        <span>• Referral fee to Broker A (25%) / Pago al Corredor A: <strong>€5,000 EUR</strong> (wire/transferencia)</span>
+      </div>
+    </div>
+
+    <div class="clause">
+      <h4>4. Agent Compensation / Distribución a los Agentes</h4>
+      <p>
+        All referral fees are paid strictly Broker-to-Broker. Broker A is solely responsible for distributing commission splits to its individual referring agents. Broker B is responsible for distributing commission splits to its local Spain receiving agents assigned to each transaction.
+      </p>
+      <span class="lang-divider">
+        Todos los honorarios de referido se pagan estrictamente de Corredor a Corredor. El Corredor A es el único responsable de distribuir la comisión a sus agentes referentes individuales. El Corredor B es responsable de distribuir la comisión a sus agentes receptores locales en España asignados a cada transacción.
       </span>
     </div>
 
     <div class="clause">
-      <h4>3. Client Registry & Lock Period / Registro del Cliente y Periodo de Reserva</h4>
+      <h4>5. Client Lock Period / Vigencia del Referido</h4>
       <p>
-        The referral is considered registered and protected once the Prospect is submitted through Broker B's portal or signed below. Broker A is entitled to the referral compensation for any real estate transaction closed by the Prospect in Spain within **24 months** of the referral registration date.
+        Each individual referral documented in an Annex is protected for a period of <strong>24 months</strong> from the date of registration. Broker A is entitled to the referral fee for any transaction completed by that referred client in Spain during this period.
       </p>
       <span class="lang-divider">
-        El referido se considera registrado y protegido una vez que se envía el Cliente a través del portal del Corredor B o se firma el presente acuerdo. El Corredor A tendrá derecho a la compensación por referido para cualquier transacción inmobiliaria (compra u opción) cerrada por el Cliente en España dentro de los **24 meses** posteriores a la fecha de registro.
+        Cada referido individual documentado en un Anexo estará protegido durante un periodo de <strong>24 meses</strong> desde la fecha de registro. El Corredor A tendrá derecho a la comisión de referido por cualquier transacción completada por dicho cliente en España durante este periodo.
       </span>
     </div>
 
     <div class="clause">
-      <h4>4. Payout Settlement & Wire Transfers / Liquidación de Pagos y Transferencias</h4>
+      <h4>6. Settlement & Tax Compliance / Liquidación y Cumplimiento Fiscal</h4>
       <p>
-        Referral fees shall be settled and wired to Broker A within **30 business days** of the transaction closing in Spain and subsequent receipt of clear funds by Broker B. Payouts will be processed via international bank wire. Intermediary bank wire and currency conversion fees shall be borne by the recipient.
+        Referral fees shall be wired to Broker A within <strong>30 business days</strong> of transaction closing and receipt of clear funds by Broker B. US-based brokerages must provide a completed <strong>IRS Form W-8BEN-E</strong> (or Canadian equivalent) and a commercial invoice prior to payment to prevent local Spanish withholding tax.
       </p>
       <span class="lang-divider">
-        Los honorarios de referido se liquidarán y transferirán al Corredor A dentro de los **30 días hábiles** posteriores al cierre de la transacción en España y la posterior recepción de los fondos correspondientes por el Corredor B. Los pagos se realizarán mediante transferencia bancaria internacional. Los gastos bancarios intermediarios y de conversión de divisas serán asumidos por el destinatario.
+        Los honorarios de referido se transferirán al Corredor A dentro de los <strong>30 días hábiles</strong> posteriores al cierre de la transacción y cobro de los fondos por el Corredor B. Las agencias de EE. UU. deben entregar el formulario <strong>IRS W-8BEN-E</strong> (o equivalente canadiense) y una factura comercial antes del pago para evitar retenciones fiscales en España.
       </span>
     </div>
 
     <div class="clause">
-      <h4>5. Tax Compliance & Invoicing / Cumplimiento Fiscal y Facturación</h4>
+      <h4>7. Duration & Termination / Vigencia y Resolución</h4>
       <p>
-        To comply with Spanish Tax Authorities, Broker A (if US-based) agrees to provide a completed **IRS Form W-8BEN-E** (or Canadian equivalent) to Broker B prior to payout, verifying corporate non-resident status and exempting the transaction from local Spanish withholding tax. Broker A shall also issue a commercial invoice for the referral fee amount.
+        This Agreement is effective for an initial period of <strong>12 months</strong> from the date of signature, automatically renewing for successive 12-month periods unless either party provides <strong>60 days' written notice</strong> of termination. Termination shall not affect referral rights on clients documented in existing Annexes.
       </p>
       <span class="lang-divider">
-        Para cumplir con la Agencia Tributaria Española, el Corredor A (si tiene sede en EE. UU.) se compromete a facilitar el formulario **IRS W-8BEN-E** (o equivalente canadiense) al Corredor B antes del pago, acreditando su condición de entidad extranjera no residente para eximir la retención fiscal en España. El Corredor A emitirá también una factura comercial por los honorarios correspondientes.
+        Este Acuerdo tendrá una vigencia inicial de <strong>12 meses</strong> desde la fecha de firma, renovándose automáticamente por períodos sucesivos de 12 meses salvo que cualquiera de las partes comunique su resolución con un preaviso de <strong>60 días por escrito</strong>. La resolución no afectará los derechos de referido sobre clientes documentados en Anexos existentes.
       </span>
     </div>
 
     <div class="clause">
-      <h4>6. Governing Law & Jurisdiction / Ley Aplicable y Jurisdicción</h4>
+      <h4>8. Governing Law / Ley Aplicable</h4>
       <p>
-        This agreement is governed by and construed under the laws of Spain. The parties agree that any disputes arising out of this agreement which cannot be resolved through amicable mediation shall be submitted to the exclusive jurisdiction of the Courts of Alicante, Spain.
+        This agreement is governed by the laws of Spain. Any disputes shall be submitted exclusively to the Courts of Alicante, Spain.
       </p>
       <span class="lang-divider">
-        Este acuerdo se rige e interpreta según las leyes de España. Las partes acuerdan que cualquier disputa derivada de este acuerdo que no pueda resolverse mediante mediación amistosa se someterá a la jurisdicción exclusiva de los Tribunales de Alicante, España.
+        Este acuerdo se rige por las leyes de España. Cualquier controversia se someterá exclusivamente a la jurisdicción de los Tribunales de Alicante, España.
       </span>
     </div>
   </div>
 
-  <!-- Section 4: Signatures -->
+  <!-- Signatures -->
   <div class="signature-section">
     <div class="signature-grid">
-      <!-- Broker A Signature -->
       <div class="sig-block">
-        <div class="sig-caption">Broker A (Referring Brokerage Representative / Representante Corredor A)</div>
+        <div class="sig-caption">Broker A (Referring Brokerage / Representante Corredor A)</div>
         <div class="sig-line"></div>
         <div class="sig-info">
-          <span>By (Signature / Firma): __________________________________</span>
-          <span>Print Name / Nombre: _____________________________________</span>
-          <span>Title / Cargo: ___________________________________________</span>
-          <span>Date / Fecha: ____________________________________________</span>
+          <span>Signature / Firma: ________________________________________</span>
+          <span>Print Name / Nombre: ______________________________________</span>
+          <span>Title / Cargo: ____________________________________________</span>
+          <span>Date / Fecha: _____________________________________________</span>
         </div>
       </div>
-
-      <!-- Broker B Signature -->
       <div class="sig-block">
-        <div class="sig-caption">Broker B (Megagestión Spain Representative / Representante Corredor B)</div>
+        <div class="sig-caption">Broker B (Megagestión / Representante Corredor B)</div>
         <div class="sig-line"></div>
         <div class="sig-info">
-          <span>By (Signature / Firma): __________________________________</span>
+          <span>Signature / Firma: ________________________________________</span>
           <span>Print Name / Nombre: <strong>José Martínez Sánchez</strong></span>
           <span>Title / Cargo: <strong>Managing Broker / Corredor de la Oficina</strong></span>
-          <span>Date / Fecha: ____________________________________________</span>
+          <span>Date / Fecha: _____________________________________________</span>
         </div>
       </div>
     </div>
@@ -547,9 +423,110 @@
   <footer>
     <p>
       Megagestión Servicios Inmobiliarios • Carrer Conrado del Campo 16, 03204, Elche (Alicante), Spain • CIF: B-54829767 • jose.martinez@remax.es • +34 966 665 651<br>
-      © 2026 Megagestión Servicios Inmobiliarios. All Rights Reserved. Prepared for International Alliance Program / Reservados todos los derechos.
+      © 2026 Megagestión Servicios Inmobiliarios. All Rights Reserved / Reservados todos los derechos.
     </p>
   </footer>
+
+  <!-- ═══════════════════════════════════════════
+       PAGE 2 — ANNEX: INDIVIDUAL CLIENT REFERRAL
+       ═══════════════════════════════════════════ -->
+
+  <div class="page-break" style="padding-top: 15px; margin-top: 40px;">
+    <header style="border-bottom: 2px solid var(--remax-blue); padding-bottom: 10px; margin-bottom: 12px;">
+      <div class="logo-container">
+        <img src="remax_logo.png" alt="RE/MAX Inmomás Logo" style="height: 38px;">
+        <div>
+          <h1 style="font-size: 15px;">Megagestión <span>Servicios Inmobiliarios</span></h1>
+          <p>RE/MAX Inmomás</p>
+        </div>
+      </div>
+      <div class="doc-title">
+        <span class="annex-badge">ANNEX / ANEXO</span>
+        <h2 style="font-size: 13px;">Individual Client Referral / Ficha de Referido Individual</h2>
+      </div>
+    </header>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 9px;">
+      <span style="color: var(--remax-blue); font-weight: 600;">Referral # / Nº: __________________</span>
+      <span style="color: var(--remax-blue); font-weight: 600;">Date / Fecha: __________________</span>
+      <span style="color: #6c757d;">Master Agreement date / Fecha Acuerdo Marco: ____/____/________</span>
+    </div>
+
+    <p style="font-size: 8.5px; color: #6c757d; margin: 0 0 10px 0; text-align: justify; line-height: 1.35;">
+      This Annex is subject to the Master Referral Agreement. The referral is protected for 24 months. /
+      <em>Este Anexo está sujeto al Acuerdo Marco. El referido queda protegido durante 24 meses.</em>
+    </p>
+
+    <!-- Agents Row - Side by Side Compact -->
+    <div class="field-grid" style="gap: 10px; margin-bottom: 10px;">
+      <div class="field-card" style="padding: 8px;">
+        <h3 style="font-size: 9px; margin-bottom: 5px;">Referring Agent / Agente Referente (US/Canada)</h3>
+        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 120px;">Name / Nombre:</div><div class="form-value"></div></div>
+        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 120px;">License # / Licencia:</div><div class="form-value"></div></div>
+        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 120px;">Email / Correo:</div><div class="form-value"></div></div>
+        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 120px;">Phone / Teléfono:</div><div class="form-value"></div></div>
+        <div class="form-row" style="margin-bottom: 0; font-size: 9px;"><div class="form-label" style="width: 120px;">Brokerage / Agencia:</div><div class="form-value"></div></div>
+      </div>
+
+      <div class="field-card" style="padding: 8px;">
+        <h3 style="font-size: 9px; margin-bottom: 5px;">Receiving Agent / Agente Receptor (Spain)</h3>
+        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 120px;">Name / Nombre:</div><div class="form-value"></div></div>
+        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 120px;">Email / Correo:</div><div class="form-value"></div></div>
+        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 120px;">Phone / Teléfono:</div><div class="form-value"></div></div>
+        <div class="form-row" style="margin-bottom: 0; font-size: 9px;"><div class="form-label" style="width: 120px;">Office / Oficina:</div><div class="form-value">RE/MAX Inmomás</div></div>
+      </div>
+    </div>
+
+    <!-- Prospect - Compact Full Width -->
+    <div class="field-card full-width" style="padding: 8px; margin-bottom: 10px;">
+      <h3 style="font-size: 9px; margin-bottom: 5px;">Prospect / Cliente Referido</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 15px;">
+        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 130px;">Full Name / Nombre:</div><div class="form-value"></div></div>
+        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 130px;">Email / Correo:</div><div class="form-value"></div></div>
+        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 130px;">Phone / Teléfono:</div><div class="form-value"></div></div>
+        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 130px;">Region / Región:</div><div class="form-value">Alicante / Costa Blanca</div></div>
+        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 130px;">Budget / Presupuesto:</div><div class="form-value"></div></div>
+        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 130px;">Property Type / Tipo:</div><div class="form-value"></div></div>
+      </div>
+      <div class="form-row" style="margin-bottom: 0; font-size: 9px;"><div class="form-label" style="width: 130px;">Notes / Notas:</div><div class="form-value"></div></div>
+    </div>
+
+    <!-- Commission - Inline -->
+    <div style="display: flex; align-items: center; gap: 20px; padding: 6px 10px; background: var(--light-grey); border-radius: 4px; border: 1px solid var(--border-color); margin-bottom: 12px; font-size: 9px;">
+      <div><strong style="color: var(--remax-blue);">Referral Fee / Comisión:</strong> As per Master Agreement: <strong>25%</strong> / Según Acuerdo Marco: <strong>25%</strong></div>
+      <div style="color: #6c757d;">☐ Modified / Modificado: ________ %</div>
+    </div>
+
+    <!-- Compact Signatures Side by Side -->
+    <div class="signature-grid" style="gap: 20px;">
+      <div>
+        <div class="sig-caption" style="font-size: 8px;">Broker A Representative / Representante Corredor A</div>
+        <div style="border-bottom: 1px solid var(--charcoal); height: 30px; margin-bottom: 3px;"></div>
+        <div style="font-size: 8.5px; color: #6c757d;">
+          <span style="display: block;">Signature / Firma</span>
+          <span style="display: block; margin-top: 2px;">Name / Nombre: ________________________________</span>
+          <span style="display: block; margin-top: 2px;">Date / Fecha: __________________________________</span>
+        </div>
+      </div>
+      <div>
+        <div class="sig-caption" style="font-size: 8px;">Broker B Representative / Representante Corredor B</div>
+        <div style="border-bottom: 1px solid var(--charcoal); height: 30px; margin-bottom: 3px;"></div>
+        <div style="font-size: 8.5px; color: #6c757d;">
+          <span style="display: block;">Signature / Firma</span>
+          <span style="display: block; margin-top: 2px;">Name / Nombre: <strong style="color: var(--charcoal);">José Martínez Sánchez</strong></span>
+          <span style="display: block; margin-top: 2px;">Date / Fecha: __________________________________</span>
+        </div>
+      </div>
+    </div>
+
+    <footer style="margin-top: 15px; padding-top: 8px;">
+      <p>
+        Megagestión Servicios Inmobiliarios • CIF: B-54829767 • jose.martinez@remax.es • +34 966 665 651<br>
+        This Annex is an integral part of the Master Referral Agreement / Este Anexo forma parte integral del Acuerdo Marco de Referidos.
+      </p>
+    </footer>
+  </div>
+
 </div>
 
 </body>

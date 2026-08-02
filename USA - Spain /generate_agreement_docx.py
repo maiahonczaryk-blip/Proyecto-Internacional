@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Generate an editable Word (.docx) Referral Agreement for
-Megagestión Servicios Inmobiliarios / RE/MAX Inmomás.
-Bilingual English-Spanish, formatted with professional styling.
+Generate an editable Word (.docx) Referral Agreement:
+  Page 1: Master Collaboration Agreement (general 25% for all referrals)
+  Page 2: Annex — Individual Client Referral Form
 """
 
 import os
@@ -13,13 +13,11 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml.ns import qn, nsdecls
 from docx.oxml import parse_xml
 
-# ── Colour palette ──
-REMAX_BLUE  = RGBColor(0, 61, 165)
-REMAX_RED   = RGBColor(225, 27, 34)
-CHARCOAL    = RGBColor(33, 37, 41)
-GREY        = RGBColor(108, 117, 125)
-LIGHT_GREY  = RGBColor(248, 249, 250)
-WHITE       = RGBColor(255, 255, 255)
+# ── Colours ──
+REMAX_BLUE = RGBColor(0, 61, 165)
+REMAX_RED  = RGBColor(225, 27, 34)
+CHARCOAL   = RGBColor(33, 37, 41)
+GREY       = RGBColor(108, 117, 125)
 
 # ── Paths ──
 SCRIPT_DIR  = os.path.dirname(os.path.abspath(__file__))
@@ -28,61 +26,21 @@ OUTPUT_PATH = os.path.join(SCRIPT_DIR, "Referral_Agreement_Template.docx")
 
 doc = Document()
 
-# ── Page margins ──
 for section in doc.sections:
     section.top_margin    = Cm(1.5)
     section.bottom_margin = Cm(1.5)
     section.left_margin   = Cm(2)
     section.right_margin  = Cm(2)
 
-# ── Default font ──
 style = doc.styles['Normal']
-font  = style.font
-font.name  = 'Calibri'
-font.size  = Pt(10)
-font.color.rgb = CHARCOAL
+style.font.name = 'Calibri'
+style.font.size = Pt(10)
+style.font.color.rgb = CHARCOAL
 
-# ────────────────────────────────────────────
-#  HELPER FUNCTIONS
-# ────────────────────────────────────────────
 
-def add_logo_header():
-    """Add logo + title header."""
-    table = doc.add_table(rows=1, cols=2)
-    table.alignment = WD_TABLE_ALIGNMENT.CENTER
-    table.columns[0].width = Inches(2.5)
-    table.columns[1].width = Inches(4.0)
+# ── Helpers ──
 
-    # Left cell: logo
-    cell_left = table.cell(0, 0)
-    cell_left.vertical_alignment = 1  # CENTER
-    p = cell_left.paragraphs[0]
-    if os.path.exists(LOGO_PATH):
-        run = p.add_run()
-        run.add_picture(LOGO_PATH, width=Inches(1.6))
-    else:
-        run = p.add_run("RE/MAX Inmomás")
-        run.bold = True
-        run.font.size = Pt(16)
-        run.font.color.rgb = REMAX_BLUE
-
-    # Right cell: titles
-    cell_right = table.cell(0, 1)
-    cell_right.vertical_alignment = 1
-    p1 = cell_right.paragraphs[0]
-    p1.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    run1 = p1.add_run("Referral Agreement\nAcuerdo de Referido")
-    run1.bold = True
-    run1.font.size = Pt(14)
-    run1.font.color.rgb = CHARCOAL
-
-    p2 = cell_right.add_paragraph()
-    p2.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    run2 = p2.add_run("B2B Broker-to-Broker / Colaboración de Corredor a Corredor")
-    run2.font.size = Pt(8)
-    run2.font.color.rgb = GREY
-
-    # Remove table borders
+def remove_borders(table):
     for row in table.rows:
         for cell in row.cells:
             tc = cell._tc
@@ -98,8 +56,43 @@ def add_logo_header():
             tcPr.append(tcBorders)
 
 
+def add_logo_header(title_line1, title_line2):
+    table = doc.add_table(rows=1, cols=2)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.columns[0].width = Inches(2.5)
+    table.columns[1].width = Inches(4.0)
+
+    cell_left = table.cell(0, 0)
+    cell_left.vertical_alignment = 1
+    p = cell_left.paragraphs[0]
+    if os.path.exists(LOGO_PATH):
+        run = p.add_run()
+        run.add_picture(LOGO_PATH, width=Inches(1.6))
+    else:
+        run = p.add_run("RE/MAX Inmomás")
+        run.bold = True
+        run.font.size = Pt(16)
+        run.font.color.rgb = REMAX_BLUE
+
+    cell_right = table.cell(0, 1)
+    cell_right.vertical_alignment = 1
+    p1 = cell_right.paragraphs[0]
+    p1.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    r1 = p1.add_run(title_line1)
+    r1.bold = True
+    r1.font.size = Pt(14)
+    r1.font.color.rgb = CHARCOAL
+
+    p2 = cell_right.add_paragraph()
+    p2.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    r2 = p2.add_run(title_line2)
+    r2.font.size = Pt(9)
+    r2.font.color.rgb = GREY
+
+    remove_borders(table)
+
+
 def add_blue_line():
-    """Add a blue horizontal rule."""
     p = doc.add_paragraph()
     p.paragraph_format.space_before = Pt(2)
     p.paragraph_format.space_after  = Pt(8)
@@ -113,51 +106,45 @@ def add_blue_line():
 
 
 def add_section_title(en_text, es_text):
-    """Add a blue section heading in EN / ES."""
     p = doc.add_paragraph()
     p.paragraph_format.space_before = Pt(12)
     p.paragraph_format.space_after  = Pt(4)
-    run_en = p.add_run(en_text)
-    run_en.bold = True
-    run_en.font.size = Pt(11)
-    run_en.font.color.rgb = REMAX_BLUE
-    run_sep = p.add_run(" / ")
-    run_sep.font.size = Pt(11)
-    run_sep.font.color.rgb = GREY
-    run_es = p.add_run(es_text)
-    run_es.bold = True
-    run_es.font.size = Pt(11)
-    run_es.font.color.rgb = REMAX_RED
-
-
-def add_field_row(table, label, value=""):
-    """Add a label / value row to a table."""
-    row = table.add_row()
-    c0 = row.cells[0]
-    c1 = row.cells[1]
-
-    p0 = c0.paragraphs[0]
-    run0 = p0.add_run(label)
-    run0.bold = True
-    run0.font.size = Pt(9)
-    run0.font.color.rgb = CHARCOAL
-
-    p1 = c1.paragraphs[0]
-    run1 = p1.add_run(value)
-    run1.font.size = Pt(9)
-    run1.font.color.rgb = CHARCOAL
+    r_en = p.add_run(en_text)
+    r_en.bold = True
+    r_en.font.size = Pt(11)
+    r_en.font.color.rgb = REMAX_BLUE
+    r_sep = p.add_run(" / ")
+    r_sep.font.size = Pt(11)
+    r_sep.font.color.rgb = GREY
+    r_es = p.add_run(es_text)
+    r_es.bold = True
+    r_es.font.size = Pt(11)
+    r_es.font.color.rgb = REMAX_RED
 
 
 def create_field_table():
-    """Create a 2-column field table."""
     table = doc.add_table(rows=0, cols=2)
     table.columns[0].width = Inches(2.2)
     table.columns[1].width = Inches(4.3)
     return table
 
 
+def add_field_row(table, label, value=""):
+    row = table.add_row()
+    c0 = row.cells[0]
+    c1 = row.cells[1]
+    p0 = c0.paragraphs[0]
+    r0 = p0.add_run(label)
+    r0.bold = True
+    r0.font.size = Pt(9)
+    r0.font.color.rgb = CHARCOAL
+    p1 = c1.paragraphs[0]
+    r1 = p1.add_run(value)
+    r1.font.size = Pt(9)
+    r1.font.color.rgb = CHARCOAL
+
+
 def shade_table(table, color_hex="F8F9FA"):
-    """Apply light grey shading to all cells."""
     for row in table.rows:
         for cell in row.cells:
             shading = parse_xml(
@@ -167,44 +154,38 @@ def shade_table(table, color_hex="F8F9FA"):
 
 
 def add_clause(num, title_en, title_es, text_en, text_es):
-    """Add a bilingual clause."""
-    # Title
     p = doc.add_paragraph()
     p.paragraph_format.space_before = Pt(10)
     p.paragraph_format.space_after  = Pt(2)
-    run = p.add_run(f"{num}. {title_en} / {title_es}")
-    run.bold = True
-    run.font.size = Pt(10)
-    run.font.color.rgb = REMAX_BLUE
+    r = p.add_run(f"{num}. {title_en} / {title_es}")
+    r.bold = True
+    r.font.size = Pt(10)
+    r.font.color.rgb = REMAX_BLUE
 
-    # English text
     p_en = doc.add_paragraph()
     p_en.paragraph_format.space_after = Pt(4)
     p_en.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    run_en = p_en.add_run(text_en)
-    run_en.font.size = Pt(9.5)
-    run_en.font.color.rgb = CHARCOAL
+    r_en = p_en.add_run(text_en)
+    r_en.font.size = Pt(9.5)
+    r_en.font.color.rgb = CHARCOAL
 
-    # Spanish text
     p_es = doc.add_paragraph()
     p_es.paragraph_format.space_after = Pt(6)
     p_es.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    run_es = p_es.add_run(text_es)
-    run_es.font.size = Pt(9)
-    run_es.font.color.rgb = GREY
-    run_es.italic = True
+    r_es = p_es.add_run(text_es)
+    r_es.font.size = Pt(9)
+    r_es.font.color.rgb = GREY
+    r_es.italic = True
 
 
 def add_signature_block(title, name="", role=""):
-    """Add a signature area."""
     p_title = doc.add_paragraph()
     p_title.paragraph_format.space_before = Pt(14)
-    run_t = p_title.add_run(title)
-    run_t.bold = True
-    run_t.font.size = Pt(9)
-    run_t.font.color.rgb = REMAX_BLUE
+    r_t = p_title.add_run(title)
+    r_t.bold = True
+    r_t.font.size = Pt(9)
+    r_t.font.color.rgb = REMAX_BLUE
 
-    # Signature line
     p_sig = doc.add_paragraph()
     p_sig.paragraph_format.space_before = Pt(24)
     pPr = p_sig._p.get_or_add_pPr()
@@ -224,50 +205,62 @@ def add_signature_block(title, name="", role=""):
     for label, val in fields:
         p = doc.add_paragraph()
         p.paragraph_format.space_after = Pt(1)
-        run_l = p.add_run(f"{label}  ")
-        run_l.font.size = Pt(9)
-        run_l.font.color.rgb = GREY
+        r_l = p.add_run(f"{label}  ")
+        r_l.font.size = Pt(9)
+        r_l.font.color.rgb = GREY
         if val:
-            run_v = p.add_run(val)
-            run_v.bold = True
-            run_v.font.size = Pt(9)
-            run_v.font.color.rgb = CHARCOAL
+            r_v = p.add_run(val)
+            r_v.bold = True
+            r_v.font.size = Pt(9)
+            r_v.font.color.rgb = CHARCOAL
 
 
-# ────────────────────────────────────────────
-#  BUILD THE DOCUMENT
-# ────────────────────────────────────────────
+def add_footer_text(text):
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.space_before = Pt(20)
+    pPr = p._p.get_or_add_pPr()
+    pBdr = parse_xml(
+        '<w:pBdr %s>'
+        '<w:top w:val="single" w:sz="4" w:space="4" w:color="DEE2E6"/>'
+        '</w:pBdr>' % nsdecls('w')
+    )
+    pPr.append(pBdr)
+    r = p.add_run(text)
+    r.font.size = Pt(7.5)
+    r.font.color.rgb = GREY
 
-# 1. Header with logo
-add_logo_header()
+
+# ══════════════════════════════════════════════
+#  PAGE 1 — MASTER COLLABORATION AGREEMENT
+# ══════════════════════════════════════════════
+
+add_logo_header(
+    "Master Referral Agreement",
+    "Acuerdo Marco de Colaboración y Referidos"
+)
 add_blue_line()
 
-# 2. Main bilingual title
 p_main = doc.add_paragraph()
 p_main.alignment = WD_ALIGN_PARAGRAPH.CENTER
 p_main.paragraph_format.space_after = Pt(2)
 r1 = p_main.add_run("INTERNATIONAL REFERRAL & COLLABORATION AGREEMENT\n")
-r1.bold = True
-r1.font.size = Pt(13)
-r1.font.color.rgb = REMAX_BLUE
+r1.bold = True; r1.font.size = Pt(13); r1.font.color.rgb = REMAX_BLUE
 r2 = p_main.add_run("ACUERDO INTERNACIONAL DE REFERIDO Y COLABORACIÓN")
-r2.bold = True
-r2.font.size = Pt(12)
-r2.font.color.rgb = REMAX_RED
+r2.bold = True; r2.font.size = Pt(12); r2.font.color.rgb = REMAX_RED
 
-# ── BROKER A ──
+# Broker A
 add_section_title("BROKER A — Referring Brokerage (US / Canada)", "CORREDOR A — Agencia Referente")
 t1 = create_field_table()
 add_field_row(t1, "Brokerage Name / Agencia:")
 add_field_row(t1, "Broker of Record / Corredor:")
 add_field_row(t1, "Office Address / Dirección:")
 add_field_row(t1, "Broker License # / Licencia:")
-add_field_row(t1, "Referring Agent / Agente Referente:")
-add_field_row(t1, "Agent License # / Licencia Agente:")
-add_field_row(t1, "Agent Contact / Contacto:")
+add_field_row(t1, "Contact Email / Correo:")
+add_field_row(t1, "Contact Phone / Teléfono:")
 shade_table(t1)
 
-# ── BROKER B ──
+# Broker B
 add_section_title("BROKER B — Receiving Brokerage (Spain)", "CORREDOR B — Agencia Receptora")
 t2 = create_field_table()
 add_field_row(t2, "Brokerage Name / Agencia:", "Megagestión Servicios Inmobiliarios")
@@ -276,51 +269,52 @@ add_field_row(t2, "Office Address / Dirección:", "Carrer Conrado del Campo 16, 
 add_field_row(t2, "CIF (Tax ID) / NIF:", "B-54829767")
 add_field_row(t2, "Contact Email / Correo:", "jose.martinez@remax.es")
 add_field_row(t2, "Office Phone / Teléfono:", "+34 966 665 651")
-add_field_row(t2, "Local Agent / Agente Local España:")
 shade_table(t2)
 
-# ── PROSPECT ──
-add_section_title("PROSPECT — Referred Buyer Client", "CLIENTE REFERIDO — Comprador")
-t3 = create_field_table()
-add_field_row(t3, "Full Name / Nombre Completo:")
-add_field_row(t3, "Email Address / Correo:")
-add_field_row(t3, "Phone Number / Teléfono:")
-add_field_row(t3, "Target Region / Región Destino:", "Alicante Province / Costa Blanca (Spain)")
-shade_table(t3)
-
-# ── COMMISSION SPLIT ──
-add_section_title("COMMISSION SPLIT & REFERRAL FEE", "SPLIT DE COMISIÓN Y HONORARIOS DE REFERIDO")
-
-p_intro = doc.add_paragraph()
-p_intro.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-p_intro.paragraph_format.space_after = Pt(4)
-r = p_intro.add_run(
-    "In consideration of the referral of the Prospect, Broker B shall compensate Broker A "
-    "in the amount of (select one): / En contraprestación por la presentación del Cliente, "
-    "el Corredor B compensará al Corredor A con el siguiente importe (marque uno):"
+# Clauses
+add_clause("1", "Purpose & Scope", "Objeto y Alcance",
+    "The purpose of this Master Agreement is to establish the general terms under which Broker A "
+    "and its licensed real estate agents may refer prospective international buyers to Broker B "
+    "for the purchase of real estate in Spain, specifically within the provinces of Alicante and "
+    "the Costa Blanca region. This agreement covers all future referrals made by Broker A's agents "
+    "during the term of this agreement. Individual client referrals shall be documented separately "
+    "in the attached Annex.",
+    "El objeto de este Acuerdo Marco es establecer las condiciones generales bajo las cuales el "
+    "Corredor A y sus agentes inmobiliarios licenciados podrán referir compradores internacionales "
+    "potenciales al Corredor B para la compra de inmuebles en España, específicamente en la provincia "
+    "de Alicante y la zona de la Costa Blanca. Este acuerdo cubre todos los referidos futuros "
+    "realizados por los agentes del Corredor A durante la vigencia del presente acuerdo. Cada referido "
+    "individual se documentará por separado en el Anexo adjunto."
 )
-r.font.size = Pt(9.5)
 
-options = [
-    ("☐", "$ ______________ USD / CAD — Flat-rate referral fee / Tarifa plana."),
-    ("☑", "25% (Twenty-Five Percent / Veinticinco Por Ciento) of the gross buyer-side commission "
-           "received by Broker B / de la comisión bruta del lado comprador recibida por el Corredor B."),
-    ("☐", "________ % of the gross buyer-side commission / de la comisión bruta del lado comprador."),
-]
-for check, text in options:
-    p = doc.add_paragraph()
-    p.paragraph_format.space_after = Pt(3)
-    p.paragraph_format.left_indent = Cm(0.5)
-    rc = p.add_run(f"  {check}  ")
-    rc.bold = True
-    rc.font.size = Pt(11)
-    rc.font.color.rgb = REMAX_BLUE
-    rt = p.add_run(text)
-    rt.font.size = Pt(9.5)
+add_clause("2", "B2B Relationship", "Relación Comercial B2B",
+    "This agreement represents a business-to-business (B2B) marketing and referral contract. "
+    "Broker A is a legally licensed brokerage in its jurisdiction of origin (United States or Canada) "
+    "and Broker B is a licensed real estate entity in Spain. As this is an international service "
+    "referral, Broker A and its agents do not require licensing or registration in Spain to receive "
+    "this B2B service fee.",
+    "Este acuerdo representa un contrato de marketing y referido de empresa a empresa (B2B). "
+    "El Corredor A es una agencia legalmente autorizada en su jurisdicción de origen (EE. UU. o Canadá) "
+    "y el Corredor B es una entidad inmobiliaria con licencia en España. Al tratarse de un servicio de "
+    "referido internacional, el Corredor A y sus agentes no requieren licencia ni registro en España "
+    "para percibir estos honorarios."
+)
+
+add_clause("3", "Commission Structure", "Estructura de Comisión",
+    "For every referred client whose property acquisition in Spain is successfully closed, Broker B "
+    "shall pay Broker A a referral fee of 25% (twenty-five percent) of the gross buyer-side commission "
+    "received by Broker B on that transaction. This rate applies uniformly to all referrals made under "
+    "this agreement unless modified in a specific Annex.",
+    "Por cada cliente referido cuya adquisición de propiedad en España se cierre exitosamente, el "
+    "Corredor B pagará al Corredor A una comisión de referido del 25% (veinticinco por ciento) de la "
+    "comisión bruta del lado comprador cobrada por el Corredor B en dicha transacción. Este porcentaje "
+    "se aplica de manera uniforme a todos los referidos realizados bajo este acuerdo, salvo que se "
+    "modifique en un Anexo específico."
+)
 
 # Example box
 p_ex = doc.add_paragraph()
-p_ex.paragraph_format.space_before = Pt(6)
+p_ex.paragraph_format.space_before = Pt(4)
 p_ex.paragraph_format.space_after  = Pt(8)
 p_ex.paragraph_format.left_indent  = Cm(0.5)
 pPr = p_ex._p.get_or_add_pPr()
@@ -331,131 +325,284 @@ pBdr = parse_xml(
 )
 pPr.append(pBdr)
 r_h = p_ex.add_run("💡 Example / Ejemplo (25% Split):\n")
-r_h.bold = True
-r_h.font.size = Pt(9)
+r_h.bold = True; r_h.font.size = Pt(9)
 r_b = p_ex.add_run(
     "• Purchase Price / Precio: €400,000\n"
     "• Gross buyer commission (5%) / Comisión bruta: €20,000\n"
-    "• Referring Broker payout (25%) / Pago al Corredor A: €5,000 EUR (wire/transferencia)"
+    "• Referral fee to Broker A (25%) / Pago al Corredor A: €5,000 EUR"
 )
-r_b.font.size = Pt(9)
-r_b.font.color.rgb = GREY
+r_b.font.size = Pt(9); r_b.font.color.rgb = GREY
 
-# ── CLAUSES ──
-add_clause(
-    "1",
-    "B2B Broker-to-Broker Relationship",
-    "Relación Comercial B2B",
-    "This agreement represents a business-to-business (B2B) marketing and referral contract. "
-    "Broker A is a legally licensed brokerage in its jurisdiction of origin (United States or Canada) "
-    "and Broker B is a licensed real estate entity in Spain. As this is an international service referral, "
-    "Broker A and its agents do not require licensing or registration in Spain to receive this B2B service fee.",
-    "Este acuerdo representa un contrato de marketing y referido de empresa a empresa (B2B). "
-    "El Corredor A es una agencia legalmente autorizada en su jurisdicción de origen (EE. UU. o Canadá) "
-    "y el Corredor B es una entidad inmobiliaria con licencia en España. Al tratarse de un servicio de "
-    "referido internacional, el Corredor A y sus agentes no requieren licencia ni registro en España "
-    "para percibir estos honorarios de servicio B2B."
+add_clause("4", "Agent Compensation", "Distribución a los Agentes",
+    "All referral fees are paid strictly Broker-to-Broker. Broker A is solely responsible for "
+    "distributing commission splits to its individual referring agents. Broker B is responsible "
+    "for distributing commission splits to its local Spain receiving agents assigned to each transaction.",
+    "Todos los honorarios de referido se pagan estrictamente de Corredor a Corredor. El Corredor A "
+    "es el único responsable de distribuir la comisión a sus agentes referentes individuales. El "
+    "Corredor B es responsable de distribuir la comisión a sus agentes receptores locales en España "
+    "asignados a cada transacción."
 )
 
-add_clause(
-    "2",
-    "Distribution to Involved Agents",
-    "Distribución a los Agentes Involucrados",
-    "Broker B shall wire the referral fee directly to the brokerage bank account of Broker A. "
-    "Broker A is solely responsible for distributing the corresponding commission split to the "
-    "Referring Real Estate Agent named above. Broker B is responsible for distributing commission "
-    "splits to the local Spain Receiving Agent assigned to the transaction.",
-    "El Corredor B transferirá los honorarios de referido directamente a la cuenta bancaria "
-    "corporativa del Corredor A. El Corredor A es el único responsable de distribuir la comisión "
-    "correspondiente al Agente Inmobiliario Referente aquí nombrado. El Corredor B es responsable "
-    "de pagar la comisión correspondiente al Agente Receptor local en España asignado a la transacción."
+add_clause("5", "Client Lock Period", "Vigencia del Referido",
+    "Each individual referral documented in an Annex is protected for a period of 24 months from "
+    "the date of registration. Broker A is entitled to the referral fee for any transaction "
+    "completed by that referred client in Spain during this period.",
+    "Cada referido individual documentado en un Anexo estará protegido durante un periodo de 24 meses "
+    "desde la fecha de registro. El Corredor A tendrá derecho a la comisión de referido por cualquier "
+    "transacción completada por dicho cliente en España durante este periodo."
 )
 
-add_clause(
-    "3",
-    "Client Registry & Lock Period",
-    "Registro del Cliente y Periodo de Reserva",
-    "The referral is considered registered and protected once the Prospect is submitted through "
-    "Broker B's portal or signed below. Broker A is entitled to the referral compensation for any "
-    "real estate transaction closed by the Prospect in Spain within 24 months of the referral "
-    "registration date.",
-    "El referido se considera registrado y protegido una vez que se envía el Cliente a través del "
-    "portal del Corredor B o se firma el presente acuerdo. El Corredor A tendrá derecho a la "
-    "compensación por referido para cualquier transacción inmobiliaria cerrada por el Cliente en "
-    "España dentro de los 24 meses posteriores a la fecha de registro."
+add_clause("6", "Settlement & Tax Compliance", "Liquidación y Cumplimiento Fiscal",
+    "Referral fees shall be wired to Broker A within 30 business days of transaction closing and "
+    "receipt of clear funds by Broker B. US-based brokerages must provide a completed IRS Form "
+    "W-8BEN-E (or Canadian equivalent) and a commercial invoice prior to payment to prevent local "
+    "Spanish withholding tax.",
+    "Los honorarios de referido se transferirán al Corredor A dentro de los 30 días hábiles posteriores "
+    "al cierre de la transacción y cobro de los fondos por el Corredor B. Las agencias de EE. UU. "
+    "deben entregar el formulario IRS W-8BEN-E (o equivalente canadiense) y una factura comercial "
+    "antes del pago para evitar retenciones fiscales en España."
 )
 
-add_clause(
-    "4",
-    "Payout Settlement & Wire Transfers",
-    "Liquidación de Pagos y Transferencias",
-    "Referral fees shall be settled and wired to Broker A within 30 business days of the transaction "
-    "closing in Spain and subsequent receipt of clear funds by Broker B. Payouts will be processed via "
-    "international bank wire. Intermediary bank wire and currency conversion fees shall be borne by the recipient.",
-    "Los honorarios de referido se liquidarán y transferirán al Corredor A dentro de los 30 días "
-    "hábiles posteriores al cierre de la transacción en España y la posterior recepción de los fondos "
-    "correspondientes por el Corredor B. Los pagos se realizarán mediante transferencia bancaria "
-    "internacional. Los gastos bancarios intermediarios y de conversión de divisas serán asumidos "
-    "por el destinatario."
+add_clause("7", "Duration & Termination", "Vigencia y Resolución",
+    "This Agreement is effective for an initial period of 12 months from the date of signature, "
+    "automatically renewing for successive 12-month periods unless either party provides 60 days' "
+    "written notice of termination. Termination shall not affect referral rights on clients "
+    "documented in existing Annexes.",
+    "Este Acuerdo tendrá una vigencia inicial de 12 meses desde la fecha de firma, renovándose "
+    "automáticamente por períodos sucesivos de 12 meses salvo que cualquiera de las partes comunique "
+    "su resolución con un preaviso de 60 días por escrito. La resolución no afectará los derechos de "
+    "referido sobre clientes documentados en Anexos existentes."
 )
 
-add_clause(
-    "5",
-    "Tax Compliance & Invoicing",
-    "Cumplimiento Fiscal y Facturación",
-    "To comply with Spanish Tax Authorities, Broker A (if US-based) agrees to provide a completed "
-    "IRS Form W-8BEN-E (or Canadian equivalent) to Broker B prior to payout, verifying corporate "
-    "non-resident status and exempting the transaction from local Spanish withholding tax. "
-    "Broker A shall also issue a commercial invoice for the referral fee amount.",
-    "Para cumplir con la Agencia Tributaria Española, el Corredor A (si tiene sede en EE. UU.) "
-    "se compromete a facilitar el formulario IRS W-8BEN-E (o equivalente canadiense) al Corredor B "
-    "antes del pago, acreditando su condición de entidad extranjera no residente para eximir la "
-    "retención fiscal en España. El Corredor A emitirá también una factura comercial por los "
-    "honorarios correspondientes."
+add_clause("8", "Governing Law", "Ley Aplicable",
+    "This agreement is governed by the laws of Spain. Any disputes shall be submitted exclusively "
+    "to the Courts of Alicante, Spain.",
+    "Este acuerdo se rige por las leyes de España. Cualquier controversia se someterá exclusivamente "
+    "a la jurisdicción de los Tribunales de Alicante, España."
 )
 
-add_clause(
-    "6",
-    "Governing Law & Jurisdiction",
-    "Ley Aplicable y Jurisdicción",
-    "This agreement is governed by and construed under the laws of Spain. The parties agree that any "
-    "disputes arising out of this agreement which cannot be resolved through amicable mediation "
-    "shall be submitted to the exclusive jurisdiction of the Courts of Alicante, Spain.",
-    "Este acuerdo se rige e interpreta según las leyes de España. Las partes acuerdan que cualquier "
-    "disputa derivada de este acuerdo que no pueda resolverse mediante mediación amistosa se someterá "
-    "a la jurisdicción exclusiva de los Tribunales de Alicante, España."
-)
-
-# ── SIGNATURE BLOCKS ──
-add_section_title("SIGNATURE BLOCKS", "FIRMAS")
+# Signatures
+add_section_title("SIGNATURES", "FIRMAS")
+add_signature_block("BROKER A — Referring Brokerage / Representante Corredor A")
 add_signature_block(
-    "BROKER A — Referring Brokerage Representative / Representante Corredor A"
-)
-add_signature_block(
-    "BROKER B — Megagestión Spain Representative / Representante Corredor B",
+    "BROKER B — Megagestión / Representante Corredor B",
     name="José Martínez Sánchez",
     role="Managing Broker / Corredor de la Oficina"
 )
 
-# ── FOOTER ──
-p_footer = doc.add_paragraph()
-p_footer.alignment = WD_ALIGN_PARAGRAPH.CENTER
-p_footer.paragraph_format.space_before = Pt(24)
-pPr = p_footer._p.get_or_add_pPr()
-pBdr = parse_xml(
-    '<w:pBdr %s>'
-    '<w:top w:val="single" w:sz="4" w:space="4" w:color="DEE2E6"/>'
-    '</w:pBdr>' % nsdecls('w')
-)
-pPr.append(pBdr)
-rf = p_footer.add_run(
+add_footer_text(
     "Megagestión Servicios Inmobiliarios • Carrer Conrado del Campo 16, 03204, Elche (Alicante), Spain\n"
     "CIF: B-54829767 • jose.martinez@remax.es • +34 966 665 651\n"
     "© 2026 Megagestión Servicios Inmobiliarios. All Rights Reserved."
 )
-rf.font.size = Pt(7.5)
-rf.font.color.rgb = GREY
 
-# ── SAVE ──
+# ══════════════════════════════════════════════
+#  PAGE 2 — ANNEX: INDIVIDUAL CLIENT REFERRAL (compact – fits on 1 page)
+# ══════════════════════════════════════════════
+
+doc.add_page_break()
+
+# Compact header
+table = doc.add_table(rows=1, cols=2)
+table.alignment = WD_TABLE_ALIGNMENT.CENTER
+table.columns[0].width = Inches(2.2)
+table.columns[1].width = Inches(4.3)
+cl = table.cell(0, 0)
+cl.vertical_alignment = 1
+p = cl.paragraphs[0]
+if os.path.exists(LOGO_PATH):
+    run = p.add_run()
+    run.add_picture(LOGO_PATH, width=Inches(1.3))
+else:
+    run = p.add_run("RE/MAX Inmomás")
+    run.bold = True; run.font.size = Pt(14); run.font.color.rgb = REMAX_BLUE
+
+cr = table.cell(0, 1)
+cr.vertical_alignment = 1
+p1 = cr.paragraphs[0]
+p1.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+r1 = p1.add_run("ANNEX / ANEXO")
+r1.bold = True; r1.font.size = Pt(12); r1.font.color.rgb = REMAX_BLUE
+p2 = cr.add_paragraph()
+p2.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+r2 = p2.add_run("Individual Client Referral / Ficha de Referido Individual")
+r2.font.size = Pt(8); r2.font.color.rgb = GREY
+remove_borders(table)
+
+# Thin blue line
+p_line = doc.add_paragraph()
+p_line.paragraph_format.space_before = Pt(1)
+p_line.paragraph_format.space_after  = Pt(4)
+pPr = p_line._p.get_or_add_pPr()
+pBdr = parse_xml(
+    '<w:pBdr %s>'
+    '<w:bottom w:val="single" w:sz="4" w:space="1" w:color="003DA5"/>'
+    '</w:pBdr>' % nsdecls('w')
+)
+pPr.append(pBdr)
+
+# Ref number + date + master agreement on single line
+p_ref = doc.add_paragraph()
+p_ref.paragraph_format.space_after = Pt(3)
+r_ref = p_ref.add_run(
+    "Referral # / Nº: ______________    Date / Fecha: ______________    "
+    "Master Agreement date / Fecha Acuerdo Marco: ____/____/________"
+)
+r_ref.font.size = Pt(8)
+r_ref.font.color.rgb = REMAX_BLUE
+r_ref.bold = True
+
+# Short note
+p_note = doc.add_paragraph()
+p_note.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+p_note.paragraph_format.space_after = Pt(5)
+r_note = p_note.add_run(
+    "This Annex is subject to the Master Referral Agreement. The referral is protected for 24 months. / "
+    "Este Anexo está sujeto al Acuerdo Marco. El referido queda protegido durante 24 meses."
+)
+r_note.font.size = Pt(7.5)
+r_note.font.color.rgb = GREY
+r_note.italic = True
+
+
+def add_compact_section(title):
+    p = doc.add_paragraph()
+    p.paragraph_format.space_before = Pt(6)
+    p.paragraph_format.space_after  = Pt(2)
+    r = p.add_run(title)
+    r.bold = True; r.font.size = Pt(9); r.font.color.rgb = REMAX_BLUE
+
+
+def create_compact_table():
+    t = doc.add_table(rows=0, cols=2)
+    t.columns[0].width = Inches(1.8)
+    t.columns[1].width = Inches(4.7)
+    return t
+
+
+def add_compact_row(t, label, value=""):
+    row = t.add_row()
+    p0 = row.cells[0].paragraphs[0]
+    p0.paragraph_format.space_after = Pt(0)
+    p0.paragraph_format.space_before = Pt(0)
+    r0 = p0.add_run(label)
+    r0.bold = True; r0.font.size = Pt(8); r0.font.color.rgb = CHARCOAL
+
+    p1 = row.cells[1].paragraphs[0]
+    p1.paragraph_format.space_after = Pt(0)
+    p1.paragraph_format.space_before = Pt(0)
+    r1 = p1.add_run(value)
+    r1.font.size = Pt(8); r1.font.color.rgb = CHARCOAL
+
+
+# Referring Agent
+add_compact_section("Referring Agent / Agente Referente (US/Canada)")
+t3 = create_compact_table()
+add_compact_row(t3, "Name / Nombre:")
+add_compact_row(t3, "License # / Licencia:")
+add_compact_row(t3, "Email / Correo:")
+add_compact_row(t3, "Phone / Teléfono:")
+add_compact_row(t3, "Brokerage / Agencia:")
+shade_table(t3)
+
+# Receiving Agent
+add_compact_section("Receiving Agent / Agente Receptor (Spain)")
+t4 = create_compact_table()
+add_compact_row(t4, "Name / Nombre:")
+add_compact_row(t4, "Email / Correo:")
+add_compact_row(t4, "Phone / Teléfono:")
+add_compact_row(t4, "Office / Oficina:", "RE/MAX Inmomás")
+shade_table(t4)
+
+# Prospect
+add_compact_section("Prospect / Cliente Referido")
+t5 = create_compact_table()
+add_compact_row(t5, "Full Name / Nombre:")
+add_compact_row(t5, "Email / Correo:")
+add_compact_row(t5, "Phone / Teléfono:")
+add_compact_row(t5, "Region / Región:", "Alicante Province / Costa Blanca")
+add_compact_row(t5, "Budget / Presupuesto:")
+add_compact_row(t5, "Property Type / Tipo:")
+add_compact_row(t5, "Notes / Notas:")
+shade_table(t5)
+
+# Referral fee — inline
+p_fee = doc.add_paragraph()
+p_fee.paragraph_format.space_before = Pt(6)
+p_fee.paragraph_format.space_after  = Pt(3)
+r_ft = p_fee.add_run("Referral Fee / Comisión: ")
+r_ft.bold = True; r_ft.font.size = Pt(8.5); r_ft.font.color.rgb = REMAX_BLUE
+r_fv = p_fee.add_run("As per Master Agreement: 25% / Según Acuerdo Marco: 25%   ")
+r_fv.font.size = Pt(8.5)
+r_fm = p_fee.add_run("☐ Modified / Modificado: ________ %")
+r_fm.font.size = Pt(8); r_fm.font.color.rgb = GREY
+
+# Compact signature blocks — side by side in a table
+sig_table = doc.add_table(rows=4, cols=2)
+sig_table.columns[0].width = Inches(3.25)
+sig_table.columns[1].width = Inches(3.25)
+
+# Headers
+for i, title in enumerate([
+    "Broker A Representative / Representante Corredor A",
+    "Broker B Representative / Representante Corredor B",
+]):
+    p = sig_table.cell(0, i).paragraphs[0]
+    p.paragraph_format.space_before = Pt(8)
+    p.paragraph_format.space_after  = Pt(0)
+    r = p.add_run(title)
+    r.bold = True; r.font.size = Pt(7.5); r.font.color.rgb = REMAX_BLUE
+
+# Signature lines
+for i in range(2):
+    p = sig_table.cell(1, i).paragraphs[0]
+    p.paragraph_format.space_before = Pt(16)
+    p.paragraph_format.space_after  = Pt(0)
+    pPr = p._p.get_or_add_pPr()
+    pBdr = parse_xml(
+        '<w:pBdr %s>'
+        '<w:bottom w:val="single" w:sz="4" w:space="1" w:color="212529"/>'
+        '</w:pBdr>' % nsdecls('w')
+    )
+    pPr.append(pBdr)
+
+# Name fields
+for i, name_val in enumerate(["", "José Martínez Sánchez"]):
+    p = sig_table.cell(2, i).paragraphs[0]
+    p.paragraph_format.space_after = Pt(0)
+    r = p.add_run("Name / Nombre: ")
+    r.font.size = Pt(8); r.font.color.rgb = GREY
+    if name_val:
+        rv = p.add_run(name_val)
+        rv.bold = True; rv.font.size = Pt(8); rv.font.color.rgb = CHARCOAL
+
+# Date fields
+for i in range(2):
+    p = sig_table.cell(3, i).paragraphs[0]
+    p.paragraph_format.space_after = Pt(0)
+    r = p.add_run("Date / Fecha: ____________________")
+    r.font.size = Pt(8); r.font.color.rgb = GREY
+
+remove_borders(sig_table)
+
+# Compact footer
+p_foot = doc.add_paragraph()
+p_foot.alignment = WD_ALIGN_PARAGRAPH.CENTER
+p_foot.paragraph_format.space_before = Pt(10)
+pPr = p_foot._p.get_or_add_pPr()
+pBdr = parse_xml(
+    '<w:pBdr %s>'
+    '<w:top w:val="single" w:sz="4" w:space="3" w:color="DEE2E6"/>'
+    '</w:pBdr>' % nsdecls('w')
+)
+pPr.append(pBdr)
+rf = p_foot.add_run(
+    "Megagestión Servicios Inmobiliarios • CIF: B-54829767 • jose.martinez@remax.es • +34 966 665 651\n"
+    "This Annex is an integral part of the Master Referral Agreement / "
+    "Este Anexo forma parte integral del Acuerdo Marco de Referidos."
+)
+rf.font.size = Pt(7); rf.font.color.rgb = GREY
+
+# ── Save ──
 doc.save(OUTPUT_PATH)
 print(f"✅ Word document saved to: {OUTPUT_PATH}")

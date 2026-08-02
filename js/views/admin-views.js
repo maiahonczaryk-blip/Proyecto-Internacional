@@ -89,9 +89,14 @@
           <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${App.utils.escapeHtml(lead.phone || '—')}</td>
           <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">${agentBadge}</td>
           <td style="padding: 1rem; border-bottom: 1px solid #e5e7eb;">
-            <button class="btn btn-primary btn-sm" onclick="App.views.admin.showLeadAssignmentModal('${lead.id}')">
-              ${actionBtnText}
-            </button>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <button class="btn btn-primary btn-sm" onclick="App.views.admin.showLeadAssignmentModal('${lead.id}')">
+                ${actionBtnText}
+              </button>
+              <button class="btn btn-sm" onclick="App.views.admin.handleDeleteLead('${lead.id}')" title="Delete lead" style="background: rgba(220, 38, 38, 0.08); color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.2); padding: 6px 10px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;">
+                🗑️
+              </button>
+            </div>
           </td>
         </tr>
       `;
@@ -906,6 +911,61 @@
     }
   }
 
+  /* ── Delete Dossier Lead ── */
+  async function handleDeleteLead(leadId) {
+    try {
+      const lead = allLeads.find(l => l.id === leadId);
+      if (!lead) return;
+
+      const leadName = `${lead.firstName} ${lead.lastName}`;
+
+      App.utils.showModal({
+        title: `<span class="lang-en">Delete Lead</span><span class="lang-es">Eliminar Lead</span>`,
+        body: `
+          <div style="text-align: center; padding: 12px 0;">
+            <div style="font-size: 2.5rem; margin-bottom: 12px;">⚠️</div>
+            <p style="font-size: 0.95rem; color: #334155; margin: 0 0 8px;">
+              <span class="lang-en">Are you sure you want to delete the lead</span>
+              <span class="lang-es">¿Estás seguro de que deseas eliminar el lead</span>
+              <strong>${App.utils.escapeHtml(leadName)}</strong>?
+            </p>
+            <p style="font-size: 0.8rem; color: #94a3b8; margin: 0;">
+              <span class="lang-en">This action cannot be undone.</span>
+              <span class="lang-es">Esta acción no se puede deshacer.</span>
+            </p>
+          </div>
+        `,
+        footer: `
+          <button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">
+            <span class="lang-en">Cancel</span>
+            <span class="lang-es">Cancelar</span>
+          </button>
+          <button class="btn btn-sm" onclick="App.views.admin.confirmDeleteLead('${lead.id}')" style="background: #dc2626; color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
+            <span class="lang-en">Delete</span>
+            <span class="lang-es">Eliminar</span>
+          </button>
+        `
+      });
+    } catch (err) {
+      console.error(err);
+      App.utils.showToast('Error processing request.', 'error');
+    }
+  }
+
+  async function confirmDeleteLead(leadId) {
+    try {
+      await App.auth.deleteDossierLead(leadId);
+      allLeads = allLeads.filter(l => l.id !== leadId);
+      setTextById('admin-stat-leads', allLeads.length);
+      renderDossierLeads(allLeads);
+      App.utils.closeModal();
+      App.utils.showToast('Lead deleted successfully.', 'success');
+    } catch (err) {
+      console.error(err);
+      App.utils.showToast('Error deleting lead.', 'error');
+    }
+  }
+
   async function handleAssignLeadAgent(leadId) {
     try {
       const select = document.getElementById('assign-lead-agent-select');
@@ -1127,7 +1187,9 @@
     handleAssignAgent,
     handleSaveFinancials,
     showLeadAssignmentModal,
-    handleAssignLeadAgent
+    handleAssignLeadAgent,
+    handleDeleteLead,
+    confirmDeleteLead
   };
 
 })();
