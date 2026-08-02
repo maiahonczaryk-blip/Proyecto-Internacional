@@ -16,7 +16,14 @@
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="icon" type="image/png" href="Globo_CMYK.png">
+  <style>
+    @keyframes webinar-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .45; transform: scale(1.4); }
+    }
+  </style>
 </head>
+
 <body class="lang-en">
 
   <!-- ===================== MAIN NAVIGATION ===================== -->
@@ -57,6 +64,10 @@
           <span class="lang-es">FAQ</span>
           <span class="lang-fr">FAQ</span>
           <span class="lang-en-ca">FAQ</span>
+        </a>
+        <a href="#webinar" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#003f99,#cc0000);color:#fff!important;padding:6px 14px;border-radius:20px;font-weight:700;font-size:.82rem;letter-spacing:.02em;white-space:nowrap;box-shadow:0 2px 10px rgba(0,63,153,.3);transition:box-shadow .2s,transform .2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,63,153,.5)';this.style.transform='translateY(-1px)';" onmouseout="this.style.boxShadow='0 2px 10px rgba(0,63,153,.3)';this.style.transform='';">
+          <span style="width:7px;height:7px;border-radius:50%;background:#ff4444;flex-shrink:0;box-shadow:0 0 6px #ff4444;animation:webinar-pulse 1.5s ease-in-out infinite;"></span>
+          <span>🎙️ Webinar</span>
         </a>
         <a href="#login" class="btn btn-outline btn-sm nav-cta" id="nav-login-btn">
           <span class="lang-en">Partner Login</span>
@@ -1638,6 +1649,11 @@
       <span class="lang-fr">Agents</span>
       <span class="lang-en-ca">Agents</span>
     </a>
+    <a href="#webinar" class="bnav-item" id="bnav-webinar" data-section="webinar" style="position:relative;">
+      <span style="position:absolute;top:5px;right:14px;width:7px;height:7px;background:#ff4444;border-radius:50%;box-shadow:0 0 5px #ff4444;animation:webinar-pulse 1.5s ease-in-out infinite;"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      <span>Webinar</span>
+    </a>
     <a href="#login" class="bnav-item" id="bnav-login" data-section="login">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span class="lang-en">Login</span>
@@ -1646,6 +1662,7 @@
       <span class="lang-en-ca">Login</span>
     </a>
   </nav>
+
 
 </body>
 </html>
