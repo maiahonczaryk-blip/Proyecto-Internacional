@@ -408,3 +408,25 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
     </div>
   `;
 };
+
+/* ---- Development Environment Indicator ---- */
+(function initDevBadge() {
+  function createDevBadge() {
+    if (document.getElementById('dev-environment-badge')) return;
+    const badge = document.createElement('div');
+    badge.id = 'dev-environment-badge';
+    badge.className = 'dev-environment-badge';
+    badge.setAttribute('aria-label', 'Development Environment Indicator');
+    badge.innerHTML = `
+      <span class="dev-badge-icon">!</span>
+      <span class="dev-badge-text">DEVELOPMENT</span>
+    `;
+    document.body.appendChild(badge);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', createDevBadge);
+  } else {
+    createDevBadge();
+  }
+})();
+
