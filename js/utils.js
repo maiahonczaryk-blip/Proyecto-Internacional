@@ -411,8 +411,34 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
 
 /* ---- Development Environment Indicator ---- */
 (function initDevBadge() {
+  function isDevEnvironment() {
+    const host = (window.location.hostname || '').toLowerCase();
+    const search = (window.location.search || '').toLowerCase();
+    const hash = (window.location.hash || '').toLowerCase();
+
+    // 1. Localhost or local network IP addresses
+    if (host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host.endsWith('.local') || host.startsWith('192.168.') || host.startsWith('10.') || host.startsWith('172.')) {
+      return true;
+    }
+
+    // 2. Hostname contains development keywords or Vercel preview domain
+    if (host.includes('dev') || host.includes('development') || host.includes('preview') || host.includes('stage') || host.includes('staging') || host.includes('vercel.app')) {
+      return true;
+    }
+
+    // 3. Force dev badge via URL query param or hash (e.g. ?env=dev or ?dev=true or #dev)
+    if (search.includes('env=dev') || search.includes('dev=true') || hash.includes('env=dev') || hash.includes('dev=true')) {
+      return true;
+    }
+
+    // Production environment -> return false (Never render on main/production domain)
+    return false;
+  }
+
   function createDevBadge() {
+    if (!isDevEnvironment()) return; // Never display in production!
     if (document.getElementById('dev-environment-badge')) return;
+
     const badge = document.createElement('div');
     badge.id = 'dev-environment-badge';
     badge.className = 'dev-environment-badge';
@@ -423,10 +449,12 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
     `;
     document.body.appendChild(badge);
   }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', createDevBadge);
   } else {
     createDevBadge();
   }
 })();
+
 
