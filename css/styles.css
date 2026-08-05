@@ -73,6 +73,30 @@ html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  /* Scrollbar — thin & styled globally (Chrome/Edge Windows) */
+  scrollbar-width: thin;
+  scrollbar-color: #CBD5E1 transparent;
+}
+
+/* Styled scrollbar for Chromium/Edge on Windows */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+  background-clip: padding-box;
 }
 
 body {
@@ -82,6 +106,7 @@ body {
   font-weight: 400;
   line-height: 1.7;
   overflow-x: hidden;
+  text-rendering: optimizeLegibility;
 }
 
 a {
@@ -7231,5 +7256,97 @@ body.nav-open {
   .dev-environment-badge .dev-badge-text {
     font-size: 10px;
   }
+}
+
+
+/* ============================================
+   WINDOWS / CROSS-PLATFORM OPTIMISATIONS
+   Fixes for Chrome, Edge & Firefox on Windows
+   ============================================ */
+
+/* -- 1. Backdrop-filter fallback for Firefox on Windows --
+   Firefox does not support backdrop-filter. Give affected
+   elements an opaque background so they stay readable.     */
+@supports not (backdrop-filter: blur(1px)) {
+  .navbar.scrolled {
+    background: rgba(255, 255, 255, 0.98) !important;
+  }
+
+  .lang-dropdown {
+    background: rgba(255, 255, 255, 0.99) !important;
+  }
+}
+
+/* -- 2. Text-gradient safe fallback --
+   On Firefox/Windows -webkit-text-fill-color can silently
+   fail, leaving invisible text. Fallback ensures solid color. */
+.text-gradient-red {
+  color: var(--red);
+}
+.text-gradient-blue {
+  color: var(--blue);
+}
+/* Re-apply gradient only where webkit supports it */
+@supports (-webkit-text-fill-color: transparent) {
+  .text-gradient-red {
+    background: var(--gradient-red);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-blue {
+    background: var(--gradient-blue);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* -- 3. Letter-spacing fine-tune for Windows ClearType --
+   macOS renders tight negative tracking cleanly; Windows
+   can look cramped. Ease letter-spacing for large headings. */
+.hero-title {
+  letter-spacing: -0.4px;
+}
+.section-title {
+  letter-spacing: -0.1px;
+}
+
+/* -- 4. Shadow intensity boost for Windows displays --
+   Large shadows look washed out on some Windows monitors;
+   slightly increase their opacity via override.            */
+:root {
+  --shadow-sm: 0 2px 8px rgba(0, 67, 255, 0.06);
+  --shadow-md: 0 8px 24px rgba(0, 67, 255, 0.10), 0 2px 8px rgba(0, 67, 255, 0.06);
+  --shadow-lg: 0 16px 40px rgba(0, 67, 255, 0.14), 0 8px 16px rgba(0, 67, 255, 0.08);
+  --shadow-xl: 0 24px 60px rgba(0, 67, 255, 0.18), 0 12px 24px rgba(0, 67, 255, 0.10);
+}
+
+/* -- 5. Image rendering on Windows high-DPI screens --   */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: auto;
+}
+
+/* -- 6. Button & input rendering uniformity --
+   Prevent Windows from adding system styles on buttons/inputs */
+button,
+input,
+select,
+textarea {
+  font-family: 'Outfit', sans-serif;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* -- 7. Focus visible outline for Windows keyboard navigation -- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
