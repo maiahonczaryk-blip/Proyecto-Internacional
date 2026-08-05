@@ -114,25 +114,72 @@
       <div class="nav-right">
         <div class="lang-selector-wrapper" id="lang-selector-wrapper">
           <button class="lang-selector-btn" id="lang-selector-btn" aria-label="Sélectionner la langue / Select language">
-            <span class="lang-flag" id="lang-flag">🇨🇦</span>
+            <!-- Active language flag: updated by CSS class on body -->
+            <span class="lang-flag-svg" id="lang-flag" aria-hidden="true">
+              <!-- US (default, shown when lang-en) -->
+              <svg class="flag-svg flag-en" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                <rect width="20" height="14" fill="#B22234"/>
+                <rect y="1.08" width="20" height="1.08" fill="#fff"/><rect y="3.23" width="20" height="1.08" fill="#fff"/><rect y="5.38" width="20" height="1.08" fill="#fff"/><rect y="7.54" width="20" height="1.08" fill="#fff"/><rect y="9.69" width="20" height="1.08" fill="#fff"/><rect y="11.85" width="20" height="1.08" fill="#fff"/>
+                <rect width="8" height="7.54" fill="#3C3B6E"/>
+                <circle cx="1.4" cy="1.3" r="0.5" fill="#fff"/><circle cx="2.8" cy="1.3" r="0.5" fill="#fff"/><circle cx="4.2" cy="1.3" r="0.5" fill="#fff"/><circle cx="5.6" cy="1.3" r="0.5" fill="#fff"/><circle cx="7" cy="1.3" r="0.5" fill="#fff"/>
+                <circle cx="2.1" cy="2.5" r="0.5" fill="#fff"/><circle cx="3.5" cy="2.5" r="0.5" fill="#fff"/><circle cx="4.9" cy="2.5" r="0.5" fill="#fff"/><circle cx="6.3" cy="2.5" r="0.5" fill="#fff"/>
+                <circle cx="1.4" cy="3.7" r="0.5" fill="#fff"/><circle cx="2.8" cy="3.7" r="0.5" fill="#fff"/><circle cx="4.2" cy="3.7" r="0.5" fill="#fff"/><circle cx="5.6" cy="3.7" r="0.5" fill="#fff"/><circle cx="7" cy="3.7" r="0.5" fill="#fff"/>
+                <circle cx="2.1" cy="4.9" r="0.5" fill="#fff"/><circle cx="3.5" cy="4.9" r="0.5" fill="#fff"/><circle cx="4.9" cy="4.9" r="0.5" fill="#fff"/><circle cx="6.3" cy="4.9" r="0.5" fill="#fff"/>
+                <circle cx="1.4" cy="6.1" r="0.5" fill="#fff"/><circle cx="2.8" cy="6.1" r="0.5" fill="#fff"/><circle cx="4.2" cy="6.1" r="0.5" fill="#fff"/><circle cx="5.6" cy="6.1" r="0.5" fill="#fff"/><circle cx="7" cy="6.1" r="0.5" fill="#fff"/>
+              </svg>
+              <!-- Spain -->
+              <svg class="flag-svg flag-es" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                <rect width="20" height="14" fill="#AA151B"/>
+                <rect y="3.5" width="20" height="7" fill="#F1BF00"/>
+              </svg>
+              <!-- Canada (FR + EN-CA) -->
+              <svg class="flag-svg flag-fr flag-en-ca" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                <rect width="20" height="14" fill="#fff"/>
+                <rect width="5" height="14" fill="#FF0000"/>
+                <rect x="15" width="5" height="14" fill="#FF0000"/>
+                <polygon points="10,2.5 10.8,5 13.5,5 11.4,6.6 12.2,9.1 10,7.5 7.8,9.1 8.6,6.6 6.5,5 9.2,5" fill="#FF0000"/>
+              </svg>
+            </span>
             <span class="lang-code" id="lang-code">EN</span>
             <svg class="lang-chevron" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 4 5 7 8 4"/></svg>
           </button>
           <div class="lang-dropdown" id="lang-dropdown">
             <button class="lang-dropdown-item" data-lang="en" id="lang-option-en">
-              <span class="item-flag">🇺🇸</span>
+              <svg class="item-flag" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="22" height="15" aria-hidden="true" style="border-radius:2px;flex-shrink:0;">
+                <rect width="20" height="14" fill="#B22234"/>
+                <rect y="1.08" width="20" height="1.08" fill="#fff"/><rect y="3.23" width="20" height="1.08" fill="#fff"/><rect y="5.38" width="20" height="1.08" fill="#fff"/><rect y="7.54" width="20" height="1.08" fill="#fff"/><rect y="9.69" width="20" height="1.08" fill="#fff"/><rect y="11.85" width="20" height="1.08" fill="#fff"/>
+                <rect width="8" height="7.54" fill="#3C3B6E"/>
+                <circle cx="1.4" cy="1.3" r="0.5" fill="#fff"/><circle cx="2.8" cy="1.3" r="0.5" fill="#fff"/><circle cx="4.2" cy="1.3" r="0.5" fill="#fff"/><circle cx="5.6" cy="1.3" r="0.5" fill="#fff"/><circle cx="7" cy="1.3" r="0.5" fill="#fff"/>
+                <circle cx="2.1" cy="2.5" r="0.5" fill="#fff"/><circle cx="3.5" cy="2.5" r="0.5" fill="#fff"/><circle cx="4.9" cy="2.5" r="0.5" fill="#fff"/><circle cx="6.3" cy="2.5" r="0.5" fill="#fff"/>
+                <circle cx="1.4" cy="3.7" r="0.5" fill="#fff"/><circle cx="2.8" cy="3.7" r="0.5" fill="#fff"/><circle cx="4.2" cy="3.7" r="0.5" fill="#fff"/><circle cx="5.6" cy="3.7" r="0.5" fill="#fff"/><circle cx="7" cy="3.7" r="0.5" fill="#fff"/>
+                <circle cx="2.1" cy="4.9" r="0.5" fill="#fff"/><circle cx="3.5" cy="4.9" r="0.5" fill="#fff"/><circle cx="4.9" cy="4.9" r="0.5" fill="#fff"/><circle cx="6.3" cy="4.9" r="0.5" fill="#fff"/>
+                <circle cx="1.4" cy="6.1" r="0.5" fill="#fff"/><circle cx="2.8" cy="6.1" r="0.5" fill="#fff"/><circle cx="4.2" cy="6.1" r="0.5" fill="#fff"/><circle cx="5.6" cy="6.1" r="0.5" fill="#fff"/><circle cx="7" cy="6.1" r="0.5" fill="#fff"/>
+              </svg>
               <span class="item-text"><span class="item-name">English</span><span class="item-region">United States</span></span>
             </button>
             <button class="lang-dropdown-item" data-lang="es" id="lang-option-es">
-              <span class="item-flag">🇪🇸</span>
+              <svg class="item-flag" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="22" height="15" aria-hidden="true" style="border-radius:2px;flex-shrink:0;">
+                <rect width="20" height="14" fill="#AA151B"/>
+                <rect y="3.5" width="20" height="7" fill="#F1BF00"/>
+              </svg>
               <span class="item-text"><span class="item-name">Español</span><span class="item-region">España</span></span>
             </button>
             <button class="lang-dropdown-item" data-lang="fr" id="lang-option-fr">
-              <span class="item-flag">🇨🇦</span>
+              <svg class="item-flag" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="22" height="15" aria-hidden="true" style="border-radius:2px;flex-shrink:0;">
+                <rect width="20" height="14" fill="#fff"/>
+                <rect width="5" height="14" fill="#FF0000"/>
+                <rect x="15" width="5" height="14" fill="#FF0000"/>
+                <polygon points="10,2.5 10.8,5 13.5,5 11.4,6.6 12.2,9.1 10,7.5 7.8,9.1 8.6,6.6 6.5,5 9.2,5" fill="#FF0000"/>
+              </svg>
               <span class="item-text"><span class="item-name">Français</span><span class="item-region">Canada</span></span>
             </button>
             <button class="lang-dropdown-item" data-lang="en-ca" id="lang-option-en-ca">
-              <span class="item-flag">🇨🇦</span>
+              <svg class="item-flag" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="22" height="15" aria-hidden="true" style="border-radius:2px;flex-shrink:0;">
+                <rect width="20" height="14" fill="#fff"/>
+                <rect width="5" height="14" fill="#FF0000"/>
+                <rect x="15" width="5" height="14" fill="#FF0000"/>
+                <polygon points="10,2.5 10.8,5 13.5,5 11.4,6.6 12.2,9.1 10,7.5 7.8,9.1 8.6,6.6 6.5,5 9.2,5" fill="#FF0000"/>
+              </svg>
               <span class="item-text"><span class="item-name">English</span><span class="item-region">Canada</span></span>
             </button>
           </div>
@@ -1345,7 +1392,7 @@
             <div style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.55);font-size:.82rem;">
               <span style="color:#fbbf24;">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</span>
               <span class="lang-en">Rated 4.9/5 by partners</span>
-              <span class="lang-es">Valorado 4,9/5 por socios</span>
+              <span class="lang-es">Valorado 4,9/5 por partners</span>
               <span class="lang-fr">Not&eacute; 4,9/5 par les partenaires</span>
               <span class="lang-en-ca">Rated 4.9/5 by partners</span>
             </div>
@@ -1452,7 +1499,7 @@
             </h2>
             <p style="color:rgba(255,255,255,.48);font-size:.88rem;max-width:500px;margin:0 auto;">
               <span class="lang-en">In just 60 minutes, learn the exact system our partners use to close international deals from their home office.</span>
-              <span class="lang-es">En solo 60 minutos, aprende el sistema exacto que usan nuestros socios para cerrar acuerdos internacionales desde su oficina.</span>
+              <span class="lang-es">En solo 60 minutos, aprende el sistema exacto que usan nuestros partners para cerrar acuerdos internacionales desde su oficina.</span>
               <span class="lang-fr">En 60 minutes, d&eacute;couvrez le syst&egrave;me exact utilis&eacute; par nos partenaires pour conclure des transactions internationales depuis leur bureau.</span>
               <span class="lang-en-ca">In just 60 minutes, learn the exact system our partners use to close international deals from their home office.</span>
             </p>
@@ -1487,7 +1534,7 @@
             <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;display:flex;gap:14px;align-items:flex-start;transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(91,173,255,.3)';" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.08)';">
               <div style="font-size:1.8rem;flex-shrink:0;">&#x1F91D;</div>
               <div>
-                <div style="font-weight:700;color:#fff;font-size:.92rem;margin-bottom:5px;"><span class="lang-en">Become a Certified Partner</span><span class="lang-es">Conv&eacute;rtete en Socio Certificado</span><span class="lang-fr">Devenez Partenaire Certifi&eacute;</span><span class="lang-en-ca">Become a Certified Partner</span></div>
+                <div style="font-weight:700;color:#fff;font-size:.92rem;margin-bottom:5px;"><span class="lang-en">Become a Certified Partner</span><span class="lang-es">Conv&eacute;rtete en Partner Certificado</span><span class="lang-fr">Devenez Partenaire Certifi&eacute;</span><span class="lang-en-ca">Become a Certified Partner</span></div>
                 <div style="color:rgba(255,255,255,.42);font-size:.8rem;line-height:1.55;"><span class="lang-en">Join our exclusive network. Get your referral link, dashboard access, and co-branded materials.</span><span class="lang-es">&Uacute;nete a nuestra red exclusiva. Obt&eacute;n tu enlace de referido, acceso al panel y materiales de marca compartida.</span><span class="lang-fr">Rejoignez notre r&eacute;seau exclusif. Obtenez votre lien de r&eacute;f&eacute;rence, acc&egrave;s au tableau de bord et mat&eacute;riaux co-brand&eacute;s.</span><span class="lang-en-ca">Join our exclusive network. Get your referral link, dashboard access, and co-branded materials.</span></div>
               </div>
             </div>

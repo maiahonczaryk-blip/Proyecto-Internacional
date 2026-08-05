@@ -383,10 +383,19 @@ body.lang-en-ca .lang-fr { display: none; }
   color: var(--text-primary);
 }
 
-.lang-selector-btn .lang-flag {
-  font-size: 1rem;
-  line-height: 1;
+/* SVG Flag button: show only the correct flag per active language */
+.lang-flag-svg .flag-svg {
+  display: none;
+  border-radius: 2px;
+  vertical-align: middle;
+  flex-shrink: 0;
 }
+body.lang-en   .lang-flag-svg .flag-en    { display: inline-block; }
+body.lang-es   .lang-flag-svg .flag-es    { display: inline-block; }
+body.lang-fr   .lang-flag-svg .flag-fr    { display: inline-block; }
+body.lang-en-ca .lang-flag-svg .flag-en-ca { display: inline-block; }
+/* Default before JS loads: show US flag */
+.lang-flag-svg .flag-en { display: inline-block; }
 
 .lang-selector-btn .lang-code {
   font-size: 0.7rem;
@@ -460,7 +469,11 @@ body.lang-en-ca .lang-fr { display: none; }
 }
 
 .lang-dropdown-item .item-flag {
-  font-size: 1.1rem;
+  width: 22px;
+  height: 15px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  display: block;
 }
 
 .lang-dropdown-item .item-text {

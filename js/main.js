@@ -8,12 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Language Selector (4 idiomas: EN, ES, FR, EN-CA) ──
   const body = document.body;
   let currentLang = 'en';
+  const LANG_STORAGE_KEY = 'remax_lang';
 
   const langConfig = {
-    en:      { flag: '🇺🇸', code: 'EN' },
-    es:      { flag: '🇪🇸', code: 'ES' },
-    fr:      { flag: '🇨🇦', code: 'FR' },
-    'en-ca': { flag: '🇨🇦', code: 'EN-CA' }
+    en:      { code: 'EN' },
+    es:      { code: 'ES' },
+    fr:      { code: 'FR' },
+    'en-ca': { code: 'EN-CA' }
   };
 
   const langSelectorWrapper = document.getElementById('lang-selector-wrapper');
@@ -27,6 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!langConfig[lang]) return;
     currentLang = lang;
 
+    // Persist preference across sessions
+    try { localStorage.setItem(LANG_STORAGE_KEY, lang); } catch(e) {}
+
     // Update body class
     body.classList.remove('lang-en', 'lang-es', 'lang-fr', 'lang-en-ca');
     body.classList.add('lang-' + lang);
@@ -35,8 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const htmlLangMap = { en: 'en', es: 'es', fr: 'fr', 'en-ca': 'en-CA' };
     document.documentElement.lang = htmlLangMap[lang];
 
-    // Update button appearance
-    if (langFlag) langFlag.textContent = langConfig[lang].flag;
+    // Update button appearance (code only — flag handled by CSS span)
     if (langCode) langCode.textContent = langConfig[lang].code;
 
     // Update active state on dropdown items
@@ -71,8 +74,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Initialize with English
-  setLang('en');
+  // Initialize: saved preference → browser language → 'en' fallback
+  (function initLang() {
+    let lang = 'en';
+    try {
+      const saved = localStorage.getItem(LANG_STORAGE_KEY);
+      if (saved && langConfig[saved]) {
+        lang = saved;
+      } else {
+        // Auto-detect from browser language
+        const bl = (navigator.language || navigator.userLanguage || '').toLowerCase();
+        if (bl.startsWith('es')) lang = 'es';
+        else if (bl.startsWith('fr')) lang = 'fr';
+        // en-CA detection: Canadian English or Canadian French
+        if (bl === 'en-ca') lang = 'en-ca';
+        if (bl === 'fr-ca') lang = 'fr';
+      }
+    } catch(e) { lang = 'en'; }
+    setLang(lang);
+  })();
 
   function updateFormPlaceholders(lang) {
     const placeholders = {
