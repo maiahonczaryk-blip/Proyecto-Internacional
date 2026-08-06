@@ -31,6 +31,37 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
+      // Check agreement status
+      const agreementStatus = currentUser.agreementStatus || 'none';
+      const warningEl = document.getElementById('realtor-agreement-warning');
+      const hasSigned = (agreementStatus === 'signed');
+      
+      if (warningEl) {
+        if (!hasSigned) {
+          warningEl.style.display = 'block';
+          warningEl.innerHTML = `
+            <div class="glass-card" style="display:flex; align-items:center; gap:1rem; padding:1.25rem; background:#fef3c7; border:1px solid #fde68a; border-radius:12px; text-align:left;">
+              <span style="font-size:2rem;">⚠️</span>
+              <div>
+                <div style="font-weight:700; color:#92400e; font-size:1.05rem;">
+                  <span class="lang-en">Master Referral Agreement Required</span>
+                  <span class="lang-es">Acuerdo de Referido Requerido</span>
+                  <span class="lang-fr">Accord de Référencement Requis</span>
+                  <span class="lang-en-ca">Master Referral Agreement Required</span>
+                </div>
+                <div style="font-size:0.85rem; color:#78350f; margin-top:4px;">
+                  <span class="lang-en">Your partnership is pending execution of the Master Referral Agreement. Please go to <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> to sign and upload it to activate your referral link.</span>
+                  <span class="lang-es">Tu colaboración está pendiente de la firma del Acuerdo de Referido. Ve a <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documentos</a> para firmarlo y subirlo para activar tu enlace.</span>
+                  <span class="lang-fr">Votre partenariat est en attente de signature de l'accord. Veuillez vous rendre dans <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> pour le signer.</span>
+                  <span class="lang-en-ca">Your partnership is pending execution of the Master Referral Agreement. Please go to <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> to sign and upload it to activate your referral link.</span>
+                </div>
+              </div>
+            </div>`;
+        } else {
+          warningEl.style.display = 'none';
+        }
+      }
+
       // Load data scoped to this realtor
       realtorClients     = await App.auth.getClients({ referredBy: currentUser.id });
       realtorCommissions = await App.auth.getCommissions({ realtorId: currentUser.id });
@@ -56,6 +87,11 @@
           linkInput.disabled = true;
           linkInput.style.color = '#9ca3af';
           linkInput.style.fontStyle = 'italic';
+        } else if (!hasSigned) {
+          linkInput.value = 'Enlace pendiente de firmar el Acuerdo / Link pending agreement signature';
+          linkInput.disabled = true;
+          linkInput.style.color = '#e11b22';
+          linkInput.style.fontStyle = 'italic';
         } else {
           linkInput.value = referralLink;
           linkInput.disabled = false;
@@ -67,7 +103,7 @@
       // Copy button handler
       const copyBtn = document.getElementById('realtor-dash-copy-link');
       if (copyBtn) {
-        if (isPending) {
+        if (isPending || !hasSigned) {
           copyBtn.disabled = true;
           copyBtn.style.opacity = '0.5';
           copyBtn.style.cursor = 'not-allowed';

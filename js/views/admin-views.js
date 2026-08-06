@@ -1218,21 +1218,27 @@
       const how  = HOW_LABELS[r.howHeard] || r.howHeard || '—';
       const ref  = r.referrerName ? App.utils.escapeHtml(r.referrerName) : '—';
 
-      // Referral link column — auto-detected from agent's link
-      let agentLinkCell = '—';
+      // Tagged agent column — auto-detected link or selected dropdown agent
+      let agentTagCell = '—';
       if (r.agentReferrerName || r.referralCode) {
         const agentName = r.agentReferrerName ? App.utils.escapeHtml(r.agentReferrerName) : '';
         const code      = r.referralCode      ? App.utils.escapeHtml(r.referralCode)      : '';
         const roleBadge = r.agentReferrerRole
           ? `<span style="background:rgba(0,67,255,.08);color:var(--primary);border-radius:12px;padding:1px 7px;font-size:.72rem;margin-left:4px;">${r.agentReferrerRole}</span>`
           : '';
-        agentLinkCell = `
+        agentTagCell = `
           <div style="display:flex;align-items:center;gap:6px;">
-            <span style="color:#16a34a;font-size:1rem;" title="Via referral link">✅</span>
+            <span style="color:#16a34a;font-size:1rem;" title="Via referral link">🔗</span>
             <div>
-              <div style="font-weight:600;font-size:.83rem;">${agentName}${roleBadge}</div>
+              <div style="font-weight:600;font-size:.83rem;color:var(--primary);">${agentName}${roleBadge}</div>
               ${code ? `<div style="font-size:.74rem;color:#6b7280;font-family:monospace;">${code}</div>` : ''}
             </div>
+          </div>`;
+      } else if (r.howHeard === 'agent' && r.referrerName) {
+        agentTagCell = `
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#3b82f6;font-size:1rem;" title="Via dropdown selection">👤</span>
+            <div style="font-weight:600;font-size:.83rem;color:#3b82f6;">${App.utils.escapeHtml(r.referrerName)}</div>
           </div>`;
       }
 
@@ -1249,7 +1255,7 @@
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.85rem;">${App.utils.escapeHtml(r.state || '—')}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${how}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${ref}</td>
-          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">${agentLinkCell}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">${agentTagCell}</td>
         </tr>`;
     }).join('');
   }
@@ -1275,26 +1281,33 @@
         'Agency','Country','State / Province',
         'How They Heard','Referring Agent (self-reported)',
         'Agent Via Link','Referral Code','Agent Role',
-        'Source','GDPR Consent'
+        'Tagged Agent','Source','GDPR Consent'
       ];
 
-      const rows = registrations.map(r => [
-        r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-US') : '',
-        r.firstName || '',
-        r.lastName || '',
-        r.email || '',
-        r.phone || '',
-        r.agency || '',
-        r.country || '',
-        r.state || '',
-        HOW_LABELS[r.howHeard] || r.howHeard || '',
-        r.referrerName || '',
-        r.agentReferrerName || '',
-        r.referralCode || '',
-        r.agentReferrerRole || '',
-        r.source || 'direct',
-        r.gdprConsent ? 'Yes' : 'No'
-      ]);
+      const rows = registrations.map(r => {
+        const taggedAgent = r.agentReferrerName 
+          ? r.agentReferrerName 
+          : (r.howHeard === 'agent' && r.referrerName ? r.referrerName : '');
+
+        return [
+          r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-US') : '',
+          r.firstName || '',
+          r.lastName || '',
+          r.email || '',
+          r.phone || '',
+          r.agency || '',
+          r.country || '',
+          r.state || '',
+          HOW_LABELS[r.howHeard] || r.howHeard || '',
+          r.referrerName || '',
+          r.agentReferrerName || '',
+          r.referralCode || '',
+          r.agentReferrerRole || '',
+          taggedAgent,
+          r.source || 'direct',
+          r.gdprConsent ? 'Yes' : 'No'
+        ];
+      });
 
       const escape = v => '"' + String(v).replace(/"/g, '""') + '"';
       const csvContent = '\uFEFF' + // BOM for Excel UTF-8

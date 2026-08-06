@@ -101,9 +101,73 @@
         `;
       }
 
+      // Render webinar registrations linked to this agent
+      await renderWebinarRegistrations();
+
     } catch (err) {
       console.error('[Agent] initDashboard error:', err);
       App.utils.showToast('Error loading dashboard.', 'error');
+    }
+  }
+
+  /* ── Render Webinar Registrations Linked to Agent ── */
+  async function renderWebinarRegistrations() {
+    const tbody = document.getElementById('agent-webinar-table-body');
+    if (!tbody) return;
+
+    try {
+      const allRegs = await App.auth.getWebinarRegistrations();
+      
+      // Filter registrations linked to this agent
+      const linkedRegs = allRegs.filter(r => {
+        // Direct ID match
+        if (r.agentReferrerId === currentUser.id) return true;
+        
+        // Referral code match
+        if (r.referralCode && currentUser.referralCode && r.referralCode.toUpperCase() === currentUser.referralCode.toUpperCase()) return true;
+        
+        // Name match (from dropdown or manual mention)
+        if (r.howHeard === 'agent' && r.referrerName) {
+          const agentFullName = `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.toLowerCase();
+          const refName = r.referrerName.toLowerCase();
+          if (refName.includes(agentFullName) || agentFullName.includes(refName)) return true;
+          // Match split parts
+          const parts = refName.split('/').map(p => p.trim());
+          for (const p of parts) {
+            if (agentFullName.includes(p) || p.includes(agentFullName)) return true;
+          }
+        }
+        return false;
+      });
+
+      if (linkedRegs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+              <span class="lang-en">No webinar registrations linked to you yet.</span>
+              <span class="lang-es">Aún no tienes registros al webinar asociados.</span>
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = linkedRegs.map(r => {
+        const date = App.utils.formatDate(r.createdAt);
+        const source = r.referralCode 
+          ? `<span class="badge badge--approved" style="background:#d1fae5; color:#065f46; font-size:0.75rem; border-radius:12px; padding:2px 8px;">🔗 Link</span>`
+          : `<span class="badge badge--pending" style="background:#fef3c7; color:#92400e; font-size:0.75rem; border-radius:12px; padding:2px 8px;">👤 Dropdown</span>`;
+        return `
+          <tr>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem; color: var(--text-secondary);">${date}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.88rem; font-weight: 600;">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${App.utils.escapeHtml(r.email)}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${App.utils.escapeHtml(r.agency || '—')}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${source}</td>
+          </tr>`;
+      }).join('');
+    } catch (err) {
+      console.error('[Agent] renderWebinarRegistrations error:', err);
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #ef4444; padding: 1rem;">Error loading registrations.</td></tr>';
     }
   }
 

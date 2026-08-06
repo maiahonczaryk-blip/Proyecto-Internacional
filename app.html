@@ -413,7 +413,7 @@
                   <th>State / Province</th>
                   <th>How They Heard</th>
                   <th>Referring Agent</th>
-                  <th>Agente (Link) ✅</th>
+                  <th>Tagged Agent</th>
                 </tr>
               </thead>
               <tbody id="webinar-registrations-tbody">
@@ -434,6 +434,7 @@
           <h1><span class="lang-en">Broker Dashboard</span><span class="lang-es">Panel de Broker</span></h1>
           <p class="dashboard-subtitle" id="broker-welcome"></p>
         </div>
+        <div id="broker-agreement-warning" style="display:none; margin-bottom: 1.5rem;"></div>
         <div class="stat-cards-grid stat-cards-grid--4cols">
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">👥</div><div class="stat-card__body"><div class="stat-card__value" id="broker-stat-realtors">0</div><div class="stat-card__label"><span class="lang-en">My Realtors</span><span class="lang-es">Mis Agentes</span></div></div></div>
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🤝</div><div class="stat-card__body"><div class="stat-card__value" id="broker-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Total Clients</span><span class="lang-es">Clientes Totales</span></div></div></div>
@@ -519,6 +520,7 @@
           <h1><span class="lang-en">My Dashboard</span><span class="lang-es">Mi Panel</span></h1>
           <p class="dashboard-subtitle" id="realtor-welcome"></p>
         </div>
+        <div id="realtor-agreement-warning" style="display:none; margin-bottom: 1.5rem;"></div>
         <div class="stat-cards-grid stat-cards-grid--4cols">
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🤝</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Referred Clients</span><span class="lang-es">Clientes Referidos</span></div></div></div>
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🔄</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-stat-active">0</div><div class="stat-card__label"><span class="lang-en">Active Pipeline</span><span class="lang-es">Pipeline Activo</span></div></div></div>
@@ -681,6 +683,30 @@
           <div class="dashboard-section">
             <h2><span class="lang-en">Recent Activity</span><span class="lang-es">Actividad Reciente</span></h2>
             <div id="agent-dash-recent"></div>
+          </div>
+        </div>
+        <!-- Webinar Registrations Section -->
+        <div class="dashboard-section" style="margin-top: 24px;">
+          <h2>🎙️ <span class="lang-en">My Webinar Registrations</span><span class="lang-es">Mis Registrados al Webinar</span></h2>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+            <span class="lang-en">Realtors and Brokers who registered to the webinar using your referral link or mentioning your name.</span>
+            <span class="lang-es">Agentes y Brokers registrados al webinar usando tu enlace o mencionando tu nombre.</span>
+          </p>
+          <div class="table-responsive">
+            <table class="data-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th style="padding: 10px 12px; font-size: 0.8rem; text-align: left;"><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
+                  <th style="padding: 10px 12px; font-size: 0.8rem; text-align: left;"><span class="lang-en">Name</span><span class="lang-es">Nombre</span></th>
+                  <th style="padding: 10px 12px; font-size: 0.8rem; text-align: left;"><span class="lang-en">Email</span><span class="lang-es">Correo</span></th>
+                  <th style="padding: 10px 12px; font-size: 0.8rem; text-align: left;"><span class="lang-en">Agency</span><span class="lang-es">Agencia</span></th>
+                  <th style="padding: 10px 12px; font-size: 0.8rem; text-align: left;"><span class="lang-en">Source</span><span class="lang-es">Origen</span></th>
+                </tr>
+              </thead>
+              <tbody id="agent-webinar-table-body">
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;"><span class="lang-en">Loading...</span><span class="lang-es">Cargando...</span></td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

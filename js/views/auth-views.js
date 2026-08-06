@@ -633,9 +633,6 @@ App.views.auth = {
       console.warn('[Pending] failed to fetch fresh user data:', e);
     }
 
-    // Render the agreement section
-    renderPendingAgreementSection(currentUser);
-
     // Bind Check Status button
     const checkBtn = document.getElementById('pending-check-btn');
     const logoutBtn = document.getElementById('pending-logout-btn');
