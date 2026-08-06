@@ -207,6 +207,11 @@ App.router = (function() {
         window.location.href = 'index.html#login';
         return;
       }
+      // Block pending users from accessing any protected route
+      if (user.status === 'pending') {
+        window.location.href = 'index.html#pending';
+        return;
+      }
       if (route.role !== 'authenticated' && user.role !== route.role) {
         // Redirect to appropriate dashboard
         navigateTo(user.role + '/dashboard', true);
@@ -214,9 +219,13 @@ App.router = (function() {
       }
     }
 
-    // If user is logged in and trying to access login/register, redirect to dashboard
+    // If user is logged in and trying to access login/register, redirect appropriately
     if ((routeKey === 'login' || routeKey === 'register') && App.auth.isAuthenticated()) {
       const user = App.auth.getCurrentUser();
+      if (user.status === 'pending') {
+        window.location.href = 'index.html#pending';
+        return;
+      }
       window.location.href = 'app.html#' + user.role + '/dashboard';
       return;
     }
@@ -356,7 +365,7 @@ App.router = (function() {
       'for-realtors':      () => App.views.forRealtors && App.views.forRealtors.init(),
       'login':             () => App.views.auth && App.views.auth.initLogin(),
       'register':          () => App.views.auth && App.views.auth.initRegister(params),
-      'pending':           () => {},
+      'pending':           () => App.views.auth && App.views.auth.initPending(),
       'intake':            () => App.views.public && App.views.public.initIntake(),
       'referral':          () => App.views.public && App.views.public.initReferralForm(),
       'admin/dashboard':   () => App.views.admin && App.views.admin.initDashboard(),

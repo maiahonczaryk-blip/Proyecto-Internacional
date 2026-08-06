@@ -26,7 +26,11 @@ App.views.auth = {
         try {
           const user = await App.auth.login(email, pass);
           if (user) {
-            window.location.href = 'app.html#' + user.role + '/dashboard';
+            if (user.status === 'pending') {
+              window.location.href = 'index.html#pending';
+            } else {
+              window.location.href = 'app.html#' + user.role + '/dashboard';
+            }
           }
         } catch (error) {
           err.textContent = error.message;
@@ -46,7 +50,11 @@ App.views.auth = {
           try {
             const user = await App.auth.loginWithGoogle();
             if (user) {
-              window.location.href = 'app.html#' + user.role + '/dashboard';
+              if (user.status === 'pending') {
+                window.location.href = 'index.html#pending';
+              } else {
+                window.location.href = 'app.html#' + user.role + '/dashboard';
+              }
             }
           } catch (error) {
             if (error.code === 'USER_NOT_REGISTERED') {
@@ -547,8 +555,9 @@ App.views.auth = {
         try {
           const res = await App.auth.register(data);
           if (res && res.success) {
-            App.utils.showToast('Registration successful! Redirecting... 🎉', 'success');
-            window.location.href = 'app.html#' + res.user.role + '/dashboard';
+            // New users are always 'pending' — show the waiting screen
+            App.utils.showToast('¡Registro exitoso! Tu solicitud está siendo revisada. 🎉', 'success');
+            window.location.href = 'index.html#pending';
           }
         } catch (err) {
           alert(err.message);
@@ -587,14 +596,74 @@ App.views.auth = {
           try {
             const res = await App.auth.registerWithGoogle(data);
             if (res && res.success) {
-              App.utils.showToast('Registration successful! Redirecting... 🎉', 'success');
-              window.location.href = 'app.html#' + res.user.role + '/dashboard';
+              App.utils.showToast('¡Registro exitoso! Tu solicitud está siendo revisada. 🎉', 'success');
+              window.location.href = 'index.html#pending';
             }
           } catch (err) {
             App.utils.showToast(err.message, 'error');
           }
         };
       }
+    }
+  },
+
+  /* ---- Pending View ---- */
+  initPending: async function() {
+    // Bind Check Status button
+    const checkBtn = document.getElementById('pending-check-btn');
+    const logoutBtn = document.getElementById('pending-logout-btn');
+
+    if (checkBtn) {
+      checkBtn.addEventListener('click', async () => {
+        const oldHTML = checkBtn.innerHTML;
+        checkBtn.innerHTML = '<span class="spinner"></span>';
+        checkBtn.disabled = true;
+
+        try {
+          const session = App.auth.getCurrentUser();
+          if (!session) {
+            window.location.href = 'index.html#login';
+            return;
+          }
+
+          let freshStatus = 'pending';
+          if (!App.demoMode && App.db) {
+            const doc = await App.db.collection('users').doc(session.id).get();
+            if (doc.exists) freshStatus = doc.data().status;
+          } else {
+            const demoUser = App.demoData.users.find(u => u.id === session.id);
+            if (demoUser) freshStatus = demoUser.status;
+          }
+
+          if (freshStatus === 'active') {
+            // Update localStorage session
+            const updatedSession = { ...session, status: 'active' };
+            localStorage.setItem('remax_session', JSON.stringify(updatedSession));
+            App.utils.showToast('¡Tu cuenta ha sido aprobada! Redirigiendo…', 'success');
+            setTimeout(() => {
+              window.location.href = 'app.html#' + session.role + '/dashboard';
+            }, 800);
+          } else if (freshStatus === 'rejected') {
+            App.utils.showToast('Tu solicitud fue rechazada. Contacta con soporte.', 'error');
+          } else {
+            App.utils.showToast('Tu solicitud sigue en revisión. Te notificaremos por email.', 'info');
+            checkBtn.innerHTML = oldHTML;
+            checkBtn.disabled = false;
+          }
+        } catch (err) {
+          console.error('[Pending] checkStatus error:', err);
+          App.utils.showToast('Error al verificar el estado. Intenta de nuevo.', 'error');
+          checkBtn.innerHTML = oldHTML;
+          checkBtn.disabled = false;
+        }
+      });
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async () => {
+        await App.auth.logout();
+        window.location.href = 'index.html#login';
+      });
     }
   }
 };

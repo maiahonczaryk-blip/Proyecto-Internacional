@@ -1335,15 +1335,24 @@
       <section class="auth-section">
         <div class="auth-card text-center">
           <div class="pending-icon">⏳</div>
-          <h2><span class="lang-en">Application Received</span><span class="lang-es">Solicitud Recibida</span></h2>
-          <p style="color:var(--text-secondary);margin-top:12px;">
-            <span class="lang-en">Thank you for your interest in joining the RE/MAX Inmomás International Referral Network. Your application is being reviewed and you'll receive an email once it's approved.</span>
-            <span class="lang-es">Gracias por tu interés en unirte a la Red Internacional de Referidos de RE/MAX Inmomás. Tu solicitud está siendo revisada y recibirás un email una vez sea aprobada.</span>
+          <h2><span class="lang-en">Application Under Review</span><span class="lang-es">Solicitud en Revisión</span></h2>
+          <p style="color:var(--text-secondary);margin-top:12px;line-height:1.7;">
+            <span class="lang-en">Thank you for registering with the RE/MAX Inmomás International Referral Network.<br>Your application is being reviewed by our team. You'll be able to access your dashboard once it's approved.</span>
+            <span class="lang-es">Gracias por registrarte en la Red Internacional de Referidos de RE/MAX Inmomás.<br>Tu solicitud está siendo revisada por nuestro equipo. Podrás acceder a tu panel una vez sea aprobada.</span>
           </p>
-          <a href="#home" class="btn btn-outline" style="margin-top:24px;">
-            <span class="lang-en">Return to Home</span>
-            <span class="lang-es">Volver al Inicio</span>
-          </a>
+          <div style="margin-top:28px; display:flex; flex-direction:column; align-items:center; gap:12px;">
+            <button id="pending-check-btn" class="btn btn-primary" style="min-width:220px;">
+              <span class="lang-en">🔄 Check Approval Status</span>
+              <span class="lang-es">🔄 Verificar Estado</span>
+            </button>
+            <a href="#home" class="btn btn-outline" style="min-width:220px;">
+              <span class="lang-en">Return to Home</span>
+              <span class="lang-es">Volver al Inicio</span>
+            </a>
+            <button id="pending-logout-btn" style="background:none; border:none; color:var(--text-muted); font-size:0.82rem; cursor:pointer; margin-top:4px; text-decoration:underline;">
+              <span class="lang-en">Log out</span><span class="lang-es">Cerrar sesión</span>
+            </button>
+          </div>
         </div>
       </section>
     </div>
