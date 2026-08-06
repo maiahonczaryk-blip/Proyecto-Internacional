@@ -55,6 +55,29 @@
       setTextById('admin-stat-leads', leads.length);
       renderDossierLeads(leads);
 
+      // 7. Setup Admin Referral Link
+      const currentUser = App.auth.getCurrentUser();
+      if (currentUser) {
+        if (!currentUser.referralCode) {
+          currentUser.referralCode = 'ADM-INMOMAS';
+        }
+        const referralLink = App.utils.generateReferralLink(currentUser.referralCode);
+        const linkInput = document.getElementById('admin-dash-referral-link');
+        if (linkInput) {
+          linkInput.value = referralLink;
+        }
+        const copyBtn = document.getElementById('admin-dash-copy-link');
+        if (copyBtn) {
+          copyBtn.onclick = () => {
+            if (linkInput) {
+              linkInput.select();
+              document.execCommand('copy');
+              App.utils.showToast('Admin referral link copied to clipboard!', 'success');
+            }
+          };
+        }
+      }
+
     } catch (err) {
       console.error('[Admin] initDashboard error:', err);
       App.utils.showToast('Error loading admin dashboard.', 'error');

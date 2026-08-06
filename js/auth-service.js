@@ -142,7 +142,7 @@ App.auth = (function() {
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
-        referralCode: `${role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : 'REA')}-${lastName.toUpperCase()}`,
+        referralCode: `${role === 'admin' ? 'ADM' : (role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : 'REA'))}-${lastName.toUpperCase()}`,
         profileImage: null,
         agreementSigned: false,
         agreementSignedAt: null,
@@ -180,7 +180,7 @@ App.auth = (function() {
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
-        referralCode: `${role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : 'REA')}-${lastName.toUpperCase()}-${uid.substring(0, 4)}`,
+        referralCode: `${role === 'admin' ? 'ADM' : (role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : 'REA'))}-${lastName.toUpperCase()}-${uid.substring(0, 4)}`,
         profileImage: null,
         agreementSigned: false,
         agreementSignedAt: null,
@@ -244,7 +244,7 @@ App.auth = (function() {
 
         // Auto-generate referralCode if missing (for users registered before this field existed)
         if (!userData.referralCode && userData.role && userData.lastName) {
-          const prefix = userData.role === 'broker' ? 'BRK' : (userData.role === 'agent_inmomas' ? 'LOC' : 'REA');
+          const prefix = userData.role === 'admin' ? 'ADM' : (userData.role === 'broker' ? 'BRK' : (userData.role === 'agent_inmomas' ? 'LOC' : 'REA'));
           const uid = credential.user.uid;
           userData.referralCode = `${prefix}-${userData.lastName.toUpperCase()}-${uid.substring(0, 4)}`;
           // Save back to Firestore
@@ -327,7 +327,7 @@ App.auth = (function() {
 
       // Auto-generate referralCode if missing
       if (!userData.referralCode && userData.role && userData.lastName) {
-        const prefix = userData.role === 'broker' ? 'BRK' : (userData.role === 'agent_inmomas' ? 'LOC' : 'REA');
+        const prefix = userData.role === 'admin' ? 'ADM' : (userData.role === 'broker' ? 'BRK' : (userData.role === 'agent_inmomas' ? 'LOC' : 'REA'));
         userData.referralCode = `${prefix}-${userData.lastName.toUpperCase()}-${firebaseUser.uid.substring(0, 4)}`;
         await App.db.collection('users').doc(firebaseUser.uid).update({ referralCode: userData.referralCode });
       }
@@ -366,7 +366,7 @@ App.auth = (function() {
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
-        referralCode: `${role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : 'REA')}-${mockLastName.toUpperCase()}`,
+        referralCode: `${role === 'admin' ? 'ADM' : (role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : 'REA'))}-${mockLastName.toUpperCase()}`,
         profileImage: null,
         agreementSigned: false,
         agreementSignedAt: null,
@@ -414,7 +414,7 @@ App.auth = (function() {
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
-        referralCode: `${role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : 'REA')}-${(finalLastName || 'USER').toUpperCase()}-${uid.substring(0, 4)}`,
+        referralCode: `${role === 'admin' ? 'ADM' : (role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : 'REA'))}-${(finalLastName || 'USER').toUpperCase()}-${uid.substring(0, 4)}`,
         profileImage: firebaseUser.photoURL || null,
         agreementSigned: false,
         agreementSignedAt: null,
@@ -489,7 +489,7 @@ App.auth = (function() {
       user.role = newRole;
       if (user.referralCode) {
         const parts = user.referralCode.split('-');
-        const prefix = newRole === 'broker' ? 'BRK' : (newRole === 'agent_inmomas' ? 'LOC' : 'REA');
+        const prefix = newRole === 'admin' ? 'ADM' : (newRole === 'broker' ? 'BRK' : (newRole === 'agent_inmomas' ? 'LOC' : 'REA'));
         if (parts.length > 1) {
           parts[0] = prefix;
           user.referralCode = parts.join('-');
@@ -509,7 +509,7 @@ App.auth = (function() {
         let updatedRefCode = userData.referralCode;
         if (updatedRefCode) {
           const parts = updatedRefCode.split('-');
-          const prefix = newRole === 'broker' ? 'BRK' : (newRole === 'agent_inmomas' ? 'LOC' : 'REA');
+          const prefix = newRole === 'admin' ? 'ADM' : (newRole === 'broker' ? 'BRK' : (newRole === 'agent_inmomas' ? 'LOC' : 'REA'));
           if (parts.length > 1) {
             parts[0] = prefix;
             updatedRefCode = parts.join('-');

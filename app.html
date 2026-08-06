@@ -48,6 +48,7 @@
       <a href="#agent_inmomas/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
       <a href="#agent_inmomas/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> Clients</a>
       <a href="#agent_inmomas/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> Finances</a>
+      <a href="#agent_inmomas/webinar" class="sidebar-link"><span class="sidebar-link__icon">🎙️</span> <span class="lang-en">Webinar</span><span class="lang-es">Webinar</span></a>
     </nav>
 
     <!-- Broker Sidebar Nav -->
@@ -115,6 +116,22 @@
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">👤</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-realtors">0</div><div class="stat-card__label"><span class="lang-en">Active Realtors</span><span class="lang-es">Realtors Activos</span></div></div></div>
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🤝</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Total Clients</span><span class="lang-es">Clientes Totales</span></div></div></div>
           <div class="stat-card stat-card--red"><div class="stat-card__icon stat-card__icon--red">📥</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-leads">0</div><div class="stat-card__label"><span class="lang-en">Buyer Guide Leads</span><span class="lang-es">Leads de Guía</span></div></div></div>
+        </div>
+
+        <!-- Referral Link Quick Access -->
+        <div class="dashboard-section referral-quick">
+          <h2>🔗 <span class="lang-en">Your Admin Referral Link</span><span class="lang-es">Tu Enlace de Referido de Administrador</span></h2>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px;">
+            <span class="lang-en">Use this link to invite new Partners (Brokers, Realtors & RE/MAX Inmomás Agents) and list RE/MAX Inmomás as their referrer.</span>
+            <span class="lang-es">Usa este enlace para invitar a nuevos Colaboradores (Brokers, Realtors y Agentes de RE/MAX Inmomás) y registrar a RE/MAX Inmomás como su referidor.</span>
+          </p>
+          <div style="display: flex; align-items: center; background: rgba(0, 67, 255, 0.04); border: 1px solid rgba(0, 67, 255, 0.15); border-radius: 12px; padding: 8px; gap: 12px; margin-top: 12px;">
+            <div style="background: white; border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <span style="font-size: 1.2rem;">👑</span>
+            </div>
+            <input type="text" readonly id="admin-dash-referral-link" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--text-primary); outline: none; padding: 0; min-width: 0;">
+            <button class="btn btn-primary" id="admin-dash-copy-link" style="border-radius: 8px; padding: 10px 20px; white-space: nowrap;"><span class="lang-en">Copy Link</span><span class="lang-es">Copiar Enlace</span></button>
+          </div>
         </div>
 
         <div class="dashboard-section">
@@ -685,30 +702,6 @@
             <div id="agent-dash-recent"></div>
           </div>
         </div>
-        <!-- Webinar Registrations Section -->
-        <div class="dashboard-section" style="margin-top: 24px;">
-          <h2>🎙️ <span class="lang-en">My Webinar Registrations</span><span class="lang-es">Mis Registrados al Webinar</span></h2>
-          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
-            <span class="lang-en">Realtors and Brokers who registered to the webinar using your referral link or mentioning your name.</span>
-            <span class="lang-es">Agentes y Brokers registrados al webinar usando tu enlace o mencionando tu nombre.</span>
-          </p>
-          <div class="data-table-container">
-            <table class="data-table data-table--narrow">
-              <thead>
-                <tr>
-                  <th style="padding: 10px 12px; font-size: 0.8rem; text-align: left;"><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
-                  <th style="padding: 10px 12px; font-size: 0.8rem; text-align: left;"><span class="lang-en">Name</span><span class="lang-es">Nombre</span></th>
-                  <th style="padding: 10px 12px; font-size: 0.8rem; text-align: left;"><span class="lang-en">Email</span><span class="lang-es">Correo</span></th>
-                  <th style="padding: 10px 12px; font-size: 0.8rem; text-align: left;"><span class="lang-en">Agency</span><span class="lang-es">Agencia</span></th>
-                  <th style="padding: 10px 12px; font-size: 0.8rem; text-align: left;"><span class="lang-en">Source</span><span class="lang-es">Origen</span></th>
-                </tr>
-              </thead>
-              <tbody id="agent-webinar-table-body">
-                <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;"><span class="lang-en">Loading...</span><span class="lang-es">Cargando...</span></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -745,6 +738,39 @@
                 </tr>
               </thead>
               <tbody id="agent-commission-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==================== VIEW: AGENT WEBINAR ==================== -->
+    <div id="view-agent-webinar" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1>🎙️ <span class="lang-en">My Webinar Registrations</span><span class="lang-es">Mis Registrados al Webinar</span></h1>
+          <p class="dashboard-subtitle">
+            <span class="lang-en">Realtors and Brokers who registered to the webinar using your referral link or mentioning your name.</span>
+            <span class="lang-es">Agentes y Brokers registrados al webinar usando tu enlace o mencionando tu nombre.</span>
+          </p>
+        </div>
+
+        <div class="dashboard-section">
+          <div class="data-table-container">
+            <table class="data-table data-table--narrow">
+              <thead>
+                <tr>
+                  <th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
+                  <th><span class="lang-en">Name</span><span class="lang-es">Nombre</span></th>
+                  <th><span class="lang-en">Email</span><span class="lang-es">Correo</span></th>
+                  <th><span class="lang-en">Agency</span><span class="lang-es">Agencia</span></th>
+                  <th><span class="lang-en">Source</span><span class="lang-es">Origen</span></th>
+                </tr>
+              </thead>
+              <tbody id="agent-webinar-table-body">
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;"><span class="lang-en">Loading...</span><span class="lang-es">Cargando...</span></td></tr>
+              </tbody>
             </table>
           </div>
         </div>

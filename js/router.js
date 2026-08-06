@@ -51,7 +51,8 @@ App.router = (function() {
     // Agente Inmomás routes
     'agent_inmomas/dashboard': { view: 'view-agent-dashboard', role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Dashboard' },
     'agent_inmomas/clients':   { view: 'view-agent-clients',   role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Clients' },
-    'agent_inmomas/finances':  { view: 'view-agent-finances',  role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Finances' }
+    'agent_inmomas/finances':  { view: 'view-agent-finances',  role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Finances' },
+    'agent_inmomas/webinar':   { view: 'view-agent-webinar',   role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Webinar Registrations' }
   };
 
   let currentRoute = null;
@@ -380,6 +381,7 @@ App.router = (function() {
       'agent_inmomas/dashboard': () => App.views.agentInmomas && App.views.agentInmomas.initDashboard(),
       'agent_inmomas/clients':   () => App.views.agentInmomas && App.views.agentInmomas.initClients(),
       'agent_inmomas/finances':  () => App.views.agentInmomas && App.views.agentInmomas.initFinances(),
+      'agent_inmomas/webinar':   () => App.views.agentInmomas && App.views.agentInmomas.initWebinar(),
       'profile':           () => App.views.auth && App.views.auth.initProfile()
     };
 

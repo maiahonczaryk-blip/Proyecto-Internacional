@@ -101,13 +101,20 @@
         `;
       }
 
-      // Render webinar registrations linked to this agent
-      await renderWebinarRegistrations();
-
     } catch (err) {
       console.error('[Agent] initDashboard error:', err);
       App.utils.showToast('Error loading dashboard.', 'error');
     }
+  }
+
+  /* ============================================
+     initWebinar()
+     Populates #view-agent-webinar with registrations.
+     ============================================ */
+  async function initWebinar() {
+    currentUser = App.auth.getCurrentUser();
+    if (!currentUser) return;
+    await renderWebinarRegistrations();
   }
 
   /* ── Render Webinar Registrations Linked to Agent ── */
@@ -629,6 +636,7 @@
     initDashboard,
     initClients,
     initFinances,
+    initWebinar,
     showClientDetail,
     handleClientDrop,
     handleSaveFinancials,

@@ -116,6 +116,11 @@ App.views.public = {
       if (pf) pf.style.display = type !== 'client' ? '' : 'none';
       if (pwGroup) pwGroup.style.display = type === 'client' ? 'none' : '';
 
+      const profWebinar = document.querySelector('.professional-webinar-group');
+      const clientWebinar = document.querySelector('.client-webinar-group');
+      if (profWebinar) profWebinar.style.display = type === 'client' ? 'none' : '';
+      if (clientWebinar) clientWebinar.style.display = type === 'client' ? '' : 'none';
+
       // Disable required on hidden client fields to prevent validation blocking
       if (cf) {
         cf.querySelectorAll('[required]').forEach(el => {
@@ -183,13 +188,16 @@ App.views.public = {
       if (referrer.role === 'broker') {
         availableTypes = ['client', 'realtor'];
       } else if (referrer.role === 'agent_inmomas' || referrer.role === 'admin') {
-        availableTypes = ['client', 'realtor', 'broker'];
+        availableTypes = referrer.role === 'admin' 
+          ? ['client', 'realtor', 'broker', 'agent_inmomas']
+          : ['client', 'realtor', 'broker'];
       }
 
       const typeConfig = {
         client: { icon: '👤', labelEn: 'Client', labelEs: 'Cliente', labelFr: 'Client', labelEnCa: 'Client' },
         realtor: { icon: '🏠', labelEn: 'Realtor', labelEs: 'Realtor', labelFr: 'Realtor', labelEnCa: 'Realtor' },
-        broker: { icon: '🏢', labelEn: 'Broker', labelEs: 'Broker', labelFr: 'Courtier', labelEnCa: 'Broker' }
+        broker: { icon: '🏢', labelEn: 'Broker', labelEs: 'Broker', labelFr: 'Courtier', labelEnCa: 'Broker' },
+        agent_inmomas: { icon: '🇪🇸', labelEn: 'RE/MAX Inmomás Agent', labelEs: 'Agente RE/MAX Inmomás', labelFr: 'Agent RE/MAX Inmomás', labelEnCa: 'RE/MAX Inmomás Agent' }
       };
 
       if (availableTypes.length > 1 && typeSelector && typeOptions) {
@@ -338,20 +346,49 @@ App.views.public = {
             await App.auth.register(userPayload);
           }
 
-          // Handle webinar consent check
-          const webinarConsent = document.getElementById('referral-webinar-consent');
-          if (webinarConsent && webinarConsent.checked) {
-            const webinarPayload = {
-              firstName,
-              lastName,
-              email,
-              phone,
-              agency: (contactType === 'client' ? 'Client' : (agencyName || 'Referred Partner')),
-              country: (contactType === 'client' ? (form.querySelector('#referral-country')?.value || 'United States') : 'United States'),
-              state: (contactType === 'client' ? 'N/A' : (market || 'N/A')),
-              howHeard: 'Referral Link',
-              referrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : ''
-            };
+          // Handle webinar consent check (professional vs client events)
+          let hasConsent = false;
+          let webinarPayload = null;
+
+          if (contactType === 'client') {
+            const clientConsent = document.getElementById('referral-client-webinar-consent');
+            if (clientConsent && clientConsent.checked) {
+              hasConsent = true;
+              webinarPayload = {
+                firstName,
+                lastName,
+                email,
+                phone,
+                agency: 'Client (Interested in Spain)',
+                country: form.querySelector('#referral-country')?.value || 'United States',
+                state: 'N/A',
+                howHeard: 'Referral Link',
+                referrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : '',
+                webinarTitle: 'Living & Investing in Spain: Relocation Guide',
+                webinarDate: 'September 15, 2026'
+              };
+            }
+          } else {
+            const profConsent = document.getElementById('referral-webinar-consent');
+            if (profConsent && profConsent.checked) {
+              hasConsent = true;
+              webinarPayload = {
+                firstName,
+                lastName,
+                email,
+                phone,
+                agency: agencyName || 'Referred Partner',
+                country: 'United States',
+                state: market || 'N/A',
+                howHeard: 'Referral Link',
+                referrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : '',
+                webinarTitle: 'Exclusive Webinar: Scale Your Business Globally',
+                webinarDate: 'August 13, 2026'
+              };
+            }
+          }
+
+          if (hasConsent && webinarPayload) {
             try {
               await App.auth.saveWebinarRegistration(webinarPayload);
             } catch (webinarErr) {
