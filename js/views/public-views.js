@@ -467,13 +467,58 @@ App.views.public = {
           return;
         }
 
+        // ---- Resolve referral link context (agent who shared the link) ----
+        const refCode = sessionStorage.getItem('referralCode');
+        let agentReferralCode = null;
+        let agentReferrerId   = null;
+        let agentReferrerName = null;
+        let agentReferrerRole = null;
+
+        if (refCode) {
+          // Try demoData first (fast, sync)
+          if (App.demoMode && App.demoData && App.demoData.users) {
+            const ref = App.demoData.users.find(u => u.referralCode === refCode);
+            if (ref) {
+              agentReferralCode = ref.referralCode;
+              agentReferrerId   = ref.id;
+              agentReferrerName = `${ref.firstName} ${ref.lastName}`;
+              agentReferrerRole = ref.role;
+            }
+          } else if (!App.demoMode && App.db) {
+            // Live Firestore lookup
+            try {
+              const snap = await App.db.collection('users')
+                .where('referralCode', '==', refCode)
+                .limit(1)
+                .get();
+              if (!snap.empty) {
+                const doc = snap.docs[0];
+                agentReferralCode = doc.data().referralCode;
+                agentReferrerId   = doc.id;
+                agentReferrerName = `${doc.data().firstName} ${doc.data().lastName}`;
+                agentReferrerRole = doc.data().role;
+              }
+            } catch (lookupErr) {
+              console.warn('[Webinar] Agent referral lookup failed:', lookupErr);
+            }
+          }
+          console.log('[Webinar] Referral context:', agentReferrerName || 'not found', '/', refCode);
+        }
+        // ---------------------------------------------------------------
+
         await App.auth.saveWebinarRegistration({
           firstName, lastName, phone, email, agency, country, state,
           howHeard,
           referrerName: howHeard === 'agent' ? referrerName : '',
           webinar: 'Beyond Borders',
           webinarDate: '2026-08-13',
-          gdprConsent: true
+          gdprConsent: true,
+          // Referral link tracking — populated when visitor arrived via agent's link
+          referralCode:     agentReferralCode || null,
+          referrerId:       agentReferrerId   || null,
+          agentReferrerName: agentReferrerName || null,
+          agentReferrerRole: agentReferrerRole || null,
+          source:           agentReferralCode ? 'referral' : 'direct'
         });
 
         // Show success panel

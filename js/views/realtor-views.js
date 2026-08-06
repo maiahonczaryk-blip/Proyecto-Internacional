@@ -434,254 +434,226 @@
     }
   }
 
-  /* ── Agreement Section ── */
+  /* ── Agreement Section — Download & Upload Flow ── */
   function renderAgreementSection() {
     const container = document.getElementById('agreement-section');
-    // If there's no dedicated container, try the general content area
     const target = container || document.getElementById('realtor-documents-content');
     if (!target) return;
 
-    if (currentUser.agreementSigned) {
-      // Signed state
-      if (container) {
-        container.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; background: #d1fae5; border-radius: 0.75rem; margin-bottom: 1.5rem;">
-            <span style="font-size: 2rem;">✅</span>
-            <div>
-              <div style="font-weight: 700; color: #065f46; font-size: 1rem;">Collaboration Agreement — Signed</div>
-              <div style="font-size: 0.85rem; color: #047857;">
-                Signed on ${App.utils.formatDate(currentUser.agreementSignedAt)}. Your agreement is active and on file.
-              </div>
-            </div>
+    const status = currentUser.agreementStatus || 'none'; // 'none' | 'uploaded' | 'signed'
+
+    let statusHtml = '';
+    if (status === 'signed') {
+      statusHtml = `
+        <div style="display:flex; align-items:center; gap:1rem; padding:1.25rem; background:#d1fae5; border-radius:0.75rem; margin-bottom:1.5rem;">
+          <span style="font-size:2rem;">✅</span>
+          <div>
+            <div style="font-weight:700; color:#065f46; font-size:1rem;">Referral Agreement — Signed by both parties</div>
+            <div style="font-size:0.85rem; color:#047857;">Agreement active. Signed on ${App.utils.formatDate(currentUser.agreementSignedAt)}.</div>
           </div>
-        `;
-      }
+        </div>`;
+    } else if (status === 'uploaded') {
+      statusHtml = `
+        <div style="display:flex; align-items:center; gap:1rem; padding:1.25rem; background:#fef9c3; border-radius:0.75rem; margin-bottom:1.5rem;">
+          <span style="font-size:2rem;">⏳</span>
+          <div>
+            <div style="font-weight:700; color:#854d0e; font-size:1rem;">Agreement uploaded — Pending RE/MAX Inmom&aacute;s signature</div>
+            <div style="font-size:0.85rem; color:#a16207;">We have received your signed agreement. The RE/MAX Inmom&aacute;s broker will countersign shortly.</div>
+          </div>
+        </div>`;
     } else {
-      // Unsigned: show agreement text + sign button
-      if (container) {
-        container.innerHTML = `
-          <div style="padding: 1.25rem; background: #fef3c7; border-radius: 0.75rem; margin-bottom: 1rem;">
-            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-              <span style="font-size: 1.5rem;">⚠️</span>
-              <div style="font-weight: 600; color: #92400e;">Agreement Required</div>
-            </div>
-            <p style="font-size: 0.85rem; color: #78350f; margin: 0;">Please read and sign the collaboration agreement below to activate your partnership.</p>
+      statusHtml = `
+        <div style="padding:1.25rem; background:#fef3c7; border-radius:0.75rem; margin-bottom:1rem;">
+          <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
+            <span style="font-size:1.5rem;">⚠️</span>
+            <div style="font-weight:600; color:#92400e;">Referral Agreement Required</div>
           </div>
-          <div id="agreement-text-container" style="max-height: 400px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.7; color: #374151; background: #fafafa;">
-            ${getAgreementText()}
-          </div>
-          <div style="text-align: center;">
-            <button class="btn btn-primary" id="sign-agreement-btn" style="padding: 0.75rem 2rem;">
-              ✍️ Sign Agreement
-            </button>
-          </div>
-        `;
-
-        // Bind sign button
-        const signBtn = document.getElementById('sign-agreement-btn');
-        if (signBtn) {
-          signBtn.addEventListener('click', openSignatureModal);
-        }
-      }
+          <p style="font-size:0.85rem; color:#78350f; margin:0;">Please download the agreement, sign it, and upload the signed copy to activate your partnership.</p>
+        </div>`;
     }
-  }
 
-  /* ── Signature Modal ── */
-  function openSignatureModal() {
-    App.utils.showModal({
-      title: 'Sign Collaboration Agreement',
-      body: `
-        <div style="margin-bottom: 1.5rem;">
-          <p style="font-size: 0.9rem; color: #374151; margin: 0 0 1rem;">
-            By checking the box below, you confirm that you have read and agree to all terms of the
-            Collaboration Agreement between yourself and RE/MAX Inmomás.
-          </p>
-          <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer;">
-            <input type="checkbox" id="agree-checkbox" style="margin-top: 0.2rem; flex-shrink: 0;">
-            <span style="font-size: 0.85rem; color: #374151; line-height: 1.5;">
-              I, <strong>${App.utils.escapeHtml(currentUser.firstName)} ${App.utils.escapeHtml(currentUser.lastName)}</strong>,
-              have read and fully agree to the terms and conditions of the RE/MAX Inmomás International
-              Referral Collaboration Agreement. I understand that my referral commission is 25% of the
-              buyer-side commission on completed sales.
-            </span>
-          </label>
+    target.innerHTML = `
+      ${statusHtml}
+
+      <!-- Step 1: Download -->
+      <div style="background:#f8f9ff; border:1.5px solid #c7d2fe; border-radius:0.75rem; padding:1.25rem; margin-bottom:1rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
+          <span style="font-size:1.4rem;">1️⃣</span>
+          <div style="font-weight:600; color:#1e40af;">Download &amp; Sign the Agreement</div>
         </div>
-        <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; background: #f9fafb; text-align: center;">
-          <p style="font-size: 0.8rem; color: #9ca3af; margin: 0 0 0.5rem;">Digital Signature</p>
-          <div style="font-family: 'Brush Script MT', cursive; font-size: 1.5rem; color: #374151; padding: 0.5rem;">
-            ${App.utils.escapeHtml(currentUser.firstName)} ${App.utils.escapeHtml(currentUser.lastName)}
-          </div>
-          <p style="font-size: 0.75rem; color: #9ca3af; margin: 0;">Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-        </div>
-      `,
-      footer: `
-        <button class="btn btn-outline btn-sm" id="sign-cancel-btn">Cancel</button>
-        <button class="btn btn-primary btn-sm" id="sign-confirm-btn" style="margin-left: 0.5rem;" disabled>
-          Confirm & Sign
+        <p style="font-size:0.85rem; color:#374151; margin:0 0 0.875rem;">Download your personalized Master Referral Agreement (Word format). Sign it and return below.</p>
+        <button class="btn btn-primary" id="download-agreement-btn" style="gap:0.5rem;">
+          📄 Download Referral Agreement (.doc)
         </button>
-      `
-    });
-
-    // Bind checkbox to enable confirm button
-    const checkbox   = document.getElementById('agree-checkbox');
-    const confirmBtn = document.getElementById('sign-confirm-btn');
-    const cancelBtn  = document.getElementById('sign-cancel-btn');
-
-    if (checkbox && confirmBtn) {
-      checkbox.addEventListener('change', () => {
-        confirmBtn.disabled = !checkbox.checked;
-      });
-    }
-
-    if (cancelBtn) {
-      cancelBtn.addEventListener('click', () => App.utils.closeModal());
-    }
-
-    if (confirmBtn) {
-      confirmBtn.addEventListener('click', async () => {
-        App.utils.closeModal();
-        try {
-          // Update user's agreement status
-          if (App.demoMode) {
-            const demoUser = App.demoData.users.find(u => u.id === currentUser.id);
-            if (demoUser) {
-              demoUser.agreementSigned = true;
-              demoUser.agreementSignedAt = new Date().toISOString();
-            }
-            // Update the cached currentUser too
-            currentUser.agreementSigned = true;
-            currentUser.agreementSignedAt = new Date().toISOString();
-            
-            if (App.auth && typeof App.auth.saveDemoData === 'function') {
-              App.auth.saveDemoData();
-            }
-          } else {
-            await App.db.collection('users').doc(currentUser.id).update({
-              agreementSigned: true,
-              agreementSignedAt: new Date().toISOString()
-            });
-            currentUser.agreementSigned = true;
-            currentUser.agreementSignedAt = new Date().toISOString();
-          }
-
-          App.utils.showToast('Agreement signed successfully! 🎉', 'success');
-          renderAgreementSection();
-
-        } catch (err) {
-          console.error('[Realtor] Sign agreement error:', err);
-          App.utils.showToast('Error signing agreement. Please try again.', 'error');
-        }
-      });
-    }
-  }
-
-  /* ── Full Agreement Text ── */
-  function getAgreementText() {
-    return `
-      <h3 style="text-align: center; margin-bottom: 0.5rem; font-size: 1.1rem; color: #003da5; font-weight: 800; font-family: 'Montserrat', sans-serif;">
-        INTERNATIONAL REFERRAL & COLLABORATION AGREEMENT
-      </h3>
-      <h3 style="text-align: center; margin-bottom: 1rem; font-size: 1rem; color: #e11b22; font-weight: 800; font-family: 'Montserrat', sans-serif;">
-        ACUERDO INTERNACIONAL DE REFERIDO Y COLABORACIÓN
-      </h3>
-      <p style="text-align: center; margin-bottom: 1.5rem; color: #6b7280; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
-        B2B Broker-to-Broker Cooperation Framework / Marco de Colaboración de Corredor a Corredor
-      </p>
-
-      <p><strong>1. PARTIES & RELATIONSHIP / PARTES Y RELACIÓN</strong></p>
-      <p><strong>EN:</strong> This Agreement is entered into between <strong>Megagestión Servicios Inmobiliarios Spain</strong>, represented by its Managing Broker <strong>José Martínez Sánchez</strong> (hereinafter "Receiving Broker"), and the registered brokerage representing the signing professional (hereinafter "Referring Broker"). This represents a B2B marketing agreement. The Referring Broker certifies active licensure in their home country (US/Canada). No Spanish real estate licensing is required for the Referring Broker or the Referring Agent.</p>
-      <p><strong>ES:</strong> Este Acuerdo se suscribe entre <strong>Megagestión Servicios Inmobiliarios España</strong>, representada por su Broker **José Martínez Sánchez** (en adelante "Corredor Receptor"), y la agencia inmobiliaria que representa al profesional firmante (en adelante "Corredor Referente"). Este representa un acuerdo comercial B2B. El Corredor Referente certifica que posee licencia activa en su país de origen (EE. UU./Canadá). No se requiere licencia española para el Corredor Referente ni para el Agente Referente.</p>
-
-      <p><strong>2. INVOLVED AGENTS / AGENTES INVOLUCRADOS</strong></p>
-      <p>• <strong>Referring Agent (US/Canada) / Agente Inmobiliario Referente:</strong> [To be completed in fields / A completar en campos]<br>
-      • <strong>Receiving Agent (Local Spain) / Agente Inmobiliario Receptor (España):</strong> [To be completed in fields / A completar en campos]</p>
-
-      <p><strong>3. COMMISSION STRUCTURE / ESTRUCTURA DE COMISIÓN</strong></p>
-      <p><strong>EN:</strong> Upon successful closing of a property acquisition in Spain by the referred client (the "Prospect"), the Receiving Broker shall pay the Referring Broker a referral fee of <strong>25% (twenty-five percent)</strong> of the gross buyer-side commission received by the Receiving Broker for that transaction.</p>
-      <p><strong>ES:</strong> Al cierre exitoso de la compra de un inmueble en España por parte del cliente referido (el "Cliente"), el Corredor Receptor pagará al Corredor Referente una comisión del **25% (veinticinco por ciento)** de la comisión bruta del lado del comprador cobrada por el Corredor Receptor.</p>
-      
-      <div style="background-color: #f3f4f6; border-left: 4px solid #003da5; padding: 10px 15px; margin: 15px 0; font-size: 0.8rem; border-radius: 0 6px 6px 0;">
-        <strong>💡 Example / Ejemplo:</strong><br>
-        • Purchase Price / Precio de compra: <strong>€400,000</strong><br>
-        • Gross buyer commission (5%) / Comisión bruta (5%): <strong>€20,000</strong><br>
-        • Referring Broker payout (25%) / Pago al Corredor Referente: <strong>€5,000 EUR</strong> (wire/transferencia)
       </div>
 
-      <p><strong>4. AGENT PROTECTION & COMPENSATION / PROTECCIÓN Y PAGO DEL AGENTE</strong></p>
-      <p><strong>EN:</strong> All referral fees are paid Broker-to-Broker. The Referring Broker is solely responsible for distributing commission splits to the individual Referring Agent. The Receiving Broker is responsible for distributing splits to the local Spain Receiving Agent.</p>
-      <p><strong>ES:</strong> Todos los honorarios de referido se pagan estrictamente de Corredor a Corredor. El Corredor Referente es el único responsable de distribuir la comisión al Agente Referente individual. El Corredor Receptor es responsable de distribuir la comisión al Agente Receptor local asignado en España.</p>
-
-      <p><strong>5. LOCK PERIOD & REGISTRY / REGISTRO Y VIGENCIA</strong></p>
-      <p><strong>EN:</strong> The referral is protected for <strong>24 months</strong> from registration. The Referring Broker is entitled to the fee for any purchase completed by the Prospect in Spain during this timeframe.</p>
-      <p><strong>ES:</strong> El referido está protegido por **24 meses** a partir del registro. El Corredor Referente tiene derecho a la comisión por cualquier compra completada por el Cliente en España durante este período.</p>
-
-      <p><strong>6. SETTLEMENT & TAX COMPLIANCE / LIQUIDACIÓN Y CUMPLIMIENTO FISCAL</strong></p>
-      <p><strong>EN:</strong> Paid via bank wire within 30 business days of closing and fund receipt in Spain. US-based brokerages must provide Form **W-8BEN-E** (or Canadian equivalent) and a commercial invoice prior to payment execution to prevent local Spain tax withholding.</p>
-      <p><strong>ES:</strong> Se liquida mediante transferencia bancaria dentro de los 30 días hábiles posteriores al cierre y cobro de la comisión en España. Las agencias de EE. UU. deben entregar el formulario **W-8BEN-E** (o equivalente canadiense) y una factura comercial antes del pago para evitar retenciones de impuestos en España.</p>
-
-      <p><strong>7. GOVERNING LAW & JURISDICTION / LEY APLICABLE Y JURISDICCIÓN</strong></p>
-      <p><strong>EN:</strong> Governed by the laws of Spain. Any disputes shall be submitted exclusively to the Courts of Alicante, Spain.</p>
-      <p><strong>ES:</strong> Se rige por las leyes de España. Cualquier controversia se someterá exclusivamente a la jurisdicción de los Tribunales de Alicante, España.</p>
-
-      <p style="margin-top: 2rem; text-align: center; color: #9ca3af; font-size: 0.75rem; font-weight: 500;">
-        — End of Agreement / Fin del Acuerdo —<br>
-        Megagestión Servicios Inmobiliarios · Spain Alliance Program
-      </p>
+      <!-- Step 2: Upload signed copy -->
+      <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:0.75rem; padding:1.25rem;">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
+          <span style="font-size:1.4rem;">2️⃣</span>
+          <div style="font-weight:600; color:#166534;">Upload Signed Agreement</div>
+        </div>
+        <p style="font-size:0.85rem; color:#374151; margin:0 0 0.875rem;">Upload your signed copy (PDF or Word). We will countersign and confirm your partnership.</p>
+        <div id="agreement-upload-zone" style="border:2px dashed #86efac; border-radius:0.625rem; padding:1.5rem; text-align:center; cursor:pointer; transition:border-color 0.2s;"
+             onclick="document.getElementById('agreement-file-input').click()"
+             onmouseover="this.style.borderColor='#22c55e'" onmouseout="this.style.borderColor='#86efac'">
+          <div style="font-size:2rem; margin-bottom:0.4rem;">📤</div>
+          <p style="font-weight:600; color:#374151; margin:0 0 0.2rem;">Drop signed file here or click to select</p>
+          <p style="font-size:0.78rem; color:#9ca3af; margin:0;">PDF or DOC, max 10 MB</p>
+        </div>
+        <input type="file" id="agreement-file-input" accept=".pdf,.doc,.docx" style="display:none;">
+        <div id="agreement-upload-status" style="margin-top:0.75rem; font-size:0.85rem;"></div>
+      </div>
     `;
+
+    // Bind download button
+    const dlBtn = document.getElementById('download-agreement-btn');
+    if (dlBtn) {
+      dlBtn.addEventListener('click', () => {
+        if (typeof App.generateReferralAgreementDoc === 'function') {
+          App.generateReferralAgreementDoc(currentUser);
+          App.utils.showToast('Agreement downloading... Open in Word, sign it, then upload it below.', 'info');
+        } else {
+          App.utils.showToast('Generator not loaded. Please refresh.', 'error');
+        }
+      });
+    }
+
+    // Bind upload zone
+    const uploadZone = document.getElementById('agreement-upload-zone');
+    const fileInput  = document.getElementById('agreement-file-input');
+    if (uploadZone) {
+      uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.borderColor = '#22c55e'; });
+      uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = '#86efac'; });
+      uploadZone.addEventListener('drop', e => {
+        e.preventDefault();
+        uploadZone.style.borderColor = '#86efac';
+        const file = e.dataTransfer.files[0];
+        if (file) handleAgreementUpload(file);
+      });
+    }
+    if (fileInput) {
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (file) handleAgreementUpload(file);
+      });
+    }
   }
 
+  /* ── Handle signed agreement upload ── */
+  async function handleAgreementUpload(file) {
+    const statusEl = document.getElementById('agreement-upload-status');
+    if (statusEl) statusEl.innerHTML = '<span style="color:#6b7280;">⏳ Uploading...</span>';
 
+    try {
+      let fileUrl = null;
 
-  /* ── Document Upload Section ── */
+      if (!App.demoMode && App.storage) {
+        // Upload to Firebase Storage
+        const ref = App.storage.ref(`agreements/${currentUser.id}/signed_${Date.now()}_${file.name}`);
+        await ref.put(file);
+        fileUrl = await ref.getDownloadURL();
+      } else {
+        // Demo mode: simulate upload
+        fileUrl = `demo://agreements/${currentUser.id}/${file.name}`;
+      }
+
+      // Update user record
+      if (!App.demoMode && App.db) {
+        await App.db.collection('users').doc(currentUser.id).update({
+          agreementStatus: 'uploaded',
+          agreementUploadedAt: new Date().toISOString(),
+          agreementFileUrl: fileUrl
+        });
+        // Create admin notification
+        await App.db.collection('agreement_notifications').add({
+          userId: currentUser.id,
+          userName: `${currentUser.firstName} ${currentUser.lastName}`,
+          userRole: currentUser.role,
+          agencyName: currentUser.agencyName || currentUser.brokerNameManual || '—',
+          email: currentUser.email,
+          fileUrl: fileUrl,
+          fileName: file.name,
+          uploadedAt: new Date().toISOString(),
+          status: 'pending_admin'
+        });
+      } else {
+        // Demo mode
+        const demoUser = App.demoData.users.find(u => u.id === currentUser.id);
+        if (demoUser) {
+          demoUser.agreementStatus = 'uploaded';
+          demoUser.agreementUploadedAt = new Date().toISOString();
+          demoUser.agreementFileUrl = fileUrl;
+        }
+        currentUser.agreementStatus = 'uploaded';
+        // Demo notification stored in memory
+        App.demoData.agreementNotifications = App.demoData.agreementNotifications || [];
+        App.demoData.agreementNotifications.push({
+          id: 'notif_' + Date.now(),
+          userId: currentUser.id,
+          userName: `${currentUser.firstName} ${currentUser.lastName}`,
+          userRole: currentUser.role,
+          agencyName: currentUser.agencyName || '—',
+          email: currentUser.email,
+          fileUrl: fileUrl,
+          fileName: file.name,
+          uploadedAt: new Date().toISOString(),
+          status: 'pending_admin'
+        });
+        if (App.auth && typeof App.auth.saveDemoData === 'function') App.auth.saveDemoData();
+      }
+
+      App.utils.showToast('✅ Agreement uploaded! The RE/MAX Inmomás broker will countersign shortly.', 'success');
+      renderAgreementSection();
+
+    } catch (err) {
+      console.error('[Realtor] Agreement upload error:', err);
+      if (statusEl) statusEl.innerHTML = '<span style="color:#e11b22;">❌ Upload failed. Please try again.</span>';
+      App.utils.showToast('Upload failed. Please try again.', 'error');
+    }
+  }
+
+  /* ── Document Upload Section (for other docs) ── */
   function renderUploadSection() {
     const uploadZone = document.getElementById('doc-upload-zone');
     const fileInput  = document.getElementById('doc-file-input');
     const docsList   = document.getElementById('uploaded-docs-list');
 
-    // Style the upload zone
     if (uploadZone) {
       uploadZone.innerHTML = `
-        <div style="border: 2px dashed #d1d5db; border-radius: 0.75rem; padding: 2rem; text-align: center; cursor: pointer; transition: border-color 0.2s;"
+        <div style="border:2px dashed #d1d5db; border-radius:0.75rem; padding:2rem; text-align:center; cursor:pointer; transition:border-color 0.2s;"
              onmouseover="this.style.borderColor='#0043ff'" onmouseout="this.style.borderColor='#d1d5db'"
              onclick="document.getElementById('doc-file-input') && document.getElementById('doc-file-input').click()">
-          <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📤</div>
-          <p style="font-weight: 600; color: #374151; margin: 0 0 0.25rem;">Drop files here or click to upload</p>
-          <p style="font-size: 0.8rem; color: #9ca3af; margin: 0;">PDF, JPG, PNG up to 10MB</p>
+          <div style="font-size:2.5rem; margin-bottom:0.5rem;">📤</div>
+          <p style="font-weight:600; color:#374151; margin:0 0 0.25rem;">Drop files here or click to upload</p>
+          <p style="font-size:0.8rem; color:#9ca3af; margin:0;">PDF, JPG, PNG up to 10MB</p>
         </div>
       `;
-
-      // Drag & drop handlers
-      uploadZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadZone.querySelector('div').style.borderColor = '#0043ff';
-      });
-      uploadZone.addEventListener('dragleave', () => {
-        uploadZone.querySelector('div').style.borderColor = '#d1d5db';
-      });
-      uploadZone.addEventListener('drop', (e) => {
+      uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.querySelector('div').style.borderColor = '#0043ff'; });
+      uploadZone.addEventListener('dragleave', () => { uploadZone.querySelector('div').style.borderColor = '#d1d5db'; });
+      uploadZone.addEventListener('drop', e => {
         e.preventDefault();
         uploadZone.querySelector('div').style.borderColor = '#d1d5db';
         App.utils.showToast('File upload will be available when connected to Firebase Storage.', 'info');
       });
     }
 
-    // File input handler
     if (fileInput) {
       fileInput.addEventListener('change', () => {
         App.utils.showToast('File upload will be available when connected to Firebase Storage.', 'info');
       });
     }
 
-    // Mock uploaded documents
     if (docsList) {
       docsList.innerHTML = `
-        <div class="empty-state" style="padding: 1.5rem;">
+        <div class="empty-state" style="padding:1.5rem;">
           <div class="empty-state__icon">📄</div>
           <p class="empty-state__text">No documents uploaded yet. Upload your business license, ID, or other required documents here.</p>
         </div>
       `;
     }
   }
+
 
   /* ============================================
      initFinances()

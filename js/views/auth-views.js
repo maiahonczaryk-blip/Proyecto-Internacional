@@ -482,6 +482,20 @@ App.views.auth = {
           opt.textContent = `${b.firstName} ${b.lastName} - ${b.agencyName || 'Independent'}`;
           brokerSelect.appendChild(opt);
         });
+        // Add 'Other' option at the end
+        const otherOpt = document.createElement('option');
+        otherOpt.value = 'other';
+        otherOpt.textContent = 'Otro / Other (enter manually)';
+        brokerSelect.appendChild(otherOpt);
+
+        // Show/hide manual fields when 'other' is selected
+        const brokerManualGroup = newForm.querySelector('#broker-manual-group');
+        const agencyManualGroup = newForm.querySelector('#agency-manual-group');
+        brokerSelect.addEventListener('change', () => {
+          const isOther = brokerSelect.value === 'other';
+          if (brokerManualGroup) brokerManualGroup.style.display = isOther ? 'block' : 'none';
+          if (agencyManualGroup) agencyManualGroup.style.display = isOther ? 'block' : 'none';
+        });
       }
       
       // Toggle fields based on role
@@ -512,6 +526,8 @@ App.views.auth = {
         const termsChecked = newForm.querySelector('#register-terms').checked;
         if (!termsChecked) return alert('Please agree to the terms.');
 
+        const brokerId = brokerSelect ? brokerSelect.value : '';
+        const isManualBroker = brokerId === 'other';
         const data = {
           role: newForm.querySelector('input[name="register-role"]:checked').value,
           firstName: newForm.querySelector('#register-firstName').value,
@@ -520,8 +536,11 @@ App.views.auth = {
           phone: newForm.querySelector('#register-phone').value,
           password: newForm.querySelector('#register-password').value,
           country: newForm.querySelector('#register-country').value,
-          agencyName: agencyNameInput ? agencyNameInput.value : '',
-          brokerId: brokerSelect ? brokerSelect.value : '',
+          agencyName: isManualBroker
+            ? (newForm.querySelector('#register-agency-manual')?.value || '')
+            : (agencyNameInput ? agencyNameInput.value : ''),
+          brokerId: isManualBroker ? '' : brokerId,
+          brokerNameManual: isManualBroker ? (newForm.querySelector('#register-broker-manual')?.value || '') : '',
           newsletterConsent: newForm.querySelector('#register-newsletter')?.checked || false,
         };
         

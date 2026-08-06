@@ -37,6 +37,7 @@
       <a href="#admin/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
       <a href="#admin/users" class="sidebar-link"><span class="sidebar-link__icon">👥</span> Manage Users</a>
       <a href="#admin/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> Clients</a>
+      <a href="#admin/agreements" class="sidebar-link" id="sidebar-agreements-link"><span class="sidebar-link__icon">📋</span> Acuerdos <span id="admin-agreements-badge" style="display:none; background:#e11b22; color:white; border-radius:10px; padding:1px 7px; font-size:0.72rem; font-weight:700; margin-left:4px;">0</span></a>
       <a href="#admin/newsletter" class="sidebar-link"><span class="sidebar-link__icon">📧</span> <span class="lang-en">Newsletter</span><span class="lang-es">Newsletter</span></a>
       <a href="#admin/webinar" class="sidebar-link"><span class="sidebar-link__icon">🎙️</span> <span class="lang-en">Webinar</span><span class="lang-es">Webinar</span></a>
     </nav>
@@ -114,6 +115,13 @@
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">👤</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-realtors">0</div><div class="stat-card__label"><span class="lang-en">Active Realtors</span><span class="lang-es">Realtors Activos</span></div></div></div>
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🤝</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Total Clients</span><span class="lang-es">Clientes Totales</span></div></div></div>
           <div class="stat-card stat-card--red"><div class="stat-card__icon stat-card__icon--red">📥</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-leads">0</div><div class="stat-card__label"><span class="lang-en">Buyer Guide Leads</span><span class="lang-es">Leads de Guía</span></div></div></div>
+        </div>
+        <!-- Agreements Pending Admin Signature -->
+        <div class="dashboard-section" id="admin-agreements-section">
+          <h2>📋 <span class="lang-en">Referral Agreements — Pending Your Signature</span><span class="lang-es">Acuerdos de Referido — Pendientes de Tu Firma</span> <span id="admin-agreements-count" style="font-size:0.85rem; font-weight:600; color:#e11b22; margin-left:8px;"></span></h2>
+          <div id="admin-agreements-list" class="card-list">
+            <div class="empty-state"><div class="empty-state__icon">📋</div><p class="empty-state__text">No agreements pending signature.</p></div>
+          </div>
         </div>
         <div class="dashboard-section">
           <h2><span class="lang-en">Pending Applications</span><span class="lang-es">Solicitudes Pendientes</span></h2>
@@ -369,10 +377,11 @@
                   <th>State / Province</th>
                   <th>How They Heard</th>
                   <th>Referring Agent</th>
+                  <th>Agente (Link) ✅</th>
                 </tr>
               </thead>
               <tbody id="webinar-registrations-tbody">
-                <tr><td colspan="9" style="text-align:center;padding:2rem;color:#6b7280;">Loading registrations…</td></tr>
+                <tr><td colspan="10" style="text-align:center;padding:2rem;color:#6b7280;">Loading registrations…</td></tr>
               </tbody>
             </table>
           </div>
@@ -840,6 +849,7 @@
   <script src="js/views/broker-views.js"></script>
   <script src="js/views/realtor-views.js"></script>
   <script src="js/views/agent-views.js"></script>
+  <script src="js/referral-agreement.js"></script>
   <script src="js/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {

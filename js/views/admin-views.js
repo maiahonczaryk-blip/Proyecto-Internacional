@@ -29,7 +29,7 @@
       allClients = await App.auth.getClients();
 
       // 2. Count users by status and role
-      const pendingUsers  = allUsers.filter(u => u.status === 'pending');
+      const pendingUsers     = allUsers.filter(u => u.status === 'pending');
       const approvedBrokers  = allUsers.filter(u => u.status === 'active' && u.role === 'broker');
       const approvedRealtors = allUsers.filter(u => u.status === 'active' && u.role === 'realtor');
 
@@ -55,10 +55,80 @@
       setTextById('admin-stat-leads', leads.length);
       renderDossierLeads(leads);
 
+      // 7. Load agreement notifications pending admin signature
+      let agreementNotifs = [];
+      if (!App.demoMode && App.db) {
+        const snap = await App.db.collection('agreement_notifications')
+          .where('status', '==', 'pending_admin')
+          .orderBy('uploadedAt', 'desc')
+          .get();
+        snap.forEach(doc => agreementNotifs.push({ id: doc.id, ...doc.data() }));
+      } else {
+        agreementNotifs = (App.demoData.agreementNotifications || [])
+          .filter(n => n.status === 'pending_admin');
+      }
+      renderAgreementNotifications(agreementNotifs);
+
     } catch (err) {
       console.error('[Admin] initDashboard error:', err);
       App.utils.showToast('Error loading admin dashboard.', 'error');
     }
+  }
+
+  /* ── Agreement Notifications List ── */
+  function renderAgreementNotifications(notifications) {
+    const list   = document.getElementById('admin-agreements-list');
+    const badge  = document.getElementById('admin-agreements-badge');
+    const count  = document.getElementById('admin-agreements-count');
+
+    // Update sidebar badge
+    if (badge) {
+      if (notifications.length > 0) {
+        badge.textContent = notifications.length;
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+    if (count) {
+      count.textContent = notifications.length > 0 ? `(${notifications.length} pending)` : '';
+    }
+
+    if (!list) return;
+
+    if (notifications.length === 0) {
+      list.innerHTML = '<div class="empty-state"><div class="empty-state__icon">📋</div><p class="empty-state__text">No agreements pending your signature.</p></div>';
+      return;
+    }
+
+    list.innerHTML = notifications.map(n => `
+      <div class="pending-card glass-card" id="agreement-card-${n.id}" style="padding:1.25rem; margin-bottom:0.75rem;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.75rem;">
+          <div>
+            <div style="font-weight:700; font-size:1rem;">${App.utils.escapeHtml(n.userName)}</div>
+            <div style="font-size:0.82rem; color:#6b7280; margin-top:2px;">
+              ${n.userRole === 'broker' ? '🏢 Broker' : '👤 Realtor'} &nbsp;·&nbsp; ${App.utils.escapeHtml(n.agencyName)} &nbsp;·&nbsp; ${App.utils.escapeHtml(n.email)}
+            </div>
+            <div style="font-size:0.8rem; color:#9ca3af; margin-top:3px;">
+              📎 ${App.utils.escapeHtml(n.fileName || 'agreement')} &nbsp;·&nbsp; Uploaded: ${App.utils.formatDate(n.uploadedAt)}
+            </div>
+          </div>
+          <span class="badge badge--pending" style="background:#fef9c3; color:#854d0e; white-space:nowrap;">⏳ Pending your signature</span>
+        </div>
+        <div style="display:flex; gap:0.75rem; margin-top:1rem; flex-wrap:wrap;">
+          ${n.fileUrl && !n.fileUrl.startsWith('demo://') ? `
+            <a href="${App.utils.escapeHtml(n.fileUrl)}" target="_blank" class="btn btn-outline btn-sm">
+              📥 Download Signed Agreement
+            </a>
+          ` : `
+            <span class="btn btn-outline btn-sm" style="opacity:0.5; cursor:not-allowed;" title="Demo mode — no real file">📥 Download (demo)</span>
+          `}
+          <button class="btn btn-primary btn-sm" onclick="App.views.admin.markAgreementSigned('${n.id}', '${n.userId}')">
+            ✅ Mark as Signed by RE/MAX Inmomás
+          </button>
+        </div>
+      </div>
+    `).join('');
   }
 
   /* ── Dossier Leads List ── */
@@ -1196,7 +1266,7 @@
     if (!tbody) return;
 
     if (registrations.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2rem;color:#6b7280;">No registrations yet.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:2rem;color:#6b7280;">No registrations yet.</td></tr>`;
       return;
     }
 
@@ -1213,6 +1283,25 @@
       const date = App.utils.formatDate(r.createdAt);
       const how  = HOW_LABELS[r.howHeard] || r.howHeard || '—';
       const ref  = r.referrerName ? App.utils.escapeHtml(r.referrerName) : '—';
+
+      // Referral link column — auto-detected from agent's link
+      let agentLinkCell = '—';
+      if (r.agentReferrerName || r.referralCode) {
+        const agentName = r.agentReferrerName ? App.utils.escapeHtml(r.agentReferrerName) : '';
+        const code      = r.referralCode      ? App.utils.escapeHtml(r.referralCode)      : '';
+        const roleBadge = r.agentReferrerRole
+          ? `<span style="background:rgba(0,67,255,.08);color:var(--primary);border-radius:12px;padding:1px 7px;font-size:.72rem;margin-left:4px;">${r.agentReferrerRole}</span>`
+          : '';
+        agentLinkCell = `
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#16a34a;font-size:1rem;" title="Via referral link">✅</span>
+            <div>
+              <div style="font-weight:600;font-size:.83rem;">${agentName}${roleBadge}</div>
+              ${code ? `<div style="font-size:.74rem;color:#6b7280;font-family:monospace;">${code}</div>` : ''}
+            </div>
+          </div>`;
+      }
+
       return `
         <tr>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;color:var(--text-muted);">${date}</td>
@@ -1226,6 +1315,7 @@
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.85rem;">${App.utils.escapeHtml(r.state || '—')}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${how}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${ref}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">${agentLinkCell}</td>
         </tr>`;
     }).join('');
   }
@@ -1249,7 +1339,9 @@
       const headers = [
         'Date','First Name','Last Name','Email','Phone',
         'Agency','Country','State / Province',
-        'How They Heard','Referring Agent','GDPR Consent'
+        'How They Heard','Referring Agent (self-reported)',
+        'Agent Via Link','Referral Code','Agent Role',
+        'Source','GDPR Consent'
       ];
 
       const rows = registrations.map(r => [
@@ -1263,6 +1355,10 @@
         r.state || '',
         HOW_LABELS[r.howHeard] || r.howHeard || '',
         r.referrerName || '',
+        r.agentReferrerName || '',
+        r.referralCode || '',
+        r.agentReferrerRole || '',
+        r.source || 'direct',
         r.gdprConsent ? 'Yes' : 'No'
       ]);
 
@@ -1287,6 +1383,44 @@
     });
   }
 
+  /* ── Mark agreement as signed by admin ── */
+  async function markAgreementSigned(notifId, userId) {
+    try {
+      const now = new Date().toISOString();
+      if (!App.demoMode && App.db) {
+        await App.db.collection('agreement_notifications').doc(notifId).update({
+          status: 'signed',
+          adminSignedAt: now
+        });
+        await App.db.collection('users').doc(userId).update({
+          agreementStatus: 'signed',
+          agreementSignedAt: now
+        });
+      } else {
+        // Demo mode
+        const notif = (App.demoData.agreementNotifications || []).find(n => n.id === notifId);
+        if (notif) { notif.status = 'signed'; notif.adminSignedAt = now; }
+        const user = App.demoData.users.find(u => u.id === userId);
+        if (user) { user.agreementStatus = 'signed'; user.agreementSignedAt = now; }
+        if (App.auth && typeof App.auth.saveDemoData === 'function') App.auth.saveDemoData();
+      }
+      // Remove card from UI
+      const card = document.getElementById(`agreement-card-${notifId}`);
+      if (card) card.remove();
+      // Update badge
+      const remaining = document.querySelectorAll('[id^="agreement-card-"]').length;
+      const badge = document.getElementById('admin-agreements-badge');
+      if (badge) { badge.textContent = remaining; if (remaining === 0) badge.style.display = 'none'; }
+      const count = document.getElementById('admin-agreements-count');
+      if (count) count.textContent = remaining > 0 ? `(${remaining} pending)` : '';
+
+      App.utils.showToast('✅ Agreement marked as signed. Partner notified!', 'success');
+    } catch (err) {
+      console.error('[Admin] markAgreementSigned error:', err);
+      App.utils.showToast('Error updating agreement status.', 'error');
+    }
+  }
+
   /* ============================================
      Public API — register on App.views.admin
      ============================================ */
@@ -1308,8 +1442,8 @@
     showLeadAssignmentModal,
     handleAssignLeadAgent,
     handleDeleteLead,
-    confirmDeleteLead
+    confirmDeleteLead,
+    markAgreementSigned
   };
 
 })();
-

@@ -1069,6 +1069,15 @@
               </select>
               <small style="color:var(--text-muted);"><span class="lang-en">Select if you work under a specific broker in our network</span><span class="lang-es">Selecciona si trabajas bajo un broker de nuestra red</span></small>
             </div>
+            <!-- Manual broker fields (shown when "Other" is selected) -->
+            <div class="form-group" id="broker-manual-group" style="display:none;">
+              <label for="register-broker-manual"><span class="lang-en">Broker Name</span><span class="lang-es">Nombre del Broker</span></label>
+              <input type="text" id="register-broker-manual" class="form-input" placeholder="e.g. John Smith">
+            </div>
+            <div class="form-group" id="agency-manual-group" style="display:none;">
+              <label for="register-agency-manual"><span class="lang-en">Agency / Brokerage Name</span><span class="lang-es">Nombre de la Agencia</span></label>
+              <input type="text" id="register-agency-manual" class="form-input" placeholder="e.g. RE/MAX Gold">
+            </div>
             <div class="form-group">
               <label class="checkbox-label">
                 <input type="checkbox" id="register-terms" required>

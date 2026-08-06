@@ -515,64 +515,187 @@
       if (!currentUser) return;
 
       const container = document.getElementById('broker-documents-content');
-      if (!container) {
-        // If no specific container, just populate within the view
-        return;
+      if (!container) return;
+
+      teamRealtors = await App.auth.getAllUsers({ brokerId: currentUser.id, role: 'realtor' });
+
+      const status = currentUser.agreementStatus || 'none';
+
+      let agreementStatusHtml = '';
+      if (status === 'signed') {
+        agreementStatusHtml = `
+          <div style="display:flex; align-items:center; gap:0.75rem; padding:1rem; background:#d1fae5; border-radius:0.5rem; margin-bottom:1rem;">
+            <span style="font-size:1.5rem;">✅</span>
+            <div>
+              <div style="font-weight:600; color:#065f46;">Referral Agreement — Signed by both parties</div>
+              <div style="font-size:0.85rem; color:#047857;">Signed on ${App.utils.formatDate(currentUser.agreementSignedAt)}</div>
+            </div>
+          </div>`;
+      } else if (status === 'uploaded') {
+        agreementStatusHtml = `
+          <div style="display:flex; align-items:center; gap:0.75rem; padding:1rem; background:#fef9c3; border-radius:0.5rem; margin-bottom:1rem;">
+            <span style="font-size:1.5rem;">⏳</span>
+            <div>
+              <div style="font-weight:600; color:#854d0e;">Agreement uploaded — Pending RE/MAX Inmom&aacute;s countersignature</div>
+              <div style="font-size:0.85rem; color:#a16207;">We will countersign shortly and confirm your partnership.</div>
+            </div>
+          </div>`;
+      } else {
+        agreementStatusHtml = `
+          <div style="padding:1rem; background:#fef3c7; border-radius:0.5rem; margin-bottom:1rem;">
+            <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.6rem;">
+              <span style="font-size:1.25rem;">⚠️</span>
+              <div style="font-weight:600; color:#92400e;">Referral Agreement Required</div>
+            </div>
+            <p style="font-size:0.85rem; color:#78350f; margin:0;">Please download, sign, and upload your Referral Agreement to activate your broker partnership.</p>
+          </div>
+          <!-- Download -->
+          <div style="background:#f8f9ff; border:1.5px solid #c7d2fe; border-radius:0.75rem; padding:1rem; margin-bottom:0.75rem;">
+            <div style="font-weight:600; color:#1e40af; margin-bottom:0.5rem;">1️⃣ Download &amp; Sign</div>
+            <p style="font-size:0.82rem; color:#374151; margin:0 0 0.75rem;">Download your personalized Master Referral Agreement (Word format).</p>
+            <button class="btn btn-primary" id="broker-download-agreement-btn">📄 Download Referral Agreement (.doc)</button>
+          </div>
+          <!-- Upload -->
+          <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:0.75rem; padding:1rem;">
+            <div style="font-weight:600; color:#166534; margin-bottom:0.5rem;">2️⃣ Upload Signed Agreement</div>
+            <p style="font-size:0.82rem; color:#374151; margin:0 0 0.75rem;">Upload your signed copy (PDF or Word).</p>
+            <div id="broker-agreement-upload-zone" style="border:2px dashed #86efac; border-radius:0.5rem; padding:1.25rem; text-align:center; cursor:pointer;"
+                 onclick="document.getElementById('broker-agreement-file-input').click()"
+                 onmouseover="this.style.borderColor='#22c55e'" onmouseout="this.style.borderColor='#86efac'">
+              <div style="font-size:1.75rem;">📤</div>
+              <p style="font-size:0.85rem; color:#374151; margin:0.25rem 0 0;">Click or drop signed file here</p>
+            </div>
+            <input type="file" id="broker-agreement-file-input" accept=".pdf,.doc,.docx" style="display:none;">
+            <div id="broker-agreement-upload-status" style="margin-top:0.5rem; font-size:0.85rem;"></div>
+          </div>`;
       }
 
-      teamRealtors  = await App.auth.getAllUsers({ brokerId: currentUser.id, role: 'realtor' });
-
-      const agreementStatus = currentUser.agreementSigned
-        ? `<div style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: #d1fae5; border-radius: 0.5rem; margin-bottom: 1.5rem;">
-             <span style="font-size: 1.5rem;">✅</span>
-             <div>
-               <div style="font-weight: 600; color: #065f46;">Broker Agreement Signed</div>
-               <div style="font-size: 0.85rem; color: #047857;">Signed on ${App.utils.formatDate(currentUser.agreementSignedAt)}</div>
-             </div>
-           </div>`
-        : `<div style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: #fef3c7; border-radius: 0.5rem; margin-bottom: 1.5rem;">
-             <span style="font-size: 1.5rem;">⚠️</span>
-             <div>
-               <div style="font-weight: 600; color: #92400e;">Broker Agreement Pending</div>
-               <div style="font-size: 0.85rem; color: #b45309;">Please sign the broker agreement.</div>
-             </div>
-           </div>`;
-
-      const teamDocsHtml = teamRealtors.length === 0 
+      const teamDocsHtml = teamRealtors.length === 0
         ? `<div class="empty-state"><div class="empty-state__icon">👥</div><p class="empty-state__text">No team members yet.</p></div>`
-        : `<div class="team-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
-             ${teamRealtors.map(r => `
-               <div class="glass-card" style="padding: 1.25rem;">
-                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+        : `<div class="team-cards-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:1rem;">
+             ${teamRealtors.map(r => {
+               const rStatus = r.agreementStatus || 'none';
+               const badge = rStatus === 'signed'
+                 ? '<span class="badge badge--approved">Signed</span>'
+                 : rStatus === 'uploaded'
+                   ? '<span class="badge badge--pending" style="background:#fef9c3; color:#854d0e;">Uploaded ⏳</span>'
+                   : '<span class="badge badge--pending">Pending</span>';
+               const detail = rStatus === 'signed'
+                 ? `<p style="margin:0; color:#10b981;">Signed on: ${App.utils.formatDate(r.agreementSignedAt)}</p>`
+                 : rStatus === 'uploaded'
+                   ? `<p style="margin:0; color:#a16207;">Agreement uploaded — awaiting admin countersignature</p>`
+                   : `<p style="margin:0; color:#f59e0b;">Waiting for realtor to upload signed agreement</p>`;
+               return `
+               <div class="glass-card" style="padding:1.25rem;">
+                 <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
                    <div>
-                     <div style="font-weight: 600; font-size: 1rem;">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}</div>
-                     <div style="font-size: 0.8rem; color: #6b7280;">Realtor</div>
+                     <div style="font-weight:600; font-size:1rem;">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}</div>
+                     <div style="font-size:0.8rem; color:#6b7280;">Realtor</div>
                    </div>
-                   ${r.agreementSigned 
-                     ? '<span class="badge badge--approved">Signed</span>' 
-                     : '<span class="badge badge--pending">Pending</span>'}
+                   ${badge}
                  </div>
-                 <div style="font-size: 0.85rem; color: #374151;">
-                   <p style="margin: 0 0 0.5rem;"><strong>Agreement:</strong> Collaboration Agreement (Standard 25%)</p>
-                   ${r.agreementSigned 
-                     ? `<p style="margin: 0; color: #10b981;">Signed on: ${App.utils.formatDate(r.agreementSignedAt)}</p>` 
-                     : `<p style="margin: 0; color: #f59e0b;">Waiting for signature</p>`}
+                 <div style="font-size:0.85rem; color:#374151;">
+                   <p style="margin:0 0 0.5rem;"><strong>Agreement:</strong> Master Referral Agreement (25%)</p>
+                   ${detail}
                  </div>
-               </div>
-             `).join('')}
+               </div>`;
+             }).join('')}
            </div>`;
 
       container.innerHTML = `
-        ${agreementStatus}
         <div class="dashboard-section">
-          <h2>Team Realtors Collaboration Agreements</h2>
+          <h2>My Referral Agreement</h2>
+          ${agreementStatusHtml}
+        </div>
+        <div class="dashboard-section">
+          <h2>Team Realtors — Agreement Status</h2>
           ${teamDocsHtml}
         </div>
       `;
 
+      // Bind broker download button
+      const dlBtn = document.getElementById('broker-download-agreement-btn');
+      if (dlBtn) {
+        dlBtn.addEventListener('click', () => {
+          if (typeof App.generateReferralAgreementDoc === 'function') {
+            App.generateReferralAgreementDoc(currentUser);
+            App.utils.showToast('Agreement downloading... Sign it and upload below.', 'info');
+          } else {
+            App.utils.showToast('Generator not loaded. Please refresh.', 'error');
+          }
+        });
+      }
+
+      // Bind broker upload zone
+      const uploadZone = document.getElementById('broker-agreement-upload-zone');
+      const fileInput  = document.getElementById('broker-agreement-file-input');
+      if (uploadZone) {
+        uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.borderColor = '#22c55e'; });
+        uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = '#86efac'; });
+        uploadZone.addEventListener('drop', e => {
+          e.preventDefault();
+          uploadZone.style.borderColor = '#86efac';
+          if (e.dataTransfer.files[0]) handleBrokerAgreementUpload(e.dataTransfer.files[0]);
+        });
+      }
+      if (fileInput) {
+        fileInput.addEventListener('change', () => {
+          if (fileInput.files[0]) handleBrokerAgreementUpload(fileInput.files[0]);
+        });
+      }
+
     } catch (err) {
       console.error('[Broker] initDocuments error:', err);
       App.utils.showToast('Error loading documents.', 'error');
+    }
+  }
+
+  /* ── Handle broker signed agreement upload ── */
+  async function handleBrokerAgreementUpload(file) {
+    const statusEl = document.getElementById('broker-agreement-upload-status');
+    if (statusEl) statusEl.innerHTML = '<span style="color:#6b7280;">⏳ Uploading...</span>';
+    try {
+      let fileUrl = null;
+      if (!App.demoMode && App.storage) {
+        const ref = App.storage.ref(`agreements/${currentUser.id}/signed_${Date.now()}_${file.name}`);
+        await ref.put(file);
+        fileUrl = await ref.getDownloadURL();
+      } else {
+        fileUrl = `demo://agreements/${currentUser.id}/${file.name}`;
+      }
+
+      if (!App.demoMode && App.db) {
+        await App.db.collection('users').doc(currentUser.id).update({
+          agreementStatus: 'uploaded',
+          agreementUploadedAt: new Date().toISOString(),
+          agreementFileUrl: fileUrl
+        });
+        await App.db.collection('agreement_notifications').add({
+          userId: currentUser.id,
+          userName: `${currentUser.firstName} ${currentUser.lastName}`,
+          userRole: currentUser.role,
+          agencyName: currentUser.agencyName || '—',
+          email: currentUser.email,
+          fileUrl: fileUrl,
+          fileName: file.name,
+          uploadedAt: new Date().toISOString(),
+          status: 'pending_admin'
+        });
+      } else {
+        const demoUser = App.demoData.users.find(u => u.id === currentUser.id);
+        if (demoUser) { demoUser.agreementStatus = 'uploaded'; demoUser.agreementUploadedAt = new Date().toISOString(); demoUser.agreementFileUrl = fileUrl; }
+        currentUser.agreementStatus = 'uploaded';
+        App.demoData.agreementNotifications = App.demoData.agreementNotifications || [];
+        App.demoData.agreementNotifications.push({ id: 'notif_' + Date.now(), userId: currentUser.id, userName: `${currentUser.firstName} ${currentUser.lastName}`, userRole: currentUser.role, agencyName: currentUser.agencyName || '—', email: currentUser.email, fileUrl, fileName: file.name, uploadedAt: new Date().toISOString(), status: 'pending_admin' });
+        if (App.auth && typeof App.auth.saveDemoData === 'function') App.auth.saveDemoData();
+      }
+
+      App.utils.showToast('✅ Agreement uploaded! RE/MAX Inmomás will countersign shortly.', 'success');
+      initDocuments();
+    } catch (err) {
+      console.error('[Broker] Agreement upload error:', err);
+      if (statusEl) statusEl.innerHTML = '<span style="color:#e11b22;">❌ Upload failed. Please try again.</span>';
+      App.utils.showToast('Upload failed. Please try again.', 'error');
     }
   }
 

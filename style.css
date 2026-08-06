@@ -1411,6 +1411,28 @@ h1, h2, h3, h4, h5, h6 {
    NEWSLETTER CONSENT & ADMIN NEWSLETTER PANEL
    ====================================================== */
 
+/* Base checkbox label — used for the terms & conditions checkbox */
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  line-height: 1.5;
+  font-size: 0.88rem;
+  color: var(--text-primary, #1a1a2e);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  min-width: 17px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--primary, #0043FF);
+  border-radius: 3px;
+}
+
 /* Newsletter consent checkbox — visually distinct from the required terms checkbox */
 .newsletter-consent-group {
   margin-top: 4px;
