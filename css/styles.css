@@ -2059,7 +2059,7 @@ body.lang-en-ca .lang-flag-svg .flag-en-ca { display: inline-block; }
   letter-spacing: 0.5px;
 }
 
-.form-group input,
+.form-group input:not([type="checkbox"]):not([type="radio"]),
 .form-group select {
   width: 100%;
   padding: 14px 18px;
@@ -2074,11 +2074,24 @@ body.lang-en-ca .lang-flag-svg .flag-en-ca { display: inline-block; }
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
 }
 
+/* Reset checkbox & radio inside .form-group so they stay as native controls */
+.form-group input[type="checkbox"],
+.form-group input[type="radio"] {
+  width: auto !important;
+  padding: 0 !important;
+  border: revert !important;
+  border-radius: revert !important;
+  background: revert !important;
+  box-shadow: none !important;
+  min-width: unset !important;
+  flex-shrink: 0;
+}
+
 .form-group input::placeholder {
   color: var(--text-muted);
 }
 
-.form-group input:focus,
+.form-group input:not([type="checkbox"]):not([type="radio"]):focus,
 .form-group select:focus {
   border-color: var(--blue);
   box-shadow: 0 0 0 3px rgba(0, 67, 255, 0.1);
