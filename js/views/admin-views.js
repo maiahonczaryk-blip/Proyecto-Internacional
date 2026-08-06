@@ -391,9 +391,9 @@
 
     if (search) {
       filtered = filtered.filter(u => {
-        const fullName = `${u.firstName} ${u.lastName}`.toLowerCase();
+        const fullName = `${u.firstName || ''} ${u.lastName || ''}`.toLowerCase();
         return fullName.includes(search) ||
-               u.email.toLowerCase().includes(search) ||
+               (u.email || '').toLowerCase().includes(search) ||
                (u.agencyName || '').toLowerCase().includes(search);
       });
     }

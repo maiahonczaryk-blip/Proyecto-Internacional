@@ -217,23 +217,28 @@ App.utils.getStatusBadgeClass = function(status) {
 
 /* ---- User Status Helpers ---- */
 App.utils.getUserStatusBadge = function(status) {
-  return `<span class="badge ${App.utils.getStatusBadgeClass(status)}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>`;
+  const safeStatus = status || 'pending';
+  return `<span class="badge ${App.utils.getStatusBadgeClass(safeStatus)}">${safeStatus.charAt(0).toUpperCase() + safeStatus.slice(1)}</span>`;
 };
 
 App.utils.getRoleBadge = function(role) {
+  const safeRole = role || 'user';
   const classes = { admin: 'badge--admin', broker: 'badge--broker', realtor: 'badge--realtor' };
-  return `<span class="badge ${classes[role] || ''}">${role.charAt(0).toUpperCase() + role.slice(1)}</span>`;
+  return `<span class="badge ${classes[safeRole] || ''}">${safeRole.charAt(0).toUpperCase() + safeRole.slice(1)}</span>`;
 };
 
 /* ---- Avatar Generation ---- */
 App.utils.getInitials = function(firstName, lastName) {
-  return ((firstName?.[0] || '') + (lastName?.[0] || '')).toUpperCase();
+  const f = firstName || '';
+  const l = lastName || '';
+  return ((f[0] || '') + (l[0] || '')).toUpperCase() || 'U';
 };
 
 App.utils.generateAvatar = function(firstName, lastName, size = 'md') {
   const initials = App.utils.getInitials(firstName, lastName);
   const colors = ['#0043ff', '#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#EC4899', '#06B6D4'];
-  const hash = (firstName + lastName).split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const nameStr = (firstName || '') + (lastName || '');
+  const hash = nameStr ? nameStr.split('').reduce((a, c) => a + c.charCodeAt(0), 0) : 0;
   const color = colors[hash % colors.length];
   return `<div class="avatar avatar--${size}" style="background-color: ${color}">${initials}</div>`;
 };
