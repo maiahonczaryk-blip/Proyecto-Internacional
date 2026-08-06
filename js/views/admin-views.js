@@ -1330,8 +1330,6 @@
     });
   }
 
-  }
-
   /* ── Dedicated Agreements View ── */
   async function initAgreementsView() {
     try {
