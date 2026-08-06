@@ -47,10 +47,10 @@
                   <span class="lang-en-ca">Master Referral Agreement Required</span>
                 </div>
                 <div style="font-size:0.85rem; color:#78350f; margin-top:4px;">
-                  <span class="lang-en">Your partnership is pending execution of the Master Referral Agreement. Please go to <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> to sign and upload it to activate your referral link.</span>
-                  <span class="lang-es">Tu colaboración está pendiente de la firma del Acuerdo de Referido. Ve a <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documentos</a> para firmarlo y subirlo para activar tu enlace.</span>
-                  <span class="lang-fr">Votre partenariat est en attente de signature de l'accord. Veuillez vous rendre dans <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> pour le signer.</span>
-                  <span class="lang-en-ca">Your partnership is pending execution of the Master Referral Agreement. Please go to <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> to sign and upload it to activate your referral link.</span>
+                  <span class="lang-en">Your partnership is pending execution of the Master Referral Agreement. Please go to <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> to sign and upload it to complete your partnership setup.</span>
+                  <span class="lang-es">Tu colaboración está pendiente de la firma del Acuerdo de Referido. Ve a <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documentos</a> para firmarlo y subirlo para completar tu perfil de colaborador.</span>
+                  <span class="lang-fr">Votre partenariat est en attente de signature de l'accord. Veuillez vous rendre dans <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> pour le signer afin de compléter votre inscription.</span>
+                  <span class="lang-en-ca">Your partnership is pending execution of the Master Referral Agreement. Please go to <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> to sign and upload it to complete your partnership setup.</span>
                 </div>
               </div>
             </div>`;
@@ -91,14 +91,9 @@
       const linkInput = document.getElementById('broker-dash-referral-link');
       if (linkInput) {
         if (isPending) {
-          linkInput.value = 'Enlace pendiente de aprobación por el Administrador';
+          linkInput.value = 'Enlace pendiente de aprobación por el Administrador / Link pending admin approval';
           linkInput.disabled = true;
           linkInput.style.color = '#9ca3af';
-          linkInput.style.fontStyle = 'italic';
-        } else if (!hasSigned) {
-          linkInput.value = 'Enlace pendiente de firmar el Acuerdo / Link pending agreement signature';
-          linkInput.disabled = true;
-          linkInput.style.color = '#e11b22';
           linkInput.style.fontStyle = 'italic';
         } else {
           linkInput.value = referralLink;
@@ -111,7 +106,7 @@
       // Copy button handler
       const copyBtn = document.getElementById('broker-dash-copy-link');
       if (copyBtn) {
-        if (isPending || !hasSigned) {
+        if (isPending) {
           copyBtn.disabled = true;
           copyBtn.style.opacity = '0.5';
           copyBtn.style.cursor = 'not-allowed';
@@ -119,8 +114,14 @@
         } else {
           copyBtn.disabled = false;
           copyBtn.style.opacity = '';
-          copyBtn.style.cursor = '';
-          copyBtn.onclick = () => App.utils.copyToClipboard(referralLink);
+          copyBtn.style.cursor = 'pointer';
+          copyBtn.onclick = () => {
+            if (linkInput) {
+              linkInput.select();
+              document.execCommand('copy');
+              App.utils.showToast('Referral link copied to clipboard!', 'success');
+            }
+          };
         }
       }
 
