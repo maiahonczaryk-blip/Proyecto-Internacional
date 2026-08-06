@@ -261,6 +261,21 @@
 
     } catch (err) {
       console.error('[Admin] initUsers error:', err);
+      const tbody = document.getElementById('admin-users-table-body');
+      if (tbody) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 3rem; color: #dc2626;">
+              <div class="empty-state">
+                <div class="empty-state__icon" style="font-size: 2.5rem; margin-bottom: 8px;">⚠️</div>
+                <p class="empty-state__text" style="font-weight: 700; font-size: 1.1rem; color: #111827; margin: 0;">Error Loading Users</p>
+                <p style="font-size: 0.85rem; color: #ef4444; margin-top: 8px; font-family: monospace; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.4;">${err.message || err}</p>
+                <p style="font-size: 0.75rem; color: #6b7280; margin-top: 12px;">Please check your browser developer tools console and your Firebase database credentials.</p>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
       App.utils.showToast('Error loading user management.', 'error');
     }
   }
@@ -680,6 +695,17 @@
       );
     } catch (err) {
       console.error('[Admin] initClients error:', err);
+      const container = document.getElementById('admin-clients-board');
+      if (container) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 3rem; color: #dc2626; background: rgba(220, 38, 38, 0.03); border: 1px dashed #fca5a5; border-radius: 12px; margin: 16px;">
+            <div style="font-size: 2.5rem; margin-bottom: 8px;">⚠️</div>
+            <div style="font-weight: 700; font-size: 1.1rem; color: #111827; margin-bottom: 6px;">Error Loading Client Pipeline</div>
+            <div style="font-size: 0.85rem; color: #ef4444; font-family: monospace; max-width: 500px; margin: 0 auto 12px; line-height: 1.4;">${err.message || err}</div>
+            <div style="font-size: 0.75rem; color: #6b7280;">Please verify your Firebase project permissions and configuration settings.</div>
+          </div>
+        `;
+      }
       App.utils.showToast('Error loading clients.', 'error');
     }
   }
