@@ -188,7 +188,7 @@ App.auth = (function() {
       notifyAuthChange();
       return { success: true, user: currentUser };
     }
-  }
+  }  // end register()
 
   /* ---- Login ---- */
   async function login(email, password) {
@@ -216,36 +216,66 @@ App.auth = (function() {
       return currentUser;
     } else {
       // Firebase login
-      const credential = await App.firebaseAuth.signInWithEmailAndPassword(email, password);
-      const doc = await App.db.collection('users').doc(credential.user.uid).get();
-      
-      if (!doc.exists) {
-        await App.firebaseAuth.signOut();
-        throw new Error('Account not found. Please register first.');
+      try {
+        const credential = await App.firebaseAuth.signInWithEmailAndPassword(email, password);
+        const doc = await App.db.collection('users').doc(credential.user.uid).get();
+
+        if (!doc.exists) {
+          await App.firebaseAuth.signOut();
+          throw new Error('Account not found. Please register first.');
+        }
+
+        const userData = doc.data();
+
+        if (userData.status === 'rejected') {
+          await App.firebaseAuth.signOut();
+          throw new Error('Your application has been rejected. Please contact support.');
+        }
+
+        // Auto-generate referralCode if missing (for users registered before this field existed)
+        if (!userData.referralCode && userData.role && userData.lastName) {
+          const prefix = userData.role === 'broker' ? 'BRK' : (userData.role === 'agent_inmomas' ? 'LOC' : 'REA');
+          const uid = credential.user.uid;
+          userData.referralCode = `${prefix}-${userData.lastName.toUpperCase()}-${uid.substring(0, 4)}`;
+          // Save back to Firestore
+          await App.db.collection('users').doc(uid).update({ referralCode: userData.referralCode });
+          console.log('[Auth] Auto-generated referralCode:', userData.referralCode);
+        }
+
+        currentUser = { id: credential.user.uid, ...userData };
+        notifyAuthChange();
+        return currentUser;
+
+      } catch (firebaseErr) {
+        // Convert raw Firebase error codes to friendly messages
+        const code = firebaseErr.code || '';
+        if (
+          code === 'auth/wrong-password' ||
+          code === 'auth/user-not-found' ||
+          code === 'auth/invalid-credential' ||
+          code === 'auth/invalid-login-credentials' ||
+          (firebaseErr.message && firebaseErr.message.includes('INVALID_LOGIN_CREDENTIALS'))
+        ) {
+          throw new Error('Incorrect email or password. Please try again.');
+        }
+        if (code === 'auth/too-many-requests') {
+          throw new Error('Too many failed attempts. Please wait a few minutes and try again.');
+        }
+        if (code === 'auth/user-disabled') {
+          throw new Error('This account has been disabled. Please contact support.');
+        }
+        if (code === 'auth/network-request-failed') {
+          throw new Error('Network error. Please check your connection and try again.');
+        }
+        // Re-throw with cleaned message (strip raw JSON if present)
+        const cleanMsg = (firebaseErr.message || 'Login failed.')
+          .replace(/\{"error".*\}/, '')
+          .trim() || 'Login failed. Please try again.';
+        throw new Error(cleanMsg);
       }
-
-      const userData = doc.data();
-
-      if (userData.status === 'rejected') {
-        await App.firebaseAuth.signOut();
-        throw new Error('Your application has been rejected. Please contact support.');
-      }
-
-      // Auto-generate referralCode if missing (for users registered before this field existed)
-      if (!userData.referralCode && userData.role && userData.lastName) {
-        const prefix = userData.role === 'broker' ? 'BRK' : (userData.role === 'agent_inmomas' ? 'LOC' : 'REA');
-        const uid = credential.user.uid;
-        userData.referralCode = `${prefix}-${userData.lastName.toUpperCase()}-${uid.substring(0, 4)}`;
-        // Save back to Firestore
-        await App.db.collection('users').doc(uid).update({ referralCode: userData.referralCode });
-        console.log('[Auth] Auto-generated referralCode:', userData.referralCode);
-      }
-
-      currentUser = { id: credential.user.uid, ...userData };
-      notifyAuthChange();
-      return currentUser;
     }
   }
+
 
   /* ---- Google Login ---- */
   async function loginWithGoogle() {
