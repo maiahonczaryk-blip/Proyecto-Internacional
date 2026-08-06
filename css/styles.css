@@ -7484,3 +7484,14 @@ textarea:focus-visible {
   accent-color: #fff !important;
 }
 
+/* ---- Wide Scrollable Data Tables ---- */
+.data-table--wide {
+  min-width: 1200px !important;
+}
+.data-table--medium {
+  min-width: 1000px !important;
+}
+.data-table--narrow {
+  min-width: 800px !important;
+}
+
