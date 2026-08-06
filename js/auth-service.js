@@ -102,7 +102,7 @@ App.auth = (function() {
 
   /* ---- Register ---- */
   async function register(data) {
-    const { email, password, firstName, lastName, agencyName, phone, country, role, brokerId } = data;
+    const { email, password, firstName, lastName, agencyName, phone, country, role, brokerId, referredBy, source } = data;
 
     if (!email || !password || !firstName || !lastName || !role) {
       throw new Error('Please fill in all required fields.');
@@ -142,6 +142,8 @@ App.auth = (function() {
         agreementSignedAt: null,
         newsletterConsent: data.newsletterConsent || false,
         newsletterConsentAt: data.newsletterConsent ? new Date().toISOString() : null,
+        referredBy: referredBy || null,
+        source: source || null,
         createdAt: new Date().toISOString()
       };
 
@@ -178,6 +180,8 @@ App.auth = (function() {
         agreementSignedAt: null,
         newsletterConsent: data.newsletterConsent || false,
         newsletterConsentAt: data.newsletterConsent ? new Date().toISOString() : null,
+        referredBy: referredBy || null,
+        source: source || null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };

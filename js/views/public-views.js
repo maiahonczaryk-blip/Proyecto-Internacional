@@ -109,8 +109,13 @@ App.views.public = {
     function updateFieldVisibility(type) {
       const cf = document.getElementById('referral-client-fields');
       const pf = document.getElementById('referral-professional-fields');
+      const pwGroup = document.getElementById('referral-password-group');
+      const pwInput = document.getElementById('referral-password');
+
       if (cf) cf.style.display = type === 'client' ? '' : 'none';
       if (pf) pf.style.display = type !== 'client' ? '' : 'none';
+      if (pwGroup) pwGroup.style.display = type === 'client' ? 'none' : '';
+
       // Disable required on hidden client fields to prevent validation blocking
       if (cf) {
         cf.querySelectorAll('[required]').forEach(el => {
@@ -121,6 +126,13 @@ App.views.public = {
             el.setAttribute('required', '');
           }
         });
+      }
+      if (pwInput) {
+        if (type === 'client') {
+          pwInput.removeAttribute('required');
+        } else {
+          pwInput.setAttribute('required', '');
+        }
       }
     }
 
@@ -229,6 +241,20 @@ App.views.public = {
     // Initial visibility
     updateFieldVisibility(selectedType);
 
+    // Bind Webinar Info toggle
+    const infoBtn = document.getElementById('webinar-info-btn');
+    const infoDetails = document.getElementById('webinar-info-details');
+    if (infoBtn && infoDetails) {
+      infoBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const isHidden = infoDetails.style.display === 'none';
+        infoDetails.style.display = isHidden ? 'block' : 'none';
+        infoBtn.style.background = isHidden ? 'var(--blue)' : 'rgba(0,0,0,0.05)';
+        infoBtn.style.color = isHidden ? 'white' : 'var(--text-muted)';
+      });
+    }
+
     // ---- Step 3: Form submission (ALWAYS attach, regardless of referrer lookup) ----
     if (form && !form.dataset.listenerAttached) {
       form.dataset.listenerAttached = 'true';
@@ -256,6 +282,9 @@ App.views.public = {
             App.utils.showToast('Please fill in all required fields.', 'error');
             return;
           }
+
+          let agencyName = '';
+          let market = '';
 
           if (contactType === 'client') {
             const country = form.querySelector('#referral-country')?.value.trim() || '';
@@ -290,31 +319,69 @@ App.views.public = {
 
             await App.auth.addReferralClient(clientPayload);
           } else {
-            const agencyName = form.querySelector('#referral-agencyName')?.value.trim() || '';
-            const market = form.querySelector('#referral-market')?.value.trim() || '';
+            agencyName = form.querySelector('#referral-agencyName')?.value.trim() || '';
+            market = form.querySelector('#referral-market')?.value.trim() || '';
             const notes = form.querySelector('#referral-notes')?.value.trim() || '';
+            const password = (form.querySelector('#referral-password')?.value || '').trim();
+
+            if (!password || password.length < 6) {
+              throw new Error('Password must be at least 6 characters.');
+            }
 
             const userPayload = {
-              firstName, lastName, email, phone,
+              email,
+              password,
+              firstName,
+              lastName,
+              agencyName,
+              phone,
+              country: market || 'United States',
               role: contactType,
-              agencyName, market, notes,
-              referredBy: referrer ? referrer.id : null,
               brokerId: (referrer && referrer.role === 'broker') ? referrer.id : null,
+              referredBy: referrer ? referrer.id : null,
+              source: 'referral'
             };
 
-            await App.auth.addReferralUser(userPayload);
+            await App.auth.register(userPayload);
+          }
+
+          // Handle webinar consent check
+          const webinarConsent = document.getElementById('referral-webinar-consent');
+          if (webinarConsent && webinarConsent.checked) {
+            const webinarPayload = {
+              firstName,
+              lastName,
+              email,
+              phone,
+              agency: (contactType === 'client' ? 'Client' : (agencyName || 'Referred Partner')),
+              country: (contactType === 'client' ? (form.querySelector('#referral-country')?.value || 'United States') : 'United States'),
+              state: (contactType === 'client' ? 'N/A' : (market || 'N/A')),
+              howHeard: 'Referral Link',
+              referrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : ''
+            };
+            try {
+              await App.auth.saveWebinarRegistration(webinarPayload);
+            } catch (webinarErr) {
+              console.warn('[Referral] Webinar registration failed:', webinarErr);
+            }
           }
 
           App.utils.showToast(
             contactType === 'client'
               ? '¡Registro exitoso! Nos pondremos en contacto contigo pronto.'
-              : '¡Solicitud enviada! Tu registro será revisado por el administrador.',
+              : '¡Registro exitoso! Redirigiendo a tu solicitud en revisión.',
             'success'
           );
 
           sessionStorage.removeItem('referralCode');
           form.reset();
-          setTimeout(() => App.router.navigateTo('home'), 1500);
+          setTimeout(() => {
+            if (contactType === 'client') {
+              App.router.navigateTo('home');
+            } else {
+              App.router.navigateTo('pending');
+            }
+          }, 1500);
 
         } catch (err) {
           console.error('[Referral] Error submitting form:', err);

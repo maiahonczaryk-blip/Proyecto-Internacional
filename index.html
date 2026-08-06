@@ -1398,10 +1398,43 @@
                 <input type="text" id="referral-market" placeholder="Miami, FL / New York, NY...">
               </div>
             </div>
+            <!-- Password Field (shown for professional registrations) -->
+            <div id="referral-password-group" style="display: none;" class="form-group">
+              <label for="referral-password">
+                <span class="lang-en">Password</span>
+                <span class="lang-es">Contraseña</span>
+                <span class="lang-fr">Mot de passe</span>
+                <span class="lang-en-ca">Password</span> *
+              </label>
+              <input type="password" id="referral-password" placeholder="Min. 6 characters">
+            </div>
             <!-- Notes -->
             <div class="form-group">
               <label><span class="lang-en">Notes</span><span class="lang-es">Notas</span></label>
               <textarea id="referral-notes" rows="3" placeholder="" style="resize: vertical; width: 100%; padding: 12px 16px; border: 1px solid rgba(0,0,0,0.12); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.95rem; background: var(--bg-card); color: var(--text-primary); transition: border-color 0.2s;"></textarea>
+            </div>
+            <!-- Webinar Registration Checkbox -->
+            <div class="form-group webinar-consent-group" style="margin-top: 20px;">
+              <label class="checkbox-label checkbox-label--webinar" style="display:flex; align-items:flex-start; gap:12px; cursor:pointer;">
+                <input type="checkbox" id="referral-webinar-consent" style="margin-top:3px; flex-shrink:0;">
+                <span style="flex-grow:1;">
+                  <strong style="display:inline-flex; align-items:center; flex-wrap:wrap; gap:4px;">
+                    <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#ff4444; box-shadow:0 0 5px #ff4444; animation:webinar-pulse 1.5s ease-in-out infinite; margin-right:4px;"></span>
+                    <span class="lang-en">Sign up for the "Beyond Borders" Live Webinar</span>
+                    <span class="lang-es">Inscribirme al Webinar en Vivo "Beyond Borders"</span>
+                    <span class="lang-fr">S'inscrire au Webinaire en Direct "Beyond Borders"</span>
+                    <span class="lang-en-ca">Sign up for the "Beyond Borders" Live Webinar</span>
+                    <span class="info-toggle-btn" id="webinar-info-btn" style="display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.1); font-size: 0.72rem; cursor: pointer; color: var(--text-muted); margin-left: 6px; font-weight: 700; transition: all 0.2s; vertical-align: middle;" title="More Info / Más Info">i</span>
+                  </strong>
+                  <br>
+                  <small id="webinar-info-details" style="display: none; font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-top: 6px; padding-left: 6px; border-left: 2px solid var(--blue);">
+                    <span class="lang-en">Join our exclusive webinar on August 13, 2026, featuring local Costa Blanca market trends, Master Referral Agreement guidelines, and commission models. Exclusively for US and Canadian agents.</span>
+                    <span class="lang-es">Únete a nuestro webinar exclusivo el 13 de agosto de 2026 sobre tendencias de la Costa Blanca, pautas de Acuerdos de Referido y comisiones. Exclusivo para agentes de EE.UU. y Canadá.</span>
+                    <span class="lang-fr">Rejoignez notre webinaire exclusif le 13 août 2026 présentant les tendances du marché de Costa Blanca, les directives de l'Accord de Référencement et les commissions. Réservé aux agents américains et canadiens.</span>
+                    <span class="lang-en-ca">Join our exclusive webinar on August 13, 2026, featuring local Costa Blanca market trends, Master Referral Agreement guidelines, and commission models. Exclusively for US and Canadian agents.</span>
+                  </small>
+                </span>
+              </label>
             </div>
             <!-- Submit -->
             <div class="form-group" style="margin-top: 24px;">
