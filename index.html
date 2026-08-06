@@ -2151,10 +2151,18 @@
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       if (App && App.auth) {
-        await App.auth.init();
+        try {
+          await App.auth.init();
+        } catch (authErr) {
+          console.error('[App] Auth initialization failed:', authErr);
+        }
       }
       if (App && App.router) {
-        App.router.init();
+        try {
+          App.router.init();
+        } catch (routerErr) {
+          console.error('[App] Router initialization failed:', routerErr);
+        }
       }
     });
   </script>

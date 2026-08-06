@@ -72,6 +72,12 @@ App.auth = (function() {
         notifyAuthChange();
         resolve(currentUser);
       } else {
+        if (!App.firebaseAuth) {
+          console.error('[Auth] Firebase Auth is not initialized or failed to load. Resolving with null user.');
+          resolve(null);
+          return;
+        }
+
         // Firebase Auth listener
         let firstResolve = true;
         App.firebaseAuth.onAuthStateChanged(async (firebaseUser) => {
