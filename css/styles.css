@@ -352,6 +352,11 @@ body.lang-en-ca .lang-fr { display: none; }
 
 .nav-cta {
   margin-left: 12px;
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast) !important;
+}
+
+.nav-cta:hover {
+  transform: none !important;
 }
 
 /* Language Selector — Dropdown elegante */
@@ -7454,19 +7459,19 @@ textarea:focus-visible {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  background: linear-gradient(135deg, rgba(0, 63, 153, 0.08) 0%, rgba(204, 0, 0, 0.08) 100%) !important;
-  border: 1.5px solid rgba(0, 63, 153, 0.25) !important;
+  background: linear-gradient(135deg, #003f99, #cc0000) !important;
+  color: #fff !important;
+  border: none !important;
   border-radius: 12px !important;
   padding: 14px 16px !important;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 63, 153, 0.05);
+  box-shadow: 0 4px 15px rgba(0, 63, 153, 0.25) !important;
 }
 
 .checkbox-label--webinar:hover {
-  border-color: rgba(204, 0, 0, 0.4) !important;
-  background: linear-gradient(135deg, rgba(0, 63, 153, 0.12) 0%, rgba(204, 0, 0, 0.12) 100%) !important;
-  box-shadow: 0 4px 12px rgba(0, 63, 153, 0.1);
+  box-shadow: 0 6px 20px rgba(0, 63, 153, 0.45) !important;
+  transform: none !important;
 }
 
 .checkbox-label--webinar input[type="checkbox"] {
@@ -7476,12 +7481,6 @@ textarea:focus-visible {
   width: 17px;
   height: 17px;
   flex-shrink: 0;
-  accent-color: #003f99 !important;
-}
-
-.info-toggle-btn:hover {
-  background: rgba(0, 67, 255, 0.1) !important;
-  color: var(--blue) !important;
-  border-color: var(--blue) !important;
+  accent-color: #fff !important;
 }
 

@@ -173,7 +173,9 @@ App.views.public = {
       // Update welcome message
       if (welcomeMsg) {
         welcomeMsg.innerHTML = `<span class="lang-en">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Please fill out the form below to register.</span>
-                                <span class="lang-es">Has sido referido por <strong>${referrer.firstName} ${referrer.lastName}</strong>. Completa el formulario para registrarte.</span>`;
+                                <span class="lang-es">Has sido referido por <strong>${referrer.firstName} ${referrer.lastName}</strong>. Completa el formulario para registrarte.</span>
+                                <span class="lang-fr">Vous avez été parrainé par <strong>${referrer.firstName} ${referrer.lastName}</strong>. Veuillez remplir le formulaire ci-dessous pour vous inscrire.</span>
+                                <span class="lang-en-ca">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Please fill out the form below to register.</span>`;
       }
 
       // Build type options
@@ -185,9 +187,9 @@ App.views.public = {
       }
 
       const typeConfig = {
-        client: { icon: '👤', labelEn: 'Client', labelEs: 'Cliente' },
-        realtor: { icon: '🏠', labelEn: 'Realtor', labelEs: 'Realtor' },
-        broker: { icon: '🏢', labelEn: 'Broker', labelEs: 'Broker' }
+        client: { icon: '👤', labelEn: 'Client', labelEs: 'Cliente', labelFr: 'Client', labelEnCa: 'Client' },
+        realtor: { icon: '🏠', labelEn: 'Realtor', labelEs: 'Realtor', labelFr: 'Realtor', labelEnCa: 'Realtor' },
+        broker: { icon: '🏢', labelEn: 'Broker', labelEs: 'Broker', labelFr: 'Courtier', labelEnCa: 'Broker' }
       };
 
       if (availableTypes.length > 1 && typeSelector && typeOptions) {
@@ -200,7 +202,10 @@ App.views.public = {
               <div class="role-card__content" style="padding: 16px 12px; text-align: center;">
                 <span class="role-card__icon" style="font-size: 1.8rem;">${cfg.icon}</span>
                 <span class="role-card__title" style="font-size: 0.85rem;">
-                  <span class="lang-en">${cfg.labelEn}</span><span class="lang-es">${cfg.labelEs}</span>
+                  <span class="lang-en">${cfg.labelEn}</span>
+                  <span class="lang-es">${cfg.labelEs}</span>
+                  <span class="lang-fr">${cfg.labelFr}</span>
+                  <span class="lang-en-ca">${cfg.labelEnCa}</span>
                 </span>
               </div>
             </label>`;
@@ -241,19 +246,7 @@ App.views.public = {
     // Initial visibility
     updateFieldVisibility(selectedType);
 
-    // Bind Webinar Info toggle
-    const infoBtn = document.getElementById('webinar-info-btn');
-    const infoDetails = document.getElementById('webinar-info-details');
-    if (infoBtn && infoDetails) {
-      infoBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const isHidden = infoDetails.style.display === 'none';
-        infoDetails.style.display = isHidden ? 'block' : 'none';
-        infoBtn.style.background = isHidden ? 'var(--blue)' : 'rgba(0,0,0,0.05)';
-        infoBtn.style.color = isHidden ? 'white' : 'var(--text-muted)';
-      });
-    }
+
 
     // ---- Step 3: Form submission (ALWAYS attach, regardless of referrer lookup) ----
     if (form && !form.dataset.listenerAttached) {
