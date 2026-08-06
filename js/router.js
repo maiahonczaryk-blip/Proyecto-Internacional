@@ -30,6 +30,7 @@ App.router = (function() {
     'admin/dashboard': { view: 'view-admin-dashboard', role: 'admin',  sidebar: 'admin', title: 'Admin Dashboard' },
     'admin/users':     { view: 'view-admin-users',     role: 'admin',  sidebar: 'admin', title: 'Manage Users' },
     'admin/clients':   { view: 'view-admin-clients',   role: 'admin',  sidebar: 'admin', title: 'Clients' },
+    'admin/agreements':{ view: 'view-admin-agreements',role: 'admin',  sidebar: 'admin', title: 'Referral Agreements' },
     'admin/newsletter':{ view: 'view-admin-newsletter',role: 'admin',  sidebar: 'admin', title: 'Newsletter' },
     'admin/webinar':   { view: 'view-admin-webinar',   role: 'admin',  sidebar: 'admin', title: 'Webinar Registrations' },
 
@@ -219,16 +220,7 @@ App.router = (function() {
       }
     }
 
-    // If user is logged in and trying to access login/register, redirect appropriately
-    if ((routeKey === 'login' || routeKey === 'register') && App.auth.isAuthenticated()) {
-      const user = App.auth.getCurrentUser();
-      if (user.status === 'pending') {
-        window.location.href = 'index.html#pending';
-        return;
-      }
-      window.location.href = 'app.html#' + user.role + '/dashboard';
-      return;
-    }
+
 
     currentRoute = routeKey;
 
@@ -371,6 +363,7 @@ App.router = (function() {
       'admin/dashboard':   () => App.views.admin && App.views.admin.initDashboard(),
       'admin/users':       () => App.views.admin && App.views.admin.initUsers(),
       'admin/clients':     () => App.views.admin && App.views.admin.initClients(),
+      'admin/agreements':  () => App.views.admin && App.views.admin.initAgreementsView(),
       'admin/newsletter':  () => App.views.admin && App.views.admin.initNewsletter(),
       'admin/webinar':    () => App.views.admin && App.views.admin.initWebinar(),
       'webinar':          () => App.views.public && App.views.public.initWebinarRegister(),

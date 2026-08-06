@@ -55,12 +55,10 @@ This script will synchronize all 11 default mock users (along with their clients
 ## 🚀 Key Workflows & Features
 
 ### 1. New Registrations & Referral Locks
-- When a new Realtor registers (with Email or Google), they default to `'pending'` status and are logged in automatically.
-- They can access their dashboard immediately, but all marketing features (referral links and QR codes) are locked:
-  - The link box displays: *"Enlace pendiente de aprobación por el Administrador"*.
-  - Copy buttons are disabled and greyed out.
-  - The QR code box displays a placeholder warning.
-- Once approved by an Admin, the restrictions are instantly lifted.
+- When a new user (Realtor or Broker) registers, they default to `'pending'` status and are redirected to the pending approval screen (`index.html#pending`).
+- On the pending screen, they must download their personalized Master Referral Agreement, sign it outside the system, and upload the signed copy.
+- Uploading the signed agreement triggers a notification for the Admin to review and countersign.
+- Once the Admin uploads the final countersigned agreement, the partner account is approved, restrictions are lifted, and both the Admin and the Realtor/Broker can access the final signed agreement in their documents tab.
 
 ### 2. Admin Approval Cards & Role Assignment
 - Under **Pending Applications** on the Admin Dashboard, the admin can approve or reject applicants directly:

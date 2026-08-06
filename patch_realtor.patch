@@ -1,0 +1,26 @@
+--- js/firebase-config.js
++++ js/firebase-config.js
+@@ -145,6 +145,23 @@
+       agreementSignedAt: '2025-04-01T09:00:00Z',
+       createdAt: '2025-03-18T11:00:00Z'
+     },
++    {
++      id: 'realtor-pending-1',
++      email: 'new.agent@remaxusa.com',
++      password: 'realtor123',
++      role: 'realtor',
++      status: 'pending_broker',
++      firstName: 'Tom',
++      lastName: 'Hanks',
++      agencyName: 'RE/MAX Premier - Miami',
++      phone: '+1 305 555 1003',
++      country: 'United States',
++      brokerId: 'broker-001',
++      referralCode: 'REA-HANKS',
++      profileImage: null,
++      agreementSigned: false,
++      createdAt: '2025-07-01T11:00:00Z'
++    },
+     {
+       id: 'partner-001',
+       email: 'partner@example.com',

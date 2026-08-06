@@ -130,7 +130,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Navbar Scroll Effect ──
   const navbar = document.getElementById('navbar');
   const handleScroll = () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 50);
+    if (navbar) {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    }
   };
   window.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll();

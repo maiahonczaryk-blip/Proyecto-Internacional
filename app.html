@@ -116,13 +116,7 @@
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🤝</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Total Clients</span><span class="lang-es">Clientes Totales</span></div></div></div>
           <div class="stat-card stat-card--red"><div class="stat-card__icon stat-card__icon--red">📥</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-leads">0</div><div class="stat-card__label"><span class="lang-en">Buyer Guide Leads</span><span class="lang-es">Leads de Guía</span></div></div></div>
         </div>
-        <!-- Agreements Pending Admin Signature -->
-        <div class="dashboard-section" id="admin-agreements-section">
-          <h2>📋 <span class="lang-en">Referral Agreements — Pending Your Signature</span><span class="lang-es">Acuerdos de Referido — Pendientes de Tu Firma</span> <span id="admin-agreements-count" style="font-size:0.85rem; font-weight:600; color:#e11b22; margin-left:8px;"></span></h2>
-          <div id="admin-agreements-list" class="card-list">
-            <div class="empty-state"><div class="empty-state__icon">📋</div><p class="empty-state__text">No agreements pending signature.</p></div>
-          </div>
-        </div>
+
         <div class="dashboard-section">
           <h2><span class="lang-en">Pending Applications</span><span class="lang-es">Solicitudes Pendientes</span></h2>
           <div id="admin-pending-list" class="card-list"></div>
@@ -199,6 +193,48 @@
           <p class="dashboard-subtitle"><span class="lang-en">Broker Inmomás CRM Overview — Assign local agents and monitor status</span><span class="lang-es">Control del CRM de Broker Inmomás — Asigna agentes locales y monitoriza el estado</span></p>
         </div>
         <div id="admin-clients-board" class="pipeline-board"></div>
+      </div>
+    </div>
+
+
+    <!-- ==================== VIEW: ADMIN AGREEMENTS ==================== -->
+    <div id="view-admin-agreements" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1>📋 <span class="lang-en">Referral Agreements</span><span class="lang-es">Acuerdos de Referido</span></h1>
+          <p class="dashboard-subtitle"><span class="lang-en">Manage, review, and countersign partnership agreements.</span><span class="lang-es">Gestiona, revisa y co-firma acuerdos de colaboración.</span></p>
+        </div>
+
+        <!-- Agreements Pending Admin Signature -->
+        <div class="dashboard-section">
+          <h2>📥 <span class="lang-en">Pending Your Signature</span><span class="lang-es">Pendientes de Tu Firma</span> <span id="admin-agreements-count-tab" style="font-size:0.85rem; font-weight:600; color:#e11b22; margin-left:8px;"></span></h2>
+          <div id="admin-agreements-list-tab" class="card-list">
+            <div class="empty-state"><div class="empty-state__icon">📋</div><p class="empty-state__text">No agreements pending signature.</p></div>
+          </div>
+        </div>
+
+        <!-- Signed / Active Agreements -->
+        <div class="dashboard-section">
+          <h2>✅ <span class="lang-en">Active / Signed Agreements</span><span class="lang-es">Acuerdos Firmados / Activos</span></h2>
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th><span class="lang-en">Partner Name</span><span class="lang-es">Nombre</span></th>
+                  <th>Role</th>
+                  <th>Agency</th>
+                  <th>Email</th>
+                  <th>Realtor Signed Copy</th>
+                  <th>Final Signed Agreement</th>
+                  <th>Actions / Re-upload</th>
+                </tr>
+              </thead>
+              <tbody id="admin-signed-agreements-tbody">
+                <tr><td colspan="7" style="text-align:center;padding:2rem;color:#6b7280;">Loading agreements…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 

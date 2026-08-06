@@ -422,7 +422,7 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
     }
 
     // 2. Hostname contains development keywords or Vercel preview domain
-    if (host.includes('dev') || host.includes('development') || host.includes('preview') || host.includes('stage') || host.includes('staging') || host.includes('vercel.app')) {
+    if (host.includes('dev') || host.includes('development') || host.includes('preview') || host.includes('stage') || host.includes('staging') || (host.includes('vercel.app') && host !== 'proyecto-internacional.vercel.app')) {
       return true;
     }
 

@@ -445,20 +445,25 @@
     let statusHtml = '';
     if (status === 'signed') {
       statusHtml = `
-        <div style="display:flex; align-items:center; gap:1rem; padding:1.25rem; background:#d1fae5; border-radius:0.75rem; margin-bottom:1.5rem;">
+        <div style="display:flex; align-items:center; gap:1rem; padding:1.25rem; background:#d1fae5; border-radius:0.75rem; margin-bottom:1.5rem; border:1px solid #a7f3d0;">
           <span style="font-size:2rem;">✅</span>
           <div>
             <div style="font-weight:700; color:#065f46; font-size:1rem;">Referral Agreement — Signed by both parties</div>
-            <div style="font-size:0.85rem; color:#047857;">Agreement active. Signed on ${App.utils.formatDate(currentUser.agreementSignedAt)}.</div>
+            <div style="font-size:0.85rem; color:#047857; margin-bottom:8px;">Agreement active. Signed on ${App.utils.formatDate(currentUser.agreementSignedAt)}.</div>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+              ${currentUser.agreementFileUrl ? `<a href="${currentUser.agreementFileUrl}" target="_blank" class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:0.78rem;">📥 Your Signed Copy</a>` : ''}
+              ${currentUser.agreementFinalUrl ? `<a href="${currentUser.agreementFinalUrl}" target="_blank" class="btn btn-primary btn-sm" style="padding:4px 10px;font-size:0.78rem;color:white;">📥 Final Countersigned Agreement</a>` : ''}
+            </div>
           </div>
         </div>`;
     } else if (status === 'uploaded') {
       statusHtml = `
-        <div style="display:flex; align-items:center; gap:1rem; padding:1.25rem; background:#fef9c3; border-radius:0.75rem; margin-bottom:1.5rem;">
+        <div style="display:flex; align-items:center; gap:1rem; padding:1.25rem; background:#fef9c3; border-radius:0.75rem; margin-bottom:1.5rem; border:1px solid #fef08a;">
           <span style="font-size:2rem;">⏳</span>
           <div>
             <div style="font-weight:700; color:#854d0e; font-size:1rem;">Agreement uploaded — Pending RE/MAX Inmom&aacute;s signature</div>
-            <div style="font-size:0.85rem; color:#a16207;">We have received your signed agreement. The RE/MAX Inmom&aacute;s broker will countersign shortly.</div>
+            <div style="font-size:0.85rem; color:#a16207; margin-bottom:8px;">We have received your signed agreement. The RE/MAX Inmom&aacute;s broker will countersign shortly.</div>
+            ${currentUser.agreementFileUrl ? `<a href="${currentUser.agreementFileUrl}" target="_blank" class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:0.78rem;">📥 View Uploaded Agreement</a>` : ''}
           </div>
         </div>`;
     } else {

@@ -35,5 +35,10 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if isAuthenticated();
     }
+
+    // Agreement notifications: Authenticated users can read/write notifications
+    match /agreement_notifications/{notifId} {
+      allow read, write: if isAuthenticated();
+    }
   }
 }

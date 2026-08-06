@@ -609,6 +609,33 @@ App.views.auth = {
 
   /* ---- Pending View ---- */
   initPending: async function() {
+    const session = App.auth.getCurrentUser();
+    if (!session) {
+      window.location.href = 'index.html#login';
+      return;
+    }
+
+    // Refresh user data from Firebase/demoData to get latest status/agreementStatus
+    let currentUser = { ...session };
+    try {
+      if (!App.demoMode && App.db) {
+        const doc = await App.db.collection('users').doc(session.id).get();
+        if (doc.exists) {
+          currentUser = { id: session.id, ...doc.data() };
+        }
+      } else {
+        const demoUser = App.demoData.users.find(u => u.id === session.id);
+        if (demoUser) {
+          currentUser = { id: session.id, ...demoUser };
+        }
+      }
+    } catch (e) {
+      console.warn('[Pending] failed to fetch fresh user data:', e);
+    }
+
+    // Render the agreement section
+    renderPendingAgreementSection(currentUser);
+
     // Bind Check Status button
     const checkBtn = document.getElementById('pending-check-btn');
     const logoutBtn = document.getElementById('pending-logout-btn');
@@ -620,28 +647,22 @@ App.views.auth = {
         checkBtn.disabled = true;
 
         try {
-          const session = App.auth.getCurrentUser();
-          if (!session) {
-            window.location.href = 'index.html#login';
-            return;
-          }
-
           let freshStatus = 'pending';
           if (!App.demoMode && App.db) {
-            const doc = await App.db.collection('users').doc(session.id).get();
+            const doc = await App.db.collection('users').doc(currentUser.id).get();
             if (doc.exists) freshStatus = doc.data().status;
           } else {
-            const demoUser = App.demoData.users.find(u => u.id === session.id);
+            const demoUser = App.demoData.users.find(u => u.id === currentUser.id);
             if (demoUser) freshStatus = demoUser.status;
           }
 
           if (freshStatus === 'active') {
             // Update localStorage session
-            const updatedSession = { ...session, status: 'active' };
+            const updatedSession = { ...currentUser, status: 'active' };
             localStorage.setItem('remax_session', JSON.stringify(updatedSession));
             App.utils.showToast('¡Tu cuenta ha sido aprobada! Redirigiendo…', 'success');
             setTimeout(() => {
-              window.location.href = 'app.html#' + session.role + '/dashboard';
+              window.location.href = 'app.html#' + currentUser.role + '/dashboard';
             }, 800);
           } else if (freshStatus === 'rejected') {
             App.utils.showToast('Tu solicitud fue rechazada. Contacta con soporte.', 'error');
@@ -664,6 +685,241 @@ App.views.auth = {
         await App.auth.logout();
         window.location.href = 'index.html#login';
       });
+    }
+
+    function renderPendingAgreementSection(user) {
+      const container = document.getElementById('pending-agreement-container');
+      if (!container) return;
+
+      const status = user.agreementStatus || 'none'; // 'none' | 'uploaded' | 'signed'
+
+      let statusHtml = '';
+      if (status === 'signed') {
+        statusHtml = `
+          <div style="display:flex; align-items:center; gap:1rem; padding:1.25rem; background:#d1fae5; border-radius:0.75rem; margin-bottom:1.5rem; border:1px solid #a7f3d0; text-align:left;">
+            <span style="font-size:2rem;">✅</span>
+            <div>
+              <div style="font-weight:700; color:#065f46; font-size:1rem;">
+                <span class="lang-en">Referral Agreement — Signed by both parties</span>
+                <span class="lang-es">Acuerdo de Referido — Firmado por ambas partes</span>
+                <span class="lang-fr">Accord de Référencement — Signé par les deux parties</span>
+                <span class="lang-en-ca">Referral Agreement — Signed by both parties</span>
+              </div>
+              <div style="font-size:0.85rem; color:#047857; margin-bottom:8px;">
+                <span class="lang-en">Your agreement is active and signed by both parties.</span>
+                <span class="lang-es">Tu acuerdo está activo y firmado por ambas partes.</span>
+                <span class="lang-fr">Votre accord est actif et signé par les deux parties.</span>
+                <span class="lang-en-ca">Your agreement is active and signed by both parties.</span>
+              </div>
+              <div style="display:flex; gap:10px;">
+                ${user.agreementFileUrl ? `<a href="${user.agreementFileUrl}" target="_blank" class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:0.78rem;">📥 <span class="lang-en">Your Copy</span><span class="lang-es">Tu Copia</span><span class="lang-fr">Votre Copie</span><span class="lang-en-ca">Your Copy</span></a>` : ''}
+                ${user.agreementFinalUrl ? `<a href="${user.agreementFinalUrl}" target="_blank" class="btn btn-primary btn-sm" style="padding:4px 10px;font-size:0.78rem;color:white;">📥 <span class="lang-en">Final Agreement</span><span class="lang-es">Acuerdo Final</span><span class="lang-fr">Accord Final</span><span class="lang-en-ca">Final Agreement</span></a>` : ''}
+              </div>
+            </div>
+          </div>`;
+      } else if (status === 'uploaded') {
+        statusHtml = `
+          <div style="display:flex; align-items:center; gap:1rem; padding:1.25rem; background:#fef9c3; border-radius:0.75rem; margin-bottom:1.5rem; border:1px solid #fef08a; text-align:left;">
+            <span style="font-size:2rem;">⏳</span>
+            <div>
+              <div style="font-weight:700; color:#854d0e; font-size:1rem;">
+                <span class="lang-en">Agreement uploaded — Pending Admin Signature</span>
+                <span class="lang-es">Acuerdo subido — Pendiente de Firma del Administrador</span>
+                <span class="lang-fr">Accord téléversé — En attente de la signature de l'admin</span>
+                <span class="lang-en-ca">Agreement uploaded — Pending Admin Signature</span>
+              </div>
+              <div style="font-size:0.85rem; color:#a16207; margin-bottom:8px;">
+                <span class="lang-en">We have received your signed agreement. The RE/MAX Inmomás broker will countersign shortly.</span>
+                <span class="lang-es">Hemos recibido tu acuerdo firmado. El broker de RE/MAX Inmomás lo co-firmará en breve.</span>
+                <span class="lang-fr">Nous avons reçu votre accord signé. Le courtier de RE/MAX Inmomás le co-signera sous peu.</span>
+                <span class="lang-en-ca">We have received your signed agreement. The RE/MAX Inmomás broker will countersign shortly.</span>
+              </div>
+              ${user.agreementFileUrl ? `<a href="${user.agreementFileUrl}" target="_blank" class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:0.78rem;">📥 <span class="lang-en">View Uploaded Copy</span><span class="lang-es">Ver Copia Subida</span><span class="lang-fr">Voir la Copie Téléversée</span><span class="lang-en-ca">View Uploaded Copy</span></a>` : ''}
+            </div>
+          </div>`;
+      } else {
+        statusHtml = `
+          <div style="padding:1.25rem; background:#fef3c7; border-radius:0.75rem; margin-bottom:1rem; border:1px solid #fde68a; text-align:left;">
+            <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
+              <span style="font-size:1.5rem;">⚠️</span>
+              <div style="font-weight:600; color:#92400e;">
+                <span class="lang-en">Referral Agreement Required</span>
+                <span class="lang-es">Acuerdo de Referido Requerido</span>
+                <span class="lang-fr">Accord de Référencement Requis</span>
+                <span class="lang-en-ca">Referral Agreement Required</span>
+              </div>
+            </div>
+            <p style="font-size:0.85rem; color:#78350f; margin:0;">
+              <span class="lang-en">Please download the agreement, sign it outside the system, and upload the signed copy here to activate your partnership.</span>
+              <span class="lang-es">Por favor descarga el acuerdo, fírmalo fuera del sistema y sube la copia firmada aquí para activar tu colaboración.</span>
+              <span class="lang-fr">Veuillez télécharger l'accord, le signer hors ligne, et téléverser la copie signée ici pour activer votre partenariat.</span>
+              <span class="lang-en-ca">Please download the agreement, sign it outside the system, and upload the signed copy here to activate your partnership.</span>
+            </p>
+          </div>
+          <!-- Download -->
+          <div style="background:#f8f9ff; border:1.5px solid #c7d2fe; border-radius:0.75rem; padding:1.25rem; margin-bottom:1rem; text-align:left;">
+            <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
+              <span style="font-size:1.4rem;">1️⃣</span>
+              <div style="font-weight:600; color:#1e40af;">
+                <span class="lang-en">Download &amp; Sign the Agreement</span>
+                <span class="lang-es">Descargar y Firmar el Acuerdo</span>
+                <span class="lang-fr">Télécharger &amp; Signer l'Accord</span>
+                <span class="lang-en-ca">Download &amp; Sign the Agreement</span>
+              </div>
+            </div>
+            <p style="font-size:0.85rem; color:#374151; margin:0 0 0.875rem;">
+              <span class="lang-en">Download your personalized Master Referral Agreement (Word format).</span>
+              <span class="lang-es">Descarga tu Acuerdo Marco de Referidos personalizado (formato Word).</span>
+              <span class="lang-fr">Téléchargez votre accord de référencement personnalisé (format Word).</span>
+              <span class="lang-en-ca">Download your personalized Master Referral Agreement (Word format).</span>
+            </p>
+            <button class="btn btn-primary" id="pending-download-agreement-btn" style="gap:0.5rem;">
+              📄 <span class="lang-en">Download Agreement (.doc)</span>
+              <span class="lang-es">Descargar Acuerdo (.doc)</span>
+              <span class="lang-fr">Télécharger l'Accord (.doc)</span>
+              <span class="lang-en-ca">Download Agreement (.doc)</span>
+            </button>
+          </div>
+          <!-- Upload -->
+          <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:0.75rem; padding:1.25rem; text-align:left;">
+            <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
+              <span style="font-size:1.4rem;">2️⃣</span>
+              <div style="font-weight:600; color:#166534;">
+                <span class="lang-en">Upload Signed Agreement</span>
+                <span class="lang-es">Subir Acuerdo Firmado</span>
+                <span class="lang-fr">Téléverser l'Accord Signé</span>
+                <span class="lang-en-ca">Upload Signed Agreement</span>
+              </div>
+            </div>
+            <p style="font-size:0.85rem; color:#374151; margin:0 0 0.875rem;">
+              <span class="lang-en">Upload your signed copy (PDF or Word). We will countersign and confirm your partnership.</span>
+              <span class="lang-es">Sube tu copia firmada (PDF o Word). Lo co-firmaremos y confirmaremos tu colaboración.</span>
+              <span class="lang-fr">Téléversez votre copie signée (PDF ou Word). Nous la co-signerons et confirmerons votre partenariat.</span>
+              <span class="lang-en-ca">Upload your signed copy (PDF or Word). We will countersign and confirm your partnership.</span>
+            </p>
+            <div id="pending-agreement-upload-zone" style="border:2px dashed #86efac; border-radius:0.625rem; padding:1.5rem; text-align:center; cursor:pointer; transition:border-color 0.2s;"
+                 onclick="document.getElementById('pending-agreement-file-input').click()"
+                 onmouseover="this.style.borderColor='#22c55e'" onmouseout="this.style.borderColor='#86efac'">
+              <div style="font-size:2rem; margin-bottom:0.4rem;">📤</div>
+              <p style="font-size:0.85rem; color:#374151; margin:0.25rem 0 0;">
+                <span class="lang-en">Click or drop signed file here</span>
+                <span class="lang-es">Haz clic o arrastra el archivo firmado aquí</span>
+                <span class="lang-fr">Cliquez ou déposez le fichier signé ici</span>
+                <span class="lang-en-ca">Click or drop signed file here</span>
+              </p>
+            </div>
+            <input type="file" id="pending-agreement-file-input" accept=".pdf,.doc,.docx" style="display:none;">
+            <div id="pending-agreement-upload-status" style="margin-top:0.5rem; font-size:0.85rem;"></div>
+          </div>`;
+      }
+
+      container.innerHTML = statusHtml;
+
+      // Translate newly rendered container elements
+      if (window.App && typeof window.App.updateLangDisplay === 'function') {
+        window.App.updateLangDisplay();
+      }
+
+      // Bind events
+      const dlBtn = document.getElementById('pending-download-agreement-btn');
+      if (dlBtn) {
+        dlBtn.addEventListener('click', () => {
+          if (typeof App.generateReferralAgreementDoc === 'function') {
+            App.generateReferralAgreementDoc(user);
+            App.utils.showToast('Agreement downloading... Sign it and upload below.', 'info');
+          } else {
+            App.utils.showToast('Generator not loaded. Please refresh.', 'error');
+          }
+        });
+      }
+
+      const uploadZone = document.getElementById('pending-agreement-upload-zone');
+      const fileInput = document.getElementById('pending-agreement-file-input');
+      if (uploadZone) {
+        uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.borderColor = '#22c55e'; });
+        uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = '#86efac'; });
+        uploadZone.addEventListener('drop', e => {
+          e.preventDefault();
+          uploadZone.style.borderColor = '#86efac';
+          if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            handlePendingAgreementUpload(e.dataTransfer.files[0], user);
+          }
+        });
+      }
+      if (fileInput) {
+        fileInput.addEventListener('change', () => {
+          if (fileInput.files && fileInput.files[0]) {
+            handlePendingAgreementUpload(fileInput.files[0], user);
+          }
+        });
+      }
+    }
+
+    async function handlePendingAgreementUpload(file, user) {
+      const statusEl = document.getElementById('pending-agreement-upload-status');
+      if (statusEl) statusEl.innerHTML = '<span style="color:#6b7280;">⏳ Uploading...</span>';
+      try {
+        let fileUrl = null;
+        if (!App.demoMode && App.storage) {
+          const ref = App.storage.ref(`agreements/${user.id}/signed_${Date.now()}_${file.name}`);
+          await ref.put(file);
+          fileUrl = await ref.getDownloadURL();
+        } else {
+          fileUrl = `demo://agreements/${user.id}/${file.name}`;
+        }
+
+        const now = new Date().toISOString();
+        if (!App.demoMode && App.db) {
+          await App.db.collection('users').doc(user.id).update({
+            agreementStatus: 'uploaded',
+            agreementUploadedAt: now,
+            agreementFileUrl: fileUrl
+          });
+          await App.db.collection('agreement_notifications').add({
+            userId: user.id,
+            userName: `${user.firstName} ${user.lastName}`,
+            userRole: user.role,
+            agencyName: user.agencyName || user.brokerNameManual || '—',
+            email: user.email,
+            fileUrl: fileUrl,
+            fileName: file.name,
+            uploadedAt: now,
+            status: 'pending_admin'
+          });
+        } else {
+          const demoUser = App.demoData.users.find(u => u.id === user.id);
+          if (demoUser) {
+            demoUser.agreementStatus = 'uploaded';
+            demoUser.agreementUploadedAt = now;
+            demoUser.agreementFileUrl = fileUrl;
+          }
+          user.agreementStatus = 'uploaded';
+          user.agreementUploadedAt = now;
+          user.agreementFileUrl = fileUrl;
+          App.demoData.agreementNotifications = App.demoData.agreementNotifications || [];
+          App.demoData.agreementNotifications.push({
+            id: 'notif_' + Date.now(),
+            userId: user.id,
+            userName: `${user.firstName} ${user.lastName}`,
+            userRole: user.role,
+            agencyName: user.agencyName || '—',
+            email: user.email,
+            fileUrl: fileUrl,
+            fileName: file.name,
+            uploadedAt: now,
+            status: 'pending_admin'
+          });
+          if (App.auth && typeof App.auth.saveDemoData === 'function') App.auth.saveDemoData();
+        }
+
+        App.utils.showToast('✅ Agreement uploaded! The RE/MAX Inmomás broker will countersign shortly.', 'success');
+        // Re-initialize view
+        App.views.auth.initPending();
+      } catch (err) {
+        console.error('[Pending] Agreement upload error:', err);
+        if (statusEl) statusEl.innerHTML = '<span style="color:#e11b22;">❌ Upload failed. Please try again.</span>';
+        App.utils.showToast('Upload failed. Please try again.', 'error');
+      }
     }
   }
 };

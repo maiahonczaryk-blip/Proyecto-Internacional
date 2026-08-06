@@ -1047,20 +1047,40 @@
         <div class="auth-card auth-card--wide">
           <div class="auth-header">
             <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="REMAX Inmomás" class="auth-logo">
-            <h2><span class="lang-en">Join Our Network</span><span class="lang-es">Únete a Nuestra Red</span></h2>
-            <p><span class="lang-en">Apply as a Broker or Realtor partner</span><span class="lang-es">Aplica como partner Broker o Agente</span></p>
+            <h2>
+              <span class="lang-en">Join Our Network</span>
+              <span class="lang-es">Únete a Nuestra Red</span>
+              <span class="lang-fr">Rejoindre Notre Réseau</span>
+              <span class="lang-en-ca">Join Our Network</span>
+            </h2>
+            <p>
+              <span class="lang-en">Apply as a Broker or Realtor partner</span>
+              <span class="lang-es">Aplica como partner Broker o Agente</span>
+              <span class="lang-fr">Postulez en tant que courtier ou agent partenaire</span>
+              <span class="lang-en-ca">Apply as a Broker or Realtor partner</span>
+            </p>
           </div>
           <form id="register-form" onsubmit="return false;">
             <!-- Role Selection -->
             <div class="form-group">
-              <label><span class="lang-en">I am a...</span><span class="lang-es">Soy un…</span></label>
+              <label>
+                <span class="lang-en">I am a...</span>
+                <span class="lang-es">Soy un…</span>
+                <span class="lang-fr">Je suis un...</span>
+                <span class="lang-en-ca">I am a...</span>
+              </label>
               <div class="role-selector">
                 <label class="role-card">
                   <input type="radio" name="register-role" value="broker" id="register-role-broker">
                   <div class="role-card__content">
                     <span class="role-card__icon">🏢</span>
                     <span class="role-card__title">Broker</span>
-                    <span class="role-card__desc"><span class="lang-en">I manage a team of agents</span><span class="lang-es">Gestiono un equipo de agentes</span></span>
+                    <span class="role-card__desc">
+                      <span class="lang-en">I manage a team of agents</span>
+                      <span class="lang-es">Gestiono un equipo de agentes</span>
+                      <span class="lang-fr">Je gère une équipe d'agents</span>
+                      <span class="lang-en-ca">I manage a team of agents</span>
+                    </span>
                   </div>
                 </label>
                 <label class="role-card">
@@ -1068,23 +1088,82 @@
                   <div class="role-card__content">
                     <span class="role-card__icon">👤</span>
                     <span class="role-card__title">Realtor</span>
-                    <span class="role-card__desc"><span class="lang-en">I'm an individual agent</span><span class="lang-es">Soy un agente individual</span></span>
+                    <span class="role-card__desc">
+                      <span class="lang-en">I'm an individual agent</span>
+                      <span class="lang-es">Soy un agente individual</span>
+                      <span class="lang-fr">Je suis un agent individuel</span>
+                      <span class="lang-en-ca">I'm an individual agent</span>
+                    </span>
                   </div>
                 </label>
               </div>
             </div>
             <div class="form-row">
-              <div class="form-group"><label for="register-firstName"><span class="lang-en">First Name</span><span class="lang-es">Nombre</span> *</label><input type="text" id="register-firstName" required></div>
-              <div class="form-group"><label for="register-lastName"><span class="lang-en">Last Name</span><span class="lang-es">Apellido</span> *</label><input type="text" id="register-lastName" required></div>
+              <div class="form-group">
+                <label for="register-firstName">
+                  <span class="lang-en">First Name</span>
+                  <span class="lang-es">Nombre</span>
+                  <span class="lang-fr">Prénom</span>
+                  <span class="lang-en-ca">First Name</span> *
+                </label>
+                <input type="text" id="register-firstName" required>
+              </div>
+              <div class="form-group">
+                <label for="register-lastName">
+                  <span class="lang-en">Last Name</span>
+                  <span class="lang-es">Apellido</span>
+                  <span class="lang-fr">Nom de famille</span>
+                  <span class="lang-en-ca">Last Name</span> *
+                </label>
+                <input type="text" id="register-lastName" required>
+              </div>
             </div>
-            <div class="form-group"><label for="register-agencyName"><span class="lang-en">Agency / Brokerage Name</span><span class="lang-es">Nombre de la Agencia</span></label><input type="text" id="register-agencyName"></div>
-            <div class="form-row">
-              <div class="form-group"><label for="register-email"><span class="lang-en">Email</span><span class="lang-es">Correo Electrónico</span> *</label><input type="email" id="register-email" required></div>
-              <div class="form-group"><label for="register-phone"><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></label><input type="tel" id="register-phone"></div>
+            <div class="form-group">
+              <label for="register-agencyName">
+                <span class="lang-en">Agency / Brokerage Name</span>
+                <span class="lang-es">Nombre de la Agencia</span>
+                <span class="lang-fr">Nom de l'agence</span>
+                <span class="lang-en-ca">Agency / Brokerage Name</span>
+              </label>
+              <input type="text" id="register-agencyName">
             </div>
             <div class="form-row">
-              <div class="form-group"><label for="register-password"><span class="lang-en">Password</span><span class="lang-es">Contraseña</span> *</label><input type="password" id="register-password" placeholder="Min. 6 characters" required></div>
-              <div class="form-group"><label for="register-country"><span class="lang-en">Country</span><span class="lang-es">País</span></label>
+              <div class="form-group">
+                <label for="register-email">
+                  <span class="lang-en">Email</span>
+                  <span class="lang-es">Correo Electrónico</span>
+                  <span class="lang-fr">Courriel</span>
+                  <span class="lang-en-ca">Email</span> *
+                </label>
+                <input type="email" id="register-email" required>
+              </div>
+              <div class="form-group">
+                <label for="register-phone">
+                  <span class="lang-en">Phone</span>
+                  <span class="lang-es">Teléfono</span>
+                  <span class="lang-fr">Téléphone</span>
+                  <span class="lang-en-ca">Phone</span>
+                </label>
+                <input type="tel" id="register-phone">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="register-password">
+                  <span class="lang-en">Password</span>
+                  <span class="lang-es">Contraseña</span>
+                  <span class="lang-fr">Mot de passe</span>
+                  <span class="lang-en-ca">Password</span> *
+                </label>
+                <input type="password" id="register-password" placeholder="Min. 6 characters" required>
+              </div>
+              <div class="form-group">
+                <label for="register-country">
+                  <span class="lang-en">Country</span>
+                  <span class="lang-es">País</span>
+                  <span class="lang-fr">Pays</span>
+                  <span class="lang-en-ca">Country</span>
+                </label>
                 <select id="register-country">
                   <option value="United States">United States</option>
                   <option value="Canada">Canada</option>
@@ -1098,33 +1177,74 @@
             </div>
             <!-- Broker selection (for Realtors) -->
             <div class="form-group" id="broker-select-group">
-              <label for="register-broker"><span class="lang-en">Your Broker (optional)</span><span class="lang-es">Tu Broker (opcional)</span></label>
+              <label for="register-broker">
+                <span class="lang-en">Your Broker (optional)</span>
+                <span class="lang-es">Tu Broker (opcional)</span>
+                <span class="lang-fr">Votre courtier (optionnel)</span>
+                <span class="lang-en-ca">Your Broker (optional)</span>
+              </label>
               <select id="register-broker">
-                <option value=""><span class="lang-en">Independent / No broker</span></option>
+                <option value="">
+                  <span class="lang-en">Independent / No broker</span>
+                  <span class="lang-es">Independiente / Sin broker</span>
+                  <span class="lang-fr">Indépendant / Aucun courtier</span>
+                  <span class="lang-en-ca">Independent / No broker</span>
+                </option>
               </select>
-              <small style="color:var(--text-muted);"><span class="lang-en">Select if you work under a specific broker in our network</span><span class="lang-es">Selecciona si trabajas bajo un broker de nuestra red</span></small>
+              <small style="color:var(--text-muted);">
+                <span class="lang-en">Select if you work under a specific broker in our network</span>
+                <span class="lang-es">Selecciona si trabajas bajo un broker de nuestra red</span>
+                <span class="lang-fr">Sélectionnez si vous travaillez sous un courtier spécifique de notre réseau</span>
+                <span class="lang-en-ca">Select if you work under a specific broker in our network</span>
+              </small>
             </div>
             <!-- Manual broker fields (shown when "Other" is selected) -->
             <div class="form-group" id="broker-manual-group" style="display:none;">
-              <label for="register-broker-manual"><span class="lang-en">Broker Name</span><span class="lang-es">Nombre del Broker</span></label>
+              <label for="register-broker-manual">
+                <span class="lang-en">Broker Name</span>
+                <span class="lang-es">Nombre del Broker</span>
+                <span class="lang-fr">Nom du courtier</span>
+                <span class="lang-en-ca">Broker Name</span>
+              </label>
               <input type="text" id="register-broker-manual" class="form-input" placeholder="e.g. John Smith">
             </div>
             <div class="form-group" id="agency-manual-group" style="display:none;">
-              <label for="register-agency-manual"><span class="lang-en">Agency / Brokerage Name</span><span class="lang-es">Nombre de la Agencia</span></label>
+              <label for="register-agency-manual">
+                <span class="lang-en">Agency / Brokerage Name</span>
+                <span class="lang-es">Nombre de la Agencia</span>
+                <span class="lang-fr">Nom de l'agence</span>
+                <span class="lang-en-ca">Agency / Brokerage Name</span>
+              </label>
               <input type="text" id="register-agency-manual" class="form-input" placeholder="e.g. RE/MAX Gold">
             </div>
             <div class="form-group">
               <label class="checkbox-label">
                 <input type="checkbox" id="register-terms" required>
-                <span><span class="lang-en">I agree to the terms and conditions of the RE/MAX Inmomás International Referral Program</span><span class="lang-es">Acepto los términos y condiciones del Programa Internacional de Referidos de RE/MAX Inmomás</span></span>
+                <span>
+                  <span class="lang-en">I agree to the terms and conditions of the RE/MAX Inmomás International Referral Program</span>
+                  <span class="lang-es">Acepto los términos y condiciones del Programa Internacional de Referidos de RE/MAX Inmomás</span>
+                  <span class="lang-fr">J'accepte les conditions générales du programme de référencement international de RE/MAX Inmomás</span>
+                  <span class="lang-en-ca">I agree to the terms and conditions of the RE/MAX Inmomás International Referral Program</span>
+                </span>
               </label>
             </div>
             <div class="form-group newsletter-consent-group">
               <label class="checkbox-label checkbox-label--newsletter">
                 <input type="checkbox" id="register-newsletter">
                 <span>
-                  <strong><span class="lang-en">✉️ Keep me updated on this project</span><span class="lang-es">✉️ Mantenerme al día sobre este proyecto</span></strong>
-                  <small><span class="lang-en">I agree to receive newsletters, webinars, and project updates from RE/MAX Inmomás International. You can unsubscribe at any time.</span><span class="lang-es">Acepto recibir newsletters, webinars y novedades del proyecto RE/MAX Inmomás International. Puedo darme de baja en cualquier momento.</span></small>
+                  <strong>
+                    <span class="lang-en">✉️ Keep me updated on this project</span>
+                    <span class="lang-es">✉️ Mantenerme al día sobre este proyecto</span>
+                    <span class="lang-fr">✉️ Tenez-moi au courant de ce projet</span>
+                    <span class="lang-en-ca">✉️ Keep me updated on this project</span>
+                  </strong>
+                  <br>
+                  <small>
+                    <span class="lang-en">I agree to receive newsletters, webinars, and project updates from RE/MAX Inmomás International. You can unsubscribe at any time.</span>
+                    <span class="lang-es">Acepto recibir newsletters, webinars y novedades del proyecto RE/MAX Inmomás International. Puedo darme de baja en cualquier momento.</span>
+                    <span class="lang-fr">J'accepte de recevoir des newsletters, des webinaires et des mises à jour du projet de RE/MAX Inmomás International. Vous pouvez vous désinscrire à tout moment.</span>
+                    <span class="lang-en-ca">I agree to receive newsletters, webinars, and project updates from RE/MAX Inmomás International. You can unsubscribe at any time.</span>
+                  </small>
                 </span>
               </label>
             </div>
@@ -1132,9 +1252,14 @@
             <button type="submit" class="btn btn-primary" style="width:100%;" id="register-submit-btn">
               <span class="lang-en">Submit Application</span>
               <span class="lang-es">Enviar Solicitud</span>
+              <span class="lang-fr">Soumettre la candidature</span>
+              <span class="lang-en-ca">Submit Application</span>
             </button>
             <div style="text-align: center; margin: 15px 0; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">
-              <span class="lang-en">or</span><span class="lang-es">o</span>
+              <span class="lang-en">or</span>
+              <span class="lang-es">o</span>
+              <span class="lang-fr">ou</span>
+              <span class="lang-en-ca">or</span>
             </div>
             <button type="button" class="btn btn-outline" style="width:100%; display: flex; align-items: center; justify-content: center; gap: 8px; border-color: var(--border-light);" id="register-google-btn">
               <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24">
@@ -1145,6 +1270,8 @@
               </svg>
               <span class="lang-en">Sign Up with Google</span>
               <span class="lang-es">Registrarse con Google</span>
+              <span class="lang-fr">S'inscrire avec Google</span>
+              <span class="lang-en-ca">Sign Up with Google</span>
             </button>
           </form>
           <div class="auth-footer">
@@ -1375,6 +1502,7 @@
             <span class="lang-en">Thank you for registering with the RE/MAX Inmomás International Referral Network.<br>Your application is being reviewed by our team. You'll be able to access your dashboard once it's approved.</span>
             <span class="lang-es">Gracias por registrarte en la Red Internacional de Referidos de RE/MAX Inmomás.<br>Tu solicitud está siendo revisada por nuestro equipo. Podrás acceder a tu panel una vez sea aprobada.</span>
           </p>
+          <div id="pending-agreement-container" style="margin-top: 24px; text-align: left; width: 100%;"></div>
           <div style="margin-top:28px; display:flex; flex-direction:column; align-items:center; gap:12px;">
             <button id="pending-check-btn" class="btn btn-primary" style="min-width:220px;">
               <span class="lang-en">🔄 Check Approval Status</span>
@@ -1829,6 +1957,7 @@
   <script src="js/views/broker-views.js"></script>
   <script src="js/views/realtor-views.js"></script>
   <script src="js/views/agent-views.js"></script>
+  <script src="js/referral-agreement.js"></script>
   <script src="js/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {

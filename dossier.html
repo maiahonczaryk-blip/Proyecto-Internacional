@@ -3373,7 +3373,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
     var hash = (window.location.hash || '').toLowerCase();
     if (h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local') || h.startsWith('192.168.')) return true;
     if (h.includes('dev') || h.includes('development') || h.includes('preview')) return true;
-    if (h.includes('vercel.app')) return true;
+    if (h.includes('vercel.app') && h !== 'proyecto-internacional.vercel.app') return true;
     if (s.includes('env=dev') || s.includes('dev=true') || hash.includes('env=dev')) return true;
     return false;
   }

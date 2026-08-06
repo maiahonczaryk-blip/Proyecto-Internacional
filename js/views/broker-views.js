@@ -521,14 +521,17 @@
 
       const status = currentUser.agreementStatus || 'none';
 
-      let agreementStatusHtml = '';
       if (status === 'signed') {
         agreementStatusHtml = `
           <div style="display:flex; align-items:center; gap:0.75rem; padding:1rem; background:#d1fae5; border-radius:0.5rem; margin-bottom:1rem;">
             <span style="font-size:1.5rem;">✅</span>
             <div>
               <div style="font-weight:600; color:#065f46;">Referral Agreement — Signed by both parties</div>
-              <div style="font-size:0.85rem; color:#047857;">Signed on ${App.utils.formatDate(currentUser.agreementSignedAt)}</div>
+              <div style="font-size:0.85rem; color:#047857; margin-bottom: 8px;">Signed on ${App.utils.formatDate(currentUser.agreementSignedAt)}</div>
+              <div style="display:flex; gap:10px; margin-top:8px;">
+                ${currentUser.agreementFileUrl ? `<a href="${currentUser.agreementFileUrl}" target="_blank" class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:0.78rem;">📥 Your Signed Copy</a>` : ''}
+                ${currentUser.agreementFinalUrl ? `<a href="${currentUser.agreementFinalUrl}" target="_blank" class="btn btn-primary btn-sm" style="padding:4px 10px;font-size:0.78rem;color:white;">📥 Final Countersigned Agreement</a>` : ''}
+              </div>
             </div>
           </div>`;
       } else if (status === 'uploaded') {
@@ -537,7 +540,8 @@
             <span style="font-size:1.5rem;">⏳</span>
             <div>
               <div style="font-weight:600; color:#854d0e;">Agreement uploaded — Pending RE/MAX Inmom&aacute;s countersignature</div>
-              <div style="font-size:0.85rem; color:#a16207;">We will countersign shortly and confirm your partnership.</div>
+              <div style="font-size:0.85rem; color:#a16207; margin-bottom: 8px;">We will countersign shortly and confirm your partnership.</div>
+              ${currentUser.agreementFileUrl ? `<a href="${currentUser.agreementFileUrl}" target="_blank" class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:0.78rem;">📥 View Uploaded Copy</a>` : ''}
             </div>
           </div>`;
       } else {
