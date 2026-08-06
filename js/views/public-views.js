@@ -428,7 +428,7 @@ App.views.public = {
 
   /* ============================================
      WEBINAR REGISTRATION FORM — Beyond Borders
-     August 13, 2026 | For US & Canadian Realtors
+     August 28, 2026 | For US & Canadian Realtors
      ============================================ */
   initWebinarRegister: function() {
     // ---- US States ----
@@ -453,7 +453,7 @@ App.views.public = {
     function startCountdown() {
       const countdownEl = document.getElementById('webinar-countdown');
       if (!countdownEl) return;
-      const TARGET = new Date('2026-08-13T11:00:00-04:00'); // 11am EDT = 17:00 Spain CEST
+      const TARGET = new Date('2026-08-28T12:00:00-04:00'); // 12pm EDT = 18:00 Spain CEST
 
       function tick() {
         const now = new Date();
@@ -608,7 +608,7 @@ App.views.public = {
           howHeard,
           referrerName: howHeard === 'agent' ? referrerName : '',
           webinar: 'Beyond Borders',
-          webinarDate: '2026-08-13',
+          webinarDate: '2026-08-28',
           gdprConsent: true,
           // Referral link tracking — populated when visitor arrived via agent's link
           referralCode:     agentReferralCode || null,
@@ -625,7 +625,7 @@ App.views.public = {
           formPanel.style.display = 'none';
           successPanel.style.display = 'flex';
         } else {
-          App.utils.showToast('🎉 You are registered! See you on August 13th.', 'success');
+          App.utils.showToast('🎉 You are registered! See you on August 28th.', 'success');
           form.reset();
         }
 
