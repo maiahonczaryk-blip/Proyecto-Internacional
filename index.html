@@ -1994,27 +1994,67 @@
                     <span class="lang-en-ca">How did you hear about this webinar? *</span>
                   </label>
                   <select id="webinar-how-heard" required class="form-input" style="cursor:pointer;">
-                    <option value="">&mdash; <span class="lang-en">Select an option</span><span class="lang-es">Selecciona una opci&oacute;n</span><span class="lang-fr">Choisir une option</span><span class="lang-en-ca">Select an option</span> &mdash;</option>
-                    <option value="social">&#x1F4F1; Social Media (Instagram / LinkedIn / Facebook)</option>
-                    <option value="remax">&#x1F3E2; RE/MAX Network</option>
-                    <option value="agent">&#x1F464; <span class="lang-en">An agent referred me</span><span class="lang-es">Me refiri&oacute; un agente</span><span class="lang-fr">Un agent m'a r&eacute;f&eacute;r&eacute;</span><span class="lang-en-ca">An agent referred me</span></option>
-                    <option value="email">&#x1F4E7; Email / Newsletter</option>
-                    <option value="event">&#x1F3AA; <span class="lang-en">Event / Conference</span><span class="lang-es">Evento / Conferencia</span><span class="lang-fr">&Eacute;v&eacute;nement / Conf&eacute;rence</span><span class="lang-en-ca">Event / Conference</span></option>
-                    <option value="other">&#x1F4AC; <span class="lang-en">Other</span><span class="lang-es">Otro</span><span class="lang-fr">Autre</span><span class="lang-en-ca">Other</span></option>
+                    <!-- English options -->
+                    <option class="lang-en" value="">&mdash; Select an option &mdash;</option>
+                    <option class="lang-en" value="social">&#x1F4F1; Social Media (Instagram / LinkedIn / Facebook)</option>
+                    <option class="lang-en" value="remax">&#x1F3E2; RE/MAX Network</option>
+                    <option class="lang-en" value="agent">&#x1F464; An agent referred me</option>
+                    <option class="lang-en" value="email">&#x1F4E7; Email / Newsletter</option>
+                    <option class="lang-en" value="event">&#x1F3AA; Event / Conference</option>
+                    <option class="lang-en" value="other">&#x1F4AC; Other</option>
+
+                    <!-- Spanish options -->
+                    <option class="lang-es" value="">&mdash; Selecciona una opción &mdash;</option>
+                    <option class="lang-es" value="social">&#x1F4F1; Redes Sociales (Instagram / LinkedIn / Facebook)</option>
+                    <option class="lang-es" value="remax">&#x1F3E2; Red RE/MAX</option>
+                    <option class="lang-es" value="agent">&#x1F464; Me refirió un agente</option>
+                    <option class="lang-es" value="email">&#x1F4E7; Correo / Boletín informativo</option>
+                    <option class="lang-es" value="event">&#x1F3AA; Evento / Conferencia</option>
+                    <option class="lang-es" value="other">&#x1F4AC; Otro</option>
+
+                    <!-- French options -->
+                    <option class="lang-fr" value="">&mdash; Choisir une option &mdash;</option>
+                    <option class="lang-fr" value="social">&#x1F4F1; Réseaux Sociaux (Instagram / LinkedIn / Facebook)</option>
+                    <option class="lang-fr" value="remax">&#x1F3E2; Réseau RE/MAX</option>
+                    <option class="lang-fr" value="agent">&#x1F464; Un agent m'a référé</option>
+                    <option class="lang-fr" value="email">&#x1F4E7; Email / Newsletter</option>
+                    <option class="lang-fr" value="event">&#x1F3AA; Événement / Conférence</option>
+                    <option class="lang-fr" value="other">&#x1F4AC; Autre</option>
+
+                    <!-- Canadian English options -->
+                    <option class="lang-en-ca" value="">&mdash; Select an option &mdash;</option>
+                    <option class="lang-en-ca" value="social">&#x1F4F1; Social Media (Instagram / LinkedIn / Facebook)</option>
+                    <option class="lang-en-ca" value="remax">&#x1F3E2; RE/MAX Network</option>
+                    <option class="lang-en-ca" value="agent">&#x1F464; An agent referred me</option>
+                    <option class="lang-en-ca" value="email">&#x1F4E7; Email / Newsletter</option>
+                    <option class="lang-en-ca" value="event">&#x1F3AA; Event / Conference</option>
+                    <option class="lang-en-ca" value="other">&#x1F4AC; Other</option>
                   </select>
                 </div>
 
                 <div id="webinar-referrer-wrap" style="display:none;" class="form-group">
                   <label for="webinar-referrer-name" style="font-weight:600;font-size:.83rem;color:#374151;margin-bottom:6px;display:block;">
-                    <span class="lang-en">Agent's Full Name *</span><span class="lang-es">Nombre completo del agente *</span><span class="lang-fr">Nom complet de l'agent *</span><span class="lang-en-ca">Agent's Full Name *</span>
+                    <span class="lang-en">Referring Agent *</span>
+                    <span class="lang-es">Agente Referente *</span>
+                    <span class="lang-fr">Agent Référent *</span>
+                    <span class="lang-en-ca">Referring Agent *</span>
                   </label>
-                  <input type="text" id="webinar-referrer-name" class="form-input"
-                    placeholder="John Smith">
+                  <select id="webinar-referrer-name" class="form-input" style="cursor:pointer;">
+                    <option class="lang-en" value="">&mdash; Select an agent &mdash;</option>
+                    <option class="lang-es" value="">&mdash; Selecciona un agente &mdash;</option>
+                    <option class="lang-fr" value="">&mdash; Sélectionner un agent &mdash;</option>
+                    <option class="lang-en-ca" value="">&mdash; Select an agent &mdash;</option>
+                    <option value="Angel Luis Rodriguez / Debra Nadal">Angel Luis Rodriguez / Debra Nadal</option>
+                    <option value="James Lavoie / Isabelle">James Lavoie / Isabelle</option>
+                    <option value="Sepehr Hosseini">Sepehr Hosseini</option>
+                    <option value="Giancarlo Agudelo">Giancarlo Agudelo</option>
+                    <option value="Denise McNeal">Denise McNeal</option>
+                  </select>
                 </div>
 
                 <div style="background:#f0f7ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px;margin:20px 0 24px;">
                   <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
-                    <input type="checkbox" id="webinar-gdpr" style="margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:#003f99;">
+                    <input type="checkbox" id="webinar-gdpr" style="margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:#003f99; -webkit-appearance: checkbox !important; appearance: checkbox !important;">
                     <span style="font-size:.79rem;color:#374151;line-height:1.5;">
                       <span class="lang-en">I agree to the <strong>data protection policy</strong> and consent to RE/MAX Inmom&aacute;s International storing my information to process this registration and send relevant event communications. I may withdraw consent at any time by contacting <a href="mailto:international@remax-inmomas.com" style="color:#003f99;">international@remax-inmomas.com</a>. *</span>
                       <span class="lang-es">Acepto la <strong>pol&iacute;tica de protecci&oacute;n de datos</strong> y consiento que RE/MAX Inmom&aacute;s Internacional almacene mis datos para gestionar este registro y enviarme comunicaciones del evento. Puedo retirar mi consentimiento en cualquier momento contactando a <a href="mailto:international@remax-inmomas.com" style="color:#003f99;">international@remax-inmomas.com</a>. *</span>
