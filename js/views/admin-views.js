@@ -1575,7 +1575,6 @@
     handleAssignLeadAgent,
     handleDeleteLead,
     confirmDeleteLead,
-    markAgreementSigned,
     initAgreementsView,
     handleAdminAgreementUpload
   };
