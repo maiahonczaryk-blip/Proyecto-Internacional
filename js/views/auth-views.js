@@ -77,6 +77,76 @@ App.views.auth = {
           }
         };
       }
+
+      // --- Forgot Password ---
+      const forgotToggle = document.getElementById('forgot-pw-toggle');
+      const forgotPanel  = document.getElementById('forgot-pw-panel');
+      const forgotSend   = document.getElementById('forgot-pw-send');
+      const forgotEmail  = document.getElementById('forgot-pw-email');
+      const forgotMsg    = document.getElementById('forgot-pw-msg');
+
+      if (forgotToggle && forgotPanel) {
+        forgotToggle.addEventListener('click', () => {
+          const isOpen = forgotPanel.style.display !== 'none';
+          forgotPanel.style.display = isOpen ? 'none' : 'block';
+          // Pre-fill with the email already typed in the login field
+          if (!isOpen && forgotEmail) {
+            const loginEmailVal = document.getElementById('login-email');
+            if (loginEmailVal && loginEmailVal.value) forgotEmail.value = loginEmailVal.value;
+            forgotEmail.focus();
+          }
+          if (forgotMsg) { forgotMsg.style.display = 'none'; forgotMsg.textContent = ''; }
+        });
+      }
+
+      if (forgotSend && forgotEmail && forgotMsg) {
+        forgotSend.addEventListener('click', async () => {
+          const email = forgotEmail.value.trim();
+          if (!email) {
+            forgotMsg.style.cssText = 'display:block;background:#fef2f2;color:#991b1b;border:1px solid #fecaca;margin-top:10px;font-size:0.82rem;border-radius:6px;padding:9px 12px;';
+            forgotMsg.textContent = 'Please enter your email address.';
+            return;
+          }
+
+          const oldHTML = forgotSend.innerHTML;
+          forgotSend.innerHTML = '<span class="spinner"></span>';
+          forgotSend.disabled = true;
+          forgotMsg.style.display = 'none';
+
+          try {
+            await App.auth.resetPassword(email);
+            forgotMsg.style.cssText = 'display:block;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;margin-top:10px;font-size:0.82rem;border-radius:6px;padding:9px 12px;';
+            // Multilingual success message
+            const lang = document.body.className.match(/lang-(\S+)/)?.[1] || 'en';
+            const msgs = {
+              en: '✅ Reset link sent! Check your inbox (and spam folder).',
+              es: '✅ ¡Enlace enviado! Revisa tu bandeja de entrada (y la carpeta de spam).',
+              fr: '✅ Lien envoyé&nbsp;! Vérifiez votre boîte de réception (et les spams).',
+              'en-ca': '✅ Reset link sent! Check your inbox (and spam folder).'
+            };
+            forgotMsg.innerHTML = msgs[lang] || msgs.en;
+            forgotSend.innerHTML = '✓';
+          } catch (err) {
+            forgotMsg.style.cssText = 'display:block;background:#fef2f2;color:#991b1b;border:1px solid #fecaca;margin-top:10px;font-size:0.82rem;border-radius:6px;padding:9px 12px;';
+            // Firebase: user-not-found should not reveal if email exists (security)
+            if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-email') {
+              forgotMsg.textContent = 'If this email is registered, a reset link has been sent.';
+            } else {
+              forgotMsg.textContent = err.message || 'Something went wrong. Please try again.';
+            }
+            forgotSend.innerHTML = oldHTML;
+            forgotSend.disabled = false;
+          } finally {
+            if (!forgotSend.disabled) return;
+            // Keep button disabled after success to prevent resends
+          }
+        });
+
+        // Also trigger on Enter key in the email input
+        forgotEmail.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); forgotSend.click(); }
+        });
+      }
     }
   },
 
