@@ -418,7 +418,7 @@ body.lang-en-ca .lang-fr { display: none; }
   flex-shrink: 0;
 }
 body.lang-en   .lang-flag-svg .flag-en    { display: inline-block; }
-body.lang-es   .lang-flag-svg .flag-es    { display: inline-block; }
+body.lang-es   .lang-flag-svg .flag-es    { display: inline-flex; align-items: center; gap: 3px; }
 body.lang-fr   .lang-flag-svg .flag-fr    { display: inline-block; }
 body.lang-en-ca .lang-flag-svg .flag-en-ca { display: inline-block; }
 /* Default before JS loads: show US flag only if no language class is on body */

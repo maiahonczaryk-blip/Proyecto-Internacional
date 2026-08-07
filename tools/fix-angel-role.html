@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Fix Angel Rodriguez Role</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 2.5rem;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    }
+    h1 { font-size: 1.3rem; font-weight: 700; color: #f8fafc; margin-bottom: .4rem; }
+    p.sub { font-size: .85rem; color: #94a3b8; margin-bottom: 2rem; }
+    .field { margin-bottom: 1.2rem; }
+    label { display: block; font-size: .8rem; font-weight: 600; color: #94a3b8; margin-bottom: .35rem; letter-spacing: .05em; text-transform: uppercase; }
+    .value { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: .6rem 1rem; font-size: .9rem; color: #f8fafc; }
+    .badge {
+      display: inline-block;
+      font-size: .75rem; font-weight: 700;
+      padding: .2rem .65rem;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .badge-old { background: #7f1d1d; color: #fca5a5; }
+    .badge-new { background: #14532d; color: #86efac; }
+    .arrow { color: #475569; margin: 0 .5rem; }
+    button {
+      width: 100%;
+      margin-top: 1.5rem;
+      padding: .85rem 1rem;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #e31837, #cc1631);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    button:hover { opacity: .85; }
+    button:disabled { opacity: .4; cursor: not-allowed; }
+    #log {
+      margin-top: 1.5rem;
+      background: #0f172a;
+      border: 1px solid #1e3a5f;
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      font-size: .8rem;
+      font-family: monospace;
+      color: #7dd3fc;
+      min-height: 60px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      display: none;
+    }
+    .ok { color: #86efac; }
+    .err { color: #f87171; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>🔧 Corrección de Rol de Usuario</h1>
+  <p class="sub">Script de uso único — Proyecto Internacional RE/MAX Inmomás</p>
+
+  <div class="field">
+    <label>Usuario</label>
+    <div class="value">Ángel Rodríguez</div>
+  </div>
+  <div class="field">
+    <label>Email</label>
+    <div class="value">angel.rodriguez@remaxes.com</div>
+  </div>
+  <div class="field">
+    <label>Cambio de Rol</label>
+    <div class="value">
+      <span class="badge badge-old">realtor</span>
+      <span class="arrow">→</span>
+      <span class="badge badge-new">agent_inmomas</span>
+    </div>
+  </div>
+
+  <button id="btn" onclick="fixRole()">Ejecutar cambio en Firebase</button>
+  <div id="log"></div>
+</div>
+
+<!-- Firebase SDKs (same version as main project) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDbGxO4nw7r63pEZqgyCoH0UyM7h3Bl7lw",
+    authDomain: "proyecto-internacional.firebaseapp.com",
+    projectId: "proyecto-internacional",
+    storageBucket: "proyecto-internacional.firebasestorage.app",
+    messagingSenderId: "742675229560",
+    appId: "1:742675229560:web:b35d82bc92d9cc393cb68d"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const TARGET_EMAIL = 'angel.rodriguez@remaxes.com';
+  const NEW_ROLE     = 'agent_inmomas';
+  const NEW_PREFIX   = 'LOC';
+
+  function log(msg, cls = '') {
+    const el = document.getElementById('log');
+    el.style.display = 'block';
+    el.innerHTML += `<span class="${cls}">${msg}\n</span>`;
+  }
+
+  async function fixRole() {
+    const btn = document.getElementById('btn');
+    btn.disabled = true;
+    log('🔍 Buscando usuario en Firestore...', '');
+
+    try {
+      // Search user by email
+      const snap = await db.collection('users')
+        .where('email', '==', TARGET_EMAIL)
+        .get();
+
+      if (snap.empty) {
+        log(`❌ No se encontró ningún usuario con email: ${TARGET_EMAIL}`, 'err');
+        log('   Verifica que el email es correcto en Firebase.', 'err');
+        btn.disabled = false;
+        return;
+      }
+
+      const docSnap = snap.docs[0];
+      const userId  = docSnap.id;
+      const data    = docSnap.data();
+
+      log(`✅ Usuario encontrado: ${data.firstName} ${data.lastName}  (ID: ${userId})`, 'ok');
+      log(`   Rol actual: ${data.role}`, '');
+
+      if (data.role === NEW_ROLE) {
+        log(`ℹ️ El usuario ya tiene el rol '${NEW_ROLE}'. No se requiere cambio.`, 'ok');
+        btn.disabled = false;
+        return;
+      }
+
+      // Update referral code prefix if present
+      let updatedRefCode = data.referralCode || null;
+      if (updatedRefCode) {
+        const parts = updatedRefCode.split('-');
+        if (parts.length > 1) {
+          parts[0] = NEW_PREFIX;
+          updatedRefCode = parts.join('-');
+        } else {
+          const lastName = data.lastName || 'RODRIGUEZ';
+          updatedRefCode = `${NEW_PREFIX}-${lastName.toUpperCase()}-${userId.substring(0, 4)}`;
+        }
+        log(`   Código de referido: ${data.referralCode || 'ninguno'} → ${updatedRefCode}`, '');
+      } else {
+        // Generate a new referral code
+        updatedRefCode = `${NEW_PREFIX}-RODRIGUEZ-${userId.substring(0, 4).toUpperCase()}`;
+        log(`   Se generará código de referido: ${updatedRefCode}`, '');
+      }
+
+      // Apply update
+      await db.collection('users').doc(userId).update({
+        role:         NEW_ROLE,
+        referralCode: updatedRefCode,
+        agencyName:   data.agencyName || 'RE/MAX Inmomás',
+        updatedAt:    new Date().toISOString()
+      });
+
+      log('', '');
+      log('✅ ¡Rol actualizado correctamente en Firestore!', 'ok');
+      log(`   ${data.firstName} ${data.lastName}  →  ${NEW_ROLE}`, 'ok');
+      log('', '');
+      log('Puedes cerrar esta ventana.', '');
+
+    } catch (err) {
+      log(`❌ Error: ${err.message}`, 'err');
+      console.error(err);
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
