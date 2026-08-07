@@ -117,6 +117,67 @@
     await renderWebinarRegistrations();
   }
 
+  /* ============================================
+     initPartners()
+     Populates #view-agent-partners with registered brokers.
+     ============================================ */
+  async function initPartners() {
+    currentUser = App.auth.getCurrentUser();
+    if (!currentUser) return;
+    await renderPartners();
+  }
+
+  async function renderPartners() {
+    const tbody = document.getElementById('agent-partners-table-body');
+    if (!tbody) return;
+
+    try {
+      const allUsers = await App.auth.getAllUsers();
+      
+      // Filter brokers/realtors linked to this agent
+      const linkedPartners = allUsers.filter(u => {
+        if (!['broker', 'realtor'].includes(u.role)) return false;
+        
+        // Match referredBy or source
+        if (u.referredBy && u.referredBy === currentUser.id) return true;
+        if (u.referredBy && currentUser.referralCode && u.referredBy.toUpperCase() === currentUser.referralCode.toUpperCase()) return true;
+        if (u.referredBy && u.referredBy.toLowerCase() === currentUser.email.toLowerCase()) return true;
+        if (u.source && u.source.toLowerCase() === currentUser.email.toLowerCase()) return true;
+
+        return false;
+      });
+
+      if (linkedPartners.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+              <span class="lang-en">No partners linked to you yet.</span>
+              <span class="lang-es">Aún no tienes partners asociados.</span>
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = linkedPartners.map(p => {
+        const date = App.utils.formatDate(p.createdAt);
+        const statusBadge = \`<span class="badge \${App.utils.getStatusBadgeClass(p.status)}">\${App.utils.getStatusLabel(p.status)}</span>\`;
+        const roleLabel = p.role === 'broker' ? 'Broker' : 'Realtor';
+        return \`
+          <tr>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem; color: var(--text-secondary);">\${date}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.88rem; font-weight: 600;">\${App.utils.escapeHtml(p.firstName)} \${App.utils.escapeHtml(p.lastName)}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">\${roleLabel}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">\${App.utils.escapeHtml(p.email)}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">\${App.utils.escapeHtml(p.agencyName || '—')}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">\${statusBadge}</td>
+          </tr>\`;
+      }).join('');
+    } catch (err) {
+      console.error('[Agent] renderPartners error:', err);
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 1rem;">Error loading partners.</td></tr>';
+    }
+  }
+
   /* ── Render Webinar Registrations Linked to Agent ── */
   async function renderWebinarRegistrations() {
     const tbody = document.getElementById('agent-webinar-table-body');
@@ -637,6 +698,7 @@
     initClients,
     initFinances,
     initWebinar,
+    initPartners,
     showClientDetail,
     handleClientDrop,
     handleSaveFinancials,

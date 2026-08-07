@@ -52,7 +52,8 @@ App.router = (function() {
     'agent_inmomas/dashboard': { view: 'view-agent-dashboard', role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Dashboard' },
     'agent_inmomas/clients':   { view: 'view-agent-clients',   role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Clients' },
     'agent_inmomas/finances':  { view: 'view-agent-finances',  role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Finances' },
-    'agent_inmomas/webinar':   { view: 'view-agent-webinar',   role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Webinar Registrations' }
+    'agent_inmomas/webinar':   { view: 'view-agent-webinar',   role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Webinar Registrations' },
+    'agent_inmomas/partners':  { view: 'view-agent-partners',  role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'My Partners' }
   };
 
   let currentRoute = null;
