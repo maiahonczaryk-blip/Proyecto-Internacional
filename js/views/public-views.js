@@ -177,10 +177,10 @@ App.views.public = {
 
       // Update welcome message
       if (welcomeMsg) {
-        welcomeMsg.innerHTML = `<span class="lang-en">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Please fill out the form below to register.</span>
-                                <span class="lang-es">Has sido referido por <strong>${referrer.firstName} ${referrer.lastName}</strong>. Completa el formulario para registrarte.</span>
-                                <span class="lang-fr">Vous avez été parrainé par <strong>${referrer.firstName} ${referrer.lastName}</strong>. Veuillez remplir le formulaire ci-dessous pour vous inscrire.</span>
-                                <span class="lang-en-ca">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Please fill out the form below to register.</span>`;
+        welcomeMsg.innerHTML = `<span class="lang-en">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Register to receive notifications and info about our next webinar.</span>
+                                <span class="lang-es">Has sido referido por <strong>${referrer.firstName} ${referrer.lastName}</strong>. Regístrate para recibir notificaciones e info sobre nuestro próximo webinario.</span>
+                                <span class="lang-fr">Vous avez été parrainé par <strong>${referrer.firstName} ${referrer.lastName}</strong>. Inscrivez-vous pour recevoir des notifications et des infos sur notre prochain webinaire.</span>
+                                <span class="lang-en-ca">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Register to receive notifications and info about our next webinar.</span>`;
       }
 
       // Build type options
