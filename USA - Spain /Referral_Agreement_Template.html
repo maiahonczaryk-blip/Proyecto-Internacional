@@ -215,44 +215,10 @@
       page-break-inside: avoid;
     }
 
-    /* ── Annex page break ── */
-    .page-break {
-      page-break-before: always;
-      border-top: 3px double var(--remax-blue);
-      padding-top: 25px;
-      margin-top: 50px;
-    }
-
-    .annex-badge {
-      display: inline-block;
-      background: var(--remax-blue);
-      color: #fff;
-      padding: 4px 14px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 10px;
-    }
-
-    .annex-number-row {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 12px;
-    }
-
-    .annex-number-row span {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--remax-blue);
-    }
-
     @media print {
       body { padding: 0; margin: 0; }
       .container { max-width: 100%; }
       @page { margin: 1.2cm; }
-      .page-break { page-break-before: always; margin-top: 0; }
     }
   </style>
 </head>
@@ -289,6 +255,8 @@
       <div class="form-row"><div class="form-label">Broker License # / Licencia:</div><div class="form-value"></div></div>
       <div class="form-row"><div class="form-label">Contact Email / Correo:</div><div class="form-value"></div></div>
       <div class="form-row"><div class="form-label">Contact Phone / Teléfono:</div><div class="form-value"></div></div>
+      <div class="form-row" style="margin-top:6px; border-top:1px dashed var(--border-color); padding-top:6px;"><div class="form-label" style="color:var(--remax-red); font-weight:700;">Referring Agent / Agente:</div><div class="form-value"></div></div>
+      <div class="form-row"><div class="form-label" style="color:var(--remax-red); font-weight:700;">Agent Email / Correo Agente:</div><div class="form-value"></div></div>
     </div>
 
     <!-- Broker B -->
@@ -309,10 +277,10 @@
     <div class="clause">
       <h4>1. Purpose & Scope / Objeto y Alcance</h4>
       <p>
-        The purpose of this Master Agreement is to establish the general terms under which Broker A and its licensed real estate agents may refer prospective international buyers to Broker B for the purchase of real estate in Spain, specifically within the provinces of Alicante and the Costa Blanca region. This agreement covers <strong>all future referrals</strong> made by Broker A's agents during the term of this agreement. Individual client referrals shall be documented separately in the attached Annex.
+        The purpose of this Agreement is to establish the terms under which the Referring Agent identified above (acting under Broker A) may refer prospective international buyers to Broker B for the purchase of real estate in Spain, specifically within the provinces of Alicante and the Costa Blanca region. This agreement is issued on a per-agent basis: one agreement per Broker A agent.
       </p>
       <span class="lang-divider">
-        El objeto de este Acuerdo Marco es establecer las condiciones generales bajo las cuales el Corredor A y sus agentes inmobiliarios licenciados podrán referir compradores internacionales potenciales al Corredor B para la compra de inmuebles en España, específicamente en la provincia de Alicante y la zona de la Costa Blanca. Este acuerdo cubre <strong>todos los referidos futuros</strong> realizados por los agentes del Corredor A durante la vigencia del presente acuerdo. Cada referido individual se documentará por separado en el Anexo adjunto.
+        El objeto de este Acuerdo es establecer las condiciones bajo las cuales el Agente Referente identificado anteriormente (actuando bajo el amparo del Corredor A) podrá referir compradores internacionales al Corredor B para la compra de inmuebles en España, específicamente en la provincia de Alicante y la Costa Blanca. Este acuerdo se emite por agente: un acuerdo por cada agente del Corredor A.
       </span>
     </div>
 
@@ -356,10 +324,10 @@
     <div class="clause">
       <h4>5. Client Lock Period / Vigencia del Referido</h4>
       <p>
-        Each individual referral documented in an Annex is protected for a period of <strong>24 months</strong> from the date of registration. Broker A is entitled to the referral fee for any transaction completed by that referred client in Spain during this period.
+        Each referred client is protected for a period of <strong>24 months</strong> from the date of registration in the Partner Portal. Broker A is entitled to the referral fee for any transaction completed by that referred client in Spain during this period.
       </p>
       <span class="lang-divider">
-        Cada referido individual documentado en un Anexo estará protegido durante un periodo de <strong>24 meses</strong> desde la fecha de registro. El Corredor A tendrá derecho a la comisión de referido por cualquier transacción completada por dicho cliente en España durante este periodo.
+        Cada cliente referido estará protegido durante un periodo de <strong>24 meses</strong> desde la fecha de registro en el Portal de Socios. El Corredor A tendrá derecho a la comisión de referido por cualquier transacción completada por dicho cliente en España durante este periodo.
       </span>
     </div>
 
@@ -376,10 +344,10 @@
     <div class="clause">
       <h4>7. Duration & Termination / Vigencia y Resolución</h4>
       <p>
-        This Agreement is effective for an initial period of <strong>12 months</strong> from the date of signature, automatically renewing for successive 12-month periods unless either party provides <strong>60 days' written notice</strong> of termination. Termination shall not affect referral rights on clients documented in existing Annexes.
+        This Agreement is effective for an initial period of <strong>12 months</strong> from the date of signature, automatically renewing for successive 12-month periods unless either party provides <strong>60 days' written notice</strong> of termination. Termination shall not affect referral rights on clients already registered prior to the termination date.
       </p>
       <span class="lang-divider">
-        Este Acuerdo tendrá una vigencia inicial de <strong>12 meses</strong> desde la fecha de firma, renovándose automáticamente por períodos sucesivos de 12 meses salvo que cualquiera de las partes comunique su resolución con un preaviso de <strong>60 días por escrito</strong>. La resolución no afectará los derechos de referido sobre clientes documentados en Anexos existentes.
+        Este Acuerdo tendrá una vigencia inicial de <strong>12 meses</strong> desde la fecha de firma, renovándose automáticamente por períodos sucesivos de 12 meses salvo que cualquiera de las partes comunique su resolución con un preaviso de <strong>60 días por escrito</strong>. La resolución no afectará los derechos de referido sobre clientes ya registrados antes de la fecha de resolución.
       </span>
     </div>
 
@@ -427,105 +395,7 @@
     </p>
   </footer>
 
-  <!-- ═══════════════════════════════════════════
-       PAGE 2 — ANNEX: INDIVIDUAL CLIENT REFERRAL
-       ═══════════════════════════════════════════ -->
 
-  <div class="page-break" style="padding-top: 15px; margin-top: 40px;">
-    <header style="border-bottom: 2px solid var(--remax-blue); padding-bottom: 10px; margin-bottom: 12px;">
-      <div class="logo-container">
-        <img src="remax_logo.png" alt="RE/MAX Inmomás Logo" style="height: 38px;">
-        <div>
-          <h1 style="font-size: 15px;">Megagestión <span>Servicios Inmobiliarios</span></h1>
-          <p>RE/MAX Inmomás</p>
-        </div>
-      </div>
-      <div class="doc-title">
-        <span class="annex-badge">ANNEX / ANEXO</span>
-        <h2 style="font-size: 13px;">Individual Client Referral / Ficha de Referido Individual</h2>
-      </div>
-    </header>
-
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 9px;">
-      <span style="color: var(--remax-blue); font-weight: 600;">Referral # / Nº: __________________</span>
-      <span style="color: var(--remax-blue); font-weight: 600;">Date / Fecha: __________________</span>
-      <span style="color: #6c757d;">Master Agreement date / Fecha Acuerdo Marco: ____/____/________</span>
-    </div>
-
-    <p style="font-size: 8.5px; color: #6c757d; margin: 0 0 10px 0; text-align: justify; line-height: 1.35;">
-      This Annex is subject to the Master Referral Agreement. The referral is protected for 24 months. /
-      <em>Este Anexo está sujeto al Acuerdo Marco. El referido queda protegido durante 24 meses.</em>
-    </p>
-
-    <!-- Agents Row - Side by Side Compact -->
-    <div class="field-grid" style="gap: 10px; margin-bottom: 10px;">
-      <div class="field-card" style="padding: 8px;">
-        <h3 style="font-size: 9px; margin-bottom: 5px;">Referring Agent / Agente Referente (US/Canada)</h3>
-        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 120px;">Name / Nombre:</div><div class="form-value"></div></div>
-        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 120px;">License # / Licencia:</div><div class="form-value"></div></div>
-        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 120px;">Email / Correo:</div><div class="form-value"></div></div>
-        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 120px;">Phone / Teléfono:</div><div class="form-value"></div></div>
-        <div class="form-row" style="margin-bottom: 0; font-size: 9px;"><div class="form-label" style="width: 120px;">Brokerage / Agencia:</div><div class="form-value"></div></div>
-      </div>
-
-      <div class="field-card" style="padding: 8px;">
-        <h3 style="font-size: 9px; margin-bottom: 5px;">Receiving Agent / Agente Receptor (Spain)</h3>
-        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 120px;">Name / Nombre:</div><div class="form-value"></div></div>
-        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 120px;">Email / Correo:</div><div class="form-value"></div></div>
-        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 120px;">Phone / Teléfono:</div><div class="form-value"></div></div>
-        <div class="form-row" style="margin-bottom: 0; font-size: 9px;"><div class="form-label" style="width: 120px;">Office / Oficina:</div><div class="form-value">RE/MAX Inmomás</div></div>
-      </div>
-    </div>
-
-    <!-- Prospect - Compact Full Width -->
-    <div class="field-card full-width" style="padding: 8px; margin-bottom: 10px;">
-      <h3 style="font-size: 9px; margin-bottom: 5px;">Prospect / Cliente Referido</h3>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 15px;">
-        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 130px;">Full Name / Nombre:</div><div class="form-value"></div></div>
-        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 130px;">Email / Correo:</div><div class="form-value"></div></div>
-        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 130px;">Phone / Teléfono:</div><div class="form-value"></div></div>
-        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 130px;">Region / Región:</div><div class="form-value">Alicante / Costa Blanca</div></div>
-        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 130px;">Budget / Presupuesto:</div><div class="form-value"></div></div>
-        <div class="form-row" style="margin-bottom: 4px; font-size: 9px;"><div class="form-label" style="width: 130px;">Property Type / Tipo:</div><div class="form-value"></div></div>
-      </div>
-      <div class="form-row" style="margin-bottom: 0; font-size: 9px;"><div class="form-label" style="width: 130px;">Notes / Notas:</div><div class="form-value"></div></div>
-    </div>
-
-    <!-- Commission - Inline -->
-    <div style="display: flex; align-items: center; gap: 20px; padding: 6px 10px; background: var(--light-grey); border-radius: 4px; border: 1px solid var(--border-color); margin-bottom: 12px; font-size: 9px;">
-      <div><strong style="color: var(--remax-blue);">Referral Fee / Comisión:</strong> As per Master Agreement: <strong>25%</strong> / Según Acuerdo Marco: <strong>25%</strong></div>
-      <div style="color: #6c757d;">☐ Modified / Modificado: ________ %</div>
-    </div>
-
-    <!-- Compact Signatures Side by Side -->
-    <div class="signature-grid" style="gap: 20px;">
-      <div>
-        <div class="sig-caption" style="font-size: 8px;">Broker A Representative / Representante Corredor A</div>
-        <div style="border-bottom: 1px solid var(--charcoal); height: 30px; margin-bottom: 3px;"></div>
-        <div style="font-size: 8.5px; color: #6c757d;">
-          <span style="display: block;">Signature / Firma</span>
-          <span style="display: block; margin-top: 2px;">Name / Nombre: ________________________________</span>
-          <span style="display: block; margin-top: 2px;">Date / Fecha: __________________________________</span>
-        </div>
-      </div>
-      <div>
-        <div class="sig-caption" style="font-size: 8px;">Broker B Representative / Representante Corredor B</div>
-        <div style="border-bottom: 1px solid var(--charcoal); height: 30px; margin-bottom: 3px;"></div>
-        <div style="font-size: 8.5px; color: #6c757d;">
-          <span style="display: block;">Signature / Firma</span>
-          <span style="display: block; margin-top: 2px;">Name / Nombre: <strong style="color: var(--charcoal);">José Martínez Sánchez</strong></span>
-          <span style="display: block; margin-top: 2px;">Date / Fecha: __________________________________</span>
-        </div>
-      </div>
-    </div>
-
-    <footer style="margin-top: 15px; padding-top: 8px;">
-      <p>
-        Megagestión Servicios Inmobiliarios • CIF: B-54829767 • jose.martinez@remax.es • +34 966 665 651<br>
-        This Annex is an integral part of the Master Referral Agreement / Este Anexo forma parte integral del Acuerdo Marco de Referidos.
-      </p>
-    </footer>
-  </div>
 
 </div>
 

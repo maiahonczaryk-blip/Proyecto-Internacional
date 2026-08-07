@@ -1,39 +1,4 @@
-/* ============================================================
-   RE/MAX Inmomás — Referral Agreement Word Generator
-   ============================================================
-   Generates a downloadable .doc file (MS Word compatible)
-   with the Broker's data AND the Referring Agent's name & email.
-   One agreement per broker-agent pair (no Annex).
-   ============================================================ */
-
-;(function() {
-  'use strict';
-
-  window.App = window.App || {};
-
-  /**
-   * generateReferralAgreementDoc(userData)
-   * Creates and downloads a Word-compatible .doc file with
-   * the Master Referral Agreement pre-filled with user data.
-   * @param {Object} userData - Current user profile object
-   */
-  App.generateReferralAgreementDoc = function(userData, agentData) {
-    const user       = userData || App.auth.getCurrentUser() || {};
-    const agent      = agentData || {};
-    const fullName   = `${user.firstName || ''} ${user.lastName || ''}`.trim() || '___________________';
-    const agency     = user.agencyName || user.brokerNameManual || '___________________';
-    const email      = user.email || '___________________';
-    const phone      = user.phone || '___________________';
-    const country    = user.country || 'United States / Canada';
-    // Agent fields — if agentData is not provided, fall back to blank
-    const agentName  = agent.firstName && agent.lastName
-                         ? `${agent.firstName} ${agent.lastName}`.trim()
-                         : (agent.name || '___________________');
-    const agentEmail = agent.email || '___________________';
-    const today      = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-
-    const html = `
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:o="urn:schemas-microsoft-com:office:office"
       xmlns:w="urn:schemas-microsoft-com:office:word"
       xmlns="http://www.w3.org/TR/REC-html40">
@@ -101,7 +66,7 @@
     Acuerdo Marco de Colaboración y Referidos
   </p>
   <p class="doc-ref">
-    Date / Fecha: <strong>${today}</strong> &nbsp;|&nbsp; Ref: INM-REF-${Date.now().toString().slice(-6)}
+    Date / Fecha: <strong>___________________</strong> &nbsp;|&nbsp; Ref: INM-REF-XXXXXX
   </p>
 
   <!-- Broker Cards -->
@@ -110,14 +75,14 @@
       <td style="width:50%; vertical-align:top; padding:0;">
         <div class="broker-title">Broker A — Referring Brokerage / Agencia Referente</div>
         <table style="margin-bottom:0; border-top:none;">
-          <tr><th>Brokerage / Agencia</th><td>${App.utils ? App.utils.escapeHtml(agency) : agency}</td></tr>
-          <tr><th>Broker of Record</th><td>${App.utils ? App.utils.escapeHtml(fullName) : fullName}</td></tr>
-          <tr><th>Country / País</th><td>${App.utils ? App.utils.escapeHtml(country) : country}</td></tr>
-          <tr><th>Email</th><td>${App.utils ? App.utils.escapeHtml(email) : email}</td></tr>
-          <tr><th>Phone / Teléfono</th><td>${App.utils ? App.utils.escapeHtml(phone) : phone}</td></tr>
+          <tr><th>Brokerage / Agencia</th><td>___________________</td></tr>
+          <tr><th>Broker of Record</th><td>___________________</td></tr>
+          <tr><th>Country / País</th><td>___________________</td></tr>
+          <tr><th>Email</th><td>___________________</td></tr>
+          <tr><th>Phone / Teléfono</th><td>___________________</td></tr>
           <tr><th>License # / Licencia</th><td>&nbsp;</td></tr>
-          <tr style="background:#fff5f5;"><th style="color:#c0392b;">Referring Agent / Agente</th><td><strong>${App.utils ? App.utils.escapeHtml(agentName) : agentName}</strong></td></tr>
-          <tr style="background:#fff5f5;"><th style="color:#c0392b;">Agent Email / Correo Agente</th><td>${App.utils ? App.utils.escapeHtml(agentEmail) : agentEmail}</td></tr>
+          <tr style="background:#fff5f5;"><th style="color:#c0392b;">Referring Agent / Agente</th><td><strong>___________________</strong></td></tr>
+          <tr style="background:#fff5f5;"><th style="color:#c0392b;">Agent Email / Correo Agente</th><td>___________________</td></tr>
         </table>
       </td>
       <td style="width:4%; border:none; background:none;"></td>
@@ -209,7 +174,7 @@
           <p class="sig-field">Signature / Firma</p>
           <br>
           <div class="sig-line"></div>
-          <p class="sig-field">Print Name / Nombre: <strong>${App.utils ? App.utils.escapeHtml(fullName) : fullName}</strong></p>
+          <p class="sig-field">Print Name / Nombre: <strong>___________________</strong></p>
           <br>
           <div class="sig-line"></div>
           <p class="sig-field">Title / Cargo: ___________________________</p>
@@ -240,22 +205,8 @@
   <!-- Footer -->
   <div class="footer">
     Megagestión Servicios Inmobiliarios &bull; Carrer Conrado del Campo 16, 03204, Elche (Alicante), Spain &bull; CIF: B-54829767 &bull; jose.martinez@remax.es &bull; +34 966 665 651<br>
-    &copy; ${new Date().getFullYear()} Megagestión Servicios Inmobiliarios. All Rights Reserved / Reservados todos los derechos.
+    &copy; 2026 Megagestión Servicios Inmobiliarios. All Rights Reserved / Reservados todos los derechos.
   </div>
 
 </body>
-</html>`;
-
-    // Create and download as .doc (Word-compatible HTML)
-    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = `Referral_Agreement_${(user.lastName || 'User').replace(/\s+/g,'_')}_${agentName !== '___________________' ? agentName.split(' ').pop().replace(/\s+/g,'_') + '_' : ''}${new Date().toISOString().slice(0,10)}.doc`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
-  };
-
-})();
+</html>
