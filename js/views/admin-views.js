@@ -659,6 +659,7 @@
               <select id="user-role-select" class="form-control" style="flex: 1; padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; background-color: white;">
                 <option value="realtor" ${user.role === 'realtor' ? 'selected' : ''}>Realtor</option>
                 <option value="broker" ${user.role === 'broker' ? 'selected' : ''}>Broker</option>
+                <option value="agent_inmomas" ${user.role === 'agent_inmomas' ? 'selected' : ''}>Agent Inmomás</option>
               </select>
               <button class="btn btn-primary btn-sm" id="save-user-role-btn">Update Role</button>
             </div>

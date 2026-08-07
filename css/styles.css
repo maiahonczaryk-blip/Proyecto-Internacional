@@ -44,9 +44,12 @@
   --gradient-red: linear-gradient(135deg, #ff1200, #cc0e00);
 
   /* Spacing */
-  --section-padding: 96px 0;
+  --section-padding: 110px 0;
+  --section-padding-sm: 72px 0;
+  --section-padding-lg: 140px 0;
+  --section-inner-gap: 64px;
   --container-max: 1200px;
-  --container-padding: 0 24px;
+  --container-padding: 0 28px;
 
   /* Transitions */
   --transition-fast: 0.2s ease;
@@ -157,6 +160,25 @@ body.lang-en-ca .lang-fr { display: none; }
 .section {
   padding: var(--section-padding);
   position: relative;
+}
+
+/* Section padding modifiers */
+.section--sm {
+  padding: var(--section-padding-sm);
+}
+
+.section--lg {
+  padding: var(--section-padding-lg);
+}
+
+/* Visual separator between same-bg sections */
+.section + .section:not(.section--no-sep) {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Tinted sections get a subtle top fade-in line instead */
+.section.bg-secondary + .section.bg-secondary {
+  border-top: 1px solid var(--border-subtle);
 }
 
 .section-label {
@@ -692,7 +714,7 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   background: var(--bg-secondary);
   border-top: 1px solid var(--border-subtle);
   border-bottom: 1px solid var(--border-subtle);
-  padding: 24px 0;
+  padding: 28px 0;
 }
 
 .proof-bar .container {
@@ -730,7 +752,7 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
 
 /* --- Trust Badges Row --- */
 .trust-badges {
-  padding: 40px 0;
+  padding: 44px 0;
   background: var(--bg-primary);
   border-bottom: 1px solid var(--border-subtle);
 }
