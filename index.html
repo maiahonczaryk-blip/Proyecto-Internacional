@@ -136,8 +136,8 @@
           <button class="lang-selector-btn" id="lang-selector-btn" aria-label="Sélectionner la langue / Select language">
             <!-- Active language flag: updated by CSS class on body -->
             <span class="lang-flag-svg" id="lang-flag" aria-hidden="true">
-              <!-- US + Puerto Rico (shown when lang-en) -->
-              <span class="flag-svg flag-en" style="display:inline-flex;align-items:center;gap:3px;">
+              <!-- US (shown when lang-en) -->
+              <span class="flag-svg flag-en">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" style="border-radius:2px;flex-shrink:0;">
                   <rect width="20" height="14" fill="#B22234"/>
                   <rect y="1.08" width="20" height="1.08" fill="#fff"/><rect y="3.23" width="20" height="1.08" fill="#fff"/><rect y="5.38" width="20" height="1.08" fill="#fff"/><rect y="7.54" width="20" height="1.08" fill="#fff"/><rect y="9.69" width="20" height="1.08" fill="#fff"/><rect y="11.85" width="20" height="1.08" fill="#fff"/>
@@ -148,17 +148,9 @@
                   <circle cx="2.1" cy="4.9" r="0.5" fill="#fff"/><circle cx="3.5" cy="4.9" r="0.5" fill="#fff"/><circle cx="4.9" cy="4.9" r="0.5" fill="#fff"/><circle cx="6.3" cy="4.9" r="0.5" fill="#fff"/>
                   <circle cx="1.4" cy="6.1" r="0.5" fill="#fff"/><circle cx="2.8" cy="6.1" r="0.5" fill="#fff"/><circle cx="4.2" cy="6.1" r="0.5" fill="#fff"/><circle cx="5.6" cy="6.1" r="0.5" fill="#fff"/><circle cx="7" cy="6.1" r="0.5" fill="#fff"/>
                 </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" style="border-radius:2px;flex-shrink:0;">
-                  <!-- Puerto Rico flag -->
-                  <rect width="20" height="14" fill="#EF3340"/>
-                  <rect y="2.8" width="20" height="2.8" fill="#fff"/>
-                  <rect y="8.4" width="20" height="2.8" fill="#fff"/>
-                  <polygon points="0,0 8,7 0,14" fill="#0E2B73"/>
-                  <polygon points="4,7 4.5,5.4 5,7 3.5,6.05 5.5,6.05" fill="#fff"/>
-                </svg>
               </span>
               <!-- Spain + Puerto Rico (shown when lang-es) -->
-              <span class="flag-svg flag-es" style="display:inline-flex;align-items:center;gap:3px;">
+              <span class="flag-svg flag-es">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" style="border-radius:2px;flex-shrink:0;">
                   <rect width="20" height="14" fill="#AA151B"/>
                   <rect y="3.5" width="20" height="7" fill="#F1BF00"/>
@@ -198,11 +190,20 @@
               <span class="item-text"><span class="item-name">English</span><span class="item-region">United States</span></span>
             </button>
             <button class="lang-dropdown-item" data-lang="es" id="lang-option-es">
-              <svg class="item-flag" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="22" height="15" aria-hidden="true" style="border-radius:2px;flex-shrink:0;">
-                <rect width="20" height="14" fill="#AA151B"/>
-                <rect y="3.5" width="20" height="7" fill="#F1BF00"/>
-              </svg>
-              <span class="item-text"><span class="item-name">Español</span><span class="item-region">España</span></span>
+              <span style="display:inline-flex;align-items:center;gap:3px;">
+                <svg class="item-flag" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="22" height="15" aria-hidden="true" style="border-radius:2px;flex-shrink:0;">
+                  <rect width="20" height="14" fill="#AA151B"/>
+                  <rect y="3.5" width="20" height="7" fill="#F1BF00"/>
+                </svg>
+                <svg class="item-flag" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="22" height="15" aria-hidden="true" style="border-radius:2px;flex-shrink:0;">
+                  <rect width="20" height="14" fill="#EF3340"/>
+                  <rect y="2.8" width="20" height="2.8" fill="#fff"/>
+                  <rect y="8.4" width="20" height="2.8" fill="#fff"/>
+                  <polygon points="0,0 8,7 0,14" fill="#0E2B73"/>
+                  <polygon points="4,7 4.5,5.4 5,7 3.5,6.05 5.5,6.05" fill="#fff" transform="translate(0,0)"/>
+                </svg>
+              </span>
+              <span class="item-text"><span class="item-name">Español</span><span class="item-region">España / Puerto Rico</span></span>
             </button>
             <button class="lang-dropdown-item" data-lang="fr" id="lang-option-fr">
               <svg class="item-flag" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="22" height="15" aria-hidden="true" style="border-radius:2px;flex-shrink:0;">
