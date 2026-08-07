@@ -162,7 +162,12 @@ App.auth = (function() {
         localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
         notifyAuthChange();
       }
-      
+
+      // Notify admin of new registration
+      if (window.App && window.App.notifications) {
+        window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
+      }
+
       return { success: true, user: newUser };
     } else {
       // Firebase registration
@@ -193,7 +198,12 @@ App.auth = (function() {
       };
 
       await App.db.collection('users').doc(uid).set(userData);
-      
+
+      // Notify admin of new registration
+      if (window.App && window.App.notifications) {
+        window.App.notifications.onNewUserRegistration({ id: uid, ...userData }).catch(() => {});
+      }
+
       currentUser = { id: uid, ...userData };
       notifyAuthChange();
       return { success: true, user: currentUser };
@@ -426,6 +436,11 @@ App.auth = (function() {
 
       await App.db.collection('users').doc(uid).set(userData);
 
+      // Notify admin of new registration via Google
+      if (window.App && window.App.notifications) {
+        window.App.notifications.onNewUserRegistration({ id: uid, ...userData }).catch(() => {});
+      }
+
       currentUser = { id: uid, ...userData };
       notifyAuthChange();
 
@@ -472,12 +487,23 @@ App.auth = (function() {
       user.status = newStatus;
       user.updatedAt = new Date().toISOString();
       saveDemoData();
+      // Notify admin of status change
+      if (window.App && window.App.notifications) {
+        window.App.notifications.onUserStatusChange(user, newStatus).catch(() => {});
+      }
       return true;
     } else {
       await App.db.collection('users').doc(userId).update({
         status: newStatus,
         updatedAt: new Date().toISOString()
       });
+      // Fetch user data to include in notification
+      try {
+        const doc = await App.db.collection('users').doc(userId).get();
+        if (doc.exists && window.App && window.App.notifications) {
+          window.App.notifications.onUserStatusChange({ id: userId, ...doc.data() }, newStatus).catch(() => {});
+        }
+      } catch (_) {}
       return true;
     }
   }
@@ -862,10 +888,19 @@ App.auth = (function() {
       if (!App.demoData.dossier_leads) App.demoData.dossier_leads = [];
       App.demoData.dossier_leads.push(newLead);
       saveDemoData();
+      // Notify admin of new Buyer's Guide lead
+      if (window.App && window.App.notifications) {
+        window.App.notifications.onNewDossierLead(newLead).catch(() => {});
+      }
       return newLead;
     } else {
       const docRef = await App.db.collection('dossier_leads').add(newLead);
-      return { id: docRef.id, ...newLead };
+      const saved = { id: docRef.id, ...newLead };
+      // Notify admin of new Buyer's Guide lead
+      if (window.App && window.App.notifications) {
+        window.App.notifications.onNewDossierLead(saved).catch(() => {});
+      }
+      return saved;
     }
   }
 
@@ -889,9 +924,17 @@ App.auth = (function() {
       payload.id = 'wreg-' + Date.now();
       App.demoData.webinar_registrations.push(payload);
       saveDemoData();
+      // Notify admin of new webinar registration
+      if (window.App && window.App.notifications) {
+        window.App.notifications.onNewWebinarRegistration(payload).catch(() => {});
+      }
       return payload.id;
     } else {
       const docRef = await App.db.collection('webinar_registrations').add(payload);
+      // Notify admin of new webinar registration
+      if (window.App && window.App.notifications) {
+        window.App.notifications.onNewWebinarRegistration({ id: docRef.id, ...payload }).catch(() => {});
+      }
       return docRef.id;
     }
   }
