@@ -28,6 +28,12 @@ App.auth = (function() {
     } else {
       App.demoData.dossier_leads = App.demoData.dossier_leads || [];
     }
+    const savedWebinarRegs = localStorage.getItem('remax_demo_webinar_registrations');
+    if (savedWebinarRegs) {
+      App.demoData.webinar_registrations = JSON.parse(savedWebinarRegs);
+    } else {
+      App.demoData.webinar_registrations = App.demoData.webinar_registrations || [];
+    }
   }
 
   function saveDemoData() {
@@ -36,6 +42,8 @@ App.auth = (function() {
     localStorage.setItem('remax_demo_clients', JSON.stringify(App.demoData.clients));
     localStorage.setItem('remax_demo_commissions', JSON.stringify(App.demoData.commissions));
     localStorage.setItem('remax_demo_dossier_leads', JSON.stringify(App.demoData.dossier_leads || []));
+    localStorage.setItem('remax_demo_webinar_registrations', JSON.stringify(App.demoData.webinar_registrations || []));
+    
     if (currentUser) {
       // Find the updated user in demoData to ensure the session gets the latest fields (e.g. agreementSigned, status)
       const updatedUser = App.demoData.users.find(u => u.id === currentUser.id);
