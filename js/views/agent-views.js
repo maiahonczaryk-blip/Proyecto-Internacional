@@ -160,17 +160,17 @@
 
       tbody.innerHTML = linkedPartners.map(p => {
         const date = App.utils.formatDate(p.createdAt);
-        const statusBadge = \`<span class="badge \${App.utils.getStatusBadgeClass(p.status)}">\${App.utils.getStatusLabel(p.status)}</span>\`;
+        const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(p.status)}">${App.utils.getStatusLabel(p.status)}</span>`;
         const roleLabel = p.role === 'broker' ? 'Broker' : 'Realtor';
-        return \`
+        return `
           <tr>
-            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem; color: var(--text-secondary);">\${date}</td>
-            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.88rem; font-weight: 600;">\${App.utils.escapeHtml(p.firstName)} \${App.utils.escapeHtml(p.lastName)}</td>
-            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">\${roleLabel}</td>
-            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">\${App.utils.escapeHtml(p.email)}</td>
-            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">\${App.utils.escapeHtml(p.agencyName || '—')}</td>
-            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">\${statusBadge}</td>
-          </tr>\`;
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem; color: var(--text-secondary);">${date}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.88rem; font-weight: 600;">${App.utils.escapeHtml(p.firstName)} ${App.utils.escapeHtml(p.lastName)}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${roleLabel}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${App.utils.escapeHtml(p.email)}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${App.utils.escapeHtml(p.agencyName || '—')}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${statusBadge}</td>
+          </tr>`;
       }).join('');
     } catch (err) {
       console.error('[Agent] renderPartners error:', err);
