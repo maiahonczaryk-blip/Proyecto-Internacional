@@ -47,6 +47,13 @@ document.addEventListener('DOMContentLoaded', () => {
       item.classList.toggle('active', item.dataset.lang === lang);
     });
 
+    // Update sidebar dashboard lang toggle label (app.html)
+    const sidebarLangLabel = document.querySelector('#sidebar-lang-toggle .lang-label');
+    if (sidebarLangLabel) {
+      // Dashboard supports EN and ES; show the opposite so clicking switches to it
+      sidebarLangLabel.textContent = (lang === 'es') ? 'EN' : 'ES';
+    }
+
     // Update form placeholders
     updateFormPlaceholders(lang);
   }
@@ -91,8 +98,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (bl === 'fr-ca') lang = 'fr';
       }
     } catch(e) { lang = 'en'; }
+
+    // Dashboard pages (app.html) only have EN and ES content.
+    // If FR or EN-CA is selected, fall back to EN to avoid blank dashboards.
+    const isDashboard = body.classList.contains('dashboard-body');
+    if (isDashboard && (lang === 'fr' || lang === 'en-ca')) {
+      lang = 'en';
+    }
+
     setLang(lang);
   })();
+
+  // ── Dashboard sidebar lang toggle (app.html: cycles EN ↔ ES) ──
+  const sidebarLangToggleBtn = document.getElementById('sidebar-lang-toggle');
+  if (sidebarLangToggleBtn) {
+    sidebarLangToggleBtn.addEventListener('click', () => {
+      const next = body.classList.contains('lang-es') ? 'en' : 'es';
+      setLang(next);
+    });
+  }
 
   function updateFormPlaceholders(lang) {
     const placeholders = {
