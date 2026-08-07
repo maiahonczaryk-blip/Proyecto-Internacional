@@ -383,6 +383,7 @@ App.router = (function() {
       'agent_inmomas/clients':   () => App.views.agentInmomas && App.views.agentInmomas.initClients(),
       'agent_inmomas/finances':  () => App.views.agentInmomas && App.views.agentInmomas.initFinances(),
       'agent_inmomas/webinar':   () => App.views.agentInmomas && App.views.agentInmomas.initWebinar(),
+      'agent_inmomas/partners':  () => App.views.agentInmomas && App.views.agentInmomas.initPartners(),
       'profile':           () => App.views.auth && App.views.auth.initProfile()
     };
 

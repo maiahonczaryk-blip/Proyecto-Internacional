@@ -403,8 +403,11 @@ App.views.public = {
               };
             }
           }
-
           if (hasConsent && webinarPayload) {
+            if (referrer) {
+              webinarPayload.agentReferrerId = referrer.id;
+              webinarPayload.referralCode = referrer.referralCode;
+            }
             try {
               await App.auth.saveWebinarRegistration(webinarPayload);
             } catch (webinarErr) {
