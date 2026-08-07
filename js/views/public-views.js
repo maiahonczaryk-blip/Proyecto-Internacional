@@ -175,12 +175,28 @@ App.views.public = {
       }
       console.log('[Referral] Referrer found:', referrer.firstName, referrer.lastName, '(' + referrer.role + ')');
 
-      // Update welcome message
-      if (welcomeMsg) {
-        welcomeMsg.innerHTML = `<span class="lang-en">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Register to receive notifications and info about our next webinar.</span>
-                                <span class="lang-es">Has sido referido por <strong>${referrer.firstName} ${referrer.lastName}</strong>. Regístrate para recibir notificaciones e info sobre nuestro próximo webinario.</span>
-                                <span class="lang-fr">Vous avez été parrainé par <strong>${referrer.firstName} ${referrer.lastName}</strong>. Inscrivez-vous pour recevoir des notifications et des infos sur notre prochain webinaire.</span>
-                                <span class="lang-en-ca">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Register to receive notifications and info about our next webinar.</span>`;
+      // Update welcome message and form texts based on referrer role
+      const formTitle = document.getElementById('referral-form-title');
+      const submitBtn = document.getElementById('referral-submit-btn');
+
+      if (referrer.role === 'realtor' || referrer.role === 'broker') {
+        if (formTitle) formTitle.innerHTML = `<span class="lang-en">Register for the Next Webinar</span><span class="lang-es">Regístrate para el Próximo Webinario</span><span class="lang-fr">S'inscrire au Prochain Webinaire</span><span class="lang-en-ca">Register for the Next Webinar</span>`;
+        if (welcomeMsg) {
+          welcomeMsg.innerHTML = `<span class="lang-en">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Register to receive notifications and info about our next webinar.</span>
+                                  <span class="lang-es">Has sido referido por <strong>${referrer.firstName} ${referrer.lastName}</strong>. Regístrate para recibir notificaciones e info sobre nuestro próximo webinario.</span>
+                                  <span class="lang-fr">Vous avez été parrainé par <strong>${referrer.firstName} ${referrer.lastName}</strong>. Inscrivez-vous pour recevoir des notifications et des infos sur notre prochain webinaire.</span>
+                                  <span class="lang-en-ca">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Register to receive notifications and info about our next webinar.</span>`;
+        }
+        if (submitBtn) submitBtn.innerHTML = `<span class="lang-en">Register</span><span class="lang-es">Registrarme</span><span class="lang-fr">S'inscrire</span><span class="lang-en-ca">Register</span>`;
+      } else {
+        if (formTitle) formTitle.innerHTML = `<span class="lang-en">Register</span><span class="lang-es">Regístrate</span><span class="lang-fr">S'inscrire</span><span class="lang-en-ca">Register</span>`;
+        if (welcomeMsg) {
+          welcomeMsg.innerHTML = `<span class="lang-en">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Please fill out the form below to register.</span>
+                                  <span class="lang-es">Has sido referido por <strong>${referrer.firstName} ${referrer.lastName}</strong>. Completa el formulario para registrarte.</span>
+                                  <span class="lang-fr">Vous avez été parrainé par <strong>${referrer.firstName} ${referrer.lastName}</strong>. Veuillez remplir le formulaire ci-dessous pour vous inscrire.</span>
+                                  <span class="lang-en-ca">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Please fill out the form below to register.</span>`;
+        }
+        if (submitBtn) submitBtn.innerHTML = `<span class="lang-en">Submit</span><span class="lang-es">Enviar</span><span class="lang-fr">Soumettre</span><span class="lang-en-ca">Submit</span>`;
       }
 
       // Build type options
