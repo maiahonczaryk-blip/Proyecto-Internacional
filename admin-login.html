@@ -106,7 +106,7 @@
       const email = document.getElementById('email').value.toLowerCase().trim();
       const password = document.getElementById('password').value;
       
-      const allowedEmails = ['maia.honczaryk@remax.es', 'jose.martinez@remax.es'];
+      const allowedEmails = ['admin@remax-inmomas.com'];
       
       if(allowedEmails.includes(email) && password === 'admin123') {
         localStorage.setItem('remax_admin', email);

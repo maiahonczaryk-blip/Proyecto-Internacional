@@ -75,7 +75,7 @@ function loginPartner(event) {
 function loginAdmin(event) {
     if (event) event.preventDefault();
     const email = document.getElementById('email').value;
-    if (email === 'maia.honczaryk@remax.es' || email === 'jose.martinez@remax.es') {
+    if (email === 'admin@remax-inmomas.com') {
         localStorage.setItem('remax_admin', email);
         window.location.href = 'admin.html';
     } else {
