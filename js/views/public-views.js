@@ -399,7 +399,7 @@ App.views.public = {
                 howHeard: 'Referral Link',
                 referrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : '',
                 webinarTitle: 'Exclusive Webinar: Scale Your Business Globally',
-                webinarDate: 'August 13, 2026'
+                webinarDate: 'August 28, 2026'
               };
             }
           }
