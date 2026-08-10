@@ -274,6 +274,14 @@
       // 1. Load all users
       allUsers = await App.auth.getAllUsers();
 
+      // Fetch webinar registrations to correlate
+      const webinarRegs = await App.auth.getWebinarRegistrations();
+      
+      // Attach webinar registration status
+      allUsers.forEach(u => {
+        u.isWebinarRegistered = webinarRegs.some(r => r.email.toLowerCase() === u.email.toLowerCase());
+      });
+
       // 2. Render the full table
       renderUsersTable(allUsers);
 
@@ -311,7 +319,7 @@
     if (users.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="7" style="text-align: center; padding: 2rem;">
+          <td colspan="9" style="text-align: center; padding: 2rem;">
             <div class="empty-state">
               <div class="empty-state__icon">🔍</div>
               <p class="empty-state__text">No users match your filters.</p>
@@ -358,6 +366,15 @@
         `;
       }
 
+      let sourceStr = user.source ? App.utils.escapeHtml(user.source) : (user.referredBy ? 'Referral' : 'Direct');
+      if (user.referredBy) {
+        sourceStr += ` <span style="font-size:0.8em; color:#6b7280;">(Ref: ${App.utils.escapeHtml(user.referredBy)})</span>`;
+      }
+
+      const webinarStr = user.isWebinarRegistered 
+        ? '<span style="color:#10b981; font-weight:bold;">Yes ✓</span>' 
+        : '<span style="color:#9ca3af;">No</span>';
+
       return `
         <tr>
           <td>
@@ -370,6 +387,8 @@
           <td>${App.utils.escapeHtml(user.agencyName || '—')}</td>
           <td>${roleBadge}</td>
           <td>${statusBadge}</td>
+          <td>${webinarStr}</td>
+          <td>${sourceStr}</td>
           <td>${dateStr}</td>
           <td>
             <div style="display: flex; align-items: center;">${actions}</div>
@@ -617,6 +636,17 @@
       const roleBadge = App.utils.getRoleBadge(user.role);
       const statusBadge = App.utils.getUserStatusBadge(user.status);
 
+      const allSysUsers = await App.auth.getAllUsers();
+      const localAgents = allSysUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
+      const agentOptions = `
+        <option value="">-- Direct / No Referral --</option>
+        ${localAgents.map(a => `
+          <option value="${a.referralCode}" ${user.referredBy === a.referralCode ? 'selected' : ''}>
+            ${App.utils.escapeHtml(a.firstName)} ${App.utils.escapeHtml(a.lastName)} (${a.referralCode})
+          </option>
+        `).join('')}
+      `;
+
       App.utils.showModal({
         title: 'User Details',
         body: `
@@ -664,7 +694,18 @@
               <button class="btn btn-primary btn-sm" id="save-user-role-btn">Update Role</button>
             </div>
           </div>
+          </div>
           ` : ''}
+          
+          <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
+            <label style="font-weight: 600; font-size: 0.875rem; color: #374151; display: block; margin-bottom: 0.5rem;">Assign Local Agent / Referral</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <select id="user-referral-select" class="form-control" style="flex: 1; padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; background-color: white;">
+                ${agentOptions}
+              </select>
+              <button class="btn btn-primary btn-sm" id="save-user-referral-btn">Assign</button>
+            </div>
+          </div>
         `,
         footer: `<button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Close</button>`,
         onClose: () => {}
@@ -692,6 +733,28 @@
           }
         });
       }
+
+      const saveReferralBtn = document.getElementById('save-user-referral-btn');
+      if (saveReferralBtn) {
+        saveReferralBtn.addEventListener('click', async () => {
+          const selectedReferral = document.getElementById('user-referral-select').value;
+          App.utils.closeModal();
+          try {
+            await App.auth.updateUserReferral(userId, selectedReferral || null);
+            App.utils.showToast('User referral/agent assigned successfully!', 'success');
+            
+            // Refresh
+            const route = App.router.getCurrentRoute();
+            if (route === 'admin/users') {
+              await initUsers();
+            }
+          } catch (err) {
+            console.error('[Admin] Error updating user referral:', err);
+            App.utils.showToast('Error assigning agent: ' + err.message, 'error');
+          }
+        });
+      }
+
 
     } catch (err) {
       console.error('[Admin] viewUser error:', err);

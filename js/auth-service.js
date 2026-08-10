@@ -609,6 +609,28 @@ App.auth = (function() {
     }
   }
 
+  /* ---- Update User Referral (Admin action) ---- */
+  async function updateUserReferral(userId, referrerCode) {
+    if (App.demoMode) {
+      const u = App.demoData.users.find(u => u.id === userId);
+      if (!u) throw new Error('User not found.');
+      u.referredBy = referrerCode;
+      u.source = referrerCode ? 'Admin Assigned Referral' : null;
+      u.updatedAt = new Date().toISOString();
+      saveDemoData();
+      return true;
+    } else {
+      const userRef = App.db.collection('users').doc(userId);
+      await userRef.update({
+        referredBy: referrerCode,
+        source: referrerCode ? 'Admin Assigned Referral' : null,
+        updatedAt: new Date().toISOString()
+      });
+      return true;
+    }
+  }
+
+
   async function getAllUsers(filters = {}) {
     if (App.demoMode) {
       let users = [...App.demoData.users].map(u => {
@@ -1324,6 +1346,7 @@ App.auth = (function() {
     requireAuth,
     updateUserStatus,
     updateUserRole,
+    updateUserReferral,
     updateProfile,
     getAllUsers,
     getUser,
