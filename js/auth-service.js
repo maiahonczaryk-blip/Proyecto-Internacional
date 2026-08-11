@@ -630,6 +630,20 @@ App.auth = (function() {
     }
   }
 
+  /* ---- Delete User (Admin action) ---- */
+  async function deleteUser(userId) {
+    if (App.demoMode) {
+      const idx = App.demoData.users.findIndex(u => u.id === userId);
+      if (idx === -1) throw new Error('User not found.');
+      App.demoData.users.splice(idx, 1);
+      saveDemoData();
+      return true;
+    } else {
+      await App.db.collection('users').doc(userId).delete();
+      return true;
+    }
+  }
+
 
   async function getAllUsers(filters = {}) {
     if (App.demoMode) {
@@ -975,6 +989,21 @@ App.auth = (function() {
     } else {
       const snapshot = await App.db.collection('webinar_registrations').orderBy('createdAt', 'desc').get();
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    }
+  }
+
+  /* ---- Delete Webinar Registration ---- */
+  async function deleteWebinarRegistration(regId) {
+    if (App.demoMode) {
+      const idx = App.demoData.webinar_registrations.findIndex(r => r.id === regId);
+      if (idx !== -1) {
+        App.demoData.webinar_registrations.splice(idx, 1);
+        saveDemoData();
+      }
+      return true;
+    } else {
+      await App.db.collection('webinar_registrations').doc(regId).delete();
+      return true;
     }
   }
 
@@ -1372,6 +1401,8 @@ App.auth = (function() {
     saveNewsletter,
     getNewsletterHistory,
     saveWebinarRegistration,
-    getWebinarRegistrations
+    getWebinarRegistrations,
+    deleteUser,
+    deleteWebinarRegistration
   };
 })();

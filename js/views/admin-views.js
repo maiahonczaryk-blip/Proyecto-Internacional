@@ -366,6 +366,13 @@
         `;
       }
 
+      // Add Delete Button for all users
+      actions += `
+        <button class="btn btn-danger btn-sm" onclick="App.views.admin.handleDeleteUser('${user.id}')" title="Delete User" style="margin-left: 0.25rem; background-color: #dc2626; border-color: #dc2626; color: white;">
+          🗑️
+        </button>
+      `;
+
       let sourceStr = user.source ? App.utils.escapeHtml(user.source) : (user.referredBy ? 'Referral' : 'Direct');
       if (user.referredBy) {
         sourceStr += ` <span style="font-size:0.8em; color:#6b7280;">(Ref: ${App.utils.escapeHtml(user.referredBy)})</span>`;
@@ -617,6 +624,32 @@
           App.utils.showToast('Error rejecting user: ' + err.message, 'error');
         }
       });
+    }
+  }
+
+  async function handleDeleteUser(userId) {
+    if (confirm('Are you sure you want to permanently delete this user? This action cannot be undone.')) {
+      try {
+        await App.auth.deleteUser(userId);
+        App.utils.showToast('User deleted successfully.', 'success');
+        await initUsers();
+      } catch (err) {
+        console.error('[Admin] handleDeleteUser error:', err);
+        App.utils.showToast('Error deleting user: ' + err.message, 'error');
+      }
+    }
+  }
+
+  async function handleDeleteWebinarRegistration(regId) {
+    if (confirm('Are you sure you want to delete this webinar registration?')) {
+      try {
+        await App.auth.deleteWebinarRegistration(regId);
+        App.utils.showToast('Registration deleted successfully.', 'success');
+        await initWebinar();
+      } catch (err) {
+        console.error('[Admin] handleDeleteWebinarReg error:', err);
+        App.utils.showToast('Error deleting registration: ' + err.message, 'error');
+      }
     }
   }
 
@@ -1369,6 +1402,11 @@
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${how}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${ref}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">${agentTagCell}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">
+            <button class="btn btn-danger btn-sm" onclick="App.views.admin.handleDeleteWebinarRegistration('${r.id}')" title="Delete Registration" style="background-color: #dc2626; border-color: #dc2626; color: white;">
+              🗑️
+            </button>
+          </td>
         </tr>`;
     }).join('');
   }
@@ -1663,7 +1701,9 @@
     handleDeleteLead,
     confirmDeleteLead,
     initAgreementsView,
-    handleAdminAgreementUpload
+    handleAdminAgreementUpload,
+    handleDeleteUser,
+    handleDeleteWebinarRegistration
   };
 
 })();
