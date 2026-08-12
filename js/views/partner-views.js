@@ -42,16 +42,11 @@ App.views.partner = (function() {
     // We can replace the stat cards
     const grid = view.querySelector('.dashboard-grid');
     if (grid) {
-      grid.innerHTML = `
-        <div class="stat-card">
-          <h3 class="stat-card__title">Assigned Clients</h3>
-          <div class="stat-card__value">${totalReferrals}</div>
-        </div>
-        <div class="stat-card">
-          <h3 class="stat-card__title">Active Services</h3>
-          <div class="stat-card__value">${activeClients}</div>
-        </div>
-      `;
+      const values = grid.querySelectorAll('.stat-card__value');
+      if (values.length >= 2) {
+        values[0].textContent = totalReferrals;
+        values[1].textContent = activeClients;
+      }
     }
 
     // Check if table container exists, if not create it
