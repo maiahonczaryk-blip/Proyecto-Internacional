@@ -226,7 +226,10 @@ App.auth = (function() {
 
     if (App.demoMode) {
       const user = App.demoData.users.find(
-        u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+        u => (
+          (u.email && u.email.toLowerCase() === email.toLowerCase()) || 
+          (u.username && u.username.toLowerCase() === email.toLowerCase())
+        ) && u.password === password
       );
 
       if (!user) {
@@ -860,6 +863,27 @@ App.auth = (function() {
     }
   }
 
+  async function updateClientPartnerFlags(clientId, flags) {
+    if (App.demoMode) {
+      const client = App.demoData.clients.find(c => c.id === clientId);
+      if (!client) throw new Error('Client not found.');
+
+      if (flags.needsUCI !== undefined) client.needsUCI = flags.needsUCI;
+      if (flags.needsFuster !== undefined) client.needsFuster = flags.needsFuster;
+      if (flags.needsHolidays !== undefined) client.needsHolidays = flags.needsHolidays;
+      
+      client.updatedAt = new Date().toISOString();
+      saveDemoData();
+    } else {
+      const updateData = { updatedAt: new Date().toISOString() };
+      if (flags.needsUCI !== undefined) updateData.needsUCI = flags.needsUCI;
+      if (flags.needsFuster !== undefined) updateData.needsFuster = flags.needsFuster;
+      if (flags.needsHolidays !== undefined) updateData.needsHolidays = flags.needsHolidays;
+      
+      await App.db.collection('clients').doc(clientId).update(updateData);
+    }
+  }
+
   /* ---- Commission Management ---- */
   async function getCommissions(filters = {}) {
     if (App.demoMode) {
@@ -1046,6 +1070,9 @@ App.auth = (function() {
           referredBy: null,
           localAgentId: agentId,
           localAgentName: agentName,
+          needsUCI: false,
+          needsFuster: false,
+          needsHolidays: false,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           interestArea: 'Buyer Guide Lead',
@@ -1093,6 +1120,9 @@ App.auth = (function() {
           referredBy: null,
           localAgentId: agentId,
           localAgentName: agentName,
+          needsUCI: false,
+          needsFuster: false,
+          needsHolidays: false,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           interestArea: 'Buyer Guide Lead',
@@ -1139,6 +1169,9 @@ App.auth = (function() {
       notes: clientData.notes || '',
       timeline: clientData.timeline || '—',
       objective: clientData.objective || '—',
+      needsUCI: clientData.needsUCI || false,
+      needsFuster: clientData.needsFuster || false,
+      needsHolidays: clientData.needsHolidays || false,
       status: 'contacted',
       referredBy: (user.role === 'realtor') ? user.id : null,
       brokerId: (user.role === 'broker') ? user.id : (user.brokerId || null),
@@ -1184,6 +1217,9 @@ App.auth = (function() {
       timeline: clientData.timeline || '—',
       objective: clientData.objective || '—',
       notes: clientData.notes || '',
+      needsUCI: clientData.needsUCI || false,
+      needsFuster: clientData.needsFuster || false,
+      needsHolidays: clientData.needsHolidays || false,
       status: 'contacted',
       referredBy: clientData.referredBy || null,
       realtorId: clientData.realtorId || null,
@@ -1385,6 +1421,7 @@ App.auth = (function() {
     assignLocalAgent,
     assignLeadToAgent,
     saveClientFinancials,
+    updateClientPartnerFlags,
     getCommissions,
     onAuthChange,
     resetPassword,

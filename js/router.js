@@ -53,7 +53,10 @@ App.router = (function() {
     'agent_inmomas/clients':   { view: 'view-agent-clients',   role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Clients' },
     'agent_inmomas/finances':  { view: 'view-agent-finances',  role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Finances' },
     'agent_inmomas/webinar':   { view: 'view-agent-webinar',   role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Webinar Registrations' },
-    'agent_inmomas/partners':  { view: 'view-agent-partners',  role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'My Partners' }
+    'agent_inmomas/partners':  { view: 'view-agent-partners',  role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'My Partners' },
+
+    // Partner routes
+    'partner/dashboard': { view: 'view-partner-dashboard', role: 'partner', sidebar: 'partner', title: 'Partner Dashboard' }
   };
 
   let currentRoute = null;
@@ -384,6 +387,7 @@ App.router = (function() {
       'agent_inmomas/finances':  () => App.views.agentInmomas && App.views.agentInmomas.initFinances(),
       'agent_inmomas/webinar':   () => App.views.agentInmomas && App.views.agentInmomas.initWebinar(),
       'agent_inmomas/partners':  () => App.views.agentInmomas && App.views.agentInmomas.initPartners(),
+      'partner/dashboard': () => App.views.partner && App.views.partner.initDashboard(),
       'profile':           () => App.views.auth && App.views.auth.initProfile()
     };
 

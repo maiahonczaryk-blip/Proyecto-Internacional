@@ -408,7 +408,28 @@
               </div>
             </div>
             <button class="btn btn-primary btn-sm" onclick="App.views.agentInmomas.handleSaveFinancials('${client.id}')" style="background: #059669; border-color: #059669; width: 100%;">
-              Save Financials (Guardar Ajustes Financieros)
+              💾 <span class="lang-en">Save Financials</span><span class="lang-es">Guardar</span>
+            </button>
+          </div>
+
+          <div style="background: white; border-radius: 0.5rem; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top: 1rem;">
+            <h4 style="margin: 0 0 1rem; font-size: 0.9rem; color: #374151; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem;">🤝 Partner Access</h4>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #4b5563; cursor: pointer;">
+                <input type="checkbox" id="partner-uci-${client.id}" ${client.needsUCI ? 'checked' : ''}>
+                Require UCI Services
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #4b5563; cursor: pointer;">
+                <input type="checkbox" id="partner-fuster-${client.id}" ${client.needsFuster ? 'checked' : ''}>
+                Require Fuster Services
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #4b5563; cursor: pointer;">
+                <input type="checkbox" id="partner-holidays-${client.id}" ${client.needsHolidays ? 'checked' : ''}>
+                Require Inmomás Holidays
+              </label>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="App.views.agentInmomas.handleSavePartnerFlags('${client.id}')" style="background: #3b82f6; border-color: #3b82f6; width: 100%; margin-top: 1rem;">
+              💾 Save Partners
             </button>
           </div>
 
@@ -471,8 +492,23 @@
       App.utils.closeModal();
       initClients(); // reload
     } catch (err) {
-      console.error(err);
-      App.utils.showToast(err.message, 'error');
+      console.error('[Agent] handleSaveFinancials error:', err);
+      App.utils.showToast('Error saving financials.', 'error');
+    }
+  }
+
+  async function handleSavePartnerFlags(clientId) {
+    const needsUCI = document.getElementById(`partner-uci-${clientId}`)?.checked || false;
+    const needsFuster = document.getElementById(`partner-fuster-${clientId}`)?.checked || false;
+    const needsHolidays = document.getElementById(`partner-holidays-${clientId}`)?.checked || false;
+    
+    try {
+      await App.auth.updateClientPartnerFlags(clientId, { needsUCI, needsFuster, needsHolidays });
+      App.utils.showToast('Partner requirements saved!', 'success');
+      showClientDetail(clientId); // Refresh detail
+    } catch (err) {
+      console.error('[Agent] handleSavePartnerFlags error:', err);
+      App.utils.showToast('Error saving partner flags.', 'error');
     }
   }
 
@@ -631,6 +667,20 @@
             <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Notes</label>
             <textarea id="mc-notes" class="form-input" rows="3" placeholder="Additional notes about this client..." style="margin-bottom: 0; resize: vertical;"></textarea>
           </div>
+          <div style="padding: 1rem; background: #f3f4f6; border-radius: 0.375rem;">
+            <label style="font-size: 0.85rem; font-weight: 600; color: #374151; display: block; margin-bottom: 8px;">Partner Services Required</label>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #4b5563; cursor: pointer;">
+                <input type="checkbox" id="mc-partner-uci"> UCI
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #4b5563; cursor: pointer;">
+                <input type="checkbox" id="mc-partner-fuster"> Fuster
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #4b5563; cursor: pointer;">
+                <input type="checkbox" id="mc-partner-holidays"> Inmomás Holidays
+              </label>
+            </div>
+          </div>
         </form>
       `,
       footer: `
@@ -672,7 +722,10 @@
         interestArea: document.getElementById('mc-interestArea')?.value || '',
         timeline,
         objective,
-        notes: document.getElementById('mc-notes')?.value.trim() || ''
+        notes: document.getElementById('mc-notes')?.value.trim() || '',
+        needsUCI: document.getElementById('mc-partner-uci')?.checked || false,
+        needsFuster: document.getElementById('mc-partner-fuster')?.checked || false,
+        needsHolidays: document.getElementById('mc-partner-holidays')?.checked || false
       });
 
       App.utils.closeModal();
@@ -701,9 +754,10 @@
     initPartners,
     showClientDetail,
     handleClientDrop,
-    handleSaveFinancials,
     showAddClientModal,
-    handleAddClient
+    handleAddClient,
+    handleSaveFinancials,
+    handleSavePartnerFlags
   };
 
 })();

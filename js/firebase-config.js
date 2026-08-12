@@ -226,6 +226,51 @@ App.demoData = {
       referralCode: 'LOC-MARTÍNEZ',
       profileImage: null,
       createdAt: '2025-02-01T10:00:00Z'
+    },
+    {
+      id: 'partner-001',
+      username: 'UCI',
+      email: '',
+      password: 'uci123',
+      role: 'partner',
+      partnerType: 'needsUCI',
+      status: 'active',
+      firstName: 'UCI',
+      lastName: 'Partner',
+      agencyName: 'UCI',
+      phone: '+34 900 123 456',
+      country: 'Spain',
+      createdAt: '2025-03-01T10:00:00Z'
+    },
+    {
+      id: 'partner-002',
+      username: 'Fuster',
+      email: '',
+      password: 'fuster123',
+      role: 'partner',
+      partnerType: 'needsFuster',
+      status: 'active',
+      firstName: 'Fuster',
+      lastName: 'Partner',
+      agencyName: 'Fuster',
+      phone: '+34 900 123 457',
+      country: 'Spain',
+      createdAt: '2025-03-01T10:00:00Z'
+    },
+    {
+      id: 'partner-003',
+      username: 'Holidays',
+      email: '',
+      password: 'holidays123',
+      role: 'partner',
+      partnerType: 'needsHolidays',
+      status: 'active',
+      firstName: 'Inmomás',
+      lastName: 'Holidays',
+      agencyName: 'Inmomás Holidays',
+      phone: '+34 900 123 458',
+      country: 'Spain',
+      createdAt: '2025-03-01T10:00:00Z'
     }
   ],
 
@@ -244,6 +289,9 @@ App.demoData = {
       budget: '€200,000 - €350,000',
       interestArea: 'Alicante City',
       notes: 'Interested in 2-bed apartment near the beach. Planning retirement.',
+      needsUCI: true,
+      needsFuster: false,
+      needsHolidays: false,
       statusHistory: [
         { status: 'contacted', date: '2025-04-01T10:00:00Z', note: 'Registered via referral link' },
         { status: 'options_sent', date: '2025-04-15T18:00:00Z', note: 'Attended April webinar' },
