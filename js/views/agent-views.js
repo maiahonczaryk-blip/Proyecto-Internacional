@@ -416,15 +416,15 @@
             <h4 style="margin: 0 0 1rem; font-size: 0.9rem; color: #374151; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem;">🤝 Partner Access</h4>
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
               <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #4b5563; cursor: pointer;">
-                <input type="checkbox" id="partner-uci-${client.id}" ${client.needsUCI ? 'checked' : ''}>
+                <input type="checkbox" id="partner-uci-${client.id}" style="-webkit-appearance: checkbox !important; appearance: checkbox !important; transform: scale(1.2); margin-right: 4px;" ${client.needsUCI ? 'checked' : ''}>
                 Require UCI Services
               </label>
               <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #4b5563; cursor: pointer;">
-                <input type="checkbox" id="partner-fuster-${client.id}" ${client.needsFuster ? 'checked' : ''}>
+                <input type="checkbox" id="partner-fuster-${client.id}" style="-webkit-appearance: checkbox !important; appearance: checkbox !important; transform: scale(1.2); margin-right: 4px;" ${client.needsFuster ? 'checked' : ''}>
                 Require Fuster Services
               </label>
               <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #4b5563; cursor: pointer;">
-                <input type="checkbox" id="partner-holidays-${client.id}" ${client.needsHolidays ? 'checked' : ''}>
+                <input type="checkbox" id="partner-holidays-${client.id}" style="-webkit-appearance: checkbox !important; appearance: checkbox !important; transform: scale(1.2); margin-right: 4px;" ${client.needsHolidays ? 'checked' : ''}>
                 Require Inmomás Holidays
               </label>
             </div>
