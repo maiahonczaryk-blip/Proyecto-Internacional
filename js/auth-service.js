@@ -248,7 +248,16 @@ App.auth = (function() {
     } else {
       // Firebase login
       try {
-        const credential = await App.firebaseAuth.signInWithEmailAndPassword(email, password);
+        let loginIdentifier = email.trim();
+        // If it's a partner username without @, map it to their default system email
+        if (!loginIdentifier.includes('@')) {
+          const lowerId = loginIdentifier.toLowerCase();
+          if (lowerId === 'uci') loginIdentifier = 'uci@partner.com';
+          else if (lowerId === 'fuster') loginIdentifier = 'fuster@partner.com';
+          else if (lowerId === 'holidays') loginIdentifier = 'holidays@partner.com';
+        }
+
+        const credential = await App.firebaseAuth.signInWithEmailAndPassword(loginIdentifier, password);
         const doc = await App.db.collection('users').doc(credential.user.uid).get();
 
         if (!doc.exists) {
