@@ -2459,7 +2459,7 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
 }
 
 .nav-logo-img {
-  height: 40px;
+  height: 65px;
   width: auto;
 }
 
@@ -2735,11 +2735,9 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
 
 /* --- Footer Logo --- */
 .footer-logo {
-  height: 48px;
+  height: 65px;
   width: auto;
   margin-bottom: 12px;
-  filter: brightness(0) invert(1);
-  opacity: 0.7;
 }
 
 /* --- Final CTA Section --- */
@@ -7200,7 +7198,7 @@ body.nav-open {
   }
 
   .nav-logo-img {
-    height: 30px;
+    height: 48px;
   }
 
   .card,
