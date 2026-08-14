@@ -352,8 +352,10 @@ body.lang-en-ca .lang-fr { display: none; }
 }
 
 .nav-logo img {
-  height: 40px;
-  width: auto;
+  height: 95px !important;
+  width: auto !important;
+  margin-top: -15px;
+  margin-bottom: -15px;
 }
 
 .nav-links {
@@ -363,6 +365,7 @@ body.lang-en-ca .lang-fr { display: none; }
 }
 
 .nav-links a {
+  white-space: nowrap;
   font-size: 0.84rem;
   font-weight: 500;
   color: var(--text-secondary);
@@ -7523,3 +7526,11 @@ textarea:focus-visible {
   min-width: 800px !important;
 }
 
+
+@media (max-width: 768px) {
+  .nav-logo img {
+    height: 70px !important;
+    margin-top: -5px;
+    margin-bottom: -5px;
+  }
+}
