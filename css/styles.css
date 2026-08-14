@@ -1,5 +1,5 @@
 /* ============================================
-   RE/MAX Inmomás — International Advisory
+   The Spain Connection
    Corporate Design System & Styles
    ============================================ */
 
@@ -9,8 +9,8 @@
 /* --- CSS Custom Properties --- */
 :root {
   /* Brand Colors */
-  --blue: #0043ff;
-  --red: #ff1200;
+  --blue: #1b5b7f; /* Ocean Teal */
+  --red: #ff8c42; /* Sun Orange */
   
   /* Neutral Palette (Light Theme) */
   --bg-primary: #FFFFFF;
@@ -21,27 +21,28 @@
   --bg-card-hover: #f7f5ee;
 
   /* Text */
-  --text-primary: #232323; /* Dark Charcoal Gray */
+  --text-primary: #123348; /* Dark Navy Gray */
   --text-secondary: #64748B;
   --text-muted: #94A3B8;
-  --text-accent: #0043ff;
+  --text-accent: #1b5b7f;
 
   /* Borders */
   --border-subtle: #E2E8F0;
   --border-light: #CBD5E1;
   --border-medium: #94A3B8;
-  --border-red: #ff1200;
+  --border-red: #ff8c42;
 
   /* Shadows — Soft, warm, organic */
-  --shadow-sm: 0 2px 8px rgba(0, 67, 255, 0.04);
-  --shadow-md: 0 8px 24px rgba(0, 67, 255, 0.08), 0 2px 8px rgba(0, 67, 255, 0.04);
-  --shadow-lg: 0 16px 40px rgba(0, 67, 255, 0.12), 0 8px 16px rgba(0, 67, 255, 0.06);
-  --shadow-xl: 0 24px 60px rgba(0, 67, 255, 0.16), 0 12px 24px rgba(0, 67, 255, 0.08);
+  --shadow-sm: 0 2px 8px rgba(27, 91, 127, 0.04);
+  --shadow-md: 0 8px 24px rgba(27, 91, 127, 0.08), 0 2px 8px rgba(27, 91, 127, 0.04);
+  --shadow-lg: 0 16px 40px rgba(27, 91, 127, 0.12), 0 8px 16px rgba(27, 91, 127, 0.06);
+  --shadow-xl: 0 24px 60px rgba(27, 91, 127, 0.16), 0 12px 24px rgba(27, 91, 127, 0.08);
+
 
   /* Gradients */
-  --gradient-hero-overlay: linear-gradient(135deg, rgba(0, 67, 255, 0.95) 0%, rgba(35, 35, 35, 0.85) 100%);
-  --gradient-blue: linear-gradient(135deg, #0043ff, #002dae);
-  --gradient-red: linear-gradient(135deg, #ff1200, #cc0e00);
+  --gradient-hero-overlay: linear-gradient(135deg, rgba(27, 91, 127, 0.95) 0%, rgba(18, 51, 72, 0.85) 100%);
+  --gradient-blue: linear-gradient(135deg, #1b5b7f, #123348);
+  --gradient-red: linear-gradient(135deg, #ff8c42, #cc5d10);
 
   /* Spacing */
   --section-padding: 110px 0;
