@@ -348,6 +348,7 @@ body.lang-en-ca .lang-fr { display: none; }
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 220px;
 }
 
 .nav-logo img {
@@ -2459,10 +2460,11 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
 }
 
 .nav-logo-img {
-  height: 95px;
-  margin-top: -15px;
-  margin-bottom: -15px;
-  width: auto;
+  height: auto;
+  width: 220px;
+  max-width: none;
+  margin-top: -10px;
+  margin-bottom: -10px;
 }
 
 /* --- Language Selector (mobile responsive) --- */
@@ -2740,7 +2742,7 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   height: 90px;
   width: auto;
   margin-bottom: 12px;
-  mix-blend-mode: multiply;
+  mix-blend-mode: darken; /* hide white bg */
 }
 
 /* --- Final CTA Section --- */
@@ -7201,9 +7203,8 @@ body.nav-open {
   }
 
   .nav-logo-img {
-    height: 70px;
-    margin-top: -5px;
-    margin-bottom: -5px;
+    height: auto;
+    width: 150px;
   }
 
   .card,
