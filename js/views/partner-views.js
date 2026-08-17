@@ -132,10 +132,12 @@ App.views.partner = (function() {
         title: `Client: ${App.utils.escapeHtml(client.firstName)} ${App.utils.escapeHtml(client.lastName)}`,
         body: `
           <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
-            <!-- Client Info (NO CONTACT DATA) -->
+            <!-- Client Info -->
             <div style="background: #f9fafb; padding: 1rem; border-radius: 8px;">
               <h4 style="margin: 0 0 1rem; font-size: 0.9rem; color: #374151;">General Information</h4>
               <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; font-size: 0.85rem;">
+                <strong style="color: #6b7280;">Email:</strong> <span><a href="mailto:${App.utils.escapeHtml(client.email)}" style="color: #3b82f6;">${App.utils.escapeHtml(client.email || '—')}</a></span>
+                <strong style="color: #6b7280;">Phone:</strong> <span>${App.utils.escapeHtml(client.phone || '—')}</span>
                 <strong style="color: #6b7280;">Objective:</strong> <span>${App.utils.escapeHtml(client.objective || '—')}</span>
                 <strong style="color: #6b7280;">Timeline:</strong> <span>${App.utils.escapeHtml(client.timeline || '—')}</span>
                 <strong style="color: #6b7280;">Interest Area:</strong> <span>${App.utils.escapeHtml(client.interestArea || '—')}</span>
