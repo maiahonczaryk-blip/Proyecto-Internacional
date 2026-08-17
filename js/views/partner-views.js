@@ -28,7 +28,17 @@ App.views.partner = (function() {
       renderPartnerDashboard(partnerClients, partnerType);
     } catch (err) {
       console.error('[Partner] Error loading dashboard:', err);
-      App.utils.showToast('Error loading partner dashboard.', 'error');
+      App.utils.showToast('Error loading partner dashboard: ' + err.message, 'error');
+      const view = document.getElementById('view-partner-dashboard');
+      if (view) {
+        const content = view.querySelector('.dashboard-content');
+        if (content) {
+          content.innerHTML += `<div style="padding:2rem; background:#fee2e2; color:#ef4444; border-radius:8px; margin-top:2rem;">
+            <h3>Error Loading Dashboard</h3>
+            <p>${err.message}</p>
+          </div>`;
+        }
+      }
     }
   }
 

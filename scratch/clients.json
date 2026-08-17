@@ -1,0 +1,516 @@
+[
+  {
+    "id": "client-001",
+    "firstName": "Sarah",
+    "budget": "€200,000 - €350,000",
+    "referredBy": "realtor-001",
+    "status": "options_sent",
+    "email": "sarah.j@gmail.com",
+    "createdAt": "2025-04-01T10:00:00Z",
+    "notes": "Interested in 2-bed apartment near the beach. Planning retirement.",
+    "localAgentId": "agent-inmomas-001",
+    "brokerId": "broker-001",
+    "lastName": "Jenkins",
+    "phone": "+1 415 555 7001",
+    "interestArea": "Alicante City",
+    "updatedAt": "2026-08-12T15:39:04.865Z",
+    "statusHistory": [
+      {
+        "status": "contacted",
+        "date": "2025-04-01T10:00:00Z",
+        "note": "Registered via referral link"
+      },
+      {
+        "date": "2025-04-15T18:00:00Z",
+        "note": "Attended April webinar",
+        "status": "options_sent"
+      },
+      {
+        "status": "properties_visited",
+        "note": "Booked VIP trip for May",
+        "date": "2025-05-01T12:00:00Z"
+      },
+      {
+        "date": "2025-05-15T16:00:00Z",
+        "note": "Visited 8 properties",
+        "status": "properties_visited"
+      },
+      {
+        "note": "Moved by Broker Inmomás (Admin)",
+        "date": "2026-08-12T15:39:04.865Z",
+        "status": "options_sent"
+      }
+    ],
+    "localAgentName": "Carlos García"
+  },
+  {
+    "id": "client-002",
+    "referredBy": "realtor-001",
+    "notes": "Looking for a villa with sea views. Digital nomad, needs good internet.",
+    "localAgentName": "Ana Martínez",
+    "phone": "+1 212 555 8001",
+    "firstName": "Michael",
+    "brokerId": "broker-001",
+    "lastName": "Wong",
+    "updatedAt": "2026-07-06T16:05:05.876Z",
+    "email": "mwong@outlook.com",
+    "statusHistory": [
+      {
+        "status": "contacted",
+        "note": "Registered via referral link",
+        "date": "2025-03-10T08:00:00Z"
+      },
+      {
+        "note": "Attended March webinar",
+        "date": "2025-03-20T18:00:00Z",
+        "status": "options_sent"
+      },
+      {
+        "note": "Loved Villa Amanecer",
+        "date": "2025-04-10T16:00:00Z",
+        "status": "properties_visited"
+      },
+      {
+        "status": "offer_made",
+        "date": "2025-04-25T14:00:00Z",
+        "note": "Offer €485,000 on Villa Amanecer"
+      },
+      {
+        "status": "notary_pending",
+        "date": "2025-05-20T11:00:00Z",
+        "note": "Fuster handling contracts"
+      }
+    ],
+    "status": "notary_pending",
+    "localAgentId": "agent-inmomas-002",
+    "budget": "€400,000 - €600,000",
+    "interestArea": "Jávea",
+    "createdAt": "2025-03-10T08:00:00Z"
+  },
+  {
+    "id": "client-003",
+    "budget": "€150,000 - €250,000",
+    "status": "closed",
+    "lastName": "Adams",
+    "interestArea": "Elche",
+    "brokerId": "broker-001",
+    "email": "jadams@yahoo.com",
+    "firstName": "Jennifer",
+    "localAgentId": "agent-inmomas-001",
+    "referredBy": "realtor-002",
+    "localAgentName": "Carlos García",
+    "phone": "+1 713 555 9001",
+    "updatedAt": "2026-07-06T16:05:06.045Z",
+    "notes": "Investment property. Bought 2-bed apartment in Elche center.",
+    "statusHistory": [
+      {
+        "status": "contacted",
+        "note": "Registered via referral link",
+        "date": "2025-02-01T09:00:00Z"
+      },
+      {
+        "note": "",
+        "date": "2025-02-15T18:00:00Z",
+        "status": "options_sent"
+      },
+      {
+        "date": "2025-03-05T16:00:00Z",
+        "note": "",
+        "status": "properties_visited"
+      },
+      {
+        "status": "offer_made",
+        "date": "2025-03-15T10:00:00Z",
+        "note": "Offer €195,000"
+      },
+      {
+        "note": "",
+        "date": "2025-03-28T14:00:00Z",
+        "status": "notary_pending"
+      },
+      {
+        "status": "closed",
+        "note": "Sale completed. Keys handed over.",
+        "date": "2025-04-20T12:00:00Z"
+      }
+    ],
+    "createdAt": "2025-02-01T09:00:00Z"
+  },
+  {
+    "id": "client-004",
+    "statusHistory": [
+      {
+        "date": "2025-05-20T14:00:00Z",
+        "status": "contacted",
+        "note": "Registered via referral link"
+      },
+      {
+        "date": "2025-06-01T18:00:00Z",
+        "note": "Very interested in Benidorm area",
+        "status": "options_sent"
+      },
+      {
+        "status": "properties_visited",
+        "note": "Moved by Broker Inmomás (Admin)",
+        "date": "2026-07-12T20:35:33.909Z"
+      }
+    ],
+    "status": "properties_visited",
+    "lastName": "Davis",
+    "referredBy": "realtor-003",
+    "budget": "€300,000 - €500,000",
+    "brokerId": "broker-002",
+    "localAgentName": null,
+    "localAgentId": null,
+    "firstName": "Robert",
+    "email": "rdavis@gmail.com",
+    "interestArea": "Benidorm",
+    "phone": "+1 469 555 4001",
+    "updatedAt": "2026-07-12T20:35:33.909Z",
+    "notes": "Looking for holiday home with rental potential.",
+    "createdAt": "2025-05-20T14:00:00Z"
+  },
+  {
+    "id": "client-005",
+    "localAgentName": null,
+    "status": "contacted",
+    "updatedAt": "2026-07-06T16:05:06.284Z",
+    "budget": "€250,000 - €400,000",
+    "createdAt": "2025-06-20T10:00:00Z",
+    "localAgentId": null,
+    "email": "alee@hotmail.com",
+    "interestArea": "Alicante / Costa Blanca",
+    "statusHistory": [
+      {
+        "status": "contacted",
+        "note": "Registered via referral link",
+        "date": "2025-06-20T10:00:00Z"
+      }
+    ],
+    "lastName": "Lee",
+    "brokerId": "broker-001",
+    "phone": "+1 818 555 5001",
+    "referredBy": "realtor-001",
+    "firstName": "Amanda",
+    "notes": "Just exploring options. Early stage."
+  },
+  {
+    "id": "client-006",
+    "localAgentName": "Ana Martínez",
+    "notes": "Premium property. Pre-approved for UCI mortgage.",
+    "brokerId": "broker-002",
+    "lastName": "Brown",
+    "createdAt": "2025-04-05T11:00:00Z",
+    "interestArea": "Jávea / Moraira",
+    "phone": "+1 503 555 6001",
+    "updatedAt": "2026-07-06T16:05:06.413Z",
+    "statusHistory": [
+      {
+        "date": "2025-04-05T11:00:00Z",
+        "note": "",
+        "status": "contacted"
+      },
+      {
+        "status": "options_sent",
+        "date": "2025-04-18T18:00:00Z",
+        "note": ""
+      },
+      {
+        "date": "2025-05-08T16:00:00Z",
+        "note": "Visited 10 properties",
+        "status": "properties_visited"
+      },
+      {
+        "status": "properties_visited",
+        "date": "2025-05-25T09:00:00Z",
+        "note": "Narrowed to 3 options in Moraira"
+      }
+    ],
+    "localAgentId": "agent-inmomas-002",
+    "referredBy": "realtor-003",
+    "firstName": "Thomas",
+    "email": "tbrown@proton.me",
+    "status": "properties_visited",
+    "budget": "€500,000 - €800,000"
+  },
+  {
+    "id": "client_1786103849527_qegdj",
+    "localAgentName": null,
+    "currentLocation": "—",
+    "realtorId": "IExSWd9EZqWjB8f9w5rfyCvftj03",
+    "firstName": "juanut",
+    "phone": "1111111111",
+    "realtorName": "Jhon Melón",
+    "status": "contacted",
+    "notes": "Objective: Invertir en España | Timeline: 6-12 months",
+    "timeline": "6-12 months",
+    "budget": "€400,000 - €600,000",
+    "referredBy": "IExSWd9EZqWjB8f9w5rfyCvftj03",
+    "objective": "Invertir en España",
+    "interestArea": "Jávea",
+    "source": "referral",
+    "createdAt": "2026-08-07T11:57:29.527Z",
+    "localAgentId": null,
+    "updatedAt": "2026-08-07T11:57:29.527Z",
+    "statusHistory": [
+      {
+        "date": "2026-08-07T11:57:29.527Z",
+        "status": "contacted",
+        "note": "Registered via referral link"
+      }
+    ],
+    "email": "jhon@aaaaremax.com",
+    "lastName": "aaaa",
+    "brokerId": null
+  },
+  {
+    "id": "client_1786114919303_0tm1d",
+    "realtorId": null,
+    "localAgentName": null,
+    "email": "srodzpaes@gmail.com",
+    "timeline": "0-3 months",
+    "firstName": "Santos Lou's",
+    "localAgentId": null,
+    "source": "referral",
+    "interestArea": "Costa Blanca (General)",
+    "status": "contacted",
+    "budget": "< €150,000",
+    "currentLocation": "United States",
+    "brokerId": null,
+    "objective": "Mudarse a España",
+    "lastName": "Rodriguez",
+    "notes": "Agente Angel Rodriguez",
+    "createdAt": "2026-08-07T15:01:59.304Z",
+    "updatedAt": "2026-08-07T15:01:59.305Z",
+    "referredBy": null,
+    "statusHistory": [
+      {
+        "date": "2026-08-07T15:01:59.305Z",
+        "note": "Registered via referral link",
+        "status": "contacted"
+      }
+    ],
+    "phone": "14078484087",
+    "realtorName": null
+  },
+  {
+    "id": "client_1786118064796_s7vmz",
+    "firstName": "Gil A.",
+    "source": "referral",
+    "notes": "Angel L Rodriguez ESTA PERSONA ES QUE ME RECOMENDO PARA ESTE SEMINARIO\nPA SL3119427",
+    "currentLocation": "United States",
+    "brokerId": null,
+    "lastName": "Medina",
+    "realtorId": null,
+    "statusHistory": [
+      {
+        "note": "Registered via referral link",
+        "date": "2026-08-07T15:54:24.796Z",
+        "status": "contacted"
+      }
+    ],
+    "phone": "14077601521",
+    "referredBy": null,
+    "createdAt": "2026-08-07T15:54:24.796Z",
+    "objective": "Tener casa vacacional en España",
+    "email": "medinarealtor2000@gmail.com",
+    "timeline": "—",
+    "localAgentName": null,
+    "interestArea": "Costa Blanca (General)",
+    "budget": "TBD",
+    "status": "contacted",
+    "updatedAt": "2026-08-07T15:54:24.796Z",
+    "localAgentId": null,
+    "realtorName": null
+  },
+  {
+    "id": "client_1786220477093_uq861",
+    "status": "contacted",
+    "budget": "TBD",
+    "localAgentName": null,
+    "email": "pedro.floridahomes@gmail.com",
+    "realtorName": null,
+    "statusHistory": [
+      {
+        "status": "contacted",
+        "date": "2026-08-08T20:21:17.093Z",
+        "note": "Registered via referral link"
+      }
+    ],
+    "firstName": "Pedro",
+    "localAgentId": null,
+    "interestArea": "—",
+    "realtorId": null,
+    "timeline": "6-12 months",
+    "currentLocation": "—",
+    "notes": "Objective: Invertir en España | Timeline: 6-12 months",
+    "updatedAt": "2026-08-08T20:21:17.093Z",
+    "createdAt": "2026-08-08T20:21:17.093Z",
+    "source": "referral",
+    "referredBy": null,
+    "objective": "Invertir en España",
+    "phone": "4072599513",
+    "brokerId": null,
+    "lastName": "Santiago"
+  },
+  {
+    "id": "client_1786360055399_d2uyd",
+    "updatedAt": "2026-08-13T10:17:57.541Z",
+    "country": "UNITED STATES",
+    "referredBy": null,
+    "lastName": "RODRIGUEZ",
+    "brokerId": null,
+    "statusHistory": [
+      {
+        "note": "Added manually by Angel Rodriguez",
+        "status": "contacted",
+        "date": "2026-08-10T11:07:35.399Z"
+      },
+      {
+        "date": "2026-08-13T10:17:57.541Z",
+        "note": "Moved by Agente Inmomás",
+        "status": "contacted"
+      }
+    ],
+    "objective": "Mudarse a España",
+    "email": "ARODRIGUEZ9427@GMAIL.COM",
+    "createdAt": "2026-08-10T11:07:35.399Z",
+    "addedManuallyBy": "SPAj0aaXOgNs1jT7JhP3FaRMnzf2",
+    "interestArea": "Other",
+    "budget": "—",
+    "localAgentId": "SPAj0aaXOgNs1jT7JhP3FaRMnzf2",
+    "status": "contacted",
+    "localAgentName": "Angel Rodriguez",
+    "timeline": "3-6 months",
+    "phone": "407-848-4087",
+    "firstName": "LOU",
+    "notes": "THIS CLIENT IS A REALTOR FROM FLORIDA US THAT HAS INTEREST IN THE REFERRAL PROGRAM"
+  },
+  {
+    "id": "client_1786360234576_2nbxr",
+    "updatedAt": "2026-08-13T10:18:03.568Z",
+    "notes": "",
+    "budget": "—",
+    "timeline": "0-3 months",
+    "status": "contacted",
+    "objective": "Invertir en España",
+    "localAgentName": "Angel Rodriguez",
+    "phone": "407-361-5093",
+    "createdAt": "2026-08-10T11:10:34.576Z",
+    "email": "CINDYCASTILLOCOACH@GMAIL.COM",
+    "referredBy": null,
+    "statusHistory": [
+      {
+        "status": "contacted",
+        "note": "Added manually by Angel Rodriguez",
+        "date": "2026-08-10T11:10:34.576Z"
+      },
+      {
+        "date": "2026-08-13T10:18:03.568Z",
+        "note": "Moved by Agente Inmomás",
+        "status": "contacted"
+      }
+    ],
+    "brokerId": null,
+    "interestArea": "Other",
+    "lastName": "CASTILLO",
+    "addedManuallyBy": "SPAj0aaXOgNs1jT7JhP3FaRMnzf2",
+    "country": "United States",
+    "localAgentId": "SPAj0aaXOgNs1jT7JhP3FaRMnzf2",
+    "firstName": "CINDY"
+  },
+  {
+    "id": "client_1786534887621_e4z05",
+    "phone": "628465985",
+    "interestArea": "—",
+    "updatedAt": "2026-08-12T11:41:27.630Z",
+    "localAgentName": null,
+    "localAgentId": null,
+    "statusHistory": [
+      {
+        "status": "contacted",
+        "note": "Registered via referral link",
+        "date": "2026-08-12T11:41:27.631Z"
+      }
+    ],
+    "notes": "Objective:  | Timeline: ",
+    "objective": "—",
+    "lastName": "Cerruti",
+    "brokerId": null,
+    "realtorName": null,
+    "createdAt": "2026-08-12T11:41:27.622Z",
+    "source": "referral",
+    "status": "contacted",
+    "budget": "TBD",
+    "realtorId": null,
+    "currentLocation": "España",
+    "timeline": "—",
+    "referredBy": null,
+    "firstName": "Ana",
+    "email": "ana.cerruti@remax.es"
+  },
+  {
+    "id": "client_1786549804257_d5ae6",
+    "firstName": "test",
+    "needsFuster": true,
+    "referredBy": "gUwZGZ4NNhfE5P4sLS7YvSz97oA3",
+    "lastName": "testing",
+    "brokerId": null,
+    "interestArea": "Santa Pola",
+    "email": "aa@test.com",
+    "localAgentId": "ZEd5fiABiTMMXAwaFkEXu8IQbGJ3",
+    "country": "—",
+    "phone": "11111",
+    "createdAt": "2026-08-12T15:50:04.257Z",
+    "statusHistory": [
+      {
+        "status": "contacted",
+        "note": "Added manually by Jhonny Bravo",
+        "date": "2026-08-12T15:50:04.257Z"
+      }
+    ],
+    "needsHolidays": true,
+    "localAgentName": "ana banana",
+    "objective": "Invertir en España",
+    "needsUCI": true,
+    "addedManuallyBy": "gUwZGZ4NNhfE5P4sLS7YvSz97oA3",
+    "timeline": "0-3 months",
+    "notes": "",
+    "updatedAt": "2026-08-12T16:04:45.482Z",
+    "status": "contacted",
+    "budget": "€250,000 - €400,000"
+  },
+  {
+    "id": "client_1786551604300_z758e",
+    "objective": "Tener casa vacacional en España",
+    "referredBy": null,
+    "needsUCI": false,
+    "email": "vionettepietri@gmail.com",
+    "currentLocation": "USA",
+    "realtorId": null,
+    "phone": "3212761906",
+    "budget": "< €150,000",
+    "lastName": "Pietri",
+    "status": "contacted",
+    "interestArea": "Costa Blanca (General)",
+    "needsFuster": false,
+    "createdAt": "2026-08-12T16:20:04.300Z",
+    "timeline": "+1 year",
+    "realtorName": null,
+    "needsHolidays": false,
+    "updatedAt": "2026-08-12T16:20:04.300Z",
+    "localAgentName": null,
+    "statusHistory": [
+      {
+        "date": "2026-08-12T16:20:04.300Z",
+        "note": "Registered via referral link",
+        "status": "contacted"
+      }
+    ],
+    "source": "referral",
+    "firstName": "Vionette",
+    "brokerId": null,
+    "notes": "Real estate agent / international broker",
+    "localAgentId": null
+  }
+]
