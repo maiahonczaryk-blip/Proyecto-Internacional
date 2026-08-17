@@ -330,10 +330,9 @@ body.lang-en-ca .lang-fr { display: none; }
 }
 
 
-.navbar.scrolled .nav-logo-img {
-  filter: invert(1) grayscale(1) brightness(200%) contrast(100);
-  mix-blend-mode: screen;
-}
+
+.navbar.scrolled .nav-logo-normal { display: none; }
+.navbar.scrolled .nav-logo-white { display: block !important; }
 
 .navbar.scrolled {
   background: rgba(255, 255, 255, 0.95);
@@ -2467,7 +2466,6 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
 
 .nav-logo-img {
   height: 48px;
-  mix-blend-mode: multiply;
   width: auto;
 }
 
@@ -2746,8 +2744,6 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   height: 90px;
   width: auto;
   margin-bottom: 12px;
-  filter: invert(1) grayscale(1) brightness(200%) contrast(100);
-  mix-blend-mode: screen;
 }
 
 /* --- Final CTA Section --- */
@@ -7332,10 +7328,9 @@ body.nav-open {
    elements an opaque background so they stay readable.     */
 @supports not (backdrop-filter: blur(1px)) {
   
-.navbar.scrolled .nav-logo-img {
-  filter: invert(1) grayscale(1) brightness(200%) contrast(100);
-  mix-blend-mode: screen;
-}
+
+.navbar.scrolled .nav-logo-normal { display: none; }
+.navbar.scrolled .nav-logo-white { display: block !important; }
 
 .navbar.scrolled {
     background: rgba(255, 255, 255, 0.98) !important;
