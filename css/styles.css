@@ -348,14 +348,11 @@ body.lang-en-ca .lang-fr { display: none; }
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 220px;
 }
 
 .nav-logo img {
-  height: 95px !important;
-  width: auto !important;
-  margin-top: -15px;
-  margin-bottom: -15px;
+  height: 48px;
+  width: auto;
 }
 
 .nav-links {
@@ -2463,11 +2460,8 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
 }
 
 .nav-logo-img {
-  height: auto;
-  width: 220px;
-  max-width: none;
-  margin-top: -10px;
-  margin-bottom: -10px;
+  height: 48px;
+  width: auto;
 }
 
 /* --- Language Selector (mobile responsive) --- */
@@ -7206,8 +7200,7 @@ body.nav-open {
   }
 
   .nav-logo-img {
-    height: auto;
-    width: 150px;
+    height: 36px;
   }
 
   .card,
@@ -7527,10 +7520,4 @@ textarea:focus-visible {
 }
 
 
-@media (max-width: 768px) {
-  .nav-logo img {
-    height: 70px !important;
-    margin-top: -5px;
-    margin-bottom: -5px;
-  }
-}
+
