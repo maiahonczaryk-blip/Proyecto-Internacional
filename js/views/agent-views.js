@@ -35,8 +35,9 @@
                              <span class="lang-es">Bienvenido de nuevo, <strong>${currentUser.firstName}</strong>. Aquí está tu embudo local.</span>`;
       }
 
-      // Load data scoped to this local agent
-      agentClients = await App.auth.getClients({ localAgentId: currentUser.id });
+      // Load data scoped to this local agent or colaborador
+      const clientFilter = currentUser.role === 'colaborador' ? { referredBy: currentUser.id } : { localAgentId: currentUser.id };
+      agentClients = await App.auth.getClients(clientFilter);
       agentCommissions = await App.auth.getCommissions({ agentId: currentUser.id });
       allUsers = await App.auth.getAllUsers();
 
@@ -312,7 +313,8 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
-      agentClients = await App.auth.getClients({ localAgentId: currentUser.id });
+      const clientFilter = currentUser.role === 'colaborador' ? { referredBy: currentUser.id } : { localAgentId: currentUser.id };
+      agentClients = await App.auth.getClients(clientFilter);
       allUsers = await App.auth.getAllUsers();
 
       const getRealtorName = (realtorId) => {

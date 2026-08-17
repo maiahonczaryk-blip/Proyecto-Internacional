@@ -323,9 +323,11 @@ App.views.public = {
               clientPayload.referredBy = referrer.id;
               if (referrer.role === 'broker') {
                 clientPayload.brokerId = referrer.id;
-              } else if (referrer.role === 'agent_inmomas' || referrer.role === 'colaborador') {
+              } else if (referrer.role === 'agent_inmomas') {
                 clientPayload.localAgentId = referrer.id;
                 clientPayload.localAgentName = `${referrer.firstName} ${referrer.lastName}`;
+              } else if (referrer.role === 'colaborador') {
+                clientPayload.referredBy = referrer.id;
               } else if (referrer.role === 'admin') {
                 // Admin referral — no specific assignment
               } else {

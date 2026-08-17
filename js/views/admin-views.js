@@ -702,7 +702,7 @@
       const statusBadge = App.utils.getUserStatusBadge(user.status);
 
       const allSysUsers = await App.auth.getAllUsers();
-      const localAgents = allSysUsers.filter(u => (u.role === 'agent_inmomas' || u.role === 'colaborador') && u.status === 'active');
+      const localAgents = allSysUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
       const agentOptions = `
         <option value="">-- Direct / No Referral --</option>
         ${localAgents.map(a => `
@@ -882,7 +882,7 @@
       const realtorName = realtor ? `${realtor.firstName} ${realtor.lastName}` : '—';
       
       // Get all active local agents
-      const localAgents = allUsers.filter(u => (u.role === 'agent_inmomas' || u.role === 'colaborador') && u.status === 'active');
+      const localAgents = allUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
       
       const dropdownOptions = `
         <option value="">-- Select Local Agent --</option>
@@ -1030,7 +1030,7 @@
       if (!lead) return;
 
       // Get all active local agents
-      const localAgents = allUsers.filter(u => (u.role === 'agent_inmomas' || u.role === 'colaborador') && u.status === 'active');
+      const localAgents = allUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
 
       const dropdownOptions = `
         <option value="">-- Select Local Agent --</option>

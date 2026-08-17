@@ -441,7 +441,8 @@ App.views.auth = {
             </div>
           `;
         } else if (user.role === 'agent_inmomas' || user.role === 'colaborador') {
-          const clients = await App.auth.getClients({ localAgentId: user.id });
+          const clientFilter = user.role === 'colaborador' ? { referredBy: user.id } : { localAgentId: user.id };
+          const clients = await App.auth.getClients(clientFilter);
           const commissions = await App.auth.getCommissions({ agentId: user.id });
 
           const activeClients = clients.filter(c => c.status !== 'closed' && c.status !== 'rejected').length;
