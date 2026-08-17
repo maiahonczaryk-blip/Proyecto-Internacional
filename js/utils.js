@@ -174,7 +174,7 @@ App.utils.copyToClipboard = async function(text) {
 App.utils.generateReferralLink = function(referralCode) {
   // Always use the production URL so referral links are publicly accessible
   // (preview deployments on Vercel require authentication)
-  const prodUrl = 'https://proyecto-internacional.vercel.app';
+  const prodUrl = 'https://thespainconnection.com';
   return `${prodUrl}/index.html#referral?ref=${encodeURIComponent(referralCode)}`;
 };
 
