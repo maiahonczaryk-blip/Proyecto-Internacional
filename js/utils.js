@@ -223,8 +223,11 @@ App.utils.getUserStatusBadge = function(status) {
 
 App.utils.getRoleBadge = function(role) {
   const safeRole = role || 'user';
-  const classes = { admin: 'badge--admin', broker: 'badge--broker', realtor: 'badge--realtor' };
-  return `<span class="badge ${classes[safeRole] || ''}">${safeRole.charAt(0).toUpperCase() + safeRole.slice(1)}</span>`;
+  const classes = { admin: 'badge--admin', broker: 'badge--broker', realtor: 'badge--realtor', agent_inmomas: 'badge--agent', colaborador: 'badge--agent' };
+  let displayName = safeRole.charAt(0).toUpperCase() + safeRole.slice(1);
+  if (safeRole === 'agent_inmomas') displayName = 'Agente Inmomás';
+  if (safeRole === 'colaborador') displayName = 'Colaborador';
+  return `<span class="badge ${classes[safeRole] || ''}">${displayName}</span>`;
 };
 
 /* ---- Avatar Generation ---- */

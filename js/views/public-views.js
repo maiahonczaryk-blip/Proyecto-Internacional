@@ -203,9 +203,9 @@ App.views.public = {
       let availableTypes = ['client'];
       if (referrer.role === 'broker') {
         availableTypes = ['client', 'realtor'];
-      } else if (referrer.role === 'agent_inmomas' || referrer.role === 'admin') {
+      } else if (referrer.role === 'agent_inmomas' || referrer.role === 'colaborador' || referrer.role === 'admin') {
         availableTypes = referrer.role === 'admin' 
-          ? ['client', 'realtor', 'broker', 'agent_inmomas']
+          ? ['client', 'realtor', 'broker', 'agent_inmomas', 'colaborador']
           : ['client', 'realtor', 'broker'];
       }
 
@@ -213,7 +213,8 @@ App.views.public = {
         client: { icon: '👤', labelEn: 'Client', labelEs: 'Cliente', labelFr: 'Client', labelEnCa: 'Client' },
         realtor: { icon: '🏠', labelEn: 'Realtor', labelEs: 'Realtor', labelFr: 'Realtor', labelEnCa: 'Realtor' },
         broker: { icon: '🏢', labelEn: 'Broker', labelEs: 'Broker', labelFr: 'Courtier', labelEnCa: 'Broker' },
-        agent_inmomas: { icon: '🇪🇸', labelEn: 'RE/MAX Inmomás Agent', labelEs: 'Agente RE/MAX Inmomás', labelFr: 'Agent RE/MAX Inmomás', labelEnCa: 'RE/MAX Inmomás Agent' }
+        agent_inmomas: { icon: '🇪🇸', labelEn: 'RE/MAX Inmomás Agent', labelEs: 'Agente RE/MAX Inmomás', labelFr: 'Agent RE/MAX Inmomás', labelEnCa: 'RE/MAX Inmomás Agent' },
+        colaborador: { icon: '🤝', labelEn: 'Collaborator', labelEs: 'Colaborador', labelFr: 'Collaborateur', labelEnCa: 'Collaborator' }
       };
 
       if (availableTypes.length > 1 && typeSelector && typeOptions) {
@@ -322,7 +323,7 @@ App.views.public = {
               clientPayload.referredBy = referrer.id;
               if (referrer.role === 'broker') {
                 clientPayload.brokerId = referrer.id;
-              } else if (referrer.role === 'agent_inmomas') {
+              } else if (referrer.role === 'agent_inmomas' || referrer.role === 'colaborador') {
                 clientPayload.localAgentId = referrer.id;
                 clientPayload.localAgentName = `${referrer.firstName} ${referrer.lastName}`;
               } else if (referrer.role === 'admin') {

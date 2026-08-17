@@ -440,7 +440,7 @@ App.views.auth = {
               </div>
             </div>
           `;
-        } else if (user.role === 'agent_inmomas') {
+        } else if (user.role === 'agent_inmomas' || user.role === 'colaborador') {
           const clients = await App.auth.getClients({ localAgentId: user.id });
           const commissions = await App.auth.getCommissions({ agentId: user.id });
 

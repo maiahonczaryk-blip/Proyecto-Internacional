@@ -167,6 +167,12 @@
         </div>
       ` : '';
 
+      const colaboradorBookmark = requestedRole === 'colaborador' ? `
+        <div style="position: absolute; top: 0; right: 12px; background: #3b82f6; color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+          Requested
+        </div>
+      ` : '';
+
       return `
         <div class="pipeline-card" style="margin-bottom: 1rem; padding: 1.25rem;">
           <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
@@ -217,6 +223,16 @@
                 ${agentInmomasBookmark}
                 <div style="font-size: 2.25rem; margin-bottom: 0.25rem;">🏠</div>
                 <div style="font-weight: 700; font-size: 0.9rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Agente Inmomás</div>
+              </div>
+
+              <!-- Colaborador Approval Card -->
+              <div onclick="App.views.admin.approveWithRole('${user.id}', 'colaborador')" 
+                   style="position: relative; flex: 1; min-width: 120px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 0.5rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                   onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
+                   onmouseout="this.style.borderColor='${defaultBorder}'; this.style.backgroundColor='${defaultBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
+                ${colaboradorBookmark}
+                <div style="font-size: 2.25rem; margin-bottom: 0.25rem;">🤝</div>
+                <div style="font-weight: 700; font-size: 0.9rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Colaborador</div>
               </div>
             </div>
             
@@ -526,6 +542,12 @@
         </div>
       ` : '';
 
+      const colaboradorBookmark = requestedRole === 'colaborador' ? `
+        <div style="position: absolute; top: 0; right: 12px; background: #3b82f6; color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+          Requested
+        </div>
+      ` : '';
+
       App.utils.showModal({
         title: 'Approve User',
         body: `
@@ -563,6 +585,16 @@
               ${agentInmomasBookmark}
               <div style="font-size: 2.25rem; margin-bottom: 0.25rem;">🏠</div>
               <div style="font-weight: 700; font-size: 0.9rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Agente Inmomás</div>
+            </div>
+
+            <!-- Colaborador Approval Card -->
+            <div onclick="App.views.admin.approveWithRole('${user.id}', 'colaborador')" 
+                 style="position: relative; flex: 1; min-width: 120px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 0.5rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                 onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff'; this.style.boxShadow='0 4px 6px -1px rgba(37,99,235,0.1)';" 
+                 onmouseout="this.style.borderColor='${defaultBorder}'; this.style.backgroundColor='${defaultBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
+              ${colaboradorBookmark}
+              <div style="font-size: 2.25rem; margin-bottom: 0.25rem;">🤝</div>
+              <div style="font-weight: 700; font-size: 0.9rem; color: #111827; letter-spacing: 0.05em; text-transform: uppercase;">Colaborador</div>
             </div>
           </div>
         `,
@@ -670,7 +702,7 @@
       const statusBadge = App.utils.getUserStatusBadge(user.status);
 
       const allSysUsers = await App.auth.getAllUsers();
-      const localAgents = allSysUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
+      const localAgents = allSysUsers.filter(u => (u.role === 'agent_inmomas' || u.role === 'colaborador') && u.status === 'active');
       const agentOptions = `
         <option value="">-- Direct / No Referral --</option>
         ${localAgents.map(a => `
@@ -723,6 +755,7 @@
                 <option value="realtor" ${user.role === 'realtor' ? 'selected' : ''}>Realtor</option>
                 <option value="broker" ${user.role === 'broker' ? 'selected' : ''}>Broker</option>
                 <option value="agent_inmomas" ${user.role === 'agent_inmomas' ? 'selected' : ''}>Agent Inmomás</option>
+                <option value="colaborador" ${user.role === 'colaborador' ? 'selected' : ''}>Colaborador</option>
               </select>
               <button class="btn btn-primary btn-sm" id="save-user-role-btn">Update Role</button>
             </div>
@@ -849,7 +882,7 @@
       const realtorName = realtor ? `${realtor.firstName} ${realtor.lastName}` : '—';
       
       // Get all active local agents
-      const localAgents = allUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
+      const localAgents = allUsers.filter(u => (u.role === 'agent_inmomas' || u.role === 'colaborador') && u.status === 'active');
       
       const dropdownOptions = `
         <option value="">-- Select Local Agent --</option>
@@ -997,7 +1030,7 @@
       if (!lead) return;
 
       // Get all active local agents
-      const localAgents = allUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
+      const localAgents = allUsers.filter(u => (u.role === 'agent_inmomas' || u.role === 'colaborador') && u.status === 'active');
 
       const dropdownOptions = `
         <option value="">-- Select Local Agent --</option>
@@ -1279,7 +1312,7 @@
       return;
     }
 
-    const roleLabel = { all: 'All', broker: 'Brokers', realtor: 'Realtors', agent_inmomas: 'Agents' };
+    const roleLabel = { all: 'All', broker: 'Brokers', realtor: 'Realtors', agent_inmomas: 'Agents', colaborador: 'Colaboradores' };
 
     const rows = history.map(nl => {
       const date = new Date(nl.sentAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
