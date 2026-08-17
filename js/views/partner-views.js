@@ -129,17 +129,17 @@ App.views.partner = (function() {
       `).join('');
 
       App.utils.showModal({
-        title: \`Client: \${App.utils.escapeHtml(client.firstName)} \${App.utils.escapeHtml(client.lastName)}\`,
-        body: \`
+        title: `Client: ${App.utils.escapeHtml(client.firstName)} ${App.utils.escapeHtml(client.lastName)}`,
+        body: `
           <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
             <!-- Client Info (NO CONTACT DATA) -->
             <div style="background: #f9fafb; padding: 1rem; border-radius: 8px;">
               <h4 style="margin: 0 0 1rem; font-size: 0.9rem; color: #374151;">General Information</h4>
               <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; font-size: 0.85rem;">
-                <strong style="color: #6b7280;">Objective:</strong> <span>\${App.utils.escapeHtml(client.objective || '—')}</span>
-                <strong style="color: #6b7280;">Timeline:</strong> <span>\${App.utils.escapeHtml(client.timeline || '—')}</span>
-                <strong style="color: #6b7280;">Interest Area:</strong> <span>\${App.utils.escapeHtml(client.interestArea || '—')}</span>
-                <strong style="color: #6b7280;">Budget:</strong> <span>\${App.utils.escapeHtml(client.budget || '—')}</span>
+                <strong style="color: #6b7280;">Objective:</strong> <span>${App.utils.escapeHtml(client.objective || '—')}</span>
+                <strong style="color: #6b7280;">Timeline:</strong> <span>${App.utils.escapeHtml(client.timeline || '—')}</span>
+                <strong style="color: #6b7280;">Interest Area:</strong> <span>${App.utils.escapeHtml(client.interestArea || '—')}</span>
+                <strong style="color: #6b7280;">Budget:</strong> <span>${App.utils.escapeHtml(client.budget || '—')}</span>
               </div>
             </div>
 
@@ -147,7 +147,7 @@ App.views.partner = (function() {
             <div>
               <h4 style="margin: 0 0 0.5rem; font-size: 0.9rem; color: #374151;">Add Follow-up Note</h4>
               <textarea id="partner-note-text" class="form-input" rows="3" placeholder="Write a status update... e.g., 'Documentación enviada para revisión'" style="margin-bottom: 0.5rem; resize: vertical;"></textarea>
-              <button class="btn btn-primary btn-sm" onclick="App.views.partner.handleAddNote('\${client.id}', '\${client.status}')">
+              <button class="btn btn-primary btn-sm" onclick="App.views.partner.handleAddNote('${client.id}', '${client.status}')">
                 Añadir Nota de Seguimiento
               </button>
             </div>
@@ -156,14 +156,14 @@ App.views.partner = (function() {
             <div>
               <h4 style="margin: 0 0 1rem; font-size: 0.9rem; color: #374151;">Status History</h4>
               <div style="padding-left: 0.25rem;">
-                \${timeline || '<p style="color: #9ca3af; font-size: 0.85rem; margin: 0;">No history available.</p>'}
+                ${timeline || '<p style="color: #9ca3af; font-size: 0.85rem; margin: 0;">No history available.</p>'}
               </div>
             </div>
           </div>
-        \`,
-        footer: \`
+        `,
+        footer: `
           <button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Close</button>
-        \`
+        `
       });
     } catch (err) {
       console.error(err);
@@ -180,7 +180,7 @@ App.views.partner = (function() {
     
     const user = App.auth.getCurrentUser();
     const partnerName = user.firstName + (user.lastName ? ' ' + user.lastName : '');
-    const fullNote = \`\${partnerName} (Partner): \${text}\`;
+    const fullNote = `${partnerName} (Partner): ${text}`;
 
     try {
       await App.auth.updateClientStatus(clientId, currentStatus, fullNote);
