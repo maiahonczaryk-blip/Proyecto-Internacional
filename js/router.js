@@ -229,6 +229,9 @@ App.router = (function() {
 
     currentRoute = routeKey;
 
+    // Set data-route attribute on body for CSS targeting
+    document.body.setAttribute("data-route", routeKey);
+
     // Update document title
     document.title = `${route.title} | RE/MAX Inmomás`;
 

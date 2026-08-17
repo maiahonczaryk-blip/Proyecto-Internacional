@@ -331,13 +331,13 @@ body.lang-en-ca .lang-fr { display: none; }
 
 
 
-/* Default (transparent navbar over dark hero) */
-.nav-logo-normal { display: none; }
-.nav-logo-white { display: block; }
+/* Default: ALWAYS show normal logo, hide white logo */
+.nav-logo-normal { display: block !important; }
+.nav-logo-white { display: none !important; }
 
-/* Scrolled (white background) */
-.navbar.scrolled .nav-logo-normal { display: block !important; }
-.navbar.scrolled .nav-logo-white { display: none !important; }
+/* ONLY on the home page, when navbar is NOT scrolled (over dark hero) */
+body[data-route="home"] .navbar:not(.scrolled) .nav-logo-normal { display: none !important; }
+body[data-route="home"] .navbar:not(.scrolled) .nav-logo-white { display: block !important; }
 
 .navbar.scrolled {
   background: rgba(255, 255, 255, 0.95);
@@ -7334,13 +7334,13 @@ body.nav-open {
 @supports not (backdrop-filter: blur(1px)) {
   
 
-/* Default (transparent navbar over dark hero) */
-.nav-logo-normal { display: none; }
-.nav-logo-white { display: block; }
+/* Default: ALWAYS show normal logo, hide white logo */
+.nav-logo-normal { display: block !important; }
+.nav-logo-white { display: none !important; }
 
-/* Scrolled (white background) */
-.navbar.scrolled .nav-logo-normal { display: block !important; }
-.navbar.scrolled .nav-logo-white { display: none !important; }
+/* ONLY on the home page, when navbar is NOT scrolled (over dark hero) */
+body[data-route="home"] .navbar:not(.scrolled) .nav-logo-normal { display: none !important; }
+body[data-route="home"] .navbar:not(.scrolled) .nav-logo-white { display: block !important; }
 
 .navbar.scrolled {
     background: rgba(255, 255, 255, 0.98) !important;
