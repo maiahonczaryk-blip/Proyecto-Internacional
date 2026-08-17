@@ -347,8 +347,6 @@ body[data-route="home"] .navbar:not(.scrolled) {
   border-bottom-color: transparent;
   box-shadow: none;
 }
-body[data-route="home"] .navbar:not(.scrolled) .nav-logo-normal { display: none !important; }
-body[data-route="home"] .navbar:not(.scrolled) .nav-logo-white { display: block !important; }
 
 .navbar.scrolled {
   padding: 10px 0;
@@ -7346,8 +7344,6 @@ body.nav-open {
 .nav-logo-white { display: none !important; }
 
 /* ONLY on the home page, when navbar is NOT scrolled (over dark hero) */
-body[data-route="home"] .navbar:not(.scrolled) .nav-logo-normal { display: none !important; }
-body[data-route="home"] .navbar:not(.scrolled) .nav-logo-white { display: block !important; }
 
 .navbar.scrolled {
     background: rgba(255, 255, 255, 0.98) !important;
