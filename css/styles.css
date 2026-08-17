@@ -329,6 +329,12 @@ body.lang-en-ca .lang-fr { display: none; }
   transition: all var(--transition-smooth);
 }
 
+
+.navbar.scrolled .nav-logo-img {
+  filter: invert(1) grayscale(1) brightness(200%) contrast(100);
+  mix-blend-mode: screen;
+}
+
 .navbar.scrolled {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
@@ -2461,6 +2467,7 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
 
 .nav-logo-img {
   height: 48px;
+  mix-blend-mode: multiply;
   width: auto;
 }
 
@@ -2739,7 +2746,8 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   height: 90px;
   width: auto;
   margin-bottom: 12px;
-  mix-blend-mode: darken; /* hide white bg */
+  filter: invert(1) grayscale(1) brightness(200%) contrast(100);
+  mix-blend-mode: screen;
 }
 
 /* --- Final CTA Section --- */
@@ -7323,7 +7331,13 @@ body.nav-open {
    Firefox does not support backdrop-filter. Give affected
    elements an opaque background so they stay readable.     */
 @supports not (backdrop-filter: blur(1px)) {
-  .navbar.scrolled {
+  
+.navbar.scrolled .nav-logo-img {
+  filter: invert(1) grayscale(1) brightness(200%) contrast(100);
+  mix-blend-mode: screen;
+}
+
+.navbar.scrolled {
     background: rgba(255, 255, 255, 0.98) !important;
   }
 
@@ -7521,3 +7535,5 @@ textarea:focus-visible {
 
 
 
+
+.login-logo { mix-blend-mode: multiply; }
