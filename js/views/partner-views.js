@@ -26,7 +26,13 @@ App.views.partner = (function() {
       const partnerClients = allClients.filter(c => c[partnerType] === true);
 
       // Referral link
-      const referralLink = App.utils.generateReferralLink(user.referralCode || user.id || 'PARTNER-DEFAULT');
+      // Referral link
+      let partnerRef = user.referralCode || user.id || 'PARTNER-DEFAULT';
+      if (partnerType === 'needsUCI') partnerRef = 'UCI';
+      else if (partnerType === 'needsFuster') partnerRef = 'Fuster & Associates';
+      else if (partnerType === 'needsHolidays') partnerRef = 'Inmomás Holidays';
+
+      const referralLink = App.utils.generateReferralLink(partnerRef);
       const linkInput = document.getElementById('partner-dash-referral-link');
       if (linkInput) {
         linkInput.value = referralLink;

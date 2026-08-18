@@ -144,6 +144,12 @@ App.views.public = {
     // ---- Step 1: Look up referrer (sync from demoData first, then async Firestore) ----
     function lookupReferrerSync() {
       if (!refCode) return null;
+      
+      // Hardcoded partner fallbacks
+      if (refCode === 'UCI') return { firstName: 'UCI', lastName: '', role: 'partner' };
+      if (refCode === 'Fuster & Associates') return { firstName: 'Fuster', lastName: '& Associates', role: 'partner' };
+      if (refCode === 'Inmomás Holidays') return { firstName: 'Inmomás', lastName: 'Holidays', role: 'partner' };
+
       if (App.demoData && App.demoData.users) {
         return App.demoData.users.find(u => u.referralCode === refCode) || null;
       }
