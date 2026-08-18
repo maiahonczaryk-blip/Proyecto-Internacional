@@ -621,6 +621,39 @@ App.auth = (function() {
     }
   }
 
+  async function updateAuthEmail(newEmail) {
+    const user = currentUser;
+    if (!user) throw new Error('No user is currently logged in.');
+
+    if (App.demoMode) {
+      App.utils.showToast('In demo mode, email update is simulated.', 'info');
+      const demoUser = App.demoData.users.find(u => u.id === user.id);
+      if (demoUser) demoUser.email = newEmail;
+      user.email = newEmail;
+      saveDemoData();
+      return true;
+    } else {
+      const fbUser = App.firebaseAuth.currentUser;
+      if (!fbUser) throw new Error('No Firebase user found.');
+      
+      try {
+        await fbUser.updateEmail(newEmail);
+        await App.db.collection('users').doc(user.id).update({
+          email: newEmail,
+          updatedAt: new Date().toISOString()
+        });
+        user.email = newEmail;
+        return true;
+      } catch (err) {
+        if (err.code === 'auth/requires-recent-login') {
+          throw new Error('Please log out and log back in before updating your email.');
+        }
+        throw err;
+      }
+    }
+  }
+
+
   /* ---- Update User Referral (Admin action) ---- */
   async function updateUserReferral(userId, referrerCode) {
     if (App.demoMode) {
