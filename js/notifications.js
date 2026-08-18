@@ -8,17 +8,18 @@
    2. Click "Add New Service" → connect your Gmail or Outlook
       → note the SERVICE ID (e.g. "service_abc123")
    3. Click "Email Templates" → "Create New Template"
-      → Create TWO templates (see below for variable names):
-        • template_new_registration  → for new signups
-        • template_status_update     → for approvals/rejections
-      → note each TEMPLATE ID
+      → Crea TRES templates (ver abajo las variables a usar):
+        • template_new_registration  → para nuevos registros (Llega al Admin)
+        • template_status_update     → para cambios de estado (Llega al Admin)
+        • template_user_approved     → para cuando se aprueba al usuario (Llega al Usuario)
+      → anota cada TEMPLATE ID
    4. Go to Account → General → copy your PUBLIC KEY
-   5. Replace the four TODO values below with your real IDs.
-      The rest of the code is ready and will work immediately.
+   5. Reemplaza los cinco valores TODO abajo con tus IDs reales.
+      El resto del código está listo y funcionará inmediatamente.
 
    --- TEMPLATE VARIABLES ---
 
-   Template "template_new_registration":
+   Template "template_new_registration": (Para el Admin)
      Subject: 🔔 Nuevo registro: {{user_type}} — {{user_name}}
      Body:
        Hola Maia,
@@ -34,7 +35,7 @@
          {{admin_url}}
        — Sistema RE/MAX Inmomás International
 
-   Template "template_status_update":
+   Template "template_status_update": (Para el Admin)
      Subject: ✅ Usuario {{new_status}}: {{user_name}}
      Body:
        Hola Maia,
@@ -47,15 +48,29 @@
        → Accede al panel de administración:
          {{admin_url}}
        — Sistema RE/MAX Inmomás International
+
+   Template "template_user_approved": (Para el Usuario)
+     Subject: ¡Felicidades! Tu cuenta ha sido aprobada 🎉
+     Body:
+       Hola {{user_name}},
+       ¡Nos complace informarte que tu cuenta en el portal de RE/MAX Inmomás ha sido aprobada!
+       Ya puedes iniciar sesión y acceder a todos los recursos, guías y acuerdos de referidos.
+       
+       → Inicia sesión aquí:
+         {{login_url}}
+       
+       ¡Bienvenido/a al equipo!
+       — Sistema RE/MAX Inmomás International
    ============================================================ */
 
 (function () {
   // ── EmailJS Credentials ────────────────────────────────────────────────────
-  // TODO: Replace these four values with your real EmailJS credentials.
-  const EMAILJS_PUBLIC_KEY        = 'YOUR_PUBLIC_KEY';       // Account → General
-  const EMAILJS_SERVICE_ID        = 'YOUR_SERVICE_ID';       // e.g. 'service_abc123'
-  const EMAILJS_TEMPLATE_NEW_REG  = 'YOUR_TEMPLATE_NEW_REG'; // e.g. 'template_abc123'
+  // TODO: Reemplaza estos valores con tus credenciales reales de EmailJS.
+  const EMAILJS_PUBLIC_KEY        = 'JTCb2ReY646jaDW4r';     // Listo! (Sacado de tu captura)
+  const EMAILJS_SERVICE_ID        = 'service_j1ney1s';       // Listo!
+  const EMAILJS_TEMPLATE_NEW_REG  = 'template_dr41flj';      // Listo! (Plantilla A)
   const EMAILJS_TEMPLATE_STATUS   = 'YOUR_TEMPLATE_STATUS';  // e.g. 'template_xyz456'
+  const EMAILJS_TEMPLATE_USER_APPROVED = 'template_giaoa5e'; // Listo! (Plantilla C)
   // ── Admin Destination ─────────────────────────────────────────────────────
   const ADMIN_EMAIL = 'maia.honczaryk@remax.es';
   const ADMIN_URL   = 'https://remax-inmomas-international.vercel.app/app.html#admin/users';
@@ -65,9 +80,7 @@
     return (
       typeof emailjs !== 'undefined' &&
       EMAILJS_PUBLIC_KEY       !== 'YOUR_PUBLIC_KEY' &&
-      EMAILJS_SERVICE_ID       !== 'YOUR_SERVICE_ID' &&
-      EMAILJS_TEMPLATE_NEW_REG !== 'YOUR_TEMPLATE_NEW_REG' &&
-      EMAILJS_TEMPLATE_STATUS  !== 'YOUR_TEMPLATE_STATUS'
+      EMAILJS_SERVICE_ID       !== 'YOUR_SERVICE_ID'
     );
   }
 
@@ -99,21 +112,21 @@
     return map[status] || status || '—';
   }
 
-  async function sendEmail(templateId, params) {
+  async function sendEmail(templateId, params, toEmail = ADMIN_EMAIL) {
     initEmailJS();
-    if (!isReady()) {
+    if (!isReady() || templateId.startsWith('YOUR_TEMPLATE')) {
       console.info(
-        '[Notifications] EmailJS not configured — notification simulated.\n' +
-        'Fill in the TODO credentials in js/notifications.js to activate real emails.\n' +
-        'Would have sent:', { templateId, to: ADMIN_EMAIL, ...params }
+        '[Notifications] EmailJS not configured para este template — notificación simulada.\n' +
+        'Completa los valores TODO en js/notifications.js para activar correos reales.\n' +
+        'Se hubiese enviado a:', toEmail, ' con template:', templateId, ' y params:', params
       );
       return;
     }
     try {
-      await emailjs.send(EMAILJS_SERVICE_ID, templateId, { to_email: ADMIN_EMAIL, ...params });
-      console.info('[Notifications] Email sent to', ADMIN_EMAIL, '— template:', templateId);
+      await emailjs.send(EMAILJS_SERVICE_ID, templateId, { to_email: toEmail, ...params });
+      console.info('[Notifications] Email enviado a', toEmail, '— template:', templateId);
     } catch (err) {
-      console.warn('[Notifications] Failed to send email:', err);
+      console.warn('[Notifications] Error al enviar email:', err);
     }
   }
 
@@ -166,6 +179,8 @@
 
   async function onUserStatusChange(user, newStatus) {
     const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
+    
+    // 1. Notificar al Admin del cambio de estado
     await sendEmail(EMAILJS_TEMPLATE_STATUS, {
       user_name:  name,
       user_email: user.email || '—',
@@ -173,7 +188,16 @@
       new_status: statusLabel(newStatus),
       updated_at: fmtDate(new Date().toISOString()),
       admin_url:  ADMIN_URL
-    });
+    }, ADMIN_EMAIL);
+
+    // 2. Si el usuario ha sido aprobado ('active'), enviarle correo a él
+    if (newStatus === 'active' && user.email) {
+      await sendEmail(EMAILJS_TEMPLATE_USER_APPROVED, {
+        user_name: name,
+        user_email: user.email,
+        login_url: 'https://remax-inmomas-international.vercel.app/#login'
+      }, user.email);
+    }
   }
 
   // ── Expose on App namespace ────────────────────────────────────────────────

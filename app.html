@@ -843,6 +843,18 @@
             <div class="stat-card__value">0</div>
           </div>
         </div>
+
+        <!-- Referral Link Quick Access -->
+        <div class="dashboard-section referral-quick" style="margin-top: 2rem;">
+          <h2>🔗 <span class="lang-en">Your Referral Link</span><span class="lang-es">Tu Enlace de Referido</span></h2>
+          <div style="display: flex; gap: 10px; align-items: center; background: var(--bg-card); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 15px;">
+            <input type="text" readonly id="partner-dash-referral-link" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--text-primary); outline: none; padding: 0; min-width: 0;">
+            <button class="btn btn-primary" onclick="App.utils.copyToClipboard(document.getElementById('partner-dash-referral-link').value)" style="border-radius: 8px; padding: 10px 20px; white-space: nowrap;">
+              <span class="lang-en">Copy Link</span>
+              <span class="lang-es">Copiar Enlace</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -920,6 +932,10 @@
                 </h3>
                 <form id="profile-edit-form" onsubmit="return false;">
                   <div class="profile-form-grid">
+                    <div class="profile-form-group" id="group-edit-email" style="display:none;">
+                      <label for="edit-email"><span class="lang-en">Login & Recovery Email</span><span class="lang-es">Email de Acceso y Recuperación</span></label>
+                      <input type="email" id="edit-email">
+                    </div>
                     <div class="profile-form-group">
                       <label for="edit-firstName"><span class="lang-en">First Name</span><span class="lang-es">Nombre</span></label>
                       <input type="text" id="edit-firstName" required>

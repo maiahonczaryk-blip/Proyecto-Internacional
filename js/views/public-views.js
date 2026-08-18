@@ -203,7 +203,7 @@ App.views.public = {
       let availableTypes = ['client'];
       if (referrer.role === 'broker') {
         availableTypes = ['client', 'realtor'];
-      } else if (referrer.role === 'agent_inmomas' || referrer.role === 'colaborador' || referrer.role === 'admin') {
+      } else if (referrer.role === 'agent_inmomas' || referrer.role === 'colaborador' || referrer.role === 'admin' || referrer.role === 'partner') {
         availableTypes = referrer.role === 'admin' 
           ? ['client', 'realtor', 'broker', 'agent_inmomas', 'colaborador']
           : ['client', 'realtor', 'broker'];

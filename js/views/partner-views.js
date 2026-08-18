@@ -25,6 +25,13 @@ App.views.partner = (function() {
       // Filter clients where the specific partner flag is true
       const partnerClients = allClients.filter(c => c[partnerType] === true);
 
+      // Referral link
+      const referralLink = App.utils.generateReferralLink(user.referralCode || user.id || 'PARTNER-DEFAULT');
+      const linkInput = document.getElementById('partner-dash-referral-link');
+      if (linkInput) {
+        linkInput.value = referralLink;
+      }
+
       renderPartnerDashboard(partnerClients, partnerType);
     } catch (err) {
       console.error('[Partner] Error loading dashboard:', err);

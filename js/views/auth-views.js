@@ -173,6 +173,8 @@ App.views.auth = {
     const editPhone = document.getElementById('edit-phone');
     const editAgencyName = document.getElementById('edit-agencyName');
     const editCountry = document.getElementById('edit-country');
+    const editEmail = document.getElementById('edit-email');
+    const groupEditEmail = document.getElementById('group-edit-email');
 
     // Buttons & Toggles
     const btnEdit = document.getElementById('profile-btn-edit');
@@ -223,6 +225,16 @@ App.views.auth = {
     if (editPhone) editPhone.value = user.phone || '';
     if (editAgencyName) editAgencyName.value = user.agencyName || '';
     if (editCountry) editCountry.value = user.country || '';
+    
+    // Only show email edit for partners
+    if (groupEditEmail) {
+      if (user.role === 'partner') {
+        groupEditEmail.style.display = 'block';
+        if (editEmail) editEmail.value = user.email || '';
+      } else {
+        groupEditEmail.style.display = 'none';
+      }
+    }
 
     // 4. Set up View/Edit Mode Toggle Listeners
     if (btnEdit && profileCard) {
@@ -237,6 +249,7 @@ App.views.auth = {
         if (editPhone) editPhone.value = user.phone || '';
         if (editAgencyName) editAgencyName.value = user.agencyName || '';
         if (editCountry) editCountry.value = user.country || '';
+        if (editEmail && user.role === 'partner') editEmail.value = user.email || '';
       };
     }
 
@@ -258,6 +271,12 @@ App.views.auth = {
         saveBtn.innerHTML = '<span class="spinner"></span>';
 
         try {
+          // If partner changed email, update auth email first
+          if (user.role === 'partner' && editEmail && editEmail.value && editEmail.value !== user.email) {
+            await App.auth.updateAuthEmail(editEmail.value);
+            // email El in view will be updated in next initProfile
+          }
+
           await App.auth.updateProfile(data);
           App.utils.showToast('Profile updated successfully! 🎉', 'success');
           profileCard.classList.remove('editing');

@@ -1422,6 +1422,7 @@ App.auth = (function() {
     updateUserRole,
     updateUserReferral,
     updateProfile,
+    updateAuthEmail,
     getAllUsers,
     getUser,
     getClients,
