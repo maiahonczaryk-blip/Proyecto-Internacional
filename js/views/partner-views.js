@@ -38,6 +38,52 @@ App.views.partner = (function() {
         linkInput.value = referralLink;
       }
 
+      // Account Settings / Email Logic
+      const emailInput = document.getElementById('partner-email');
+      const saveEmailBtn = document.getElementById('btn-partner-save-email');
+      const resetPwBtn = document.getElementById('btn-partner-reset-pw');
+
+      if (emailInput) {
+        emailInput.value = user.email || '';
+      }
+
+      if (saveEmailBtn) {
+        saveEmailBtn.onclick = async () => {
+          const newEmail = emailInput.value.trim();
+          if (!newEmail) {
+            App.utils.showToast('Please enter an email address.', 'error');
+            return;
+          }
+          saveEmailBtn.disabled = true;
+          saveEmailBtn.innerHTML = '<span class="spinner"></span>';
+          try {
+            await App.auth.updateAuthEmail(newEmail);
+            App.utils.showToast('Email updated successfully! 🎉', 'success');
+          } catch (err) {
+            App.utils.showToast(err.message, 'error');
+          } finally {
+            saveEmailBtn.disabled = false;
+            saveEmailBtn.innerHTML = '<span class="lang-en">Save Email</span><span class="lang-es">Guardar Correo</span>';
+          }
+        };
+      }
+
+      if (resetPwBtn) {
+        resetPwBtn.onclick = async () => {
+          const currentEmail = App.auth.getCurrentUser()?.email;
+          if (!currentEmail) {
+            App.utils.showToast('Please save a recovery email first.', 'error');
+            return;
+          }
+          try {
+            await App.auth.resetPassword(currentEmail);
+            App.utils.showToast('Password reset link sent to your email! ✉️', 'success');
+          } catch (err) {
+            App.utils.showToast(err.message, 'error');
+          }
+        };
+      }
+
       renderPartnerDashboard(partnerClients, partnerType);
     } catch (err) {
       console.error('[Partner] Error loading dashboard:', err);

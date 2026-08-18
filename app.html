@@ -855,6 +855,29 @@
             </button>
           </div>
         </div>
+
+        <!-- Account Settings / Email -->
+        <div class="dashboard-section" style="margin-top: 2rem;">
+          <h2>⚙️ <span class="lang-en">Account Settings</span><span class="lang-es">Configuración de Cuenta</span></h2>
+          <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 15px;">
+            <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.95rem;">
+              <span class="lang-en">Associate an email address to your account to enable password resets.</span>
+              <span class="lang-es">Asocia un correo electrónico a tu cuenta para poder restablecer tu contraseña.</span>
+            </p>
+            <div style="display: flex; gap: 10px; max-width: 400px; flex-direction: column;">
+              <label for="partner-email" style="font-size:0.85rem; font-weight:600;"><span class="lang-en">Recovery Email</span><span class="lang-es">Correo de Recuperación</span></label>
+              <input type="email" id="partner-email" class="form-input" placeholder="tu-correo@ejemplo.com" style="width: 100%;">
+              <button id="btn-partner-save-email" class="btn btn-primary" style="margin-top: 5px; width: fit-content;"><span class="lang-en">Save Email</span><span class="lang-es">Guardar Correo</span></button>
+            </div>
+            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+              <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.85rem;">
+                <span class="lang-en">If you forgot your password or want to change it, click the button below. An email will be sent to your recovery email.</span>
+                <span class="lang-es">Si olvidaste tu contraseña o quieres cambiarla, haz clic abajo. Se enviará un enlace a tu correo de recuperación.</span>
+              </p>
+              <button id="btn-partner-reset-pw" class="btn btn-outline" style="color: #e11b22; border-color: #e11b22;"><span class="lang-en">Send Password Reset Link</span><span class="lang-es">Enviar Enlace de Recuperación</span></button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
