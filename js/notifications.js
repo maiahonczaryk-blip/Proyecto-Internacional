@@ -115,9 +115,9 @@
   async function sendEmail(templateId, params, toEmail = ADMIN_EMAIL) {
     initEmailJS();
     if (!isReady() || templateId.startsWith('YOUR_TEMPLATE')) {
+      alert("⚠️ Aviso (Modo Pruebas): El correo no se ha enviado. Motivo: Tu navegador no detecta EmailJS. Por favor, asegúrate de haber refrescado la página con Cmd+Shift+R.");
       console.info(
         '[Notifications] EmailJS not configured para este template — notificación simulada.\n' +
-        'Completa los valores TODO en js/notifications.js para activar correos reales.\n' +
         'Se hubiese enviado a:', toEmail, ' con template:', templateId, ' y params:', params
       );
       return;
@@ -126,6 +126,7 @@
       await emailjs.send(EMAILJS_SERVICE_ID, templateId, { to_email: toEmail, ...params });
       console.info('[Notifications] Email enviado a', toEmail, '— template:', templateId);
     } catch (err) {
+      alert("⚠️ Error de EmailJS: No se pudo enviar el correo. Revisa la consola para más detalles.");
       console.warn('[Notifications] Error al enviar email:', err);
     }
   }
