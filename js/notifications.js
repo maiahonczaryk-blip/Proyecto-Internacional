@@ -102,7 +102,8 @@
   function roleLabel(role) {
     const map = {
       broker: 'Broker', realtor: 'Realtor',
-      agent_inmomas: 'Agente Inmomás', admin: 'Administrador'
+      agent_inmomas: 'Agente Inmomás', admin: 'Administrador',
+      colaborador: 'Colaborador'
     };
     return map[role] || role || '—';
   }
@@ -146,6 +147,27 @@
       source:        user.source || '—',
       admin_url:     ADMIN_URL
     });
+  }
+
+  async function onNewReferredCollaborator(newUser, referrerAgent) {
+    const newUserName = `${newUser.firstName || ''} ${newUser.lastName || ''}`.trim() || newUser.email;
+    const agentName = `${referrerAgent.firstName || ''} ${referrerAgent.lastName || ''}`.trim() || referrerAgent.email;
+    
+    // Si el agente no tiene correo (improbable), no enviamos
+    if (!referrerAgent.email) return;
+
+    // Reutilizamos la plantilla de administrador para la alerta del agente
+    await sendEmail(EMAILJS_TEMPLATE_NEW_REG, {
+      user_type:     `Referido para ${agentName} — ${roleLabel(newUser.role)}`,
+      user_name:     newUserName,
+      user_email:    newUser.email || '—',
+      user_country:  newUser.country || '—',
+      user_agency:   newUser.agencyName || '—',
+      user_phone:    newUser.phone || '—',
+      registered_at: fmtDate(newUser.createdAt),
+      source:        newUser.source || '—',
+      admin_url:     'https://remax-inmomas-international.vercel.app/app.html#agent/clients'
+    }, referrerAgent.email);
   }
 
   async function onNewDossierLead(lead) {
@@ -205,6 +227,7 @@
   window.App = window.App || {};
   window.App.notifications = {
     onNewUserRegistration,
+    onNewReferredCollaborator,
     onNewDossierLead,
     onNewWebinarRegistration,
     onUserStatusChange
