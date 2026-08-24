@@ -179,7 +179,7 @@ App.auth = (function() {
         if (newUser.referredBy) {
           try {
             const allUsers = App.demoData.users;
-            const referrerAgent = allUsers.find(u => u.id === newUser.referredBy || (u.referralCode && u.referralCode === newUser.referredBy));
+            const referrerAgent = allUsers.find(u => u.id === newUser.referredBy || (u.referralCode && u.referralCode.toUpperCase() === (newUser.referredBy || "").toUpperCase()));
             if (referrerAgent) {
               window.App.notifications.onNewReferredCollaborator(newUser, referrerAgent).catch(() => {});
             }
@@ -229,7 +229,7 @@ App.auth = (function() {
         if (userData.referredBy) {
           try {
             const allUsers = await getAllUsers();
-            const referrerAgent = allUsers.find(u => u.id === userData.referredBy || (u.referralCode && u.referralCode === userData.referredBy));
+            const referrerAgent = allUsers.find(u => u.id === userData.referredBy || (u.referralCode && u.referralCode.toUpperCase() === (userData.referredBy || "").toUpperCase()));
             if (referrerAgent) {
               window.App.notifications.onNewReferredCollaborator(fullUser, referrerAgent).catch(() => {});
             }
@@ -449,7 +449,7 @@ App.auth = (function() {
         if (newUser.referredBy) {
           try {
             const allUsers = App.demoData.users;
-            const referrerAgent = allUsers.find(u => u.id === newUser.referredBy || (u.referralCode && u.referralCode === newUser.referredBy));
+            const referrerAgent = allUsers.find(u => u.id === newUser.referredBy || (u.referralCode && u.referralCode.toUpperCase() === (newUser.referredBy || "").toUpperCase()));
             if (referrerAgent) {
               window.App.notifications.onNewReferredCollaborator(newUser, referrerAgent).catch(() => {});
             }
@@ -514,7 +514,7 @@ App.auth = (function() {
         if (userData.referredBy) {
           try {
             const allUsers = await getAllUsers();
-            const referrerAgent = allUsers.find(u => u.id === userData.referredBy || (u.referralCode && u.referralCode === userData.referredBy));
+            const referrerAgent = allUsers.find(u => u.id === userData.referredBy || (u.referralCode && u.referralCode.toUpperCase() === (userData.referredBy || "").toUpperCase()));
             if (referrerAgent) {
               window.App.notifications.onNewReferredCollaborator(fullUser, referrerAgent).catch(() => {});
             }
@@ -1400,7 +1400,7 @@ App.auth = (function() {
       if (newUser.referredBy) {
         try {
           const allUsers = await getAllUsers();
-          const referrerAgent = allUsers.find(u => u.id === newUser.referredBy || (u.referralCode && u.referralCode === newUser.referredBy));
+          const referrerAgent = allUsers.find(u => u.id === newUser.referredBy || (u.referralCode && u.referralCode.toUpperCase() === (newUser.referredBy || "").toUpperCase()));
           if (referrerAgent) {
             window.App.notifications.onNewReferredCollaborator(newUser, referrerAgent).catch(() => {});
           }
