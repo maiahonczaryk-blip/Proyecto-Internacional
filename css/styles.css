@@ -6469,19 +6469,69 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
    ============================================ */
 
 /* ===========================================
-   1. HERO — Full-cover image + text overlay
-   MOBILE ONLY: desktop keeps original design
+   1. HERO — Overlay for video background
    =========================================== */
 
-@media (max-width: 768px) {
+/* Dark gradient overlay so text is readable over the bright video */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    160deg,
+    rgba(0, 10, 40, 0.70) 0%,
+    rgba(0, 20, 60, 0.50) 50%,
+    rgba(0, 10, 30, 0.35) 100%
+  );
+  pointer-events: none;
+}
 
-  .hero-bg {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
-    pointer-events: none;
-  }
+/* All hero content above the image+overlay */
+.hero .container {
+  position: relative;
+  z-index: 2;
+}
+
+/* Hero text: white over dark overlay */
+.hero .hero-title {
+  color: #ffffff !important;
+}
+
+.hero .hero-badge {
+  color: rgba(255,255,255,0.9) !important;
+  border-color: rgba(255,255,255,0.25) !important;
+  background: rgba(255,255,255,0.08) !important;
+}
+
+.hero .hero-subtitle {
+  color: rgba(255,255,255,0.82) !important;
+}
+
+.hero .hero-stat-value {
+  color: #ffffff !important;
+}
+
+.hero .hero-stat-label {
+  color: rgba(255,255,255,0.70) !important;
+}
+
+.hero .hero-stat::before {
+  background: rgba(255,255,255,0.5) !important;
+}
+
+/* Outline button in hero: white border on dark bg */
+.hero .hero-ctas .btn-outline {
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,0.45) !important;
+  background: rgba(255,255,255,0.08) !important;
+}
+
+.hero .hero-ctas .btn-outline:hover {
+  background: rgba(255,255,255,0.18) !important;
+}
+
+@media (max-width: 768px) {
 
   .hero-bg img {
     width: 100%;
@@ -6489,66 +6539,6 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
     object-fit: cover;
     object-position: center 30%;
     display: block;
-  }
-
-  /* Dark gradient overlay so text is readable on mobile */
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background: linear-gradient(
-      160deg,
-      rgba(0, 10, 40, 0.70) 0%,
-      rgba(0, 20, 60, 0.50) 50%,
-      rgba(0, 10, 30, 0.35) 100%
-    );
-    pointer-events: none;
-  }
-
-  /* All hero content above the image+overlay */
-  .hero .container {
-    position: relative;
-    z-index: 2;
-  }
-
-  /* Hero text: white over dark overlay — scoped to .hero only */
-  .hero .hero-title {
-    color: #ffffff !important;
-  }
-
-  .hero .hero-badge {
-    color: rgba(255,255,255,0.9) !important;
-    border-color: rgba(255,255,255,0.25) !important;
-    background: rgba(255,255,255,0.08) !important;
-  }
-
-  .hero .hero-subtitle {
-    color: rgba(255,255,255,0.82) !important;
-  }
-
-  .hero .hero-stat-value {
-    color: #ffffff !important;
-  }
-
-  .hero .hero-stat-label {
-    color: rgba(255,255,255,0.70) !important;
-  }
-
-  .hero .hero-stat::before {
-    background: rgba(255,255,255,0.5) !important;
-  }
-
-  /* Outline button in hero: white border on dark bg */
-  .hero .hero-ctas .btn-outline {
-    color: #ffffff !important;
-    border-color: rgba(255,255,255,0.45) !important;
-    background: rgba(255,255,255,0.08) !important;
-  }
-
-  .hero .hero-ctas .btn-outline:hover {
-    background: rgba(255,255,255,0.18) !important;
-    border-color: rgba(255,255,255,0.7) !important;
   }
 
 }
