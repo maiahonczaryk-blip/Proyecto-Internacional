@@ -626,6 +626,7 @@ App.views.auth = {
 
         const brokerId = brokerSelect ? brokerSelect.value : '';
         const isManualBroker = brokerId === 'other';
+        const refCode = sessionStorage.getItem('referralCode') || null;
         const data = {
           role: newForm.querySelector('input[name="register-role"]:checked').value,
           firstName: newForm.querySelector('#register-firstName').value,
@@ -640,6 +641,8 @@ App.views.auth = {
           brokerId: isManualBroker ? '' : brokerId,
           brokerNameManual: isManualBroker ? (newForm.querySelector('#register-broker-manual')?.value || '') : '',
           newsletterConsent: newForm.querySelector('#register-newsletter')?.checked || false,
+          referredBy: refCode,
+          source: refCode ? 'referral' : 'direct',
         };
         
         try {
@@ -671,6 +674,7 @@ App.views.auth = {
 
           const firstName = newForm.querySelector('#register-firstName').value;
           const lastName = newForm.querySelector('#register-lastName').value;
+          const refCode = sessionStorage.getItem('referralCode') || null;
 
           const data = {
             role: roleRadio.value,
@@ -681,6 +685,8 @@ App.views.auth = {
             agencyName: agencyNameInput ? agencyNameInput.value : '',
             brokerId: brokerSelect ? brokerSelect.value : '',
             newsletterConsent: newForm.querySelector('#register-newsletter')?.checked || false,
+            referredBy: refCode,
+            source: refCode ? 'referral' : 'direct',
           };
 
           try {
