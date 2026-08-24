@@ -151,14 +151,13 @@
 
   async function onNewReferredCollaborator(newUser, referrerAgent) {
     const newUserName = `${newUser.firstName || ''} ${newUser.lastName || ''}`.trim() || newUser.email;
-    const agentName = `${referrerAgent.firstName || ''} ${referrerAgent.lastName || ''}`.trim() || referrerAgent.email;
     
     // Si el agente no tiene correo (improbable), no enviamos
     if (!referrerAgent.email) return;
 
     // Reutilizamos la plantilla de administrador para la alerta del agente
     await sendEmail(EMAILJS_TEMPLATE_NEW_REG, {
-      user_type:     `Referido para ${agentName} — ${roleLabel(newUser.role)}`,
+      user_type:     roleLabel(newUser.role),
       user_name:     newUserName,
       user_email:    newUser.email || '—',
       user_country:  newUser.country || '—',

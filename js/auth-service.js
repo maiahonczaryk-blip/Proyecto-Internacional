@@ -174,6 +174,19 @@ App.auth = (function() {
       // Notify admin of new registration
       if (window.App && window.App.notifications) {
         window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
+
+        // If referred, notify the referring agent
+        if (newUser.referredBy) {
+          try {
+            const allUsers = App.demoData.users;
+            const referrerAgent = allUsers.find(u => u.id === newUser.referredBy || (u.referralCode && u.referralCode === newUser.referredBy));
+            if (referrerAgent) {
+              window.App.notifications.onNewReferredCollaborator(newUser, referrerAgent).catch(() => {});
+            }
+          } catch(e) {
+            console.warn('[Notifications] Error finding referrer agent:', e);
+          }
+        }
       }
 
       return { success: true, user: newUser };
@@ -209,7 +222,21 @@ App.auth = (function() {
 
       // Notify admin of new registration
       if (window.App && window.App.notifications) {
-        window.App.notifications.onNewUserRegistration({ id: uid, ...userData }).catch(() => {});
+        const fullUser = { id: uid, ...userData };
+        window.App.notifications.onNewUserRegistration(fullUser).catch(() => {});
+
+        // If referred, notify the referring agent
+        if (userData.referredBy) {
+          try {
+            const allUsers = await getAllUsers();
+            const referrerAgent = allUsers.find(u => u.id === userData.referredBy || (u.referralCode && u.referralCode === userData.referredBy));
+            if (referrerAgent) {
+              window.App.notifications.onNewReferredCollaborator(fullUser, referrerAgent).catch(() => {});
+            }
+          } catch(e) {
+            console.warn('[Notifications] Error finding referrer agent:', e);
+          }
+        }
       }
 
       currentUser = { id: uid, ...userData };
@@ -370,7 +397,7 @@ App.auth = (function() {
 
   /* ---- Google Registration ---- */
   async function registerWithGoogle(data) {
-    const { role, firstName, lastName, agencyName, phone, country, brokerId } = data;
+    const { role, firstName, lastName, agencyName, phone, country, brokerId, referredBy, source } = data;
 
     if (!role) {
       throw new Error('Please select a role (Broker or Realtor).');
@@ -402,6 +429,8 @@ App.auth = (function() {
         agreementSignedAt: null,
         newsletterConsent: data.newsletterConsent || false,
         newsletterConsentAt: data.newsletterConsent ? new Date().toISOString() : null,
+        referredBy: referredBy || null,
+        source: source || null,
         createdAt: new Date().toISOString()
       };
 
@@ -411,6 +440,24 @@ App.auth = (function() {
       currentUser = { ...newUser };
       localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
       notifyAuthChange();
+
+      // Notify admin of new registration via Google
+      if (window.App && window.App.notifications) {
+        window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
+
+        // If referred, notify the referring agent
+        if (newUser.referredBy) {
+          try {
+            const allUsers = App.demoData.users;
+            const referrerAgent = allUsers.find(u => u.id === newUser.referredBy || (u.referralCode && u.referralCode === newUser.referredBy));
+            if (referrerAgent) {
+              window.App.notifications.onNewReferredCollaborator(newUser, referrerAgent).catch(() => {});
+            }
+          } catch(e) {
+            console.warn('[Notifications] Error finding referrer agent:', e);
+          }
+        }
+      }
 
       return { success: true, user: newUser };
     } else {
@@ -450,6 +497,8 @@ App.auth = (function() {
         agreementSignedAt: null,
         newsletterConsent: data.newsletterConsent || false,
         newsletterConsentAt: data.newsletterConsent ? new Date().toISOString() : null,
+        referredBy: referredBy || null,
+        source: source || null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -458,7 +507,21 @@ App.auth = (function() {
 
       // Notify admin of new registration via Google
       if (window.App && window.App.notifications) {
-        window.App.notifications.onNewUserRegistration({ id: uid, ...userData }).catch(() => {});
+        const fullUser = { id: uid, ...userData };
+        window.App.notifications.onNewUserRegistration(fullUser).catch(() => {});
+
+        // If referred, notify the referring agent
+        if (userData.referredBy) {
+          try {
+            const allUsers = await getAllUsers();
+            const referrerAgent = allUsers.find(u => u.id === userData.referredBy || (u.referralCode && u.referralCode === userData.referredBy));
+            if (referrerAgent) {
+              window.App.notifications.onNewReferredCollaborator(fullUser, referrerAgent).catch(() => {});
+            }
+          } catch(e) {
+            console.warn('[Notifications] Error finding referrer agent:', e);
+          }
+        }
       }
 
       currentUser = { id: uid, ...userData };
@@ -1317,6 +1380,22 @@ App.auth = (function() {
       saveDemoData();
     } else {
       await App.db.collection('users').doc(newUser.id).set(newUser);
+    }
+
+    if (window.App && window.App.notifications) {
+      window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
+      
+      if (newUser.referredBy) {
+        try {
+          const allUsers = await getAllUsers();
+          const referrerAgent = allUsers.find(u => u.id === newUser.referredBy || (u.referralCode && u.referralCode === newUser.referredBy));
+          if (referrerAgent) {
+            window.App.notifications.onNewReferredCollaborator(newUser, referrerAgent).catch(() => {});
+          }
+        } catch(e) {
+          console.warn('[Notifications] Error finding referrer agent:', e);
+        }
+      }
     }
 
     return newUser;
