@@ -440,9 +440,9 @@ document.addEventListener('DOMContentLoaded', () => {
           title: "Get Your NIE",
           desc: "The NIE (Foreigner Identity Number) is essential for buying property, opening bank accounts, or contracting utility services in Spain. Our partner law firm handles the entire application process with the immigration office or consulate, saving you any travel.",
           highlights: [
-            { icon: "⏱", text: "1–2 weeks" },
+            { icon: "⏱", text: "1–2 semaines" },
             { icon: "🏰", text: "Fuster & Associates" },
-            { icon: "🌐", text: "100% remote" }
+            { icon: "🌐", text: "100% à distance" }
           ]
         },
         es: {
@@ -455,12 +455,12 @@ document.addEventListener('DOMContentLoaded', () => {
           ]
         },
         fr: {
-          title: "Get Your NIE",
+          title: "Obtenir votre NIE",
           desc: "Le NIE (Numéro d'identité des étrangers) est indispensable pour acheter un bien immobilier, ouvrir un compte bancaire ou souscrire à des services en Espagne. Notre cabinet juridique partenaire gère l'ensemble de la procédure auprès du bureau de l'immigration ou du consulat.",
           highlights: [
-            { icon: "⏱", text: "1–2 weeks" },
+            { icon: "⏱", text: "1–2 semaines" },
             { icon: "🏰", text: "Fuster & Associates" },
-            { icon: "🌐", text: "100% remote" }
+            { icon: "🌐", text: "100% à distance" }
           ]
         },
         'en-ca': {
@@ -480,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
           highlights: [
             { icon: "🏦", text: "Banco UCI partner" },
             { icon: "📱", text: "Remote setup" },
-            { icon: "✅", text: "No travel needed" }
+            { icon: "✅", text: "Sans déplacement" }
           ]
         },
         es: {
@@ -493,12 +493,12 @@ document.addEventListener('DOMContentLoaded', () => {
           ]
         },
         fr: {
-          title: "Open Bank Account",
+          title: "Ouvrir un compte bancaire",
           desc: "Vous aurez besoin d'un compte bancaire espagnol pour transférer les fonds d'achat et domicilier vos futures factures et impôts. Nous vous aidons à ouvrir un compte rapidement et à distance via nos partenaires bancaires et hypothécaires.",
           highlights: [
             { icon: "🏦", text: "Partenaire Banco UCI" },
             { icon: "📱", text: "Ouverture à distance" },
-            { icon: "✅", text: "No travel needed" }
+            { icon: "✅", text: "Sans déplacement" }
           ]
         },
         'en-ca': {
@@ -531,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ]
         },
         fr: {
-          title: "Define Your Strategy",
+          title: "Définir votre stratégie",
           desc: "Nous analysons vos objectifs : investissement à haut rendement ou résidence de vacances. Nous élaborons un plan adapté à votre profil financier et personnel pour optimiser la fiscalité et le rendement.",
           highlights: [
             { icon: "📊", text: "Plan personnalisé" },
@@ -555,8 +555,8 @@ document.addEventListener('DOMContentLoaded', () => {
           desc: "We filter the best properties on the Costa Blanca based on your criteria. We access the complete RE/MAX database and off-market listings to ensure you only visit highly qualified options.",
           highlights: [
             { icon: "🏠", text: "RE/MAX database" },
-            { icon: "🔒", text: "Off-market access" },
-            { icon: "🎯", text: "Pre-qualified" }
+            { icon: "🔒", text: "Accès hors marché" },
+            { icon: "🎯", text: "Pré-qualifiées" }
           ]
         },
         es: {
@@ -573,8 +573,8 @@ document.addEventListener('DOMContentLoaded', () => {
           desc: "Nous sélectionnons les meilleures propriétés sur la Costa Blanca selon vos critères. Nous accédons à la base de données complète RE/MAX et aux biens hors marché pour vous garantir des visites ciblées et qualifiées.",
           highlights: [
             { icon: "🏠", text: "Base RE/MAX" },
-            { icon: "🔒", text: "Off-market access" },
-            { icon: "🎯", text: "Pre-qualified" }
+            { icon: "🔒", text: "Accès hors marché" },
+            { icon: "🎯", text: "Pré-qualifiées" }
           ]
         },
         'en-ca': {
@@ -582,8 +582,8 @@ document.addEventListener('DOMContentLoaded', () => {
           desc: "We select the best properties on the Costa Blanca based on your criteria. We access the full RE/MAX database and off-market listings to guarantee you targeted, pre-qualified viewings.",
           highlights: [
             { icon: "🏠", text: "RE/MAX Database" },
-            { icon: "🔒", text: "Accès hors marché" },
-            { icon: "🎯", text: "Pré-qualifiées" }
+            { icon: "🔒", text: "Off-market access" },
+            { icon: "🎯", text: "Pre-qualified" }
           ]
         }
       },
@@ -612,16 +612,16 @@ document.addEventListener('DOMContentLoaded', () => {
           highlights: [
             { icon: "⚖️", text: "Vérification juridique" },
             { icon: "📋", text: "Contrôle cadastral" },
-            { icon: "🛡", text: "Zero risk" }
+            { icon: "🛡", text: "Zéro risque" }
           ]
         },
         'en-ca': {
           title: "Due Diligence",
           desc: "A crucial step for a safe purchase. Fuster & Associates performs an exhaustive study of the property's registry status, liens, debts, urban legality, and licences so you buy with total peace of mind and zero risk.",
           highlights: [
-            { icon: "⚖️", text: "Vérification juridique" },
+            { icon: "⚖️", text: "Legal verification" },
             { icon: "📋", text: "Registry check" },
-            { icon: "🛡", text: "Zéro risque" }
+            { icon: "🛡", text: "Zero risk" }
           ]
         }
       },
