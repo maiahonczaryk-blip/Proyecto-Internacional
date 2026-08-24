@@ -184,9 +184,9 @@
     });
   }
 
-  async function onNewWebinarRegistration(reg) {
+  async function onNewWebinarRegistration(reg, agentEmail = null) {
     const name = `${reg.firstName || ''} ${reg.lastName || ''}`.trim() || reg.email;
-    await sendEmail(EMAILJS_TEMPLATE_NEW_REG, {
+    const emailData = {
       user_type:     'Registro Webinar',
       user_name:     name,
       user_email:    reg.email || '—',
@@ -196,7 +196,15 @@
       registered_at: fmtDate(reg.createdAt),
       source:        reg.howHeard || 'Webinar B2B',
       admin_url:     ADMIN_URL
-    });
+    };
+
+    // 1. Send to Admin
+    await sendEmail(EMAILJS_TEMPLATE_NEW_REG, emailData);
+
+    // 2. If referred, send a copy to the agent
+    if (agentEmail) {
+      await sendEmail(EMAILJS_TEMPLATE_NEW_REG, emailData, agentEmail);
+    }
   }
 
   async function onUserStatusChange(user, newStatus) {

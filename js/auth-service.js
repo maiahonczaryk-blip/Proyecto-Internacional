@@ -1092,6 +1092,18 @@ App.auth = (function() {
       ...data,
       createdAt: new Date().toISOString()
     };
+
+    let agentEmail = null;
+    if (payload.agentReferrerId) {
+      try {
+        const allUsers = await getAllUsers();
+        const agent = allUsers.find(u => u.id === payload.agentReferrerId);
+        if (agent && agent.email) agentEmail = agent.email;
+      } catch (e) {
+        console.warn('[Webinar] Could not fetch agent email for notification', e);
+      }
+    }
+
     if (App.demoMode) {
       if (!App.demoData.webinar_registrations) App.demoData.webinar_registrations = [];
       payload.id = 'wreg-' + Date.now();
@@ -1099,14 +1111,14 @@ App.auth = (function() {
       saveDemoData();
       // Notify admin of new webinar registration
       if (window.App && window.App.notifications) {
-        window.App.notifications.onNewWebinarRegistration(payload).catch(() => {});
+        window.App.notifications.onNewWebinarRegistration(payload, agentEmail).catch(() => {});
       }
       return payload.id;
     } else {
       const docRef = await App.db.collection('webinar_registrations').add(payload);
       // Notify admin of new webinar registration
       if (window.App && window.App.notifications) {
-        window.App.notifications.onNewWebinarRegistration({ id: docRef.id, ...payload }).catch(() => {});
+        window.App.notifications.onNewWebinarRegistration({ id: docRef.id, ...payload }, agentEmail).catch(() => {});
       }
       return docRef.id;
     }
