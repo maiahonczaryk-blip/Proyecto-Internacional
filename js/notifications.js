@@ -72,7 +72,7 @@
   const EMAILJS_TEMPLATE_STATUS   = 'YOUR_TEMPLATE_STATUS';  // e.g. 'template_xyz456'
   const EMAILJS_TEMPLATE_USER_APPROVED = 'template_giaoa5e'; // Listo! (Plantilla C)
   // ── Admin Destination ─────────────────────────────────────────────────────
-  const ADMIN_EMAIL = 'maia.honczaryk@remax.es';
+  const ADMIN_EMAIL = 'spainconnection0@gmail.com';
   const ADMIN_URL   = 'https://remax-inmomas-international.vercel.app/app.html#admin/users';
   // ──────────────────────────────────────────────────────────────────────────
 
