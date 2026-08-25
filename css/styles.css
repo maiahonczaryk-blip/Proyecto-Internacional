@@ -6638,6 +6638,10 @@ body.nav-open {
     box-shadow: 0 1px 8px rgba(0,0,0,0.06) !important;
     padding: 10px 0 !important;
   }
+  
+  /* Force dark logo on mobile because navbar is white */
+  body[data-route="home"] .navbar:not(.scrolled) .nav-logo-normal { display: block !important; }
+  body[data-route="home"] .navbar:not(.scrolled) .nav-logo-white { display: none !important; }
 
   /* Add bottom padding to main content so it clears the bottom nav */
   .app-main,
