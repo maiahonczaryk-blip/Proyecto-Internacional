@@ -57,6 +57,9 @@
 
       // Recent activity (last 5 clients, sorted by updatedAt/createdAt)
       renderRecentClients(agentClients);
+      
+      // Recent webinar registrations (top 3)
+      renderRecentWebinars();
 
       // Referral link
       const isPending = currentUser.status === 'pending';
@@ -105,6 +108,57 @@
     } catch (err) {
       console.error('[Agent] initDashboard error:', err);
       App.utils.showToast('Error loading dashboard.', 'error');
+    }
+  }
+
+  /* ============================================
+     renderRecentWebinars()
+     Populates #agent-dash-webinar-body with top 3
+     ============================================ */
+  async function renderRecentWebinars() {
+    const tbody = document.getElementById('agent-dash-webinar-body');
+    if (!tbody || !currentUser) return;
+
+    try {
+      const allRegs = await App.auth.getWebinarRegistrations();
+      const linkedRegs = allRegs.filter(r => {
+        if (r.agentReferrerId === currentUser.id) return true;
+        if (r.referralCode && currentUser.referralCode && r.referralCode.toUpperCase() === currentUser.referralCode.toUpperCase()) return true;
+        if (r.howHeard === 'agent' && r.referrerName) {
+          const agentFullName = `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.toLowerCase();
+          const refName = r.referrerName.toLowerCase();
+          if (refName.includes(agentFullName) || agentFullName.includes(refName)) return true;
+          const parts = refName.split('/').map(p => p.trim());
+          for (const p of parts) {
+            if (agentFullName.includes(p) || p.includes(agentFullName)) return true;
+          }
+        }
+        return false;
+      });
+
+      if (linkedRegs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1rem;"><span class="lang-en">No registrations yet.</span><span class="lang-es">Aún no hay registros.</span></td></tr>`;
+        return;
+      }
+
+      // Show top 3 recent
+      const recent = linkedRegs.sort((a,b) => new Date(b.createdAt||0) - new Date(a.createdAt||0)).slice(0, 3);
+      tbody.innerHTML = recent.map(r => {
+        const date = App.utils.formatDate(r.createdAt);
+        const source = r.referralCode 
+          ? `<span class="badge badge--approved" style="background:#d1fae5; color:#065f46; font-size:0.75rem; border-radius:12px; padding:2px 8px;">🔗 Link</span>`
+          : `<span class="badge badge--pending" style="background:#fef3c7; color:#92400e; font-size:0.75rem; border-radius:12px; padding:2px 8px;">👤 Dropdown</span>`;
+        return `
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem; color: var(--text-secondary);">${date}</td>
+            <td style="padding: 10px; border-bottom: 1px solid var(--border-light); font-size: 0.88rem; font-weight: 600;">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}</td>
+            <td style="padding: 10px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${App.utils.escapeHtml(r.email)}</td>
+            <td style="padding: 10px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${source}</td>
+          </tr>`;
+      }).join('');
+    } catch (err) {
+      console.error('[Agent] renderRecentWebinars error:', err);
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #ef4444; padding: 1rem;">Error</td></tr>';
     }
   }
 
