@@ -336,15 +336,26 @@
                 }
               });
 
-              // Seamless loop check
+              // Seamless loop check with crossfade mask
+              var isFading = false;
               setInterval(function() {
                 if (heroPlayer && typeof heroPlayer.getCurrentTime === 'function') {
                   var currentTime = heroPlayer.getCurrentTime();
+                  
+                  // 1. Fade cover IN just before the end
+                  if (currentTime >= 18.5 && !isFading) {
+                    isFading = true;
+                    var cover = document.getElementById('hero-video-cover');
+                    if (cover) cover.style.opacity = '1';
+                  }
+
+                  // 2. Seek back while hidden under the cover
                   if (currentTime >= 19.5) {
+                    isFading = false;
                     heroPlayer.seekTo(0.1);
                   }
                 }
-              }, 150);
+              }, 100);
             }
           </script>
         </div>
