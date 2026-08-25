@@ -309,7 +309,7 @@
           </div>
           <iframe 
             id="hero-video"
-            src="https://www.youtube.com/embed/uH8EViA-9Ns?autoplay=1&mute=1&start=0&end=20&loop=1&playlist=uH8EViA-9Ns&controls=0&showinfo=0&rel=0&cc_load_policy=0&iv_load_policy=3&enablejsapi=1" 
+            src="https://www.youtube.com/embed/uH8EViA-9Ns?autoplay=1&mute=1&start=0&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1" 
             frameborder="0" 
             allow="autoplay; encrypted-media" 
             style="position: absolute; top: 50%; left: 50%; width: 100vw; height: 56.25vw; min-height: 120vh; min-width: 213.33vh; pointer-events: none; transform: translate(-50%, -50%) scale(1.05);"
@@ -335,6 +335,16 @@
                   }
                 }
               });
+
+              // Seamless loop check
+              setInterval(function() {
+                if (heroPlayer && typeof heroPlayer.getCurrentTime === 'function') {
+                  var currentTime = heroPlayer.getCurrentTime();
+                  if (currentTime >= 19.5) {
+                    heroPlayer.seekTo(0.1);
+                  }
+                }
+              }, 150);
             }
           </script>
         </div>
