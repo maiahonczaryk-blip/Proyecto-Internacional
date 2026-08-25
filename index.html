@@ -40,6 +40,34 @@
         top: 0 !important;
       }
     }
+    .testimonial-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 40px;
+      margin-top: 50px;
+    }
+    .testimonial-row.reverse {
+      flex-direction: row-reverse;
+    }
+    .testimonial-video {
+      flex: 1 1 315px;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+    .testimonial-text {
+      flex: 1 1 400px;
+    }
+    @media (max-width: 850px) {
+      .testimonial-row, .testimonial-row.reverse {
+        flex-direction: column;
+        text-align: center;
+      }
+      .testimonial-row .testimonial-video, .testimonial-row.reverse .testimonial-video {
+        margin-bottom: 20px;
+      }
+    }
   </style>
 </head>
 
@@ -575,13 +603,13 @@
           </div>
           
           <!-- Debra & Angel -->
-          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 40px; margin-top: 50px; flex-direction: row-reverse;" class="reveal">
-            <div style="flex: 1 1 315px; display: flex; justify-content: center;">
+          <div class="testimonial-row reverse reveal">
+            <div class="testimonial-video">
               <div style="width: 100%; max-width: 315px; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-md); aspect-ratio: 9/16; background: #000;">
                 <iframe src="https://www.youtube.com/embed/Hxf1KoSkTls" style="width: 100%; height: 100%; border:0;" allowfullscreen></iframe>
               </div>
             </div>
-            <div style="flex: 1 1 400px;">
+            <div class="testimonial-text">
               <h3 style="font-size: 1.8rem; margin-bottom: 15px; color: var(--text-primary);">
                 <span class="lang-en">From US Realtors to Spain Experts: Debra & Angel</span>
                 <span class="lang-es">De Realtors en EE.UU. a Expertos en España: Debra y Ángel</span>
@@ -598,13 +626,13 @@
           </div>
 
           <!-- Denise McNeal -->
-          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 40px; margin-top: 80px;" class="reveal">
-            <div style="flex: 1 1 315px; display: flex; justify-content: center;">
+          <div class="testimonial-row reveal" style="margin-top: 80px;">
+            <div class="testimonial-video">
               <div style="width: 100%; max-width: 315px; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-md); aspect-ratio: 9/16; background: #000;">
                 <iframe src="https://www.youtube.com/embed/A5WlvahUVxo" style="width: 100%; height: 100%; border:0;" allowfullscreen></iframe>
               </div>
             </div>
-            <div style="flex: 1 1 400px;">
+            <div class="testimonial-text">
               <h3 style="font-size: 1.8rem; margin-bottom: 15px; color: var(--text-primary);">
                 <span class="lang-en">Your Trusted Guide in Spain: Meet Denise</span>
                 <span class="lang-es">Tu guía de confianza en España: Conoce a Denise</span>
