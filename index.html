@@ -328,30 +328,41 @@
               heroPlayer = new YT.Player('hero-video', {
                 events: {
                   'onStateChange': function(event) {
+                    var cover = document.getElementById('hero-video-cover');
+                    if (!cover) return;
                     if (event.data === YT.PlayerState.PLAYING) {
-                      var cover = document.getElementById('hero-video-cover');
-                      if (cover) cover.style.opacity = '0';
+                      // Smoothly fade out cover to reveal the video
+                      cover.style.transition = 'opacity 0.8s ease';
+                      cover.style.opacity = '0';
+                    } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.BUFFERING || event.data === YT.PlayerState.UNSTARTED) {
+                      // Instantly cover the video to hide YouTube UI
+                      cover.style.transition = 'none';
+                      cover.style.opacity = '1';
                     }
                   }
                 }
               });
 
               // Seamless loop check with crossfade mask
-              var isFading = false;
               setInterval(function() {
                 if (heroPlayer && typeof heroPlayer.getCurrentTime === 'function') {
                   var currentTime = heroPlayer.getCurrentTime();
+                  var cover = document.getElementById('hero-video-cover');
                   
                   // 1. Fade cover IN just before the end
-                  if (currentTime >= 18.5 && !isFading) {
-                    isFading = true;
-                    var cover = document.getElementById('hero-video-cover');
-                    if (cover) cover.style.opacity = '1';
+                  if (currentTime >= 18.5) {
+                    if (cover && cover.style.opacity !== '1') {
+                      cover.style.transition = 'opacity 0.8s ease';
+                      cover.style.opacity = '1';
+                    }
                   }
 
-                  // 2. Seek back while hidden under the cover
+                  // 2. Seek back instantly while hidden
                   if (currentTime >= 19.5) {
-                    isFading = false;
+                    if (cover) {
+                      cover.style.transition = 'none';
+                      cover.style.opacity = '1';
+                    }
                     heroPlayer.seekTo(0.1);
                   }
                 }
