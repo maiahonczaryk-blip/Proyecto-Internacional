@@ -6775,55 +6775,55 @@ body.nav-open {
     justify-content: center;
     flex-wrap: wrap;
     white-space: normal;
-    font-size: 0.68rem !important;
-    letter-spacing: 1px;
-    margin-bottom: 20px;
-    padding: 6px 14px;
+    font-size: 0.6rem !important;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    padding: 4px 10px;
   }
 
   .hero-title {
-    font-size: clamp(1.85rem, 8vw, 2.6rem) !important;
-    line-height: 1.15;
-    margin-bottom: 16px;
+    font-size: clamp(1.6rem, 7vw, 2.2rem) !important;
+    line-height: 1.1;
+    margin-bottom: 12px;
   }
 
   .hero-subtitle {
-    font-size: 0.98rem !important;
+    font-size: 0.88rem !important;
     max-width: 100%;
-    line-height: 1.75;
-    margin-bottom: 32px;
+    line-height: 1.5;
+    margin-bottom: 24px;
   }
 
   /* CTA buttons: stacked, full width */
   .hero-ctas {
     flex-direction: column;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 40px;
+    gap: 10px;
+    margin-bottom: 32px;
   }
 
   .hero-ctas .btn {
     width: 100%;
     max-width: 340px;
     justify-content: center;
-    font-size: 0.92rem;
-    padding: 14px 24px;
+    font-size: 0.9rem;
+    padding: 12px 20px;
   }
 
   /* Stats: grid 2×2 on mobile — ONLY inside hero */
   .hero .hero-stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 12px;
   }
 
   .hero .hero-stat {
     text-align: center;
     padding-left: 0;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 12px;
-    padding: 14px 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 10px 8px;
   }
 
   .hero .hero-stat::before {
@@ -6831,11 +6831,12 @@ body.nav-open {
   }
 
   .hero .hero-stat-value {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+    margin-bottom: 2px;
   }
 
   .hero .hero-stat-label {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     letter-spacing: 0.5px;
   }
 
