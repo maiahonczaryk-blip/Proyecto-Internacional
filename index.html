@@ -305,14 +305,14 @@
       <section class="hero" id="hero">
         <div class="hero-bg" style="overflow: hidden;">
           <div id="hero-video-cover" style="position: absolute; inset: 0; z-index: 1; transition: opacity 0.8s ease; pointer-events: none; overflow: hidden; background-color: #050b14;">
-            <div style="position: absolute; top: 50%; left: 50%; width: max(100vw, 266.66vh); height: max(56.25vw, 150vh); transform: translate(-50%, -50%) scale(2.2); background-image: url('https://img.youtube.com/vi/uH8EViA-9Ns/maxresdefault.jpg'); background-size: cover; background-position: center;"></div>
+            <div style="position: absolute; top: 50%; left: 50%; width: max(100vw, 213.33vh); height: max(56.25vw, 120vh); transform: translate(-50%, -50%) scale(1.05); background-image: url('https://img.youtube.com/vi/uH8EViA-9Ns/maxresdefault.jpg'); background-size: cover; background-position: center;"></div>
           </div>
           <iframe 
             id="hero-video"
-            src="https://www.youtube.com/embed/uH8EViA-9Ns?autoplay=1&mute=1&start=0&end=20&controls=0&showinfo=0&rel=0&cc_load_policy=0&iv_load_policy=3&enablejsapi=1" 
+            src="https://www.youtube.com/embed/uH8EViA-9Ns?autoplay=1&mute=1&start=0&end=20&loop=1&playlist=uH8EViA-9Ns&controls=0&showinfo=0&rel=0&cc_load_policy=0&iv_load_policy=3&enablejsapi=1" 
             frameborder="0" 
             allow="autoplay; encrypted-media" 
-            style="position: absolute; top: 50%; left: 50%; width: 100vw; height: 56.25vw; min-height: 150vh; min-width: 266.66vh; pointer-events: none; transform: translate(-50%, -50%) scale(2.2);"
+            style="position: absolute; top: 50%; left: 50%; width: 100vw; height: 56.25vw; min-height: 120vh; min-width: 213.33vh; pointer-events: none; transform: translate(-50%, -50%) scale(1.05);"
             title="Spain Background Video">
           </iframe>
           <a href="https://www.youtube.com/watch?v=uH8EViA-9Ns" target="_blank" style="position: absolute; inset: 0; z-index: 2;"></a>
@@ -331,10 +331,6 @@
                     if (event.data === YT.PlayerState.PLAYING) {
                       var cover = document.getElementById('hero-video-cover');
                       if (cover) cover.style.opacity = '0';
-                    }
-                    if (event.data === YT.PlayerState.ENDED) {
-                      heroPlayer.seekTo(0);
-                      heroPlayer.playVideo();
                     }
                   }
                 }
