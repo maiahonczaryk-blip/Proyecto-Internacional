@@ -185,8 +185,11 @@
     <!-- ==================== VIEW: ADMIN USERS ==================== -->
     <div id="view-admin-users" class="app-view">
       <div class="dashboard-content">
-        <div class="dashboard-header">
+        <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
           <h1><span class="lang-en">Manage Users</span><span class="lang-es">Gestionar Usuarios</span></h1>
+          <div style="background: rgba(0,67,255,0.1); color: var(--blue); padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
+            <span id="admin-user-count">0</span> <span class="lang-en">Users</span><span class="lang-es">Usuarios</span>
+          </div>
         </div>
         <div class="dashboard-filters">
           <div class="form-group" style="margin-bottom:0;">

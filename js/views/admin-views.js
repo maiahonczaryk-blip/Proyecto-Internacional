@@ -332,6 +332,11 @@
     const tbody = document.getElementById('admin-users-table-body');
     if (!tbody) return;
 
+    const countSpan = document.getElementById('admin-user-count');
+    if (countSpan) {
+      countSpan.textContent = users.length;
+    }
+
     if (users.length === 0) {
       tbody.innerHTML = `
         <tr>
