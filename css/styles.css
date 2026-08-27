@@ -335,52 +335,15 @@ body.lang-en-ca .lang-fr { display: none; }
 
 
 
+/* ONLY on the home page, when navbar is NOT scrolled (over dark hero) */
+/* (Transparency removed as requested, keeping it solid) */
+
 /* Default: ALWAYS show normal logo, hide white logo */
 .nav-logo-normal { display: block !important; }
 .nav-logo-white { display: none !important; }
 
-/* ONLY on the home page, when navbar is NOT scrolled (over dark hero) */
-body[data-route="home"] .navbar:not(.scrolled) {
-  background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border-bottom-color: transparent;
-  box-shadow: none;
-}
+/* We keep the default solid background and dark text for all states */
 
-/* White text/logo when over dark hero on home page */
-body[data-route="home"] .navbar:not(.scrolled) .nav-logo-normal { display: none !important; }
-body[data-route="home"] .navbar:not(.scrolled) .nav-logo-white { display: block !important; }
-
-body[data-route="home"] .navbar:not(.scrolled) .nav-links a {
-  color: rgba(255, 255, 255, 0.85);
-}
-
-body[data-route="home"] .navbar:not(.scrolled) .nav-links a:hover {
-  color: #ffffff;
-}
-
-body[data-route="home"] .navbar:not(.scrolled) .nav-cta.btn-outline {
-  color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.4) !important;
-}
-
-body[data-route="home"] .navbar:not(.scrolled) .nav-cta.btn-outline:hover {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-color: #ffffff !important;
-}
-
-body[data-route="home"] .navbar:not(.scrolled) .lang-selector-btn {
-  color: rgba(255, 255, 255, 0.9);
-  border-color: rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-body[data-route="home"] .navbar:not(.scrolled) .lang-selector-btn:hover {
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.15);
-}
 
 .navbar.scrolled {
   padding: 10px 0;
@@ -399,6 +362,89 @@ body[data-route="home"] .navbar:not(.scrolled) .lang-selector-btn:hover {
   gap: 12px;
   flex-shrink: 0;
 }
+
+/* =========================================================================
+   Navbar Buttons (Webinar, Collaborator Login, Register)
+   ========================================================================= */
+
+/* 1. Webinar Button */
+.nav-webinar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #003f99, #cc0000);
+  color: #fff !important;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: .82rem;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(0,63,153,.3);
+  transition: box-shadow .2s, transform .2s;
+  text-decoration: none;
+}
+.nav-webinar-btn:hover {
+  box-shadow: 0 4px 16px rgba(0,63,153,.5);
+  transform: translateY(-1px);
+}
+.nav-webinar-btn .webinar-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff4444;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px #ff4444;
+  animation: webinar-pulse 1.5s ease-in-out infinite;
+}
+
+/* 2. Join as Collaborator Button */
+.nav-register-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #e50914, #990000);
+  color: #fff !important;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: .82rem;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(229,9,20,.3);
+  transition: box-shadow .2s, transform .2s;
+  margin-left: 12px;
+  text-decoration: none;
+}
+.nav-register-btn:hover {
+  box-shadow: 0 4px 16px rgba(229,9,20,.5);
+  transform: translateY(-1px);
+}
+
+/* 3. Collaborator Login Button */
+.nav-collaborator-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: .82rem;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  margin-left: 12px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  background: #fff;
+  border: 1px solid var(--blue);
+  color: var(--blue) !important;
+}
+.nav-collaborator-btn:hover {
+  background: rgba(0,67,255,0.04);
+  color: var(--blue) !important;
+  transform: translateY(-1px);
+}
+
 
 .nav-logo img {
   height: 48px;
