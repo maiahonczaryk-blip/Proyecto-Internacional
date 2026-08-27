@@ -1365,6 +1365,9 @@
      ============================================ */
   async function initWebinar() {
     try {
+      if (!allUsers || allUsers.length === 0) {
+        allUsers = await App.auth.getAllUsers();
+      }
       const registrations = await App.auth.getWebinarRegistrations();
 
       // Update stat
@@ -1404,11 +1407,23 @@
 
       // Tagged agent column — auto-detected link or selected dropdown agent
       let agentTagCell = '—';
-      if (r.agentReferrerName || r.referralCode) {
-        const agentName = r.agentReferrerName ? App.utils.escapeHtml(r.agentReferrerName) : '';
+      
+      let mappedAgentName = r.agentReferrerName || '';
+      let mappedAgentRole = r.agentReferrerRole || '';
+
+      if (r.referralCode && !mappedAgentName) {
+         const foundAgent = allUsers.find(u => u.referralCode && u.referralCode.toUpperCase() === r.referralCode.toUpperCase());
+         if (foundAgent) {
+           mappedAgentName = `${foundAgent.firstName} ${foundAgent.lastName}`.trim();
+           mappedAgentRole = foundAgent.role;
+         }
+      }
+
+      if (mappedAgentName || r.referralCode) {
+        const agentName = mappedAgentName ? App.utils.escapeHtml(mappedAgentName) : '';
         const code      = r.referralCode      ? App.utils.escapeHtml(r.referralCode)      : '';
-        const roleBadge = r.agentReferrerRole
-          ? `<span style="background:rgba(0,67,255,.08);color:var(--primary);border-radius:12px;padding:1px 7px;font-size:.72rem;margin-left:4px;">${r.agentReferrerRole}</span>`
+        const roleBadge = mappedAgentRole
+          ? `<span style="background:rgba(0,67,255,.08);color:var(--primary);border-radius:12px;padding:1px 7px;font-size:.72rem;margin-left:4px;">${mappedAgentRole}</span>`
           : '';
         agentTagCell = `
           <div style="display:flex;align-items:center;gap:6px;">
@@ -1489,8 +1504,12 @@
     App.utils.showToast(`✅ Exported ${allUsers.length} users to Excel.`, 'success');
   }
 
-  function exportWebinarToExcel() {
-    App.auth.getWebinarRegistrations().then(registrations => {
+  async function exportWebinarToExcel() {
+    try {
+      if (!allUsers || allUsers.length === 0) {
+        allUsers = await App.auth.getAllUsers();
+      }
+      const registrations = await App.auth.getWebinarRegistrations();
       if (registrations.length === 0) {
         App.utils.showToast('No registrations to export.', 'error');
         return;
@@ -1514,8 +1533,19 @@
       ];
 
       const rows = registrations.map(r => {
-        const taggedAgent = r.agentReferrerName 
-          ? r.agentReferrerName 
+        let mappedAgentName = r.agentReferrerName || '';
+        let mappedAgentRole = r.agentReferrerRole || '';
+
+        if (r.referralCode && !mappedAgentName) {
+           const foundAgent = allUsers.find(u => u.referralCode && u.referralCode.toUpperCase() === r.referralCode.toUpperCase());
+           if (foundAgent) {
+             mappedAgentName = `${foundAgent.firstName} ${foundAgent.lastName}`.trim();
+             mappedAgentRole = foundAgent.role;
+           }
+        }
+
+        const taggedAgent = mappedAgentName 
+          ? mappedAgentName 
           : (r.howHeard === 'agent' && r.referrerName ? r.referrerName : '');
 
         return [
@@ -1529,9 +1559,9 @@
           r.state || '',
           HOW_LABELS[r.howHeard] || r.howHeard || '',
           r.referrerName || '',
-          r.agentReferrerName || '',
+          mappedAgentName || '',
           r.referralCode || '',
-          r.agentReferrerRole || '',
+          mappedAgentRole || '',
           taggedAgent,
           r.source || 'direct',
           r.gdprConsent ? 'Yes' : 'No'
@@ -1553,10 +1583,10 @@
       URL.revokeObjectURL(url);
 
       App.utils.showToast(`✅ Exported ${registrations.length} registrations to Excel.`, 'success');
-    }).catch(err => {
-      console.error('[Admin] Export error:', err);
-      App.utils.showToast('Error exporting data.', 'error');
-    });
+    } catch (err) {
+      console.error('[Admin] exportWebinar error:', err);
+      App.utils.showToast('Error exporting registrations.', 'error');
+    }
   }
 
   /* ── Dedicated Agreements View ── */

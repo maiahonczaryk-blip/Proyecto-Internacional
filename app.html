@@ -187,6 +187,9 @@
       <div class="dashboard-content">
         <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
           <h1><span class="lang-en">Manage Users</span><span class="lang-es">Gestionar Usuarios</span></h1>
+          <button class="btn btn-primary" onclick="App.views.admin.exportUsersToExcel()" style="margin-left: 1rem;">
+            <span class="lang-en">Export Users</span><span class="lang-es">Exportar Usuarios</span>
+          </button>
           <div style="background: rgba(0,67,255,0.1); color: var(--blue); padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
             <span id="admin-user-count">0</span> <span class="lang-en">Users</span><span class="lang-es">Usuarios</span>
           </div>
@@ -229,6 +232,38 @@
           <p class="dashboard-subtitle"><span class="lang-en">Broker Inmomás CRM Overview — Assign local agents and monitor status</span><span class="lang-es">Control del CRM de Broker Inmomás — Asigna agentes locales y monitoriza el estado</span></p>
         </div>
         <div id="admin-clients-board" class="pipeline-board"></div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW-ADMIN-WEBINAR ==================== -->
+    <div id="view-admin-webinar" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h1><span class="lang-en">Webinar Registrations</span><span class="lang-es">Registrados al Webinario</span></h1>
+          <button class="btn btn-primary" onclick="App.views.admin.exportWebinarToExcel()" style="margin-left: 1rem;">
+            <span class="lang-en">Export Registrants</span><span class="lang-es">Exportar Registrados</span>
+          </button>
+        </div>
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
+                <th><span class="lang-en">Name</span><span class="lang-es">Nombre</span></th>
+                <th>Email</th>
+                <th><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></th>
+                <th><span class="lang-en">Agency</span><span class="lang-es">Agencia</span></th>
+                <th><span class="lang-en">Country</span><span class="lang-es">País</span></th>
+                <th><span class="lang-en">State</span><span class="lang-es">Estado</span></th>
+                <th><span class="lang-en">Source</span><span class="lang-es">Fuente</span></th>
+                <th><span class="lang-en">Referred By</span><span class="lang-es">Referido Por</span></th>
+                <th><span class="lang-en">Agent Link</span><span class="lang-es">Enlace Agente</span></th>
+                <th><span class="lang-en">Actions</span><span class="lang-es">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody id="webinar-registrations-tbody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
