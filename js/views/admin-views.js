@@ -1449,6 +1449,46 @@
     }).join('');
   }
 
+  function exportUsersToExcel() {
+    if (!allUsers || allUsers.length === 0) {
+      App.utils.showToast('No users to export.', 'error');
+      return;
+    }
+
+    const headers = [
+      'Date', 'First Name', 'Last Name', 'Email', 'Phone', 'Agency', 'Role', 'Status', 'Country', 'State', 'Webinar Registered'
+    ];
+
+    const rows = allUsers.map(u => [
+      u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-US') : '',
+      u.firstName || '',
+      u.lastName || '',
+      u.email || '',
+      u.phone || '',
+      u.agency || '',
+      u.role || '',
+      u.status || '',
+      u.country || '',
+      u.state || '',
+      u.isWebinarRegistered ? 'Yes' : 'No'
+    ]);
+
+    const escape = v => '"' + String(v).replace(/"/g, '""') + '"';
+    const csvContent = '\uFEFF' + [headers, ...rows].map(row => row.map(escape).join(',')).join('\r\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = `Users-Export-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    App.utils.showToast(`✅ Exported ${allUsers.length} users to Excel.`, 'success');
+  }
+
   function exportWebinarToExcel() {
     App.auth.getWebinarRegistrations().then(registrations => {
       if (registrations.length === 0) {
@@ -1725,6 +1765,7 @@
     initClients,
     initNewsletter,
     initWebinar,
+    exportUsersToExcel,
     exportWebinarToExcel,
     handleApprove,
     approveWithRole,
