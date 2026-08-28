@@ -33,6 +33,7 @@ App.router = (function() {
     'admin/agreements':{ view: 'view-admin-agreements',role: 'admin',  sidebar: 'admin', title: 'Referral Agreements' },
     'admin/newsletter':{ view: 'view-admin-newsletter',role: 'admin',  sidebar: 'admin', title: 'Newsletter' },
     'admin/webinar':   { view: 'view-admin-webinar',   role: 'admin',  sidebar: 'admin', title: 'Webinar Registrations' },
+    'admin/unified':   { view: 'view-admin-unified',   role: 'admin',  sidebar: 'admin', title: 'Unified Directory' },
 
     // Broker routes
     'broker/dashboard': { view: 'view-broker-dashboard', role: 'broker', sidebar: 'broker', title: 'Broker Dashboard' },
@@ -381,6 +382,7 @@ App.router = (function() {
       'admin/agreements':  () => App.views.admin && App.views.admin.initAgreementsView(),
       'admin/newsletter':  () => App.views.admin && App.views.admin.initNewsletter(),
       'admin/webinar':    () => App.views.admin && App.views.admin.initWebinar(),
+      'admin/unified':    () => App.views.admin && App.views.admin.initUnified(),
       'webinar':          () => App.views.public && App.views.public.initWebinarRegister(),
       'broker/dashboard':  () => App.views.broker && App.views.broker.initDashboard(),
       'broker/team':       () => App.views.broker && App.views.broker.initTeam(),

@@ -39,6 +39,7 @@
       <a href="#admin/agreements" class="sidebar-link" id="sidebar-agreements-link"><span class="sidebar-link__icon">📋</span> Acuerdos <span id="admin-agreements-badge" style="display:none; background:#e11b22; color:white; border-radius:10px; padding:1px 7px; font-size:0.72rem; font-weight:700; margin-left:4px;">0</span></a>
       <a href="#admin/newsletter" class="sidebar-link"><span class="sidebar-link__icon">📧</span> <span class="lang-en">Newsletter</span><span class="lang-es">Newsletter</span></a>
       <a href="#admin/webinar" class="sidebar-link"><span class="sidebar-link__icon">🎙️</span> <span class="lang-en">Webinar</span><span class="lang-es">Webinar</span></a>
+      <a href="#admin/unified" class="sidebar-link"><span class="sidebar-link__icon">🗂️</span> <span class="lang-en">Unified Directory</span><span class="lang-es">Directorio Unificado</span></a>
     </nav>
 
     <!-- Agente Inmomás Sidebar Nav -->
@@ -218,6 +219,48 @@
           <table class="data-table data-table--medium">
             <thead><tr><th><span class="lang-en">User</span><span class="lang-es">Usuario</span></th><th>Email</th><th><span class="lang-en">Agency</span><span class="lang-es">Agencia</span></th><th><span class="lang-en">Role</span><span class="lang-es">Rol</span></th><th>Status</th><th><span class="lang-en">Webinar</span><span class="lang-es">Webinario</span></th><th><span class="lang-en">Source</span><span class="lang-es">Origen</span></th><th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th><th><span class="lang-en">Actions</span><span class="lang-es">Acciones</span></th></tr></thead>
             <tbody id="admin-users-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==================== VIEW: ADMIN UNIFIED DIRECTORY ==================== -->
+    <div id="view-admin-unified" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h1><span class="lang-en">Unified Directory</span><span class="lang-es">Directorio Unificado</span></h1>
+          <div style="background: rgba(0,67,255,0.1); color: var(--blue); padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
+            <span id="admin-unified-count">0</span> <span class="lang-en">Total Records</span><span class="lang-es">Registros</span>
+          </div>
+        </div>
+        <div class="dashboard-filters">
+          <div class="form-group" style="margin-bottom:0; flex:1;">
+            <input type="text" id="admin-unified-search" placeholder="Search by name, email or agent..." class="form-input">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <select id="admin-unified-filter-status" class="form-select">
+              <option value="">All Status / Todos</option>
+              <option value="Ambos">Ambos (Plataforma y Web.)</option>
+              <option value="Solo Plataforma">Solo Plataforma</option>
+              <option value="Solo Webinar">Solo Webinar</option>
+            </select>
+          </div>
+        </div>
+        <div class="data-table-container">
+          <table class="data-table data-table--medium">
+            <thead>
+              <tr>
+                <th><span class="lang-en">Name</span><span class="lang-es">Nombre</span></th>
+                <th>Email</th>
+                <th><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></th>
+                <th><span class="lang-en">Status</span><span class="lang-es">Estado</span></th>
+                <th><span class="lang-en">Role</span><span class="lang-es">Rol</span></th>
+                <th><span class="lang-en">Referrer</span><span class="lang-es">Referido Por</span></th>
+                <th><span class="lang-en">Source</span><span class="lang-es">Origen</span></th>
+              </tr>
+            </thead>
+            <tbody id="admin-unified-table-body"></tbody>
           </table>
         </div>
       </div>

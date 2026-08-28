@@ -1787,6 +1787,170 @@
   }
 
   /* ============================================
+     initUnified()
+     Shows a unified directory merging users 
+     and webinar registrations.
+     ============================================ */
+  async function initUnified() {
+    try {
+      if (!allUsers || allUsers.length === 0) {
+        allUsers = await App.auth.getAllUsers();
+      }
+      const webinarRegs = await App.auth.getWebinarRegistrations();
+      
+      const unifiedMap = new Map();
+      const userLookup = {};
+      
+      // Build lookup for referrer names
+      allUsers.forEach(u => {
+        if (u.id) {
+          userLookup[u.id] = u.name || (u.firstName ? u.firstName + ' ' + (u.lastName || '') : '');
+        }
+      });
+      
+      // 1. Process all platform users
+      allUsers.forEach(u => {
+        let email = (u.email || '').toLowerCase().trim();
+        if (!email) return;
+        
+        let userName = u.name || (u.firstName ? u.firstName + ' ' + (u.lastName || '') : 'Sin Nombre');
+        let referrerId = u.referredBy || u.registeredBy || '';
+        let referrerName = referrerId ? (userLookup[referrerId] || referrerId) : 'N/A';
+        if (referrerName === 'admin-001') referrerName = 'admin-001';
+        if (referrerName === 'N/A' && u.partnerCode) referrerName = u.partnerCode;
+
+        unifiedMap.set(email, {
+          name: userName,
+          email: u.email, // preserve original case
+          phone: u.phone || 'N/A',
+          status: 'Solo Plataforma (Colaborador/Agente)',
+          role: u.role || 'colaborador',
+          referrer: referrerName,
+          origin: 'Directo / Plataforma',
+          _timestamp: new Date(u.createdAt || 0).getTime()
+        });
+      });
+
+      // 2. Process webinar registrations
+      webinarRegs.forEach(w => {
+        let email = (w.email || '').toLowerCase().trim();
+        if (!email) return;
+        
+        let existing = unifiedMap.get(email);
+        
+        let userName = w.name || (w.firstName ? w.firstName + ' ' + (w.lastName || '') : 'Sin Nombre');
+        let phone = w.phone || 'N/A';
+        let origin = w.source || (w.isReferral ? 'referral' : (w.howDidYouHear || 'direct'));
+        let referrer = (w.referredByAgentName || 'N/A').trim();
+        if (!referrer || referrer.toLowerCase() === 'n/a' || referrer === '') referrer = 'N/A';
+
+        if (existing) {
+          existing.status = 'Ambos (Plataforma y Webinar)';
+          if (existing.referrer === 'N/A' && referrer !== 'N/A') {
+            existing.referrer = referrer;
+            existing.origin = origin;
+          }
+          if (existing.phone === 'N/A' && phone !== 'N/A') {
+            existing.phone = phone;
+          }
+        } else {
+          unifiedMap.set(email, {
+            name: userName,
+            email: w.email,
+            phone: phone,
+            status: 'Solo Webinar',
+            role: 'Invitado Webinar',
+            referrer: referrer,
+            origin: origin,
+            _timestamp: new Date(w.createdAt || 0).getTime()
+          });
+        }
+      });
+      
+      const unifiedArray = Array.from(unifiedMap.values());
+      // Sort by status, then name
+      unifiedArray.sort((a, b) => {
+        if (a.status !== b.status) return a.status.localeCompare(b.status);
+        return a.name.localeCompare(b.name);
+      });
+      
+      setTextById('admin-unified-count', unifiedArray.length);
+      
+      renderUnifiedTable(unifiedArray);
+      
+      // Search and Filter Events
+      const searchInput = document.getElementById('admin-unified-search');
+      const filterSelect = document.getElementById('admin-unified-filter-status');
+      
+      const filterData = () => {
+        const term = (searchInput.value || '').toLowerCase();
+        const stat = filterSelect.value;
+        const filtered = unifiedArray.filter(item => {
+          const matchTerm = !term || item.name.toLowerCase().includes(term) || item.email.toLowerCase().includes(term) || item.referrer.toLowerCase().includes(term);
+          const matchStat = !stat || item.status === stat || (stat.includes('Ambos') && item.status.includes('Ambos')) || (stat.includes('Plataforma') && item.status.includes('Plataforma'));
+          return matchTerm && matchStat;
+        });
+        renderUnifiedTable(filtered);
+      };
+      
+      if (searchInput) {
+        // Remove existing listeners by cloning
+        const newSearch = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(newSearch, searchInput);
+        newSearch.addEventListener('input', filterData);
+      }
+      if (filterSelect) {
+        const newSelect = filterSelect.cloneNode(true);
+        filterSelect.parentNode.replaceChild(newSelect, filterSelect);
+        newSelect.addEventListener('change', filterData);
+      }
+      
+    } catch (err) {
+      console.error('[Admin] initUnified error:', err);
+      App.utils.showToast('Error loading unified directory.', 'error');
+    }
+  }
+
+  function renderUnifiedTable(data) {
+    const tbody = document.getElementById('admin-unified-table-body');
+    if (!tbody) return;
+
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:#6b7280;">No hay registros.</td></tr>`;
+      return;
+    }
+
+    let html = '';
+    data.forEach(item => {
+      let statusColor = '#6b7280';
+      if (item.status.includes('Ambos')) statusColor = '#10b981'; // Green
+      else if (item.status.includes('Webinar')) statusColor = '#f59e0b'; // Yellow/Orange
+      else if (item.status.includes('Plataforma')) statusColor = '#3b82f6'; // Blue
+      
+      html += `
+        <tr>
+          <td>
+            <div style="font-weight:600; color:var(--text-primary);">${App.utils.escapeHTML(item.name || '')}</div>
+          </td>
+          <td>
+            <a href="mailto:${App.utils.escapeHTML(item.email || '')}" style="color:var(--blue); text-decoration:none;">${App.utils.escapeHTML(item.email || '')}</a>
+          </td>
+          <td>${App.utils.escapeHTML(item.phone || '')}</td>
+          <td>
+            <span style="display:inline-block; padding:4px 8px; border-radius:12px; font-size:0.75rem; font-weight:600; background-color:${statusColor}22; color:${statusColor};">
+              ${App.utils.escapeHTML(item.status)}
+            </span>
+          </td>
+          <td style="text-transform:capitalize;">${App.utils.escapeHTML(item.role || '')}</td>
+          <td>${App.utils.escapeHTML(item.referrer || 'N/A')}</td>
+          <td><span style="font-size:0.8rem; color:var(--text-secondary); background:#f3f4f6; padding:2px 6px; border-radius:4px;">${App.utils.escapeHTML(item.origin || 'N/A')}</span></td>
+        </tr>
+      `;
+    });
+    tbody.innerHTML = html;
+  }
+
+  /* ============================================
      Public API — register on App.views.admin
      ============================================ */
   App.views.admin = {
@@ -1812,7 +1976,8 @@
     initAgreementsView,
     handleAdminAgreementUpload,
     handleDeleteUser,
-    handleDeleteWebinarRegistration
+    handleDeleteWebinarRegistration,
+    initUnified
   };
 
 })();
