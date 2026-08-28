@@ -1930,20 +1930,20 @@
       html += `
         <tr>
           <td>
-            <div style="font-weight:600; color:var(--text-primary);">${App.utils.escapeHTML(item.name || '')}</div>
+            <div style="font-weight:600; color:var(--text-primary);">${App.utils.escapeHtml(item.name || '')}</div>
           </td>
           <td>
-            <a href="mailto:${App.utils.escapeHTML(item.email || '')}" style="color:var(--blue); text-decoration:none;">${App.utils.escapeHTML(item.email || '')}</a>
+            <a href="mailto:${App.utils.escapeHtml(item.email || '')}" style="color:var(--blue); text-decoration:none;">${App.utils.escapeHtml(item.email || '')}</a>
           </td>
-          <td>${App.utils.escapeHTML(item.phone || '')}</td>
+          <td>${App.utils.escapeHtml(item.phone || '')}</td>
           <td>
             <span style="display:inline-block; padding:4px 8px; border-radius:12px; font-size:0.75rem; font-weight:600; background-color:${statusColor}22; color:${statusColor};">
-              ${App.utils.escapeHTML(item.status)}
+              ${App.utils.escapeHtml(item.status)}
             </span>
           </td>
-          <td style="text-transform:capitalize;">${App.utils.escapeHTML(item.role || '')}</td>
-          <td>${App.utils.escapeHTML(item.referrer || 'N/A')}</td>
-          <td><span style="font-size:0.8rem; color:var(--text-secondary); background:#f3f4f6; padding:2px 6px; border-radius:4px;">${App.utils.escapeHTML(item.origin || 'N/A')}</span></td>
+          <td style="text-transform:capitalize;">${App.utils.escapeHtml(item.role || '')}</td>
+          <td>${App.utils.escapeHtml(item.referrer || 'N/A')}</td>
+          <td><span style="font-size:0.8rem; color:var(--text-secondary); background:#f3f4f6; padding:2px 6px; border-radius:4px;">${App.utils.escapeHtml(item.origin || 'N/A')}</span></td>
         </tr>
       `;
     });
