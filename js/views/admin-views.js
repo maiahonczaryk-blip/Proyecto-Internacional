@@ -775,12 +775,20 @@
           ${user.role === 'agent_inmomas' ? `
           <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
             <label style="font-weight: 600; font-size: 0.875rem; color: #374151; display: block; margin-bottom: 0.5rem;">Realtors bajo su paraguas</label>
-            <div style="max-height: 120px; overflow-y: auto; font-size: 0.85rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.5rem; background: #f9fafb;">
+            <div style="max-height: 120px; overflow-y: auto; font-size: 0.85rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.5rem; background: #f9fafb; margin-bottom: 0.75rem;">
               ${(() => {
                 const assigned = allSysUsers.filter(u => u.referredBy === user.referralCode || u.referredBy === user.id || (u.referredBy && u.referredBy.toUpperCase() === (user.referralCode || '').toUpperCase()));
                 if (assigned.length === 0) return '<div style="color: #6b7280; text-align: center;">Ningún realtor asignado aún.</div>';
                 return '<ul style="margin: 0; padding-left: 1rem; color: #374151;">' + assigned.map(r => `<li>${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)} <span style="color:#9ca3af; font-size:0.75rem;">(${r.role})</span></li>`).join('') + '</ul>';
               })()}
+            </div>
+            <label style="font-weight: 600; font-size: 0.875rem; color: #374151; display: block; margin-bottom: 0.5rem;">Añadir Realtor al paraguas</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <select id="agent-assign-realtor-select" class="form-control" style="flex: 1; padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; background-color: white;">
+                <option value="">-- Seleccionar Realtor --</option>
+                ${allSysUsers.filter(u => (u.role === 'realtor' || u.role === 'broker') && u.status === 'active' && u.referredBy !== user.referralCode).map(r => `<option value="${r.id}">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)} (${r.email})</option>`).join('')}
+              </select>
+              <button class="btn btn-primary btn-sm" id="agent-save-realtor-btn">Añadir</button>
             </div>
           </div>
           ` : `
@@ -844,6 +852,28 @@
         });
       }
 
+      const agentSaveRealtorBtn = document.getElementById('agent-save-realtor-btn');
+      if (agentSaveRealtorBtn) {
+        agentSaveRealtorBtn.addEventListener('click', async () => {
+          const selectedRealtorId = document.getElementById('agent-assign-realtor-select').value;
+          if (!selectedRealtorId) {
+            App.utils.showToast('Please select a Realtor', 'error');
+            return;
+          }
+          App.utils.closeModal();
+          try {
+            await App.auth.updateUserReferral(selectedRealtorId, user.referralCode);
+            App.utils.showToast('Realtor assigned to agent successfully!', 'success');
+            const route = App.router.getCurrentRoute();
+            if (route === 'admin/users') {
+              await initUsers();
+            }
+          } catch (err) {
+            console.error('[Admin] Error assigning realtor to agent:', err);
+            App.utils.showToast('Error assigning realtor: ' + err.message, 'error');
+          }
+        });
+      }
 
     } catch (err) {
       console.error('[Admin] viewUser error:', err);
