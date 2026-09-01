@@ -773,7 +773,7 @@ App.auth = (function() {
       if (filters.brokerId) query = query.where('brokerId', '==', filters.brokerId);
       
       const snapshot = await query.get();
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     }
   }
 
@@ -786,7 +786,7 @@ App.auth = (function() {
       return copy;
     } else {
       const doc = await App.db.collection('users').doc(userId).get();
-      return doc.exists ? { id: doc.id, ...doc.data() } : null;
+      return doc.exists ? { ...doc.data(), id: doc.id } : null;
     }
   }
 
@@ -807,7 +807,7 @@ App.auth = (function() {
       if (filters.status) query = query.where('status', '==', filters.status);
       
       const snapshot = await query.get();
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     }
   }
 
@@ -1004,7 +1004,7 @@ App.auth = (function() {
       if (filters.agentId) query = query.where('agentId', '==', filters.agentId);
       
       const snapshot = await query.get();
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     }
   }
 
@@ -1082,7 +1082,7 @@ App.auth = (function() {
       return App.demoData.dossier_leads || [];
     } else {
       const snapshot = await App.db.collection('dossier_leads').orderBy('createdAt', 'desc').get();
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     }
   }
 
@@ -1129,7 +1129,7 @@ App.auth = (function() {
       return App.demoData.webinar_registrations || [];
     } else {
       const snapshot = await App.db.collection('webinar_registrations').orderBy('createdAt', 'desc').get();
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     }
   }
 
