@@ -768,15 +768,29 @@
           </div>
           ` : ''}
           
+          ${user.role === 'agent_inmomas' ? `
           <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
-            <label style="font-weight: 600; font-size: 0.875rem; color: #374151; display: block; margin-bottom: 0.5rem;">Assign Local Agent / Referral</label>
+            <label style="font-weight: 600; font-size: 0.875rem; color: #374151; display: block; margin-bottom: 0.5rem;">Realtors bajo su paraguas</label>
+            <div style="max-height: 120px; overflow-y: auto; font-size: 0.85rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.5rem; background: #f9fafb;">
+              ${(() => {
+                const assigned = allSysUsers.filter(u => u.referredBy === user.referralCode || u.referredBy === user.id || (u.referredBy && u.referredBy.toUpperCase() === (user.referralCode || '').toUpperCase()));
+                if (assigned.length === 0) return '<div style="color: #6b7280; text-align: center;">Ningún realtor asignado aún.</div>';
+                return '<ul style="margin: 0; padding-left: 1rem; color: #374151;">' + assigned.map(r => `<li>${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)} <span style="color:#9ca3af; font-size:0.75rem;">(${r.role})</span></li>`).join('') + '</ul>';
+              })()}
+            </div>
+          </div>
+          ` : `
+          <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
+            <label style="font-weight: 600; font-size: 0.875rem; color: #374151; display: block; margin-bottom: 0.5rem;">Asignar Agente Inmomás / Referral</label>
             <div style="display: flex; gap: 0.5rem;">
               <select id="user-referral-select" class="form-control" style="flex: 1; padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; background-color: white;">
                 ${agentOptions}
               </select>
-              <button class="btn btn-primary btn-sm" id="save-user-referral-btn">Assign</button>
+              <button class="btn btn-primary btn-sm" id="save-user-referral-btn">Asignar</button>
             </div>
+            <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">Esto asignará el usuario al paraguas del Agente Inmomás seleccionado.</p>
           </div>
+          `}
         `,
         footer: `<button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Close</button>`,
         onClose: () => {}
