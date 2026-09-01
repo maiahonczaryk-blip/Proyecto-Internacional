@@ -116,9 +116,8 @@
   async function sendEmail(templateId, params, toEmail = ADMIN_EMAIL) {
     initEmailJS();
     if (!isReady() || templateId.startsWith('YOUR_TEMPLATE')) {
-      alert("⚠️ Aviso (Modo Pruebas): El correo no se ha enviado. Motivo: Tu navegador no detecta EmailJS. Por favor, asegúrate de haber refrescado la página con Cmd+Shift+R.");
       console.info(
-        '[Notifications] EmailJS not configured para este template — notificación simulada.\n' +
+        '[Notifications] EmailJS no configurado o no detectado para este template — notificación simulada.\n' +
         'Se hubiese enviado a:', toEmail, ' con template:', templateId, ' y params:', params
       );
       return;
