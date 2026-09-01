@@ -396,7 +396,12 @@
 
       let sourceStr = user.source ? App.utils.escapeHtml(user.source) : (user.referredBy ? 'Referral' : 'Direct');
       if (user.referredBy) {
-        sourceStr += ` <span style="font-size:0.8em; color:#6b7280;">(Ref: ${App.utils.escapeHtml(user.referredBy)})</span>`;
+        const agent = window.App && window.App.auth && allUsers ? allUsers.find(u => u.referralCode === user.referredBy || u.id === user.referredBy || (u.referralCode && u.referralCode.toUpperCase() === user.referredBy.toUpperCase())) : null;
+        if (agent) {
+          sourceStr = `<span style="font-weight:600; color:#047857;">Paraguas: ${App.utils.escapeHtml(agent.firstName)} ${App.utils.escapeHtml(agent.lastName)}</span>`;
+        } else {
+          sourceStr += ` <span style="font-size:0.8em; color:#6b7280;">(Ref: ${App.utils.escapeHtml(user.referredBy)})</span>`;
+        }
       }
 
       const webinarStr = user.isWebinarRegistered 
@@ -764,7 +769,6 @@
               </select>
               <button class="btn btn-primary btn-sm" id="save-user-role-btn">Update Role</button>
             </div>
-          </div>
           </div>
           ` : ''}
           
