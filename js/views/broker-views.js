@@ -592,22 +592,46 @@
           </div>
           <!-- Download -->
           <div style="background:#f8f9ff; border:1.5px solid #c7d2fe; border-radius:0.75rem; padding:1rem; margin-bottom:0.75rem;">
-            <div style="font-weight:600; color:#1e40af; margin-bottom:0.5rem;">1️⃣ Download &amp; Sign</div>
-            <p style="font-size:0.82rem; color:#374151; margin:0 0 0.75rem;">Download your personalized Master Referral Agreement (Word format).</p>
-            <button class="btn btn-primary" id="broker-download-agreement-btn">📄 Download Referral Agreement (.doc)</button>
-          </div>
-          <!-- Upload -->
-          <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:0.75rem; padding:1rem;">
-            <div style="font-weight:600; color:#166534; margin-bottom:0.5rem;">2️⃣ Upload Signed Agreement</div>
-            <p style="font-size:0.82rem; color:#374151; margin:0 0 0.75rem;">Upload your signed copy (PDF or Word).</p>
-            <div id="broker-agreement-upload-zone" style="border:2px dashed #86efac; border-radius:0.5rem; padding:1.25rem; text-align:center; cursor:pointer;"
-                 onclick="document.getElementById('broker-agreement-file-input').click()"
-                 onmouseover="this.style.borderColor='#22c55e'" onmouseout="this.style.borderColor='#86efac'">
-              <div style="font-size:1.75rem;">📤</div>
-              <p style="font-size:0.85rem; color:#374151; margin:0.25rem 0 0;">Click or drop signed file here</p>
+            <div style="font-weight:600; color:#1e40af; margin-bottom:0.5rem;">
+              <span class="lang-en">1️⃣ Download &amp; Complete</span>
+              <span class="lang-es">1️⃣ Descargar y Completar</span>
+              <span class="lang-fr">1️⃣ Télécharger et Compléter</span>
+              <span class="lang-en-ca">1️⃣ Download &amp; Complete</span>
             </div>
-            <input type="file" id="broker-agreement-file-input" accept=".pdf,.doc,.docx" style="display:none;">
-            <div id="broker-agreement-upload-status" style="margin-top:0.5rem; font-size:0.85rem;"></div>
+            <p style="font-size:0.82rem; color:#374151; margin:0 0 0.75rem;">
+              <span class="lang-en">Download the Master Referral Agreement. Please complete it with your details and sign it.</span>
+              <span class="lang-es">Descarga el Acuerdo Marco de Referidos. Por favor, complétalo con tus datos y fírmalo.</span>
+              <span class="lang-fr">Téléchargez l'accord de référencement. Veuillez le compléter avec vos coordonnées et le signer.</span>
+              <span class="lang-en-ca">Download the Master Referral Agreement. Please complete it with your details and sign it.</span>
+            </p>
+            <button class="btn btn-primary" id="broker-download-agreement-btn">
+              📄 
+              <span class="lang-en">Download Referral Agreement (.doc)</span>
+              <span class="lang-es">Descargar Acuerdo (.doc)</span>
+              <span class="lang-fr">Télécharger l'Accord (.doc)</span>
+              <span class="lang-en-ca">Download Referral Agreement (.doc)</span>
+            </button>
+          </div>
+          <!-- Send by Email -->
+          <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:0.75rem; padding:1rem;">
+            <div style="font-weight:600; color:#166534; margin-bottom:0.5rem;">
+              <span class="lang-en">2️⃣ Send via Email</span>
+              <span class="lang-es">2️⃣ Enviar por Correo</span>
+              <span class="lang-fr">2️⃣ Envoyer par Email</span>
+              <span class="lang-en-ca">2️⃣ Send via Email</span>
+            </div>
+            <p style="font-size:0.82rem; color:#374151; margin:0 0 0.75rem;">
+              <span class="lang-en">Send the completed and signed agreement to <strong>spainconnection0@gmail.com</strong>.</span>
+              <span class="lang-es">Envía el acuerdo completado y firmado a <strong>spainconnection0@gmail.com</strong>.</span>
+              <span class="lang-fr">Envoyez l'accord complété et signé à <strong>spainconnection0@gmail.com</strong>.</span>
+              <span class="lang-en-ca">Send the completed and signed agreement to <strong>spainconnection0@gmail.com</strong>.</span>
+            </p>
+            <p style="font-size:0.82rem; color:#374151; margin:0;">
+              <span class="lang-en">We will return a countersigned copy to you to confirm your partnership.</span>
+              <span class="lang-es">Te devolveremos una copia co-firmada para confirmar tu colaboración.</span>
+              <span class="lang-fr">Nous vous retournerons une copie contresignée pour confirmer votre partenariat.</span>
+              <span class="lang-en-ca">We will return a countersigned copy to you to confirm your partnership.</span>
+            </p>
           </div>`;
       }
 

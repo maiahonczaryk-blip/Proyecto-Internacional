@@ -14,3 +14,7 @@ You must strictly adhere to the following rules when modifying the codebase:
 - Public routes (`home`, `about-spain`, `professionals`, `login`, `register`, `pending`, `intake`) are defined in `js/router.js` with `role: null` and live on `index.html`.
 - Private/authenticated routes (dashboards, `profile`) require roles and live on `app.html`.
 - The route `'profile'` is set to `role: 'authenticated'` and `sidebar: 'user'` to keep authenticated users inside `app.html` without looping back to a blank `index.html` view.
+
+## 3. Git & Branching Rules
+- **Development Branch**: The working branch is strictly named `development`. Any commands, requests, or actions related to "dev" or "push to dev" MUST be executed on the `development` branch. Do not create or use a branch named `dev`.
+- **Main Branch Protection**: NEVER commit or push directly to `main`. All direct development must occur on `development` (or feature branches merged into `development`). The `main` branch is strictly for production releases and should only be updated via Pull Requests or explicit merges from `development`.

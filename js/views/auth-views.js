@@ -854,17 +854,17 @@ App.views.auth = {
             <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
               <span style="font-size:1.4rem;">1️⃣</span>
               <div style="font-weight:600; color:#1e40af;">
-                <span class="lang-en">Download &amp; Sign the Agreement</span>
-                <span class="lang-es">Descargar y Firmar el Acuerdo</span>
-                <span class="lang-fr">Télécharger &amp; Signer l'Accord</span>
-                <span class="lang-en-ca">Download &amp; Sign the Agreement</span>
+                <span class="lang-en">Download &amp; Complete the Agreement</span>
+                <span class="lang-es">Descargar y Completar el Acuerdo</span>
+                <span class="lang-fr">Télécharger &amp; Compléter l'Accord</span>
+                <span class="lang-en-ca">Download &amp; Complete the Agreement</span>
               </div>
             </div>
             <p style="font-size:0.85rem; color:#374151; margin:0 0 0.875rem;">
-              <span class="lang-en">Download your personalized Master Referral Agreement (Word format).</span>
-              <span class="lang-es">Descarga tu Acuerdo Marco de Referidos personalizado (formato Word).</span>
-              <span class="lang-fr">Téléchargez votre accord de référencement personnalisé (format Word).</span>
-              <span class="lang-en-ca">Download your personalized Master Referral Agreement (Word format).</span>
+              <span class="lang-en">Download the Master Referral Agreement. Please complete it with your details and have your Broker sign it.</span>
+              <span class="lang-es">Descarga el Acuerdo Marco de Referidos. Por favor complétalo con tus datos y que lo firme tu Broker.</span>
+              <span class="lang-fr">Téléchargez l'accord de référencement. Veuillez le compléter et le faire signer par votre Broker.</span>
+              <span class="lang-en-ca">Download the Master Referral Agreement. Please complete it with your details and have your Broker sign it.</span>
             </p>
             <button class="btn btn-primary" id="pending-download-agreement-btn" style="gap:0.5rem;">
               📄 <span class="lang-en">Download Agreement (.doc)</span>
@@ -873,36 +873,23 @@ App.views.auth = {
               <span class="lang-en-ca">Download Agreement (.doc)</span>
             </button>
           </div>
-          <!-- Upload -->
+          <!-- Send via Email -->
           <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:0.75rem; padding:1.25rem; text-align:left;">
             <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
               <span style="font-size:1.4rem;">2️⃣</span>
               <div style="font-weight:600; color:#166534;">
-                <span class="lang-en">Upload Signed Agreement</span>
-                <span class="lang-es">Subir Acuerdo Firmado</span>
-                <span class="lang-fr">Téléverser l'Accord Signé</span>
-                <span class="lang-en-ca">Upload Signed Agreement</span>
+                <span class="lang-en">Send via Email</span>
+                <span class="lang-es">Enviar por Correo</span>
+                <span class="lang-fr">Envoyer par Email</span>
+                <span class="lang-en-ca">Send via Email</span>
               </div>
             </div>
             <p style="font-size:0.85rem; color:#374151; margin:0 0 0.875rem;">
-              <span class="lang-en">Upload your signed copy (PDF or Word). We will countersign and confirm your partnership.</span>
-              <span class="lang-es">Sube tu copia firmada (PDF o Word). Lo co-firmaremos y confirmaremos tu colaboración.</span>
-              <span class="lang-fr">Téléversez votre copie signée (PDF ou Word). Nous la co-signerons et confirmerons votre partenariat.</span>
-              <span class="lang-en-ca">Upload your signed copy (PDF or Word). We will countersign and confirm your partnership.</span>
+              <span class="lang-en">Send the completed and signed agreement to <strong>spainconnection0@gmail.com</strong>. We will return a countersigned copy to you to confirm your partnership.</span>
+              <span class="lang-es">Envía el acuerdo completado y firmado a <strong>spainconnection0@gmail.com</strong>. Te devolveremos una copia co-firmada para confirmar tu colaboración.</span>
+              <span class="lang-fr">Envoyez l'accord complété et signé à <strong>spainconnection0@gmail.com</strong>. Nous vous retournerons une copie contresignée pour confirmer votre partenariat.</span>
+              <span class="lang-en-ca">Send the completed and signed agreement to <strong>spainconnection0@gmail.com</strong>. We will return a countersigned copy to you to confirm your partnership.</span>
             </p>
-            <div id="pending-agreement-upload-zone" style="border:2px dashed #86efac; border-radius:0.625rem; padding:1.5rem; text-align:center; cursor:pointer; transition:border-color 0.2s;"
-                 onclick="document.getElementById('pending-agreement-file-input').click()"
-                 onmouseover="this.style.borderColor='#22c55e'" onmouseout="this.style.borderColor='#86efac'">
-              <div style="font-size:2rem; margin-bottom:0.4rem;">📤</div>
-              <p style="font-size:0.85rem; color:#374151; margin:0.25rem 0 0;">
-                <span class="lang-en">Click or drop signed file here</span>
-                <span class="lang-es">Haz clic o arrastra el archivo firmado aquí</span>
-                <span class="lang-fr">Cliquez ou déposez le fichier signé ici</span>
-                <span class="lang-en-ca">Click or drop signed file here</span>
-              </p>
-            </div>
-            <input type="file" id="pending-agreement-file-input" accept=".pdf,.doc,.docx" style="display:none;">
-            <div id="pending-agreement-upload-status" style="margin-top:0.5rem; font-size:0.85rem;"></div>
           </div>`;
       }
 
@@ -919,7 +906,7 @@ App.views.auth = {
         dlBtn.addEventListener('click', () => {
           if (typeof App.generateReferralAgreementDoc === 'function') {
             App.generateReferralAgreementDoc(user);
-            App.utils.showToast('Agreement downloading... Sign it and upload below.', 'info');
+            App.utils.showToast('Agreement downloading... / Descargando acuerdo...', 'info');
           } else {
             App.utils.showToast('Generator not loaded. Please refresh.', 'error');
           }

@@ -270,11 +270,40 @@
     <!-- ==================== VIEW: ADMIN CLIENTS ==================== -->
     <div id="view-admin-clients" class="app-view">
       <div class="dashboard-content">
-        <div class="dashboard-header">
-          <h1><span class="lang-en">Client Pipeline</span><span class="lang-es">Pipeline de Clientes</span></h1>
-          <p class="dashboard-subtitle"><span class="lang-en">Broker Inmomás CRM Overview — Assign local agents and monitor status</span><span class="lang-es">Control del CRM de Broker Inmomás — Asigna agentes locales y monitoriza el estado</span></p>
+        <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h1><span class="lang-en">Client Pipeline</span><span class="lang-es">Pipeline de Clientes</span></h1>
+            <p class="dashboard-subtitle"><span class="lang-en">Broker Inmomás CRM Overview — Assign local agents and monitor status</span><span class="lang-es">Control del CRM de Broker Inmomás — Asigna agentes locales y monitoriza el estado</span></p>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <div style="background: rgba(0,0,0,0.05); padding: 4px; border-radius: 8px; display: flex;">
+              <button class="btn btn-secondary active" onclick="App.views.admin.toggleClientView('board')" id="btn-admin-client-board" style="border: none; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">Kanban</button>
+              <button class="btn btn-secondary" onclick="App.views.admin.toggleClientView('list')" id="btn-admin-client-list" style="border: none; background: transparent;"><span class="lang-en">List</span><span class="lang-es">Lista</span></button>
+            </div>
+            <button class="btn btn-primary" onclick="App.views.admin.exportClientsToExcel()">
+              <span class="lang-en">Export Clients</span><span class="lang-es">Exportar Clientes</span>
+            </button>
+          </div>
         </div>
         <div id="admin-clients-board" class="pipeline-board"></div>
+        <div id="admin-clients-list" style="display:none;" class="data-table-container">
+          <table class="data-table data-table--medium">
+            <thead>
+              <tr>
+                <th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
+                <th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th>
+                <th>Email</th>
+                <th><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></th>
+                <th><span class="lang-en">Budget</span><span class="lang-es">Presupuesto</span></th>
+                <th><span class="lang-en">Status</span><span class="lang-es">Estado</span></th>
+                <th>Realtor</th>
+              </tr>
+            </thead>
+            <tbody id="admin-clients-tbody">
+              <!-- Client rows injected via JS -->
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 

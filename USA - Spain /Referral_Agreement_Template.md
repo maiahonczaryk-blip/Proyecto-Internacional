@@ -10,9 +10,6 @@
 * **Broker of Record (Authorized Signatory) / Corredor Autorizado:** ___________________________
 * **Office Address / Dirección de la Oficina:** __________________________________________________
 * **Brokerage License Number / Número de Licencia de la Agencia:** ___________________________
-* **Referring Real Estate Agent Name / Agente Inmobiliario Referente:** _________________________
-* **Referring Agent License Number / Licencia del Agente Referente:** ___________________________
-* **Agent Email & Phone / Contacto del Agente:** _____________________________________________
 
 #### BROKER B (Receiving Brokerage — Spain) / CORREDOR B (Agencia Receptora)
 * **Brokerage Name / Nombre de la Agencia:** Megagestión Servicios Inmobiliarios (RE/MAX Inmomás Partner Agency)
@@ -21,7 +18,6 @@
 * **Corporate CIF (Tax ID) / NIF:** B-54829767
 * **Contact Email / Correo de Contacto:** jose.martinez@remax.es
 * **Office Phone / Teléfono:** +34 966 665 651
-* **Receiving Agent Name (Local Spain Agent) / Agente Inmobiliario Receptor (España):** ___________________
 
 ---
 
@@ -51,9 +47,9 @@ Upon the successful completion of a property sale or purchase transaction involv
 > * Gross commission received by Broker B (5%) / Comisión bruta cobrada por Corredor B: **€20,000**
 > * Referral fee paid to Broker A (25% of €20,000) / Honorarios para el Corredor A: **€5,000 EUR** (wire-transferred / transferidos por banco)
 
-#### 3. Agent Compensation Protection / Distribución a los Agentes Involucrados
-* **EN:** Broker B shall pay the referral commission strictly **Broker-to-Broker**. Broker A is solely and legally responsible for distributing the corresponding commission split to the Referring Agent named above. Broker B is responsible for distributing commission splits to the local Spain Receiving Agent assigned to the transaction.
-* **ES:** El Corredor B transferirá los honorarios de referido directamente a la cuenta bancaria del Corredor A. El Corredor A es el único responsable de distribuir la comisión correspondiente al Agente Inmobiliario Referente aquí nombrado. El Corredor B es responsable de pagar la comisión correspondiente al Agente Receptor local en España asignado a la transacción.
+#### 3. Broker Compensation / Compensación entre Corredores
+* **EN:** Broker B shall pay the referral commission strictly **Broker-to-Broker**. Broker A is solely and legally responsible for any internal distribution of the commission within its brokerage. Broker B is responsible for any internal distribution within its brokerage.
+* **ES:** El Corredor B transferirá los honorarios de referido directamente a la cuenta bancaria del Corredor A. El Corredor A es el único responsable de cualquier distribución interna de la comisión dentro de su agencia. El Corredor B es responsable de cualquier distribución interna dentro de su agencia.
 
 #### 4. Referral Lock & Duration / Registro del Cliente y Periodo de Reserva
 * **EN:** The referral is protected for **24 months** from the registration date. Broker A is entitled to the referral compensation for any real estate transaction closed by the Prospect in Spain during this period.

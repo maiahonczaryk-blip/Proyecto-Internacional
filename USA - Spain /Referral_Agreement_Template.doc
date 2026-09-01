@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:o="urn:schemas-microsoft-com:office:office"
       xmlns:w="urn:schemas-microsoft-com:office:word"
       xmlns="http://www.w3.org/TR/REC-html40">
@@ -81,8 +81,6 @@
           <tr><th>Email</th><td>___________________</td></tr>
           <tr><th>Phone / Teléfono</th><td>___________________</td></tr>
           <tr><th>License # / Licencia</th><td>&nbsp;</td></tr>
-          <tr style="background:#fff5f5;"><th style="color:#c0392b;">Referring Agent / Agente</th><td><strong>___________________</strong></td></tr>
-          <tr style="background:#fff5f5;"><th style="color:#c0392b;">Agent Email / Correo Agente</th><td>___________________</td></tr>
         </table>
       </td>
       <td style="width:4%; border:none; background:none;"></td>
@@ -103,8 +101,8 @@
   <!-- Clause 1 -->
   <div class="clause">
     <h3>1. Purpose &amp; Scope / Objeto y Alcance</h3>
-    <p>The purpose of this Agreement is to establish the terms under which the Referring Agent identified above (acting under Broker A) may refer prospective international buyers (clients) to Broker B for the purchase of real estate in Spain, specifically within the provinces of Alicante and the Costa Blanca region. This agreement is issued on a <strong>per-agent basis</strong>: it covers all future client referrals submitted by this specific Agent.</p>
-    <span class="lang-divider">El objeto de este Acuerdo es establecer las condiciones bajo las cuales el Agente Referente identificado anteriormente (actuando bajo el amparo del Corredor A) podrá referir compradores internacionales (clientes) al Corredor B para la compra de inmuebles en España, específicamente en la provincia de Alicante y la Costa Blanca. Este acuerdo se emite <strong>por agente</strong>: cubre todos los futuros clientes referidos enviados por este Agente específico.</span>
+    <p>The purpose of this Agreement is to establish the terms under which Broker A may refer prospective international buyers (clients) to Broker B for the purchase of real estate in Spain, specifically within the provinces of Alicante and the Costa Blanca region. This agreement covers all future client referrals submitted by Broker A.</p>
+    <span class="lang-divider">El objeto de este Acuerdo es establecer las condiciones bajo las cuales el Corredor A podrá referir compradores internacionales (clientes) al Corredor B para la compra de inmuebles en España, específicamente en la provincia de Alicante y la Costa Blanca. Este acuerdo cubre todos los futuros clientes referidos enviados por el Corredor A.</span>
   </div>
 
   <!-- Clause 2 -->
@@ -129,9 +127,9 @@
 
   <!-- Clause 4 -->
   <div class="clause">
-    <h3>4. Agent Compensation / Distribución a los Agentes</h3>
-    <p>All referral fees are paid strictly Broker-to-Broker. Broker A is solely responsible for distributing commission splits to its individual referring agents. Broker B is responsible for distributing commission splits to its local Spain receiving agents assigned to each transaction.</p>
-    <span class="lang-divider">Todos los honorarios de referido se pagan estrictamente de Corredor a Corredor. El Corredor A es el único responsable de distribuir la comisión al Agente Referente individual. El Corredor B es responsable de distribuir la comisión al Agente Receptor local en España.</span>
+    <h3>4. Broker Compensation / Compensación entre Corredores</h3>
+    <p>All referral fees are paid strictly Broker-to-Broker. Broker A is solely responsible for any internal distribution of the commission within its brokerage. Broker B is responsible for any internal distribution within its brokerage.</p>
+    <span class="lang-divider">Todos los honorarios de referido se pagan estrictamente de Corredor a Corredor. El Corredor A es el único responsable de cualquier distribución interna de la comisión dentro de su agencia. El Corredor B es responsable de cualquier distribución interna dentro de su agencia.</span>
   </div>
 
   <!-- Clause 5 -->

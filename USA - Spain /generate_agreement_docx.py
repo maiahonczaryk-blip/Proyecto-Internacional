@@ -333,14 +333,13 @@ r_b = p_ex.add_run(
 )
 r_b.font.size = Pt(9); r_b.font.color.rgb = GREY
 
-add_clause("4", "Agent Compensation", "Distribución a los Agentes",
+add_clause("4", "Broker Compensation", "Compensación entre Corredores",
     "All referral fees are paid strictly Broker-to-Broker. Broker A is solely responsible for "
-    "distributing commission splits to its individual referring agents. Broker B is responsible "
-    "for distributing commission splits to its local Spain receiving agents assigned to each transaction.",
+    "any internal distribution of the commission within its brokerage. Broker B is responsible "
+    "for any internal distribution within its brokerage.",
     "Todos los honorarios de referido se pagan estrictamente de Corredor a Corredor. El Corredor A "
-    "es el único responsable de distribuir la comisión a sus agentes referentes individuales. El "
-    "Corredor B es responsable de distribuir la comisión a sus agentes receptores locales en España "
-    "asignados a cada transacción."
+    "es el único responsable de cualquier distribución interna de la comisión dentro de su agencia. El "
+    "Corredor B es responsable de cualquier distribución interna dentro de su agencia."
 )
 
 add_clause("5", "Client Lock Period", "Vigencia del Referido",
@@ -494,25 +493,6 @@ def add_compact_row(t, label, value=""):
     r1 = p1.add_run(value)
     r1.font.size = Pt(8); r1.font.color.rgb = CHARCOAL
 
-
-# Referring Agent
-add_compact_section("Referring Agent / Agente Referente (US/Canada)")
-t3 = create_compact_table()
-add_compact_row(t3, "Name / Nombre:")
-add_compact_row(t3, "License # / Licencia:")
-add_compact_row(t3, "Email / Correo:")
-add_compact_row(t3, "Phone / Teléfono:")
-add_compact_row(t3, "Brokerage / Agencia:")
-shade_table(t3)
-
-# Receiving Agent
-add_compact_section("Receiving Agent / Agente Receptor (Spain)")
-t4 = create_compact_table()
-add_compact_row(t4, "Name / Nombre:")
-add_compact_row(t4, "Email / Correo:")
-add_compact_row(t4, "Phone / Teléfono:")
-add_compact_row(t4, "Office / Oficina:", "RE/MAX Inmomás")
-shade_table(t4)
 
 # Prospect
 add_compact_section("Prospect / Cliente Referido")

@@ -851,6 +851,29 @@
         getRealtorName,
         'App.views.admin.handleClientDrop'
       );
+
+      // Render List View
+      const tbody = document.getElementById('admin-clients-tbody');
+      if (tbody) {
+        tbody.innerHTML = '';
+        allClients.forEach(client => {
+          const dateStr = client.createdAt ? new Date(client.createdAt).toLocaleDateString() : '';
+          const tr = document.createElement('tr');
+          tr.style.cursor = 'pointer';
+          tr.onclick = () => App.views.admin.showClientDetail(client.id);
+          
+          tr.innerHTML = `
+            <td>${dateStr}</td>
+            <td style="font-weight:600;">${App.utils.escapeHtml(client.firstName || '')} ${App.utils.escapeHtml(client.lastName || '')}</td>
+            <td>${App.utils.escapeHtml(client.email || '')}</td>
+            <td>${App.utils.escapeHtml(client.phone || '-')}</td>
+            <td>€${Number(client.budget || 0).toLocaleString()}</td>
+            <td><span class="status-badge status-${(client.status || 'new').toLowerCase().replace(/\s+/g, '-')}">${App.utils.escapeHtml(client.status || 'New')}</span></td>
+            <td>${App.utils.escapeHtml(getRealtorName(client.realtorId))}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
     } catch (err) {
       console.error('[Admin] initClients error:', err);
       const container = document.getElementById('admin-clients-board');
@@ -1503,6 +1526,83 @@
 
     App.utils.showToast(`✅ Exported ${allUsers.length} users to Excel.`, 'success');
   }
+  function toggleClientView(viewType) {
+    const board = document.getElementById('admin-clients-board');
+    const list = document.getElementById('admin-clients-list');
+    const btnBoard = document.getElementById('btn-admin-client-board');
+    const btnList = document.getElementById('btn-admin-client-list');
+
+    if (viewType === 'list') {
+      if (board) board.style.display = 'none';
+      if (list) list.style.display = 'block';
+      if (btnBoard) {
+        btnBoard.classList.remove('active');
+        btnBoard.style.background = 'transparent';
+        btnBoard.style.boxShadow = 'none';
+      }
+      if (btnList) {
+        btnList.classList.add('active');
+        btnList.style.background = 'white';
+        btnList.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+      }
+    } else {
+      if (board) board.style.display = 'flex';
+      if (list) list.style.display = 'none';
+      if (btnList) {
+        btnList.classList.remove('active');
+        btnList.style.background = 'transparent';
+        btnList.style.boxShadow = 'none';
+      }
+      if (btnBoard) {
+        btnBoard.classList.add('active');
+        btnBoard.style.background = 'white';
+        btnBoard.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+      }
+    }
+  }
+
+  function exportClientsToExcel() {
+    if (!allClients || allClients.length === 0) {
+      App.utils.showToast('No clients to export.', 'error');
+      return;
+    }
+
+    const headers = [
+      'Date', 'First Name', 'Last Name', 'Email', 'Phone', 'Budget', 'Requirements', 'Status', 'Assigned Realtor'
+    ];
+
+    const getRealtorName = (realtorId) => {
+      const realtor = allUsers.find(u => u.id === realtorId);
+      return realtor ? `${realtor.firstName || ''} ${realtor.lastName || ''}`.trim() : 'Unknown';
+    };
+
+    const rows = allClients.map(c => [
+      c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-US') : '',
+      c.firstName || '',
+      c.lastName || '',
+      c.email || '',
+      c.phone || '',
+      c.budget || '',
+      c.requirements || '',
+      c.status || '',
+      getRealtorName(c.realtorId)
+    ]);
+
+    const escape = v => '"' + String(v).replace(/"/g, '""') + '"';
+    const csvContent = '\uFEFF' + [headers, ...rows].map(row => row.map(escape).join(',')).join('\r\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = `Clients-Export-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    App.utils.showToast(`✅ Exported ${allClients.length} clients to Excel.`, 'success');
+  }
 
   async function exportWebinarToExcel() {
     try {
@@ -1960,6 +2060,8 @@
     initNewsletter,
     initWebinar,
     exportUsersToExcel,
+    exportClientsToExcel,
+    toggleClientView,
     exportWebinarToExcel,
     handleApprove,
     approveWithRole,
