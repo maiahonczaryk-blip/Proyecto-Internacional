@@ -715,11 +715,13 @@
       const localAgents = allSysUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
       const agentOptions = `
         <option value="">-- Direct / No Referral --</option>
-        ${localAgents.map(a => `
-          <option value="${a.referralCode}" ${user.referredBy === a.referralCode ? 'selected' : ''}>
-            ${App.utils.escapeHtml(a.firstName)} ${App.utils.escapeHtml(a.lastName)} (${a.referralCode})
+        ${localAgents.map(a => {
+          const code = a.referralCode || a.id;
+          return `
+          <option value="${code}" ${user.referredBy === code ? 'selected' : ''}>
+            ${App.utils.escapeHtml(a.firstName)} ${App.utils.escapeHtml(a.lastName)} (${a.referralCode || 'ID: ' + a.id})
           </option>
-        `).join('')}
+        `}).join('')}
       `;
 
       App.utils.showModal({
@@ -786,7 +788,7 @@
             <div style="display: flex; gap: 0.5rem;">
               <select id="agent-assign-realtor-select" class="form-control" style="flex: 1; padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; background-color: white;">
                 <option value="">-- Seleccionar Realtor --</option>
-                ${allSysUsers.filter(u => (u.role === 'realtor' || u.role === 'broker') && u.status === 'active' && u.referredBy !== user.referralCode).map(r => `<option value="${r.id}">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)} (${r.email})</option>`).join('')}
+                ${allSysUsers.filter(u => (u.role === 'realtor' || u.role === 'broker') && u.status === 'active' && u.referredBy !== user.referralCode && u.referredBy !== user.id).map(r => `<option value="${r.id}">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)} (${r.email})</option>`).join('')}
               </select>
               <button class="btn btn-primary btn-sm" id="agent-save-realtor-btn">Añadir</button>
             </div>
@@ -862,7 +864,8 @@
           }
           App.utils.closeModal();
           try {
-            await App.auth.updateUserReferral(selectedRealtorId, user.referralCode);
+            const assignmentCode = user.referralCode || user.id;
+            await App.auth.updateUserReferral(selectedRealtorId, assignmentCode);
             App.utils.showToast('Realtor assigned to agent successfully!', 'success');
             const route = App.router.getCurrentRoute();
             if (route === 'admin/users') {

@@ -188,16 +188,17 @@
 
     try {
       const allUsers = await App.auth.getAllUsers();
+      const freshCurrentUser = allUsers.find(u => u.id === currentUser.id) || currentUser;
       
       // Filter brokers/realtors linked to this agent
       const linkedPartners = allUsers.filter(u => {
         if (!['broker', 'realtor'].includes(u.role)) return false;
         
         // Match referredBy or source
-        if (u.referredBy && u.referredBy === currentUser.id) return true;
-        if (u.referredBy && currentUser.referralCode && u.referredBy.toUpperCase() === currentUser.referralCode.toUpperCase()) return true;
-        if (u.referredBy && u.referredBy.toLowerCase() === currentUser.email.toLowerCase()) return true;
-        if (u.source && u.source.toLowerCase() === currentUser.email.toLowerCase()) return true;
+        if (u.referredBy && u.referredBy === freshCurrentUser.id) return true;
+        if (u.referredBy && freshCurrentUser.referralCode && u.referredBy.toUpperCase() === freshCurrentUser.referralCode.toUpperCase()) return true;
+        if (u.referredBy && u.referredBy.toLowerCase() === freshCurrentUser.email.toLowerCase()) return true;
+        if (u.source && u.source.toLowerCase() === freshCurrentUser.email.toLowerCase()) return true;
 
         return false;
       });
@@ -241,17 +242,20 @@
     try {
       const allRegs = await App.auth.getWebinarRegistrations();
       
+      const allUsers = await App.auth.getAllUsers();
+      const freshCurrentUser = allUsers.find(u => u.id === currentUser.id) || currentUser;
+
       // Filter registrations linked to this agent
       const linkedRegs = allRegs.filter(r => {
         // Direct ID match
-        if (r.agentReferrerId === currentUser.id) return true;
+        if (r.agentReferrerId === freshCurrentUser.id) return true;
         
         // Referral code match
-        if (r.referralCode && currentUser.referralCode && r.referralCode.toUpperCase() === currentUser.referralCode.toUpperCase()) return true;
+        if (r.referralCode && freshCurrentUser.referralCode && r.referralCode.toUpperCase() === freshCurrentUser.referralCode.toUpperCase()) return true;
         
         // Name match (from dropdown or manual mention)
         if (r.howHeard === 'agent' && r.referrerName) {
-          const agentFullName = `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.toLowerCase();
+          const agentFullName = `${freshCurrentUser.firstName || ''} ${freshCurrentUser.lastName || ''}`.toLowerCase();
           const refName = r.referrerName.toLowerCase();
           if (refName.includes(agentFullName) || agentFullName.includes(refName)) return true;
           // Match split parts
