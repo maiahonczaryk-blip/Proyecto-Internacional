@@ -228,15 +228,20 @@
     <!-- ==================== VIEW: ADMIN UNIFIED DIRECTORY ==================== -->
     <div id="view-admin-unified" class="app-view">
       <div class="dashboard-content">
-        <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
           <h1><span class="lang-en">Unified Directory</span><span class="lang-es">Directorio Unificado</span></h1>
-          <div style="background: rgba(0,67,255,0.1); color: var(--blue); padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
-            <span id="admin-unified-count">0</span> <span class="lang-en">Total Records</span><span class="lang-es">Registros</span>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn btn-outline btn-sm" onclick="App.views.admin.exportUnifiedToExcel()" style="display: flex; align-items: center; gap: 6px;">
+              📥 <span class="lang-en">Export Directory</span><span class="lang-es">Exportar Directorio</span>
+            </button>
+            <div style="background: rgba(0,67,255,0.1); color: var(--blue); padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
+              <span id="admin-unified-count">0</span> <span class="lang-en">Total Records</span><span class="lang-es">Registros</span>
+            </div>
           </div>
         </div>
         <div class="dashboard-filters">
           <div class="form-group" style="margin-bottom:0; flex:1;">
-            <input type="text" id="admin-unified-search" placeholder="Search by name, email or agent..." class="form-input">
+            <input type="text" id="admin-unified-search" placeholder="Search by name, email, phone or agent..." class="form-input">
           </div>
           <div class="form-group" style="margin-bottom:0;">
             <select id="admin-unified-filter-status" class="form-select">
@@ -244,6 +249,7 @@
               <option value="Ambos">Ambos (Plataforma y Web.)</option>
               <option value="Solo Plataforma">Solo Plataforma</option>
               <option value="Solo Webinar">Solo Webinar</option>
+              <option value="Cliente Comprador">Cliente Comprador</option>
             </select>
           </div>
         </div>
@@ -258,6 +264,7 @@
                 <th><span class="lang-en">Role</span><span class="lang-es">Rol</span></th>
                 <th><span class="lang-en">Referrer</span><span class="lang-es">Referido Por</span></th>
                 <th><span class="lang-en">Source</span><span class="lang-es">Origen</span></th>
+                <th><span class="lang-en">Date</span><span class="lang-es">Fecha Registro</span></th>
               </tr>
             </thead>
             <tbody id="admin-unified-table-body"></tbody>

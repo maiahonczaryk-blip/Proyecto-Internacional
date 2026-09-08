@@ -337,10 +337,12 @@ App.utils.$$ = function(selector) {
 };
 
 App.utils.escapeHtml = function(str) {
+  if (str === null || str === undefined) return '';
   const div = document.createElement('div');
-  div.textContent = str;
+  div.textContent = typeof str === 'string' ? str : String(str);
   return div.innerHTML;
 };
+App.utils.escapeHTML = App.utils.escapeHtml;
 
 /* ---- Debounce ---- */
 App.utils.debounce = function(fn, delay = 300) {

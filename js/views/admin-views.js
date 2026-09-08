@@ -2321,9 +2321,12 @@
 
   /* ============================================
      initUnified()
-     Shows a unified directory merging users 
-     and webinar registrations.
+     Shows a unified directory merging users,
+     clients, and webinar registrations.
+     Always sorted with newest records first.
      ============================================ */
+  let currentUnifiedData = [];
+
   async function initUnified() {
     try {
       if (!allUsers || allUsers.length === 0) {
@@ -2363,6 +2366,7 @@
           role: u.role || 'colaborador',
           referrer: referrerName,
           origin: 'Directo / Plataforma',
+          createdAt: u.createdAt || '',
           _timestamp: new Date(u.createdAt || 0).getTime()
         });
       });
@@ -2381,6 +2385,10 @@
           existing.status = 'Ambos (Plataforma y Cliente)';
           if (existing.referrer === 'N/A' && referrerName !== 'N/A') existing.referrer = referrerName;
           if (existing.phone === 'N/A' && c.phone) existing.phone = c.phone;
+          if (!existing.createdAt && c.createdAt) {
+            existing.createdAt = c.createdAt;
+            existing._timestamp = new Date(c.createdAt).getTime();
+          }
         } else {
           unifiedMap.set(email, {
             name: userName,
@@ -2390,6 +2398,7 @@
             role: 'Cliente Comprador España',
             referrer: referrerName,
             origin: c.source || 'Referido / Intake',
+            createdAt: c.createdAt || '',
             _timestamp: new Date(c.createdAt || 0).getTime()
           });
         }
@@ -2429,18 +2438,17 @@
             role: webinarRole,
             referrer: referrer,
             origin: origin,
+            createdAt: w.createdAt || '',
             _timestamp: new Date(w.createdAt || 0).getTime()
           });
         }
       });
       
       const unifiedArray = Array.from(unifiedMap.values());
-      // Sort by status, then name
-      unifiedArray.sort((a, b) => {
-        if (a.status !== b.status) return a.status.localeCompare(b.status);
-        return a.name.localeCompare(b.name);
-      });
+      // Always sort by newest registration first so no contact is buried
+      unifiedArray.sort((a, b) => (b._timestamp || 0) - (a._timestamp || 0));
       
+      currentUnifiedData = unifiedArray;
       setTextById('admin-unified-count', unifiedArray.length);
       
       renderUnifiedTable(unifiedArray);
@@ -2450,18 +2458,30 @@
       const filterSelect = document.getElementById('admin-unified-filter-status');
       
       const filterData = () => {
-        const term = (searchInput.value || '').toLowerCase();
-        const stat = filterSelect.value;
+        const term = (searchInput?.value || '').toLowerCase().trim();
+        const stat = filterSelect?.value || '';
         const filtered = unifiedArray.filter(item => {
-          const matchTerm = !term || item.name.toLowerCase().includes(term) || item.email.toLowerCase().includes(term) || item.referrer.toLowerCase().includes(term);
-          const matchStat = !stat || item.status === stat || (stat.includes('Ambos') && item.status.includes('Ambos')) || (stat.includes('Plataforma') && item.status.includes('Plataforma'));
+          const matchTerm = !term || 
+            (item.name || '').toLowerCase().includes(term) || 
+            (item.email || '').toLowerCase().includes(term) || 
+            (item.phone || '').toLowerCase().includes(term) ||
+            (item.referrer || '').toLowerCase().includes(term) ||
+            (item.origin || '').toLowerCase().includes(term) ||
+            (item.role || '').toLowerCase().includes(term);
+
+          const matchStat = !stat || 
+            item.status === stat || 
+            (stat === 'Ambos' && item.status.includes('Ambos')) || 
+            (stat === 'Solo Plataforma' && item.status.includes('Plataforma')) ||
+            (stat === 'Solo Webinar' && item.status.includes('Webinar')) ||
+            (stat === 'Cliente Comprador' && item.status.includes('Cliente'));
+
           return matchTerm && matchStat;
         });
         renderUnifiedTable(filtered);
       };
       
       if (searchInput) {
-        // Remove existing listeners by cloning
         const newSearch = searchInput.cloneNode(true);
         searchInput.parentNode.replaceChild(newSearch, searchInput);
         newSearch.addEventListener('input', filterData);
@@ -2482,39 +2502,88 @@
     const tbody = document.getElementById('admin-unified-table-body');
     if (!tbody) return;
 
-    if (data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:#6b7280;">No hay registros.</td></tr>`;
+    if (!data || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:#6b7280;">No hay registros coincidentes.</td></tr>`;
       return;
     }
 
     let html = '';
     data.forEach(item => {
-      let statusColor = '#6b7280';
-      if (item.status.includes('Ambos')) statusColor = '#10b981'; // Green
-      else if (item.status.includes('Webinar')) statusColor = '#f59e0b'; // Yellow/Orange
-      else if (item.status.includes('Plataforma')) statusColor = '#3b82f6'; // Blue
-      
-      html += `
-        <tr>
-          <td>
-            <div style="font-weight:600; color:var(--text-primary);">${App.utils.escapeHtml(item.name || '')}</div>
-          </td>
-          <td>
-            <a href="mailto:${App.utils.escapeHtml(item.email || '')}" style="color:var(--blue); text-decoration:none;">${App.utils.escapeHtml(item.email || '')}</a>
-          </td>
-          <td>${App.utils.escapeHtml(item.phone || '')}</td>
-          <td>
-            <span style="display:inline-block; padding:4px 8px; border-radius:12px; font-size:0.75rem; font-weight:600; background-color:${statusColor}22; color:${statusColor};">
-              ${App.utils.escapeHtml(item.status)}
-            </span>
-          </td>
-          <td style="text-transform:capitalize;">${App.utils.escapeHtml(item.role || '')}</td>
-          <td>${App.utils.escapeHtml(item.referrer || 'N/A')}</td>
-          <td><span style="font-size:0.8rem; color:var(--text-secondary); background:#f3f4f6; padding:2px 6px; border-radius:4px;">${App.utils.escapeHtml(item.origin || 'N/A')}</span></td>
-        </tr>
-      `;
+      try {
+        let statusColor = '#6b7280';
+        if (item.status.includes('Ambos')) statusColor = '#10b981'; // Green
+        else if (item.status.includes('Webinar')) statusColor = '#f59e0b'; // Yellow/Orange
+        else if (item.status.includes('Plataforma')) statusColor = '#3b82f6'; // Blue
+        else if (item.status.includes('Cliente')) statusColor = '#8b5cf6'; // Purple
+        
+        const dateStr = item.createdAt ? App.utils.formatDate(item.createdAt) : '—';
+
+        html += `
+          <tr>
+            <td>
+              <div style="font-weight:600; color:var(--text-primary);">${App.utils.escapeHtml(item.name || '')}</div>
+            </td>
+            <td>
+              <a href="mailto:${App.utils.escapeHtml(item.email || '')}" style="color:var(--blue); text-decoration:none;">${App.utils.escapeHtml(item.email || '')}</a>
+            </td>
+            <td>${App.utils.escapeHtml(item.phone || '')}</td>
+            <td>
+              <span style="display:inline-block; padding:4px 8px; border-radius:12px; font-size:0.75rem; font-weight:600; background-color:${statusColor}22; color:${statusColor};">
+                ${App.utils.escapeHtml(item.status)}
+              </span>
+            </td>
+            <td style="text-transform:capitalize;">${App.utils.escapeHtml(item.role || '')}</td>
+            <td>${App.utils.escapeHtml(item.referrer || 'N/A')}</td>
+            <td><span style="font-size:0.8rem; color:var(--text-secondary); background:#f3f4f6; padding:2px 6px; border-radius:4px;">${App.utils.escapeHtml(item.origin || 'N/A')}</span></td>
+            <td style="font-size:0.85rem; color:#4b5563; white-space:nowrap;">${dateStr}</td>
+          </tr>
+        `;
+      } catch (rowErr) {
+        console.warn('[Admin] Error rendering directory row:', rowErr, item);
+      }
     });
     tbody.innerHTML = html;
+  }
+
+  /* ── Export Unified Directory to CSV ── */
+  function exportUnifiedToExcel() {
+    try {
+      if (!currentUnifiedData || currentUnifiedData.length === 0) {
+        App.utils.showToast('No records to export.', 'error');
+        return;
+      }
+
+      const headers = ['Nombre', 'Email', 'Telefono', 'Estado', 'Rol', 'Referido Por', 'Origen', 'Fecha Registro'];
+      const rows = currentUnifiedData.map(item => [
+        item.name || '',
+        item.email || '',
+        item.phone || '',
+        item.status || '',
+        item.role || '',
+        item.referrer || '',
+        item.origin || '',
+        item.createdAt || ''
+      ]);
+
+      const csvContent = '\uFEFF' + [headers, ...rows]
+        .map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))
+        .join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Directorio-Unificado-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      App.utils.showToast(`✅ Exportados ${currentUnifiedData.length} contactos.`, 'success');
+    } catch (err) {
+      console.error('[Admin] exportUnified error:', err);
+      App.utils.showToast('Error exporting directory.', 'error');
+    }
   }
 
   /* ============================================
@@ -2530,6 +2599,7 @@
     exportClientsToExcel,
     toggleClientView,
     exportWebinarToExcel,
+    exportUnifiedToExcel,
     handleApprove,
     approveWithRole,
     handleReject,
