@@ -85,45 +85,51 @@
       const leads = await App.auth.getDossierLeads();
       renderDossierLeads(leads);
 
-      // Referral link
+      // Multi-channel Personalized Referral Links
       const isPending = currentUser.status === 'pending';
-      const referralLink = isPending ? '' : App.utils.generateReferralLink(currentUser.referralCode || 'BRK-DEFAULT');
-      const linkInput = document.getElementById('broker-dash-referral-link');
-      if (linkInput) {
-        if (isPending) {
-          linkInput.value = 'Enlace pendiente de aprobación por el Administrador / Link pending admin approval';
-          linkInput.disabled = true;
-          linkInput.style.color = '#9ca3af';
-          linkInput.style.fontStyle = 'italic';
-        } else {
-          linkInput.value = referralLink;
-          linkInput.disabled = false;
-          linkInput.style.color = '';
-          linkInput.style.fontStyle = '';
+      const refCode = currentUser.referralCode || 'BRK-DEFAULT';
+      const clientLink = isPending ? '' : App.utils.generateReferralLink(refCode, 'client');
+      const realtorLink = isPending ? '' : App.utils.generateReferralLink(refCode, 'realtor');
+      const generalLink = isPending ? '' : App.utils.generateReferralLink(refCode);
+
+      function setupBrokerLinkInput(inputId, copyBtnId, linkVal) {
+        const inputEl = document.getElementById(inputId);
+        const copyEl = document.getElementById(copyBtnId);
+        if (inputEl) {
+          if (isPending) {
+            inputEl.value = 'Enlace pendiente de aprobación / Pending admin approval';
+            inputEl.disabled = true;
+            inputEl.style.color = '#9ca3af';
+            inputEl.style.fontStyle = 'italic';
+          } else {
+            inputEl.value = linkVal;
+            inputEl.disabled = false;
+            inputEl.style.color = '';
+            inputEl.style.fontStyle = '';
+          }
+        }
+        if (copyEl) {
+          if (isPending) {
+            copyEl.disabled = true;
+            copyEl.style.opacity = '0.5';
+            copyEl.style.cursor = 'not-allowed';
+            copyEl.onclick = null;
+          } else {
+            copyEl.disabled = false;
+            copyEl.style.opacity = '';
+            copyEl.style.cursor = 'pointer';
+            copyEl.onclick = () => {
+              App.utils.copyToClipboard(linkVal);
+              App.utils.showToast('Referral link copied to clipboard!', 'success');
+            };
+          }
         }
       }
 
-      // Copy button handler
-      const copyBtn = document.getElementById('broker-dash-copy-link');
-      if (copyBtn) {
-        if (isPending) {
-          copyBtn.disabled = true;
-          copyBtn.style.opacity = '0.5';
-          copyBtn.style.cursor = 'not-allowed';
-          copyBtn.onclick = null;
-        } else {
-          copyBtn.disabled = false;
-          copyBtn.style.opacity = '';
-          copyBtn.style.cursor = 'pointer';
-          copyBtn.onclick = () => {
-            if (linkInput) {
-              linkInput.select();
-              document.execCommand('copy');
-              App.utils.showToast('Referral link copied to clipboard!', 'success');
-            }
-          };
-        }
-      }
+      // Populate broker dashboard link inputs
+      setupBrokerLinkInput('broker-dash-link-client', 'broker-dash-copy-client', clientLink);
+      setupBrokerLinkInput('broker-dash-link-realtor', 'broker-dash-copy-realtor', realtorLink);
+      setupBrokerLinkInput('broker-dash-referral-link', 'broker-dash-copy-link', generalLink);
 
       // Manual Add Client button
       const addBtnContainer = document.getElementById('broker-dash-add-client-btn');

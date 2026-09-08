@@ -149,7 +149,7 @@ App.views.public = {
           }
         }
         if (submitBtn) {
-          submitBtn.innerHTML = `<span class="lang-en">Register for Webinar</span><span class="lang-es">Registrarme al Webinario</span><span class="lang-fr">S'inscrire au Webinaire</span><span class="lang-en-ca">Register for Webinar</span>`;
+          submitBtn.innerHTML = `<span class="lang-en">🎟️ Claim My Free VIP Webinar Pass</span><span class="lang-es">🎟️ Reservar Mi Pase VIP Gratuito</span><span class="lang-fr">🎟️ Réserver Mon Pass VIP Gratuit</span><span class="lang-en-ca">🎟️ Claim My Free VIP Webinar Pass</span>`;
         }
       } else if (type === 'realtor') {
         if (formTitle) {
@@ -282,12 +282,20 @@ App.views.public = {
         selectedType = 'client';
       } else if (referrer.role === 'broker') {
         availableTypes = ['client', 'realtor'];
-        if (!availableTypes.includes(selectedType)) selectedType = 'client';
+        if (availableTypes.includes(requestedType)) {
+          selectedType = requestedType;
+        } else if (!availableTypes.includes(selectedType)) {
+          selectedType = 'client';
+        }
       } else if (referrer.role === 'agent_inmomas' || referrer.role === 'colaborador' || referrer.role === 'admin' || referrer.role === 'partner') {
         availableTypes = referrer.role === 'admin' 
           ? ['client', 'realtor', 'broker', 'agent_inmomas', 'colaborador']
           : ['client', 'realtor', 'broker'];
-        if (!availableTypes.includes(selectedType)) selectedType = 'client';
+        if (availableTypes.includes(requestedType)) {
+          selectedType = requestedType;
+        } else if (!availableTypes.includes(selectedType)) {
+          selectedType = 'client';
+        }
       }
 
       const typeConfig = {
