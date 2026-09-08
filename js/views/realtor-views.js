@@ -337,7 +337,7 @@
       realtorClients = await App.auth.getClients({ referredBy: currentUser.id });
 
       const isPending = currentUser.status === 'pending';
-      const referralLink = isPending ? '' : App.utils.generateReferralLink(currentUser.referralCode || 'REA-DEFAULT', 'client');
+      const referralLink = isPending ? '' : App.utils.generateReferralLink(currentUser.referralCode || 'REA-DEFAULT');
 
       // Display referral link
       const linkDisplay = document.getElementById('realtor-referral-link-display');

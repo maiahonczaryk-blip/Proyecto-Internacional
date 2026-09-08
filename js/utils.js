@@ -184,19 +184,19 @@ App.utils.generateReferralLink = function(referralCode, type) {
 /* ---- Share Webinar & Partner Helpers ---- */
 App.utils.getClientWebinarShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
-  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode, 'client') : 'https://thespainconnection.com/#webinar');
+  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#webinar');
   return `🇪🇸 ¡Hola! Te invito con un Pase VIP Gratuito a nuestro próximo webinario en vivo el 18 de septiembre (12:00 PM EDT / 18:00 h España): "Descubre España · Cómo Comprar, Mudarse e Invertir con Seguridad".\n\n📌 Conoce las claves de compra segura, visados de residencia e hipotecas para no residentes.\n\n🎟️ Reserva tu plaza gratuita aquí: ${link}`;
 };
 
 App.utils.getRealtorPartnerShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
-  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode, 'realtor') : 'https://thespainconnection.com/#register');
+  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#register');
   return `🤝 ¡Hola! Te invito a unirte a la red de Realtors Partners de RE/MAX Inmomás · The Spain Connection. Conecta a tus clientes de EE.UU., Canadá y Puerto Rico interesados en comprar o invertir en España y gana un 50% de comisión de referido con soporte legal e hipotecario completo en destino.\n\n🔗 Regístrate aquí para activar tu cuenta de Realtor Partner: ${link}`;
 };
 
 App.utils.getBrokerPartnerShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
-  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode, 'broker') : 'https://thespainconnection.com/#register');
+  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#register');
   return `🏢 ¡Hola! Te invito a crear una alianza estratégica entre tu Brokerage/Agencia y RE/MAX Inmomás · The Spain Connection. Abre un nuevo canal de ingresos internacionales para tu equipo con 50% de split de comisión en España y respaldo institucional completo.\n\n🔗 Registra tu Brokerage aquí: ${link}`;
 };
 

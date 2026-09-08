@@ -1684,99 +1684,100 @@
 
     <!-- ==================== VIEW: REFERRAL FORM ==================== -->
     <div id="view-referral-form" class="app-view">
-      <section class="auth-section" style="padding: 100px 24px; min-height: 100vh;">
-        <div class="auth-card auth-card--wide" style="max-width: 660px;">
-          <div class="auth-header">
-            <img src="images/spain-connection-logo.png" alt="The Spain Connection" class="auth-logo" style="margin-bottom: 12px;">
-            <div style="font-size: 1.2rem; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 24px; font-weight: 500;">
+      <section class="auth-section" style="padding: 100px 24px 60px; min-height: 100vh;">
+        <div class="auth-card auth-card--wide" style="max-width: 720px; padding: 36px 32px;">
+          <div class="auth-header" style="margin-bottom: 24px;">
+            <img src="images/spain-connection-logo.png" alt="The Spain Connection" class="auth-logo" style="margin-bottom: 12px; max-height: 52px;">
+            <div style="font-size: 1.1rem; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-weight: 500;">
               <span>By</span>
-              <img src="images/remax-logo.png" alt="RE/MAX Inmomás" style="height: 38px;">
+              <img src="images/remax-logo.png" alt="RE/MAX Inmomás" style="height: 34px;">
             </div>
-            <h2 id="referral-form-title">
-              <span class="lang-en">Exclusive VIP Registration</span>
-              <span class="lang-es">Registro VIP Exclusivo</span>
-              <span class="lang-fr">Inscription VIP Exclusive</span>
-              <span class="lang-en-ca">Exclusive VIP Registration</span>
+            <h2 id="referral-form-title" style="font-size: 1.6rem; font-weight: 800; margin-bottom: 8px;">
+              <span class="lang-en">Spain Unlocked · VIP Webinar Registration</span>
+              <span class="lang-es">Descubre España · Registro VIP al Webinario</span>
+              <span class="lang-fr">Découvrez l'Espagne · Inscription VIP au Webinaire</span>
+              <span class="lang-en-ca">Spain Unlocked · VIP Webinar Registration</span>
             </h2>
-            <p id="referral-welcome-msg" style="color: var(--primary);">
-              <span class="lang-en">Fill out the form below to get started.</span>
-              <span class="lang-es">Completa el formulario para comenzar.</span>
-              <span class="lang-fr">Remplissez le formulaire ci-dessous pour commencer.</span>
-              <span class="lang-en-ca">Fill out the form below to get started.</span>
-            </p>
-          </div>
-
-          <!-- ==================== WEBINAR SPOTLIGHT SHOWCASE BANNER ==================== -->
-          <div id="referral-webinar-spotlight-banner" style="background: linear-gradient(135deg, #140508 0%, #290710 40%, #480c1b 100%); border: 1.5px solid rgba(244, 63, 94, 0.45); border-radius: 18px; padding: 22px 24px; margin-bottom: 28px; color: #fff; box-shadow: 0 10px 30px rgba(225, 29, 72, 0.22); position: relative; overflow: hidden; text-align: left;">
-            <!-- Ambient glowing decorative orb -->
-            <div style="position: absolute; top: -30px; right: -30px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(239, 68, 68, 0.35) 0%, transparent 70%); pointer-events: none;"></div>
-
-            <!-- Top live tag -->
-            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(225, 29, 72, 0.25); border: 1px solid rgba(244, 63, 94, 0.65); border-radius: 50px; padding: 4px 14px; margin-bottom: 14px;">
-              <span style="width: 7px; height: 7px; border-radius: 50%; background: #ff4444; box-shadow: 0 0 6px #ff4444; animation: webinar-pulse 1.5s infinite;"></span>
-              <span style="font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #ffe4e6;">
-                <span class="lang-en">🔴 Live Webinar Invitation · September 18, 2026</span>
-                <span class="lang-es">🔴 Invitación Exclusiva al Webinario · 18 de Septiembre, 2026</span>
-                <span class="lang-fr">🔴 Invitation au Webinaire en Direct · 18 Septembre 2026</span>
-                <span class="lang-en-ca">🔴 Live Webinar Invitation · September 18, 2026</span>
-              </span>
-            </div>
-
-            <!-- Main webinar info card -->
-            <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-              <img src="images/webinar-client-sept18.jpg" alt="Webinario 18 de Septiembre" style="width: 85px; height: 85px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(251, 191, 36, 0.75); box-shadow: 0 6px 20px rgba(0,0,0,0.4); flex-shrink: 0;">
-              <div style="flex: 1; min-width: 220px;">
-                <h3 style="font-size: 1.18rem; font-weight: 800; color: #fff; margin: 0 0 4px; line-height: 1.25;">
-                  <span class="lang-en">Spain Unlocked: Living, Moving & Investing in Spain</span>
-                  <span class="lang-es">Descubre España: Guía para Comprar, Mudarse e Invertir</span>
-                  <span class="lang-fr">Découvrez l'Espagne : Vivre, S'installer & Investir</span>
-                  <span class="lang-en-ca">Spain Unlocked: Living, Moving & Investing in Spain</span>
-                </h3>
-                <div id="referral-banner-invitee" style="font-size: 0.84rem; color: #fecdd3; display: flex; align-items: center; gap: 6px; margin-top: 4px;">
-                  <span>✨</span>
-                  <span class="lang-en">Complimentary VIP invitation from your RE/MAX Inmomás personal advisor</span>
-                  <span class="lang-es">Invitación VIP gratuita cortesía de tu asesor personal RE/MAX Inmomás</span>
-                  <span class="lang-fr">Invitation VIP offerte par votre conseiller RE/MAX Inmomás</span>
-                  <span class="lang-en-ca">Complimentary VIP invitation from your RE/MAX Inmomás personal advisor</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Highlights strip -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.12);">
-              <div style="font-size: 0.78rem; color: rgba(255,255,255,0.9); display: flex; align-items: center; gap: 6px;">
-                <span>📅</span> <strong>18 Sep 2026</strong>
-              </div>
-              <div style="font-size: 0.78rem; color: rgba(255,255,255,0.9); display: flex; align-items: center; gap: 6px;">
-                <span>⏰</span> <strong>12:00 PM EDT / 18:00 h</strong>
-              </div>
-              <div style="font-size: 0.78rem; color: #fef08a; display: flex; align-items: center; gap: 6px;">
-                <span>🎟️</span> <strong>Pase 100% Gratis</strong>
-              </div>
-              <div style="font-size: 0.78rem; color: #fecdd3; display: flex; align-items: center; gap: 6px;">
-                <span>🔥</span> <strong>Solo 25 plazas</strong>
-              </div>
-            </div>
-
-            <p style="font-size: 0.78rem; color: rgba(255,255,255,0.72); margin: 12px 0 0; line-height: 1.45; font-style: italic;">
-              <span class="lang-en">⚡ By completing this form, you will be registered for the September 18 webinar and receive live access links, recordings, and the Buyer's Guide directly in your email.</span>
-              <span class="lang-es">⚡ Al completar este formulario, quedas automáticamente inscrito/a para el webinario del 18 de septiembre y recibirás los enlaces de acceso en vivo, grabación y guía de compra en tu correo.</span>
-              <span class="lang-fr">⚡ En remplissant ce formulaire, vous êtes automatiquement inscrit(e) au webinaire du 18 septembre et recevrez les liens d'accès direct et le guide d'achat.</span>
-              <span class="lang-en-ca">⚡ By completing this form, you will be registered for the September 18 webinar and receive live access links, recordings, and the Buyer's Guide directly in your email.</span>
+            <p id="referral-welcome-msg" style="color: var(--primary); font-size: 0.95rem; line-height: 1.5; margin: 0 auto; max-width: 580px;">
+              <span class="lang-en">Complete the form below to secure your complimentary VIP pass for the September 18 live webinar.</span>
+              <span class="lang-es">Completa el formulario para asegurar tu plaza VIP gratuita en el webinario en vivo del 18 de septiembre.</span>
+              <span class="lang-fr">Remplissez le formulaire ci-dessous pour réserver votre place VIP gratuite pour le webinaire du 18 septembre.</span>
+              <span class="lang-en-ca">Complete the form below to secure your complimentary VIP pass for the September 18 live webinar.</span>
             </p>
           </div>
 
           <!-- Contact type selector (hidden for realtor referrals, visible for broker/agent) -->
-          <div id="referral-type-selector" style="display:none; margin-bottom: 24px;">
-            <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 12px; display: block; color: var(--text-primary);">
-              <span class="lang-en">I am a…</span>
-              <span class="lang-es">Soy un…</span>
-              <span class="lang-fr">Je suis un…</span>
-              <span class="lang-en-ca">I am a…</span>
+          <div id="referral-type-selector" style="display:none; margin-bottom: 26px; padding: 16px; background: rgba(0, 67, 255, 0.04); border: 1px solid rgba(0, 67, 255, 0.15); border-radius: 14px;">
+            <label style="font-weight: 700; font-size: 0.92rem; margin-bottom: 10px; display: block; color: var(--text-primary); text-align: center;">
+              <span class="lang-en">Select your registration profile:</span>
+              <span class="lang-es">Selecciona tu perfil de registro:</span>
+              <span class="lang-fr">Sélectionnez votre profil d'inscription :</span>
+              <span class="lang-en-ca">Select your profile:</span>
             </label>
-            <div id="referral-type-options" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
-              <!-- Options injected by JS based on referrer's role -->
+            <div id="referral-type-options" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+              <!-- Injected by JS based on referrer's role -->
             </div>
+          </div>
+
+          <!-- ==================== WEBINAR SPOTLIGHT SHOWCASE BANNER (BIG & PROMINENT) ==================== -->
+          <div id="referral-webinar-spotlight-banner" style="background: linear-gradient(145deg, #130307 0%, #290610 35%, #4e091b 75%, #630c23 100%); border: 2px solid rgba(244, 63, 94, 0.65); border-radius: 20px; padding: 24px 26px; margin-bottom: 28px; color: #fff; box-shadow: 0 12px 36px rgba(225, 29, 72, 0.28); position: relative; overflow: hidden; text-align: left;">
+            <!-- Ambient glowing decorative orb -->
+            <div style="position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(239, 68, 68, 0.45) 0%, transparent 70%); pointer-events: none;"></div>
+
+            <!-- Top live tag -->
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(225, 29, 72, 0.3); border: 1px solid rgba(244, 63, 94, 0.8); border-radius: 50px; padding: 5px 16px; margin-bottom: 16px;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #ff4444; box-shadow: 0 0 8px #ff4444; animation: webinar-pulse 1.5s infinite;"></span>
+              <span style="font-size: 0.78rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #ffe4e6;">
+                <span class="lang-en">🔴 Live Webinar · September 18, 2026 · 12:00 PM EDT</span>
+                <span class="lang-es">🔴 Webinar en Vivo · 18 de Septiembre 2026 · 12:00 PM EDT / 18:00 h ESP</span>
+                <span class="lang-fr">🔴 Webinaire en Direct · 18 Septembre 2026 · 12h00 EDT</span>
+                <span class="lang-en-ca">🔴 Live Webinar · September 18, 2026 · 12:00 PM EDT</span>
+              </span>
+            </div>
+
+            <!-- Large Banner Image Preview -->
+            <div style="margin-bottom: 16px; border-radius: 14px; overflow: hidden; border: 2px solid rgba(251, 191, 36, 0.7); box-shadow: 0 8px 24px rgba(0,0,0,0.5);">
+              <img src="images/webinar-client-sept18.jpg" alt="Webinario 18 de Septiembre — Descubre España" style="width: 100%; max-height: 240px; object-fit: cover; display: block;">
+            </div>
+
+            <!-- Main webinar info -->
+            <h3 style="font-size: 1.35rem; font-weight: 800; color: #fff; margin: 0 0 6px; line-height: 1.3;">
+              <span class="lang-en">Spain Unlocked: How to Buy, Move & Invest in Spain Safely</span>
+              <span class="lang-es">Descubre España: Guía para Comprar, Mudarse e Invertir con Seguridad</span>
+              <span class="lang-fr">Découvrez l'Espagne : Vivre, S'installer & Investir en Toute Sécurité</span>
+              <span class="lang-en-ca">Spain Unlocked: How to Buy, Move & Invest in Spain Safely</span>
+            </h3>
+
+            <div id="referral-banner-invitee" style="font-size: 0.9rem; color: #fecdd3; display: flex; align-items: center; gap: 8px; margin-top: 6px; background: rgba(0,0,0,0.25); border-radius: 8px; padding: 8px 12px; border: 1px solid rgba(255,255,255,0.12);">
+              <span style="font-size: 1.1rem;">✨</span>
+              <span class="lang-en">Complimentary VIP invitation courtesy of your personal advisor</span>
+              <span class="lang-es">Invitación VIP gratuita cortesía de tu asesor personal RE/MAX Inmomás</span>
+              <span class="lang-fr">Invitation VIP offerte par votre conseiller RE/MAX Inmomás</span>
+              <span class="lang-en-ca">Complimentary VIP invitation courtesy of your personal advisor</span>
+            </div>
+
+            <!-- Key Feature Badges -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.15);">
+              <div style="font-size: 0.82rem; color: rgba(255,255,255,0.95); display: flex; align-items: center; gap: 6px;">
+                <span>📅</span> <strong>18 Sep 2026</strong>
+              </div>
+              <div style="font-size: 0.82rem; color: rgba(255,255,255,0.95); display: flex; align-items: center; gap: 6px;">
+                <span>⏰</span> <strong>12:00 PM EDT / 18:00 h</strong>
+              </div>
+              <div style="font-size: 0.82rem; color: #fef08a; display: flex; align-items: center; gap: 6px;">
+                <span>🎟️</span> <strong>Pase 100% Gratis</strong>
+              </div>
+              <div style="font-size: 0.82rem; color: #86efac; display: flex; align-items: center; gap: 6px;">
+                <span>🇪🇸</span> <strong>Hipotecas & Visados</strong>
+              </div>
+            </div>
+
+            <p style="font-size: 0.82rem; color: rgba(255,255,255,0.85); margin: 14px 0 0; line-height: 1.5; background: rgba(225, 29, 72, 0.2); border-radius: 10px; padding: 10px 14px; border: 1px solid rgba(244, 63, 94, 0.4);">
+              <span class="lang-en">⚡ By completing this form, you will be automatically registered for the September 18 live webinar and receive direct access links, full session recording, and the Spain Buyer's Guide in your email.</span>
+              <span class="lang-es">⚡ Al completar este formulario, quedas automáticamente inscrito/a para el webinario en vivo del 18 de septiembre y recibirás los enlaces de acceso VIP, la grabación completa y la Guía del Comprador en tu correo.</span>
+              <span class="lang-fr">⚡ En remplissant ce formulaire, vous êtes automatiquement inscrit(e) au webinaire du 18 septembre et recevrez les liens d'accès direct, l'enregistrement et le guide d'achat.</span>
+              <span class="lang-en-ca">⚡ By completing this form, you will be automatically registered for the September 18 live webinar and receive direct access links, full session recording, and the Spain Buyer's Guide in your email.</span>
+            </p>
           </div>
 
           <form id="referral-form">
@@ -1985,65 +1986,20 @@
             <!-- Notes -->
             <div class="form-group">
               <label>
-                <span class="lang-en">Notes</span>
-                <span class="lang-es">Notas</span>
-                <span class="lang-fr">Notes</span>
-                <span class="lang-en-ca">Notes</span>
+                <span class="lang-en">Notes / Questions</span>
+                <span class="lang-es">Notas / Dudas</span>
+                <span class="lang-fr">Remarques / Questions</span>
+                <span class="lang-en-ca">Notes / Questions</span>
               </label>
               <textarea id="referral-notes" rows="3" placeholder="" style="resize: vertical; width: 100%; padding: 12px 16px; border: 1px solid rgba(0,0,0,0.12); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.95rem; background: var(--bg-card); color: var(--text-primary); transition: border-color 0.2s;"></textarea>
             </div>
-            <!-- Professional Webinar Registration Checkbox -->
-            <div class="form-group webinar-consent-group professional-webinar-group" style="margin-top: 20px;">
-              <label class="checkbox-label checkbox-label--webinar" style="display:flex; align-items:flex-start; gap:12px; cursor:pointer;">
-                <input type="checkbox" id="referral-webinar-consent" style="margin-top:3px; flex-shrink:0;">
-                <span style="flex-grow:1;">
-                  <strong style="display:inline-flex; align-items:center; flex-wrap:wrap; gap:4px; color: #fff;">
-                    <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#ff4444; box-shadow:0 0 5px #ff4444; animation:webinar-pulse 1.5s ease-in-out infinite; margin-right:4px;"></span>
-                    <span class="lang-en">Exclusive Webinar: Scale Your Business Globally</span>
-                    <span class="lang-es">Webinar Exclusivo: Escala tu Negocio a Nivel Global</span>
-                    <span class="lang-fr">Webinaire exclusif : développez votre activité à l'international</span>
-                    <span class="lang-en-ca">Exclusive Webinar: Scale Your Business Globally</span>
-                  </strong>
-                  <br>
-                  <small id="webinar-info-details" style="display: block; font-size: 0.78rem; color: rgba(255,255,255,0.85); line-height: 1.5; margin-top: 6px; padding-left: 6px; border-left: 2px solid rgba(255,255,255,0.5);">
-                    <span class="lang-en">Join the "Beyond Borders" live webinar on August 28, 2026. Discover how top Realtors tap into Spain's booming luxury market to unlock a passive international commission stream—with zero extra listings or work.</span>
-                    <span class="lang-es">Únete al webinar en vivo "Beyond Borders" el 28 de agosto de 2026. Descubre cómo los mejores Realtors acceden al próspero mercado de lujo en España para activar comisiones internacionales pasivas—sin listados ni trabajo adicional.</span>
-                    <span class="lang-fr">Rejoignez le webinaire en direct "Beyond Borders" le 28 août 2026. Découvrez comment les meilleurs Courtiers accèdent au marché de luxe espagnol pour générer des commissions internationales passives—sans effort supplémentaire.</span>
-                    <span class="lang-en-ca">Join the "Beyond Borders" live webinar on August 28, 2026. Discover how top Realtors tap into Spain's booming luxury market to unlock a passive international commission stream—with zero extra listings or work.</span>
-                  </small>
-                </span>
-              </label>
-            </div>
-
-            <!-- Client Webinar Registration Checkbox -->
-            <div class="form-group webinar-consent-group client-webinar-group" style="margin-top: 20px; display: none;">
-              <label class="checkbox-label checkbox-label--webinar" style="display:flex; align-items:flex-start; gap:12px; cursor:pointer;">
-                <input type="checkbox" id="referral-client-webinar-consent" style="margin-top:3px; flex-shrink:0;">
-                <span style="flex-grow:1;">
-                  <strong style="display:inline-flex; align-items:center; flex-wrap:wrap; gap:4px; color: #fff;">
-                    <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#ff4444; box-shadow:0 0 5px #ff4444; animation:webinar-pulse 1.5s ease-in-out infinite; margin-right:4px;"></span>
-                    <span class="lang-en">Spain Unlocked: Living, Moving & Investing in Spain</span>
-                    <span class="lang-es">Descubre España: Guía para Comprar, Mudarse e Invertir</span>
-                    <span class="lang-fr">Découvrez l'Espagne : Vivre, S'installer & Investir</span>
-                    <span class="lang-en-ca">Spain Unlocked: Living, Moving & Investing in Spain</span>
-                  </strong>
-                  <br>
-                  <small id="client-webinar-info-details" style="display: block; font-size: 0.78rem; color: rgba(255,255,255,0.85); line-height: 1.5; margin-top: 6px; padding-left: 6px; border-left: 2px solid rgba(255,255,255,0.5);">
-                    <span class="lang-en">Join our buyer & investor live session on September 18, 2026. Learn about non-resident mortgages, residency visas, purchasing procedures, taxes, and high-growth properties in Spain.</span>
-                    <span class="lang-es">Únete a nuestra sesión para compradores e inversores el 18 de septiembre de 2026. Conoce hipotecas para no residentes, visados de residencia, proceso de compra e impuestos en España.</span>
-                    <span class="lang-fr">Rejoignez notre session en direct pour acheteurs et investisseurs le 18 septembre 2026. Découvrez les prêts pour non-résidents, visas, procédures d'achat et fiscalité en Espagne.</span>
-                    <span class="lang-en-ca">Join our buyer & investor live session on September 18, 2026. Learn about non-resident mortgages, residency visas, purchasing procedures, taxes, and high-growth properties in Spain.</span>
-                  </small>
-                </span>
-              </label>
-            </div>
             <!-- Submit -->
             <div class="form-group" style="margin-top: 24px;">
-              <button type="submit" class="btn btn-primary" style="width: 100%;" id="referral-submit-btn">
-                <span class="lang-en">Submit</span>
-                <span class="lang-es">Enviar</span>
-                <span class="lang-fr">Soumettre</span>
-                <span class="lang-en-ca">Submit</span>
+              <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px 20px; font-size: 1.05rem; font-weight: 700; border-radius: 10px;" id="referral-submit-btn">
+                <span class="lang-en">🎟️ Claim My Free VIP Webinar Pass</span>
+                <span class="lang-es">🎟️ Reservar Mi Pase VIP Gratuito</span>
+                <span class="lang-fr">🎟️ Réserver Mon Pass VIP Gratuit</span>
+                <span class="lang-en-ca">🎟️ Claim My Free VIP Webinar Pass</span>
               </button>
             </div>
           </form>
