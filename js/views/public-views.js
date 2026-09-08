@@ -530,36 +530,37 @@ App.views.public = {
         topBannerEl.classList.remove('webinar-theme--b2b', 'webinar-theme--b2c');
         topBannerEl.classList.add('webinar-theme--' + activeType);
         topBannerEl.style.background = isB2C
-          ? 'linear-gradient(90deg, #051329 0%, #0284c7 35%, #ea580c 70%, #051329 100%)'
+          ? 'linear-gradient(90deg, #180309 0%, #881337 35%, #e11d48 65%, #f97316 90%, #180309 100%)'
           : 'linear-gradient(90deg, #04081a 0%, #003f99 35%, #880000 65%, #04081a 100%)';
       }
 
       const topBannerBtn = document.getElementById('webinar-top-banner-btn');
       if (topBannerBtn) {
-        topBannerBtn.style.background = isB2C ? '#fef08a' : '#ffffff';
-        topBannerBtn.style.color = isB2C ? '#7c2d12' : '#003f99';
-        topBannerBtn.style.boxShadow = isB2C ? '0 2px 14px rgba(245,158,11,.4)' : 'none';
+        topBannerBtn.style.background = isB2C ? '#fff1f2' : '#ffffff';
+        topBannerBtn.style.color = isB2C ? '#881337' : '#003f99';
+        topBannerBtn.style.boxShadow = isB2C ? '0 2px 14px rgba(225,29,72,.4)' : 'none';
       }
 
       // ── Section & Ambient Glow Orbs Styling ──
       const sectionEl = document.getElementById('webinar-section');
       if (sectionEl) {
+        sectionEl.style.paddingTop = '130px';
         sectionEl.style.background = isB2C
-          ? 'linear-gradient(160deg, #040d1e 0%, #09203c 28%, #0d3b66 58%, #20132a 100%)'
+          ? 'linear-gradient(160deg, #140508 0%, #290710 28%, #480c1b 58%, #19030a 100%)'
           : 'linear-gradient(160deg, #030718 0%, #061530 35%, #0e051c 70%, #030718 100%)';
       }
 
       const orb1 = document.getElementById('webinar-orb-1');
       const orb2 = document.getElementById('webinar-orb-2');
       const orb3 = document.getElementById('webinar-orb-3');
-      if (orb1) orb1.style.background = isB2C ? 'radial-gradient(circle, rgba(245,158,11,.32) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(0,63,153,.28) 0%, transparent 70%)';
-      if (orb2) orb2.style.background = isB2C ? 'radial-gradient(circle, rgba(234,88,12,.25) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(204,0,0,.16) 0%, transparent 70%)';
-      if (orb3) orb3.style.background = isB2C ? 'radial-gradient(ellipse, rgba(14,165,233,.30) 0%, transparent 70%)' : 'radial-gradient(ellipse, rgba(0,63,153,.15) 0%, transparent 70%)';
+      if (orb1) orb1.style.background = isB2C ? 'radial-gradient(circle, rgba(239,68,68,.38) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(0,63,153,.28) 0%, transparent 70%)';
+      if (orb2) orb2.style.background = isB2C ? 'radial-gradient(circle, rgba(244,63,94,.32) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(204,0,0,.16) 0%, transparent 70%)';
+      if (orb3) orb3.style.background = isB2C ? 'radial-gradient(ellipse, rgba(245,158,11,.28) 0%, transparent 70%)' : 'radial-gradient(ellipse, rgba(0,63,153,.15) 0%, transparent 70%)';
 
       const topBandWrap = document.getElementById('webinar-top-announcement-band-wrap');
       if (topBandWrap) {
         topBandWrap.style.background = isB2C
-          ? 'linear-gradient(90deg, #b45309 0%, #ea580c 25%, #0284c7 65%, #b45309 100%)'
+          ? 'linear-gradient(90deg, #881337 0%, #be123c 25%, #e11d48 50%, #f97316 75%, #881337 100%)'
           : 'linear-gradient(90deg, #cc0000 0%, #003f99 50%, #cc0000 100%)';
       }
 
@@ -603,14 +604,14 @@ App.views.public = {
       // ── 3. Hero Label Pill ──
       const heroPillWrap = document.getElementById('webinar-hero-pill-wrap');
       if (heroPillWrap) {
-        heroPillWrap.style.background = isB2C ? 'rgba(245,158,11,.12)' : 'rgba(255,255,255,.07)';
-        heroPillWrap.style.border = isB2C ? '1.5px solid rgba(245,158,11,.45)' : '1px solid rgba(255,255,255,.15)';
-        heroPillWrap.style.boxShadow = isB2C ? '0 0 24px rgba(245,158,11,.22)' : 'none';
+        heroPillWrap.style.background = isB2C ? 'rgba(225,29,72,.16)' : 'rgba(255,255,255,.07)';
+        heroPillWrap.style.border = isB2C ? '1.5px solid rgba(244,63,94,.6)' : '1px solid rgba(255,255,255,.15)';
+        heroPillWrap.style.boxShadow = isB2C ? '0 0 24px rgba(225,29,72,.28)' : 'none';
       }
 
       const heroPillEl = document.getElementById('webinar-hero-pill');
       if (heroPillEl && config.heroPill) {
-        heroPillEl.style.color = isB2C ? '#fef08a' : 'rgba(255,255,255,.85)';
+        heroPillEl.style.color = isB2C ? '#ffe4e6' : 'rgba(255,255,255,.85)';
         heroPillEl.innerHTML = `
           <span class="lang-en">${config.heroPill.en}</span>
           <span class="lang-es">${config.heroPill.es}</span>
@@ -627,7 +628,7 @@ App.views.public = {
         if (hEl && highlight) {
           hEl.textContent = highlight;
           hEl.style.background = isB2C
-            ? 'linear-gradient(90deg, #fbbf24 0%, #f97316 45%, #38bdf8 100%)'
+            ? 'linear-gradient(90deg, #ff4365 0%, #f43f5e 35%, #fb7185 70%, #fbbf24 100%)'
             : 'linear-gradient(90deg, #5badff 0%, #cc0000 50%, #ff8c42 100%)';
           hEl.style.webkitBackgroundClip = 'text';
           hEl.style.webkitTextFillColor = 'transparent';
@@ -655,10 +656,10 @@ App.views.public = {
       // ── 6. Hero Spots Urgency Pill ──
       const heroSpotsEl = document.getElementById('webinar-hero-spots-pill');
       if (heroSpotsEl) {
-        heroSpotsEl.style.background = isB2C ? 'rgba(255,180,0,.18)' : 'rgba(255,180,0,.12)';
-        heroSpotsEl.style.border = isB2C ? '1px solid rgba(255,180,0,.5)' : '1px solid rgba(255,180,0,.35)';
-        heroSpotsEl.style.color = isB2C ? '#fef08a' : '#ffe066';
-        heroSpotsEl.style.boxShadow = isB2C ? '0 0 16px rgba(245,158,11,.25)' : 'none';
+        heroSpotsEl.style.background = isB2C ? 'rgba(225,29,72,.22)' : 'rgba(255,180,0,.12)';
+        heroSpotsEl.style.border = isB2C ? '1px solid rgba(244,63,94,.6)' : '1px solid rgba(255,180,0,.35)';
+        heroSpotsEl.style.color = isB2C ? '#ffe4e6' : '#ffe066';
+        heroSpotsEl.style.boxShadow = isB2C ? '0 0 18px rgba(225,29,72,.35)' : 'none';
         heroSpotsEl.innerHTML = `
           🔥
           <span class="lang-en">Only ${spots} spots available</span>
@@ -694,16 +695,16 @@ App.views.public = {
       const refCard = document.getElementById('webinar-reference-card');
       if (refCard) {
         refCard.style.background = isB2C
-          ? 'linear-gradient(135deg, rgba(234,88,12,.35), rgba(245,158,11,.22))'
+          ? 'linear-gradient(135deg, rgba(136,19,55,.55), rgba(225,29,72,.3))'
           : 'linear-gradient(135deg, rgba(0,63,153,.45), rgba(0,85,204,.28))';
-        refCard.style.border = isB2C ? '2px solid rgba(251,191,36,.6)' : '2px solid rgba(91,173,255,.45)';
-        refCard.style.boxShadow = isB2C ? '0 0 35px rgba(245,158,11,.3)' : '0 0 28px rgba(0,63,153,.35)';
+        refCard.style.border = isB2C ? '2px solid rgba(244,63,94,.75)' : '2px solid rgba(91,173,255,.45)';
+        refCard.style.boxShadow = isB2C ? '0 0 35px rgba(225,29,72,.38)' : '0 0 28px rgba(0,63,153,.35)';
       }
 
       const refBadge = document.getElementById('webinar-reference-badge');
       if (refBadge) {
-        refBadge.style.background = isB2C ? 'linear-gradient(90deg, #d97706, #ea580c)' : 'linear-gradient(90deg, #003f99, #0055cc)';
-        refBadge.style.boxShadow = isB2C ? '0 2px 10px rgba(234,88,12,.4)' : 'none';
+        refBadge.style.background = isB2C ? 'linear-gradient(90deg, #be123c, #e11d48)' : 'linear-gradient(90deg, #003f99, #0055cc)';
+        refBadge.style.boxShadow = isB2C ? '0 2px 12px rgba(225,29,72,.45)' : 'none';
       }
 
       // ── 8. What You'll Learn Section ──
@@ -727,7 +728,7 @@ App.views.public = {
         `;
       }
 
-      const hoverBorderColor = isB2C ? 'rgba(251,191,36,.35)' : 'rgba(91,173,255,.3)';
+      const hoverBorderColor = isB2C ? 'rgba(244,63,94,.45)' : 'rgba(91,173,255,.3)';
       const benefitsContainer = document.getElementById('webinar-benefits-container');
       if (benefitsContainer && Array.isArray(config.benefits)) {
         benefitsContainer.innerHTML = config.benefits.map(b => `
@@ -755,25 +756,25 @@ App.views.public = {
       const urgencyBar = document.getElementById('webinar-urgency-bar');
       if (urgencyBar) {
         urgencyBar.style.background = isB2C
-          ? 'linear-gradient(135deg, rgba(245,158,11,.18), rgba(2,132,199,.24))'
+          ? 'linear-gradient(135deg, rgba(136,19,55,.35), rgba(225,29,72,.25))'
           : 'linear-gradient(135deg, rgba(204,0,0,.15), rgba(0,63,153,.25))';
-        urgencyBar.style.border = isB2C ? '1px solid rgba(251,191,36,.35)' : '1px solid rgba(255,255,255,.12)';
-        urgencyBar.style.boxShadow = isB2C ? '0 10px 35px rgba(245,158,11,.15)' : 'none';
+        urgencyBar.style.border = isB2C ? '1px solid rgba(244,63,94,.45)' : '1px solid rgba(255,255,255,.12)';
+        urgencyBar.style.boxShadow = isB2C ? '0 10px 35px rgba(225,29,72,.2)' : 'none';
       }
 
       const urgencyBtn = document.getElementById('webinar-urgency-btn');
       if (urgencyBtn) {
         urgencyBtn.style.background = isB2C
-          ? 'linear-gradient(135deg, #ea580c 0%, #f97316 40%, #e11d48 100%)'
+          ? 'linear-gradient(135deg, #e11d48 0%, #be123c 45%, #9f1239 100%)'
           : 'linear-gradient(135deg, #003f99 0%, #cc0000 100%)';
-        urgencyBtn.style.boxShadow = isB2C ? '0 8px 32px rgba(234,88,12,.5)' : '0 6px 28px rgba(0,63,153,.35)';
+        urgencyBtn.style.boxShadow = isB2C ? '0 8px 32px rgba(225,29,72,.55)' : '0 6px 28px rgba(0,63,153,.35)';
       }
 
       // ── 9. Form Card Header, Inputs & Submit Button ──
       const cardHeader = document.getElementById('webinar-card-header');
       if (cardHeader) {
         cardHeader.style.background = isB2C
-          ? 'linear-gradient(135deg, #0284c7 0%, #0369a1 35%, #d97706 75%, #ea580c 115%)'
+          ? 'linear-gradient(135deg, #881337 0%, #be123c 40%, #e11d48 75%, #f97316 110%)'
           : 'linear-gradient(135deg, #003f99 0%, #004ab5 40%, #880000 130%)';
       }
 
@@ -790,9 +791,9 @@ App.views.public = {
       const submitBtn = document.getElementById('webinar-submit-btn');
       if (submitBtn) {
         submitBtn.style.background = isB2C
-          ? 'linear-gradient(135deg, #ea580c 0%, #f97316 40%, #e11d48 100%)'
+          ? 'linear-gradient(135deg, #e11d48 0%, #be123c 45%, #9f1239 100%)'
           : 'linear-gradient(135deg, #003f99 0%, #cc0000 100%)';
-        submitBtn.style.boxShadow = isB2C ? '0 8px 30px rgba(234,88,12,.45)' : '0 6px 28px rgba(0,63,153,.35)';
+        submitBtn.style.boxShadow = isB2C ? '0 8px 32px rgba(225,29,72,.55)' : '0 6px 28px rgba(0,63,153,.35)';
       }
 
       const agencyLabel = document.getElementById('webinar-agency-label');

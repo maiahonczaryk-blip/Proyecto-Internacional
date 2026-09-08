@@ -7560,6 +7560,7 @@ textarea:focus-visible {
 
 /* Common Webinar Elements */
 #webinar-section {
+  padding-top: 130px !important;
   transition: background 0.4s ease;
 }
 .webinar-ambient-orb {
@@ -7644,85 +7645,86 @@ textarea:focus-visible {
 }
 
 /* ──────────────────────────────────────────────
-   2. B2C THEME: Mediterranean Coastal Luxury & Sunny Living in Spain
-   Colors: Mediterranean Azure (#0284c7), Spanish Gold (#fbbf24), Warm Coral/Amber (#ea580c, #f97316)
+   2. B2C THEME: Spanish Warm Crimson, Ruby Wine & Mediterranean Sunset
+   Colors: Iberian Ruby (#881337, #be123c), Vibrant Spanish Crimson (#e11d48, #f43f5e), Sunset Amber & Gold (#f97316, #fbbf24)
    ────────────────────────────────────────────── */
 .webinar-theme--b2c #webinar-section {
-  background: linear-gradient(160deg, #040d1e 0%, #09203c 28%, #0d3b66 58%, #20132a 100%) !important;
+  background: linear-gradient(160deg, #140508 0%, #290710 28%, #480c1b 58%, #19030a 100%) !important;
 }
 .webinar-theme--b2c .webinar-orb-1 {
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.32) 0%, transparent 70%) !important; /* Golden Sun */
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.38) 0%, transparent 70%) !important; /* Spanish Scarlet Sun */
 }
 .webinar-theme--b2c .webinar-orb-2 {
-  background: radial-gradient(circle, rgba(234, 88, 12, 0.25) 0%, transparent 70%) !important; /* Warm Coral */
+  background: radial-gradient(circle, rgba(244, 63, 94, 0.32) 0%, transparent 70%) !important; /* Radiant Ruby */
 }
 .webinar-theme--b2c .webinar-orb-3 {
-  background: radial-gradient(ellipse, rgba(14, 165, 233, 0.30) 0%, transparent 70%) !important; /* Azure Sea */
+  background: radial-gradient(ellipse, rgba(245, 158, 11, 0.28) 0%, transparent 70%) !important; /* Golden Sunset Amber */
 }
 .webinar-theme--b2c #webinar-top-announcement-band-wrap {
-  background: linear-gradient(90deg, #b45309 0%, #ea580c 25%, #0284c7 65%, #b45309 100%) !important;
+  background: linear-gradient(90deg, #881337 0%, #be123c 25%, #e11d48 50%, #f97316 75%, #881337 100%) !important;
 }
 .webinar-theme--b2c #webinar-hero-pill-wrap {
-  background: rgba(245, 158, 11, 0.12) !important;
-  border: 1.5px solid rgba(245, 158, 11, 0.45) !important;
-  box-shadow: 0 0 24px rgba(245, 158, 11, 0.22) !important;
+  background: rgba(225, 29, 72, 0.16) !important;
+  border: 1.5px solid rgba(244, 63, 94, 0.6) !important;
+  box-shadow: 0 0 24px rgba(225, 29, 72, 0.28) !important;
   backdrop-filter: blur(12px) !important;
 }
 .webinar-theme--b2c #webinar-hero-pill {
-  color: #fef08a !important; /* Sunburst Gold */
+  color: #ffe4e6 !important; /* Soft Rose-White */
   font-weight: 800 !important;
 }
 .webinar-theme--b2c .webinar-highlight-text {
-  background: linear-gradient(90deg, #fbbf24 0%, #f97316 45%, #38bdf8 100%) !important;
+  background: linear-gradient(90deg, #ff4365 0%, #f43f5e 35%, #fb7185 70%, #fbbf24 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
 }
 .webinar-theme--b2c #webinar-hero-spots-pill {
-  background: rgba(245, 158, 11, 0.18) !important;
-  border: 1px solid rgba(245, 158, 11, 0.5) !important;
-  color: #fef08a !important;
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.25) !important;
+  background: rgba(225, 29, 72, 0.22) !important;
+  border: 1px solid rgba(244, 63, 94, 0.6) !important;
+  color: #ffe4e6 !important;
+  box-shadow: 0 0 18px rgba(225, 29, 72, 0.35) !important;
 }
 .webinar-theme--b2c #webinar-reference-card {
-  background: linear-gradient(135deg, rgba(234, 88, 12, 0.35), rgba(245, 158, 11, 0.22)) !important;
-  border: 2px solid rgba(251, 191, 36, 0.6) !important;
-  box-shadow: 0 0 35px rgba(245, 158, 11, 0.3) !important;
+  background: linear-gradient(135deg, rgba(136, 19, 55, 0.55), rgba(225, 29, 72, 0.3)) !important;
+  border: 2px solid rgba(244, 63, 94, 0.75) !important;
+  box-shadow: 0 0 35px rgba(225, 29, 72, 0.38) !important;
 }
 .webinar-theme--b2c #webinar-reference-badge {
-  background: linear-gradient(90deg, #d97706, #ea580c) !important;
+  background: linear-gradient(90deg, #be123c, #e11d48) !important;
   color: #fff !important;
-  box-shadow: 0 2px 10px rgba(234, 88, 12, 0.4) !important;
+  box-shadow: 0 2px 12px rgba(225, 29, 72, 0.45) !important;
 }
 .webinar-theme--b2c #webinar-urgency-bar {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(2, 132, 199, 0.24)) !important;
-  border: 1px solid rgba(251, 191, 36, 0.35) !important;
-  box-shadow: 0 10px 35px rgba(245, 158, 11, 0.15) !important;
+  background: linear-gradient(135deg, rgba(136, 19, 55, 0.35), rgba(225, 29, 72, 0.25)) !important;
+  border: 1px solid rgba(244, 63, 94, 0.45) !important;
+  box-shadow: 0 10px 35px rgba(225, 29, 72, 0.2) !important;
 }
 .webinar-theme--b2c #webinar-card-header {
-  background: linear-gradient(135deg, #0284c7 0%, #0369a1 35%, #d97706 75%, #ea580c 115%) !important;
+  background: linear-gradient(135deg, #881337 0%, #be123c 40%, #e11d48 75%, #f97316 110%) !important;
 }
 .webinar-theme--b2c #webinar-submit-btn,
 .webinar-theme--b2c #webinar-urgency-btn {
-  background: linear-gradient(135deg, #ea580c 0%, #f97316 40%, #e11d48 100%) !important;
-  box-shadow: 0 8px 32px rgba(234, 88, 12, 0.5) !important;
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 45%, #9f1239 100%) !important;
+  box-shadow: 0 8px 32px rgba(225, 29, 72, 0.55) !important;
 }
 .webinar-theme--b2c #webinar-submit-btn:hover,
 .webinar-theme--b2c #webinar-urgency-btn:hover {
-  box-shadow: 0 12px 42px rgba(234, 88, 12, 0.7) !important;
+  background: linear-gradient(135deg, #f43f5e 0%, #e11d48 50%, #be123c 100%) !important;
+  box-shadow: 0 12px 42px rgba(225, 29, 72, 0.75) !important;
   transform: translateY(-2px);
 }
 .webinar-theme--b2c #webinar-top-banner {
-  background: linear-gradient(90deg, #051329 0%, #0284c7 35%, #ea580c 70%, #051329 100%) !important;
+  background: linear-gradient(90deg, #180309 0%, #881337 35%, #e11d48 65%, #f97316 90%, #180309 100%) !important;
 }
 .webinar-theme--b2c #webinar-top-banner-btn {
-  background: #fef08a !important;
-  color: #7c2d12 !important;
+  background: #fff1f2 !important;
+  color: #881337 !important;
   font-weight: 800 !important;
-  box-shadow: 0 2px 14px rgba(245, 158, 11, 0.4) !important;
+  box-shadow: 0 2px 14px rgba(225, 29, 72, 0.4) !important;
 }
 .webinar-theme--b2c #webinar-top-banner-spots {
-  background: rgba(245, 158, 11, 0.25) !important;
-  border: 1px solid rgba(245, 158, 11, 0.55) !important;
-  color: #fef08a !important;
+  background: rgba(225, 29, 72, 0.28) !important;
+  border: 1px solid rgba(244, 63, 94, 0.6) !important;
+  color: #ffe4e6 !important;
 }
