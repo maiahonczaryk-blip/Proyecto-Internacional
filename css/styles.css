@@ -3587,6 +3587,21 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   margin-bottom: 32px;
 }
 
+.auth-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.auth-logo {
+  display: block;
+  margin: 0 auto 12px auto;
+  height: 52px;
+  max-height: 52px;
+  width: auto;
+  max-width: 280px;
+  object-fit: contain;
+}
+
 .auth-card__logo img {
   height: 40px;
   width: auto;
@@ -3743,11 +3758,122 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   display: none;
 }
 
-/* ---- Referral Type Card Selection ---- */
-.referral-type-card.selected .role-card__content {
-  border-color: var(--blue);
-  background: rgba(0, 67, 255, 0.04);
-  box-shadow: 0 0 0 4px rgba(0, 67, 255, 0.08);
+/* ---- Prominent Referral Role Selector Component ---- */
+.referral-role-selector-box {
+  margin-bottom: 28px;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.referral-role-selector-box .selector-title-badge {
+  display: inline-block;
+  background: #003f99;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+
+.referral-role-selector-box .selector-heading {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 14px;
+  text-align: center;
+}
+
+.referral-role-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.referral-role-card {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 2px solid #cbd5e1;
+  background: #ffffff;
+  color: #1e293b;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  text-align: left;
+}
+
+.referral-role-card:hover {
+  border-color: #003f99;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 63, 153, 0.12);
+}
+
+.referral-role-card.selected {
+  border-color: #003f99;
+  background: linear-gradient(145deg, #003380 0%, #004ecc 100%);
+  color: #ffffff;
+  box-shadow: 0 8px 22px rgba(0, 63, 153, 0.32);
+  transform: translateY(-2px);
+}
+
+.referral-role-card .role-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.referral-role-card .role-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.referral-role-card .role-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: #f1f5f9;
+  color: #475569;
+  transition: background 0.2s, color 0.2s;
+}
+
+.referral-role-card.selected .role-badge {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+.referral-role-card .role-main-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-bottom: 4px;
+  color: #0f172a;
+}
+
+.referral-role-card.selected .role-main-title {
+  color: #ffffff;
+}
+
+.referral-role-card .role-sub-desc {
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: #64748b;
+}
+
+.referral-role-card.selected .role-sub-desc {
+  color: rgba(255, 255, 255, 0.88);
 }
 
 #referral-form textarea:focus,

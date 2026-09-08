@@ -299,40 +299,102 @@ App.views.public = {
       }
 
       const typeConfig = {
-        client: { icon: '👤', labelEn: 'Client (Webinar 18 Sep)', labelEs: 'Cliente (Webinario 18 Sep)', labelFr: 'Client (Webinaire 18 Sep)', labelEnCa: 'Client (Webinar 18 Sep)' },
-        realtor: { icon: '🏠', labelEn: 'Realtor Partner', labelEs: 'Realtor Partner', labelFr: 'Conseiller Partenaire', labelEnCa: 'Realtor Partner' },
-        broker: { icon: '🏢', labelEn: 'Brokerage / Agency', labelEs: 'Broker / Agencia', labelFr: 'Courtier / Agence', labelEnCa: 'Brokerage / Agency' },
-        agent_inmomas: { icon: '🇪🇸', labelEn: 'RE/MAX Inmomás Agent', labelEs: 'Agente RE/MAX Inmomás', labelFr: 'Agent RE/MAX Inmomás', labelEnCa: 'RE/MAX Inmomás Agent' },
-        colaborador: { icon: '🤝', labelEn: 'Collaborator', labelEs: 'Colaborador', labelFr: 'Collaborateur', labelEnCa: 'Collaborator' }
+        client: {
+          icon: '👤',
+          badge: 'Webinar 18 Sep',
+          labelEn: 'Client / Buyer',
+          labelEs: 'Cliente / Comprador',
+          labelFr: 'Client / Acheteur',
+          labelEnCa: 'Client / Buyer',
+          subEn: 'Complimentary VIP Pass to Sep 18 Webinar',
+          subEs: 'Pase VIP Gratuito al Webinario 18 Sep',
+          subFr: 'Pass VIP Gratuit au Webinaire du 18 Sep',
+          subEnCa: 'Complimentary VIP Pass to Sep 18 Webinar'
+        },
+        realtor: {
+          icon: '🏠',
+          badge: '50% Split',
+          labelEn: 'Realtor Partner',
+          labelEs: 'Realtor Partner',
+          labelFr: 'Conseiller Partenaire',
+          labelEnCa: 'Realtor Partner',
+          subEn: 'USA & Canada Agents · 50% Referral Split',
+          subEs: 'Agentes USA y Canadá · 50% Comisión',
+          subFr: 'Courtiers USA et Canada · 50% Commission',
+          subEnCa: 'USA & Canada Agents · 50% Referral Split'
+        },
+        broker: {
+          icon: '🏢',
+          badge: 'Alianza B2B',
+          labelEn: 'Brokerage / Agency',
+          labelEs: 'Broker / Agencia',
+          labelFr: 'Courtier / Agence',
+          labelEnCa: 'Brokerage / Agency',
+          subEn: 'Strategic Alliance for Teams & Brokerages',
+          subEs: 'Alianza Estratégica para tu Oficina',
+          subFr: 'Partenariat Stratégique pour votre Agence',
+          subEnCa: 'Strategic Alliance for Teams & Brokerages'
+        },
+        agent_inmomas: {
+          icon: '🇪🇸',
+          badge: 'RE/MAX Inmomás',
+          labelEn: 'RE/MAX Inmomás Agent',
+          labelEs: 'Agente RE/MAX Inmomás',
+          labelFr: 'Agent RE/MAX Inmomás',
+          labelEnCa: 'RE/MAX Inmomás Agent',
+          subEn: 'Spain Inmomás Team Network',
+          subEs: 'Equipo Asesor en España',
+          subFr: 'Équipe Conseiller en Espagne',
+          subEnCa: 'Spain Inmomás Team Network'
+        },
+        colaborador: {
+          icon: '🤝',
+          badge: 'Partner',
+          labelEn: 'Collaborator',
+          labelEs: 'Colaborador',
+          labelFr: 'Collaborateur',
+          labelEnCa: 'Collaborator',
+          subEn: 'Professional Services & Alliances',
+          subEs: 'Servicios Profesionales y Alianzas',
+          subFr: 'Services Professionnels & Partenariats',
+          subEnCa: 'Professional Services & Alliances'
+        }
       };
 
       if (availableTypes.length > 1 && typeSelector && typeOptions) {
         typeSelector.style.display = 'block';
         typeOptions.innerHTML = availableTypes.map((type) => {
-          const cfg = typeConfig[type];
+          const cfg = typeConfig[type] || typeConfig.client;
           const isSelected = type === selectedType;
           return `
-            <label class="role-card referral-type-card ${isSelected ? 'selected' : ''}">
+            <div class="referral-role-card ${isSelected ? 'selected' : ''}" data-type="${type}">
               <input type="radio" name="referral-contact-type" value="${type}" ${isSelected ? 'checked' : ''} style="display:none;">
-              <div class="role-card__content" style="padding: 14px 10px; text-align: center;">
-                <span class="role-card__icon" style="font-size: 1.6rem;">${cfg.icon}</span>
-                <span class="role-card__title" style="font-size: 0.85rem; font-weight: 700;">
-                  <span class="lang-en">${cfg.labelEn}</span>
-                  <span class="lang-es">${cfg.labelEs}</span>
-                  <span class="lang-fr">${cfg.labelFr}</span>
-                  <span class="lang-en-ca">${cfg.labelEnCa}</span>
-                </span>
+              <div class="role-top-row">
+                <span class="role-icon">${cfg.icon}</span>
+                <span class="role-badge">${cfg.badge}</span>
               </div>
-            </label>`;
+              <div class="role-main-title">
+                <span class="lang-en">${cfg.labelEn}</span>
+                <span class="lang-es">${cfg.labelEs}</span>
+                <span class="lang-fr">${cfg.labelFr}</span>
+                <span class="lang-en-ca">${cfg.labelEnCa}</span>
+              </div>
+              <div class="role-sub-desc">
+                <span class="lang-en">${cfg.subEn}</span>
+                <span class="lang-es">${cfg.subEs}</span>
+                <span class="lang-fr">${cfg.subFr}</span>
+                <span class="lang-en-ca">${cfg.subEnCa}</span>
+              </div>
+            </div>`;
         }).join('');
 
-        typeOptions.querySelectorAll('.referral-type-card').forEach(card => {
+        typeOptions.querySelectorAll('.referral-role-card').forEach(card => {
           card.addEventListener('click', function() {
-            typeOptions.querySelectorAll('.referral-type-card').forEach(c => c.classList.remove('selected'));
+            typeOptions.querySelectorAll('.referral-role-card').forEach(c => c.classList.remove('selected'));
             this.classList.add('selected');
             const radio = this.querySelector('input');
             if (radio) radio.checked = true;
-            selectedType = radio ? radio.value : 'client';
+            selectedType = this.dataset.type || 'client';
             updateFieldVisibility(selectedType);
           });
         });
