@@ -15,6 +15,8 @@
   let allUsers = [];
   let allClients = [];
   let allLeads = [];
+  let activeClientTag = 'spain_buyer'; // 'spain_buyer' | 'realtor_network' | 'all'
+  let clientSearchQuery = '';
 
   /* ============================================
      initDashboard()
@@ -890,41 +892,19 @@
       allUsers = await App.auth.getAllUsers();
       allClients = await App.auth.getClients();
       
-      const getRealtorName = (realtorId) => {
-        const realtor = allUsers.find(u => u.id === realtorId);
-        return realtor ? `${realtor.firstName} ${realtor.lastName}` : 'Unknown';
-      };
-      
-      App.utils.renderKanbanBoard(
-        'admin-clients-board',
-        allClients,
-        'App.views.admin.showClientDetail',
-        getRealtorName,
-        'App.views.admin.handleClientDrop'
-      );
-
-      // Render List View
-      const tbody = document.getElementById('admin-clients-tbody');
-      if (tbody) {
-        tbody.innerHTML = '';
-        allClients.forEach(client => {
-          const dateStr = client.createdAt ? new Date(client.createdAt).toLocaleDateString() : '';
-          const tr = document.createElement('tr');
-          tr.style.cursor = 'pointer';
-          tr.onclick = () => App.views.admin.showClientDetail(client.id);
-          
-          tr.innerHTML = `
-            <td>${dateStr}</td>
-            <td style="font-weight:600;">${App.utils.escapeHtml(client.firstName || '')} ${App.utils.escapeHtml(client.lastName || '')}</td>
-            <td>${App.utils.escapeHtml(client.email || '')}</td>
-            <td>${App.utils.escapeHtml(client.phone || '-')}</td>
-            <td>€${Number(client.budget || 0).toLocaleString()}</td>
-            <td><span class="status-badge status-${(client.status || 'new').toLowerCase().replace(/\s+/g, '-')}">${App.utils.escapeHtml(client.status || 'New')}</span></td>
-            <td>${App.utils.escapeHtml(getRealtorName(client.realtorId))}</td>
-          `;
-          tbody.appendChild(tr);
+      // Setup Search Input
+      const searchInput = document.getElementById('admin-client-search-input');
+      if (searchInput) {
+        const newSearch = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(newSearch, searchInput);
+        newSearch.value = clientSearchQuery;
+        newSearch.addEventListener('input', (e) => {
+          clientSearchQuery = (e.target.value || '').trim().toLowerCase();
+          renderClientsView();
         });
       }
+
+      renderClientsView();
     } catch (err) {
       console.error('[Admin] initClients error:', err);
       const container = document.getElementById('admin-clients-board');
@@ -939,6 +919,107 @@
         `;
       }
       App.utils.showToast('Error loading clients.', 'error');
+    }
+  }
+
+  function setClientTagFilter(tag) {
+    activeClientTag = tag;
+    renderClientsView();
+  }
+
+  function renderClientsView() {
+    // 1. Update count badge
+    const badgeEl = document.getElementById('admin-client-count-badge');
+    if (badgeEl) {
+      badgeEl.textContent = `${allClients.length} ${allClients.length === 1 ? 'cliente' : 'clientes'}`;
+    }
+
+    // 2. Filter clients by search query
+    let displayClients = allClients;
+
+    if (clientSearchQuery) {
+      displayClients = displayClients.filter(c => {
+        const fullName = `${c.firstName || ''} ${c.lastName || ''}`.toLowerCase();
+        const email = (c.email || '').toLowerCase();
+        const phone = (c.phone || '').toLowerCase();
+        const area = (c.interestArea || '').toLowerCase();
+        const agentName = (c.localAgentName || '').toLowerCase();
+        const realtor = allUsers.find(u => u.id === (c.realtorId || c.referredBy));
+        const realtorName = realtor ? `${realtor.firstName || ''} ${realtor.lastName || ''}`.toLowerCase() : '';
+        return fullName.includes(clientSearchQuery) || email.includes(clientSearchQuery) || phone.includes(clientSearchQuery) || area.includes(clientSearchQuery) || agentName.includes(clientSearchQuery) || realtorName.includes(clientSearchQuery);
+      });
+    }
+
+    const getRealtorName = (realtorId) => {
+      const realtor = allUsers.find(u => u.id === realtorId);
+      return realtor ? `${realtor.firstName} ${realtor.lastName}` : 'Directo / Sin asignar';
+    };
+
+    // 3. Render Kanban
+    App.utils.renderKanbanBoard(
+      'admin-clients-board',
+      displayClients,
+      'App.views.admin.showClientDetail',
+      getRealtorName,
+      'App.views.admin.handleClientDrop'
+    );
+
+    // 4. Render List View
+    const tbody = document.getElementById('admin-clients-tbody');
+    if (tbody) {
+      tbody.innerHTML = '';
+      if (displayClients.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #6b7280; padding: 2rem;">No se encontraron clientes.</td></tr>`;
+      } else {
+        displayClients.forEach(client => {
+          const dateStr = client.createdAt ? new Date(client.createdAt).toLocaleDateString() : '';
+          const tr = document.createElement('tr');
+          tr.style.cursor = 'pointer';
+          tr.onclick = () => App.views.admin.showClientDetail(client.id);
+          
+          const fullNameEscaped = App.utils.escapeHtml(`${client.firstName || ''} ${client.lastName || ''}`.trim());
+
+          tr.innerHTML = `
+            <td>${dateStr}</td>
+            <td style="font-weight:600;">${App.utils.escapeHtml(client.firstName || '')} ${App.utils.escapeHtml(client.lastName || '')}</td>
+            <td>${App.utils.escapeHtml(client.email || '')}</td>
+            <td>${App.utils.escapeHtml(client.phone || '-')}</td>
+            <td>${client.budget && !isNaN(Number(client.budget)) ? '€' + Number(client.budget).toLocaleString() : App.utils.escapeHtml(client.budget || '—')}</td>
+            <td>${App.utils.escapeHtml(client.interestArea || '—')}</td>
+            <td><span class="status-badge status-${(client.status || 'new').toLowerCase().replace(/\s+/g, '-')}">${App.utils.escapeHtml(client.status || 'New')}</span></td>
+            <td><span style="color:#b45309;font-weight:600;">🇪🇸 ${App.utils.escapeHtml(client.localAgentName || 'Sin asignar')}</span></td>
+            <td>${App.utils.escapeHtml(getRealtorName(client.realtorId || client.referredBy))}</td>
+            <td style="text-align: right; white-space: nowrap;" onclick="event.stopPropagation();">
+              <button class="btn btn-outline btn-sm" onclick="App.views.admin.showClientDetail('${client.id}')" title="Ver Detalles" style="padding: 4px 8px; font-size: 0.8rem; margin-right: 4px;">👁️</button>
+              <button class="btn btn-sm" onclick="App.views.admin.confirmConvertClient('${client.id}', '${fullNameEscaped}', 'realtor')" title="Convertir a Agente (Realtor)" style="background: #0043ff; color: white; border: none; padding: 4px 8px; font-size: 0.8rem; font-weight: 600; margin-right: 4px;">🔄 Realtor</button>
+              <button class="btn btn-sm" onclick="App.utils.confirmDeleteClient('${client.id}', '${fullNameEscaped}', () => App.views.admin.initClients())" title="Eliminar Cliente" style="background: #ef4444; color: white; border: none; padding: 4px 8px; font-size: 0.8rem;">🗑️</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
+  }
+
+  async function handleUpdateClientTag(clientId) {
+    try {
+      const select = document.getElementById('client-tag-select');
+      if (!select) return;
+      const newTag = select.value;
+      await App.auth.updateClientTag(clientId, newTag);
+      
+      const client = allClients.find(c => c.id === clientId);
+      if (client) {
+        client.tag = newTag;
+        client._tag = newTag;
+      }
+      
+      App.utils.showToast('Etiqueta actualizada correctamente.', 'success');
+      App.utils.closeModal();
+      renderClientsView();
+    } catch (err) {
+      console.error(err);
+      App.utils.showToast(err.message || 'Error al actualizar etiqueta.', 'error');
     }
   }
 
@@ -957,7 +1038,8 @@
       const client = allClients.find(c => c.id === clientId);
       if (!client) return;
 
-      const realtor = allUsers.find(u => u.id === client.referredBy);
+      const clientTag = client.tag || App.utils.getClientTag(client);
+      const realtor = allUsers.find(u => u.id === (client.realtorId || client.referredBy));
       const realtorName = realtor ? `${realtor.firstName} ${realtor.lastName}` : '—';
       
       // Get all active local agents
@@ -990,9 +1072,45 @@
       App.utils.showModal({
         title: 'Client Details & Assignment',
         body: `
-          <div style="margin-bottom: 1.5rem;">
-            <h3 style="margin: 0 0 0.25rem;">${App.utils.escapeHtml(client.firstName)} ${App.utils.escapeHtml(client.lastName)}</h3>
-            <div style="margin-bottom: 0.5rem;">${statusBadge}</div>
+          <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <h3 style="margin: 0 0 0.25rem;">${App.utils.escapeHtml(client.firstName)} ${App.utils.escapeHtml(client.lastName)}</h3>
+              <div style="margin-bottom: 0.5rem;">${statusBadge}</div>
+            </div>
+            <div>
+              ${App.utils.getClientTagBadge(clientTag)}
+            </div>
+          </div>
+
+          <!-- Convert to Agent / Professional Box -->
+          <div style="background: rgba(0, 67, 255, 0.05); border: 1px solid rgba(0, 67, 255, 0.2); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label style="font-weight: 700; font-size: 0.85rem; color: #0043ff; text-transform: uppercase;">🔄 Convertir Contacto a Agente / Profesional</label>
+            </div>
+            <p style="font-size: 0.8rem; color: #4b5563; margin-bottom: 12px; line-height: 1.4;">
+              ¿Esta persona se registró como Agente / Profesional y no como cliente comprador? Conviértela para transferir su cuenta a <strong>Gestión de Usuarios</strong> con su código de referido y retirarla de este pipeline de clientes.
+            </p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn btn-primary btn-sm" onclick="App.views.admin.confirmConvertClient('${client.id}', '${App.utils.escapeHtml(client.firstName)} ${App.utils.escapeHtml(client.lastName)}', 'realtor')" style="background: #0043ff; border-color: #0043ff;">
+                🏠 Convertir a Realtor (Agente)
+              </button>
+              <button class="btn btn-outline btn-sm" onclick="App.views.admin.confirmConvertClient('${client.id}', '${App.utils.escapeHtml(client.firstName)} ${App.utils.escapeHtml(client.lastName)}', 'broker')" style="border-color: #0043ff; color: #0043ff;">
+                🏢 Convertir a Broker
+              </button>
+            </div>
+          </div>
+
+          <!-- Tag / Classification Settings -->
+          <div style="background: rgba(5, 150, 105, 0.05); border: 1px solid rgba(5, 150, 105, 0.2); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+            <label for="client-tag-select" style="font-weight: 600; font-size: 0.85rem; color: #059669; text-transform: uppercase;">🏷️ Tag / Clasificación del Contacto</label>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <select id="client-tag-select" class="form-select" style="flex: 1; margin-bottom: 0;">
+                <option value="spain_buyer" ${clientTag === 'spain_buyer' ? 'selected' : ''}>🇪🇸 Comprador / Inversor España (Cliente Real)</option>
+                <option value="realtor_network" ${clientTag === 'realtor_network' ? 'selected' : ''}>🏠 Red RE/MAX / Realtor o Broker</option>
+                <option value="general_lead" ${clientTag === 'general_lead' ? 'selected' : ''}>📋 Lead General / Sin clasificar</option>
+              </select>
+              <button class="btn btn-primary" onclick="App.views.admin.handleUpdateClientTag('${client.id}')" style="background: #059669; border-color: #059669;">Guardar Tag</button>
+            </div>
           </div>
           
           <div style="background: rgba(180, 83, 9, 0.05); border: 1px solid rgba(180, 83, 9, 0.15); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
@@ -1099,6 +1217,26 @@
     } catch (err) {
       console.error(err);
       App.utils.showToast(err.message, 'error');
+    }
+  }
+
+  async function confirmConvertClient(clientId, clientName, targetRole = 'realtor') {
+    const roleLabel = targetRole === 'broker' ? 'Broker' : 'Agente (Realtor)';
+    if (!confirm(`¿Deseas convertir a "${clientName}" en ${roleLabel}?\n\n• Se creará su cuenta en el panel de Gestión de Usuarios con su código de referido.\n• Se eliminará del pipeline de clientes.`)) {
+      return;
+    }
+    await handleConvertClient(clientId, targetRole);
+  }
+
+  async function handleConvertClient(clientId, targetRole = 'realtor') {
+    try {
+      const res = await App.auth.convertClientToUser(clientId, targetRole);
+      App.utils.showToast(`¡Contacto convertido exitosamente a ${targetRole === 'broker' ? 'Broker' : 'Realtor'}! Ahora aparece en Gestión de Usuarios. 🎉`, 'success');
+      App.utils.closeModal();
+      await initClients();
+    } catch (err) {
+      console.error('[Admin] handleConvertClient error:', err);
+      App.utils.showToast(err.message || 'Error al convertir cliente a agente.', 'error');
     }
   }
 
@@ -1856,12 +1994,12 @@
     }
 
     const headers = [
-      'Date', 'First Name', 'Last Name', 'Email', 'Phone', 'Budget', 'Requirements', 'Status', 'Assigned Realtor'
+      'Date', 'First Name', 'Last Name', 'Email', 'Phone', 'Budget', 'Interest Area', 'Status', 'Assigned Inmomas Agent', 'Referring Realtor / Partner'
     ];
 
     const getRealtorName = (realtorId) => {
       const realtor = allUsers.find(u => u.id === realtorId);
-      return realtor ? `${realtor.firstName || ''} ${realtor.lastName || ''}`.trim() : 'Unknown';
+      return realtor ? `${realtor.firstName || ''} ${realtor.lastName || ''}`.trim() : 'Directo / Sin asignar';
     };
 
     const rows = allClients.map(c => [
@@ -1871,9 +2009,10 @@
       c.email || '',
       c.phone || '',
       c.budget || '',
-      c.requirements || '',
+      c.interestArea || '',
       c.status || '',
-      getRealtorName(c.realtorId)
+      c.localAgentName || 'Sin asignar',
+      getRealtorName(c.realtorId || c.referredBy)
     ]);
 
     const escape = v => '"' + String(v).replace(/"/g, '""') + '"';
@@ -2190,6 +2329,9 @@
       if (!allUsers || allUsers.length === 0) {
         allUsers = await App.auth.getAllUsers();
       }
+      if (!allClients || allClients.length === 0) {
+        allClients = await App.auth.getClients();
+      }
       const webinarRegs = await App.auth.getWebinarRegistrations();
       
       const unifiedMap = new Map();
@@ -2225,7 +2367,35 @@
         });
       });
 
-      // 2. Process webinar registrations
+      // 2. Process all clients
+      allClients.forEach(c => {
+        let email = (c.email || '').toLowerCase().trim();
+        if (!email) return;
+
+        let userName = `${c.firstName || ''} ${c.lastName || ''}`.trim() || 'Sin Nombre';
+        let realtor = allUsers.find(u => u.id === (c.realtorId || c.referredBy));
+        let referrerName = realtor ? `${realtor.firstName || ''} ${realtor.lastName || ''}`.trim() : 'N/A';
+
+        let existing = unifiedMap.get(email);
+        if (existing) {
+          existing.status = 'Ambos (Plataforma y Cliente)';
+          if (existing.referrer === 'N/A' && referrerName !== 'N/A') existing.referrer = referrerName;
+          if (existing.phone === 'N/A' && c.phone) existing.phone = c.phone;
+        } else {
+          unifiedMap.set(email, {
+            name: userName,
+            email: c.email,
+            phone: c.phone || 'N/A',
+            status: 'Cliente Comprador',
+            role: 'Cliente Comprador España',
+            referrer: referrerName,
+            origin: c.source || 'Referido / Intake',
+            _timestamp: new Date(c.createdAt || 0).getTime()
+          });
+        }
+      });
+
+      // 3. Process webinar registrations
       webinarRegs.forEach(w => {
         let email = (w.email || '').toLowerCase().trim();
         if (!email) return;
@@ -2238,8 +2408,11 @@
         let referrer = (w.referredByAgentName || 'N/A').trim();
         if (!referrer || referrer.toLowerCase() === 'n/a' || referrer === '') referrer = 'N/A';
 
+        const isB2B = (w.webinarType || '').toLowerCase() === 'b2b' || (w.webinar || '').toLowerCase().includes('beyond borders') || (w.agency && (w.agency.toLowerCase().includes('remax') || w.agency.toLowerCase().includes('broker')));
+        const webinarRole = isB2B ? 'Realtor / Broker (B2B)' : 'Invitado Webinar';
+
         if (existing) {
-          existing.status = 'Ambos (Plataforma y Webinar)';
+          existing.status = 'Ambos (Registrado y Webinar)';
           if (existing.referrer === 'N/A' && referrer !== 'N/A') {
             existing.referrer = referrer;
             existing.origin = origin;
@@ -2253,7 +2426,7 @@
             email: w.email,
             phone: phone,
             status: 'Solo Webinar',
-            role: 'Invitado Webinar',
+            role: webinarRole,
             referrer: referrer,
             origin: origin,
             _timestamp: new Date(w.createdAt || 0).getTime()
@@ -2378,7 +2551,11 @@
     resetWebinarDefaults,
     filterWebinarTable,
     searchWebinarTable,
-    initUnified
+    initUnified,
+    setClientTagFilter,
+    handleUpdateClientTag,
+    confirmConvertClient,
+    handleConvertClient
   };
 
 })();

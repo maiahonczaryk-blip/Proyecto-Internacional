@@ -998,6 +998,23 @@ App.auth = (function() {
     }
   }
 
+  async function updateClientTag(clientId, tag) {
+    if (App.demoMode) {
+      const client = App.demoData.clients.find(c => c.id === clientId);
+      if (!client) throw new Error('Client not found.');
+      client.tag = tag;
+      client.updatedAt = new Date().toISOString();
+      saveDemoData();
+      return true;
+    } else {
+      await App.db.collection('clients').doc(clientId).update({
+        tag: tag,
+        updatedAt: new Date().toISOString()
+      });
+      return true;
+    }
+  }
+
   /* ---- Commission Management ---- */
   async function getCommissions(filters = {}) {
     if (App.demoMode) {
@@ -1159,19 +1176,19 @@ App.auth = (function() {
 
   /* ---- Webinar Settings (B2B vs B2C Switch & Date Config) ---- */
   const DEFAULT_WEBINAR_SETTINGS = {
-    activeType: 'b2c', // Default next upcoming webinar: B2C (Sept 18, 2026)
-    date: '2026-09-18',
-    time: '12:00', // 12:00 PM EDT (18:00 Spain CEST)
+    activeType: 'b2b', // Default next upcoming webinar: B2B for Realtors (Sept 24, 2026 at 7:00 PM EDT)
+    date: '2026-09-24',
+    time: '19:00', // 7:00 PM EDT (19:00 h Miami / NY / Toronto)
     timeZone: 'EDT',
     spotsAvailable: 25,
     updatedAt: new Date().toISOString(),
     b2b: {
-      title: 'Beyond the Borders',
+      title: 'Beyond Borders',
       subtitle: 'Passive International Commissions for Realtors & Brokers',
-      targetAudience: 'US, Canadian & Puerto Rico Realtors',
+      targetAudience: 'US, Canadian & Puerto Rico Realtors & Brokers',
       spots: 25,
-      date: '2026-08-28',
-      time: '12:00',
+      date: '2026-09-24',
+      time: '19:00',
       badge: {
         en: '🔴 LIVE WEBINAR · 🇺🇸 Exclusively for US, Canadian & Puerto Rico Realtors · 🇵🇷 FREE Registration',
         es: '🔴 WEBINAR EN VIVO · 🇺🇸 Exclusivo para Realtors de EE.UU., Canadá y Puerto Rico · 🇵🇷 Registro GRATUITO',
@@ -1179,28 +1196,28 @@ App.auth = (function() {
         'en-ca': '🔴 LIVE WEBINAR · 🇺🇸 Exclusively for US, Canadian & Puerto Rico Realtors · 🇵🇷 FREE Registration'
       },
       heroPill: {
-        en: 'RE/MAX Inmomás International — Realtor Partner Webinar',
-        es: 'RE/MAX Inmomás International — Webinar para Realtors Partners',
-        fr: 'RE/MAX Inmomás International — Webinaire Partenaires',
-        'en-ca': 'RE/MAX Inmomás International — Realtor Partner Webinar'
+        en: 'RE/MAX Inmomás International — Realtor Partner Masterclass',
+        es: 'RE/MAX Inmomás International — Masterclass para Realtors Partners',
+        fr: 'RE/MAX Inmomás International — Masterclass VIP Partenaires',
+        'en-ca': 'RE/MAX Inmomás International — Realtor Partner Masterclass'
       },
       titlePrefix: {
-        en: 'Beyond the',
-        es: 'Más Allá de',
+        en: 'Beyond',
+        es: 'Beyond',
         fr: 'Au-Delà des',
-        'en-ca': 'Beyond the'
+        'en-ca': 'Beyond'
       },
       titleHighlight: {
         en: 'Borders',
-        es: 'las Fronteras',
+        es: 'Borders',
         fr: 'Frontières',
         'en-ca': 'Borders'
       },
       subtitleText: {
-        en: 'The live webinar where top US, Canadian & Puerto Rico Realtors discover how to build a passive international income stream by referring clients to Spain\'s booming luxury market — with zero extra work.',
-        es: 'El webinar en vivo donde los mejores Realtors de EE.UU., Canadá y Puerto Rico descubren cómo generar ingresos internacionales pasivos refiriendo clientes al mercado de lujo de España — sin trabajo adicional.',
-        fr: 'Le webinaire en direct où les meilleurs agents US, canadiens & porto-ricains découvrent comment générer des revenus internationaux passifs en référant des clients au marché de luxe espagnol — sans travail supplémentaire.',
-        'en-ca': 'The live webinar where top US, Canadian & Puerto Rico Realtors discover how to build a passive international income stream by referring clients to Spain\'s booming luxury market — with zero extra work.'
+        en: 'The live masterclass where top US, Canadian & Puerto Rico Realtors discover how to earn 50% referral commissions in Spain\'s booming luxury market — with zero extra work.',
+        es: 'La masterclass en vivo donde los mejores Realtors de EE.UU., Canadá y Puerto Rico descubren cómo ganar el 50% de comisión de referidos en España — sin listados ni trabajo adicional.',
+        fr: 'La masterclass en direct où les meilleurs agents découvrent comment gagner 50% de commission de référence en Espagne — sans effort supplémentaire.',
+        'en-ca': 'The live masterclass where top US, Canadian & Puerto Rico Realtors discover how to earn 50% referral commissions in Spain\'s booming luxury market — with zero extra work.'
       },
       sectionHeadline: {
         en: 'Why Every US, Canadian & Puerto Rico Realtor Should Attend',
@@ -1209,22 +1226,22 @@ App.auth = (function() {
         'en-ca': 'Why Every US, Canadian & Puerto Rico Realtor Should Attend'
       },
       sectionSubheadline: {
-        en: 'In just 60 minutes, learn the exact system our collaborators use to close international deals from their home office.',
-        es: 'En solo 60 minutos, aprende el sistema exacto que usan nuestros colaboradores para cerrar acuerdos internacionales desde su oficina.',
-        fr: 'En 60 minutes, découvrez le système exact utilisé par nos partenaires pour conclure des transactions internationales depuis leur bureau.',
-        'en-ca': 'In just 60 minutes, learn the exact system our collaborators use to close international deals from their home office.'
+        en: 'In just 60 minutes, learn the exact system our collaborators use to close international deals and earn 50% commissions from their home office.',
+        es: 'En solo 60 minutos, aprende el sistema exacto que usan nuestros colaboradores para cerrar acuerdos internacionales y ganar el 50% de comisión desde su oficina.',
+        fr: 'En 60 minutes, découvrez le système exact utilisé par nos partenaires pour conclure des transactions internationales.',
+        'en-ca': 'In just 60 minutes, learn the exact system our collaborators use to close international deals and earn 50% commissions.'
       },
       bannerText: {
-        en: 'Beyond Borders · 12 PM EDT / 6 PM Spain · Free for Realtors & Brokers',
-        es: 'Beyond Borders · 12 PM EDT / 18 h España · Gratuito para Realtors y Brokers',
-        fr: 'Beyond Borders · 12 h EDT / 18 h Espagne · Gratuit pour les agents & courtiers',
-        'en-ca': 'Beyond Borders · 12 PM EDT / 6 PM Spain · Free for Realtors & Brokers'
+        en: 'Beyond Borders · September 24 · 7 PM EDT / 19:00 h Miami · Free for Realtors & Brokers',
+        es: 'Beyond Borders · 24 de Septiembre · 7 PM EDT / 19:00 h Miami · Gratuito para Realtors y Brokers',
+        fr: 'Beyond Borders · 24 Septembre · 19 h EDT · Gratuit pour les Agents & Courtiers',
+        'en-ca': 'Beyond Borders · September 24 · 7 PM EDT · Free for Realtors & Brokers'
       },
       formCardTitle: {
-        en: 'Beyond Borders · Realtor VIP Access',
-        es: 'Beyond Borders · Acceso VIP Realtors',
-        fr: 'Beyond Borders · Accès VIP Agents',
-        'en-ca': 'Beyond Borders · Realtor VIP Access'
+        en: 'Beyond Borders · Realtor VIP Pass',
+        es: 'Beyond Borders · Pase VIP Realtors',
+        fr: 'Beyond Borders · Pass VIP Agents',
+        'en-ca': 'Beyond Borders · Realtor VIP Pass'
       },
       organizationLabel: {
         en: 'Real Estate Agency / Brokerage *',
@@ -1364,7 +1381,14 @@ App.auth = (function() {
     let currentSettings = null;
     try {
       const cached = localStorage.getItem('remax_webinar_settings');
-      if (cached) currentSettings = JSON.parse(cached);
+      if (cached) {
+        currentSettings = JSON.parse(cached);
+        // Auto-migrate stale dates from prior iterations to ensure current Sept 24 settings apply
+        if (currentSettings.date === '2026-09-18' || currentSettings.date === '2026-08-28' || (currentSettings.b2b && currentSettings.b2b.date === '2026-08-28')) {
+          currentSettings = JSON.parse(JSON.stringify(DEFAULT_WEBINAR_SETTINGS));
+          localStorage.setItem('remax_webinar_settings', JSON.stringify(currentSettings));
+        }
+      }
     } catch (e) {}
 
     // 2. If online and not in demo mode, try fetching from Firestore
@@ -1607,6 +1631,7 @@ App.auth = (function() {
       needsUCI: clientData.needsUCI || false,
       needsFuster: clientData.needsFuster || false,
       needsHolidays: clientData.needsHolidays || false,
+      tag: clientData.tag || 'spain_buyer',
       status: 'contacted',
       referredBy: clientData.referredBy || null,
       realtorId: clientData.realtorId || null,
@@ -1704,6 +1729,145 @@ App.auth = (function() {
       if (!commQuery.empty) await batch.commit();
     }
     return true;
+  }
+
+  /* ---- Convert Client to User (Realtor / Broker) ---- */
+  async function convertClientToUser(clientId, targetRole = 'realtor', options = {}) {
+    if (!clientId) throw new Error('Client ID is required.');
+
+    if (App.demoMode) {
+      const client = App.demoData.clients.find(c => c.id === clientId);
+      if (!client) throw new Error('Client not found.');
+
+      const email = (client.email || '').toLowerCase().trim();
+      const lastName = client.lastName || 'User';
+      const userId = client.id.startsWith('client_') || client.id.startsWith('cli-') 
+        ? client.id.replace(/^client_|^cli-/, 'usr_') 
+        : ('usr_' + Date.now());
+
+      const referralCode = `${targetRole === 'broker' ? 'BRK' : (targetRole === 'agent_inmomas' ? 'LOC' : (targetRole === 'colaborador' ? 'COL' : 'REA'))}-${lastName.toUpperCase().replace(/[^A-Z0-9]/g, '')}-${Date.now().toString().slice(-4)}`;
+
+      let user = App.demoData.users.find(u => u.email.toLowerCase() === email);
+      if (user) {
+        user.role = targetRole;
+        user.status = options.status || 'pending';
+        user.firstName = client.firstName || user.firstName;
+        user.lastName = client.lastName || user.lastName;
+        user.phone = client.phone || user.phone;
+        user.updatedAt = new Date().toISOString();
+      } else {
+        user = {
+          id: userId,
+          email: email,
+          firstName: client.firstName || '',
+          lastName: client.lastName || '',
+          phone: client.phone || '',
+          country: client.currentLocation || client.country || 'United States',
+          agencyName: client.agencyName || (targetRole === 'broker' ? 'Brokerage Agency' : 'Real Estate Agent'),
+          role: targetRole,
+          status: options.status || 'pending',
+          brokerStatus: targetRole === 'realtor' ? 'pending' : null,
+          brokerId: client.brokerId || null,
+          referredBy: client.referredBy || client.realtorId || null,
+          referralCode: referralCode,
+          profileImage: null,
+          agreementSigned: false,
+          agreementSignedAt: null,
+          source: client.source || 'converted_from_client',
+          createdAt: client.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        App.demoData.users.push(user);
+      }
+
+      if (options.deleteClient !== false) {
+        const cIdx = App.demoData.clients.findIndex(c => c.id === clientId);
+        if (cIdx !== -1) App.demoData.clients.splice(cIdx, 1);
+        const commIdx = App.demoData.commissions.findIndex(c => c.clientId === clientId);
+        if (commIdx !== -1) App.demoData.commissions.splice(commIdx, 1);
+      }
+
+      saveDemoData();
+      return { success: true, user };
+    } else {
+      const clientDoc = await App.db.collection('clients').doc(clientId).get();
+      if (!clientDoc.exists) throw new Error('Client not found in database.');
+      const client = clientDoc.data();
+
+      const email = (client.email || '').toLowerCase().trim();
+      const lastName = client.lastName || 'User';
+      const userId = clientId.startsWith('client_') || clientId.startsWith('cli-')
+        ? clientId.replace(/^client_|^cli-/, 'usr_')
+        : ('usr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4));
+
+      const referralCode = `${targetRole === 'broker' ? 'BRK' : (targetRole === 'agent_inmomas' ? 'LOC' : (targetRole === 'colaborador' ? 'COL' : 'REA'))}-${lastName.toUpperCase().replace(/[^A-Z0-9]/g, '')}-${Date.now().toString().slice(-4)}`;
+
+      const userSnap = await App.db.collection('users').where('email', '==', email).get();
+      let finalUser;
+
+      if (!userSnap.empty) {
+        const existingDoc = userSnap.docs[0];
+        const updatePayload = {
+          role: targetRole,
+          status: options.status || 'pending',
+          updatedAt: new Date().toISOString()
+        };
+        if (client.phone && (!existingDoc.data().phone || existingDoc.data().phone === '—')) {
+          updatePayload.phone = client.phone;
+        }
+        await existingDoc.ref.update(updatePayload);
+        finalUser = { id: existingDoc.id, ...existingDoc.data(), ...updatePayload };
+      } else {
+        const userPayload = {
+          email: email,
+          firstName: client.firstName || '',
+          lastName: client.lastName || '',
+          phone: client.phone && client.phone !== '—' ? client.phone : '',
+          country: client.currentLocation || client.country || 'United States',
+          agencyName: client.agencyName || (targetRole === 'broker' ? 'Brokerage Agency' : 'Real Estate Agent'),
+          role: targetRole,
+          status: options.status || 'pending',
+          brokerStatus: targetRole === 'realtor' ? 'pending' : null,
+          brokerId: client.brokerId || null,
+          referredBy: client.referredBy || client.realtorId || null,
+          referralCode: referralCode,
+          profileImage: null,
+          agreementSigned: false,
+          agreementSignedAt: null,
+          source: client.source || 'converted_from_client',
+          createdAt: client.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        await App.db.collection('users').doc(userId).set(userPayload);
+        finalUser = { id: userId, ...userPayload };
+      }
+
+      if (options.deleteClient !== false) {
+        await App.db.collection('clients').doc(clientId).delete();
+        const commQuery = await App.db.collection('commissions').where('clientId', '==', clientId).get();
+        if (!commQuery.empty) {
+          const batch = App.db.batch();
+          commQuery.docs.forEach(d => batch.delete(d.ref));
+          await batch.commit();
+        }
+      }
+
+      return { success: true, user: finalUser };
+    }
+  }
+
+  async function batchConvertClientsToUsers(clientIds, targetRole = 'realtor') {
+    if (!Array.isArray(clientIds) || clientIds.length === 0) return [];
+    const results = [];
+    for (const id of clientIds) {
+      try {
+        const res = await convertClientToUser(id, targetRole);
+        results.push({ id, success: true, user: res.user });
+      } catch (err) {
+        results.push({ id, success: false, error: err.message });
+      }
+    }
+    return results;
   }
 
   /* ============================================
@@ -1821,7 +1985,10 @@ App.auth = (function() {
     getUser,
     getClients,
     updateClientStatus,
+    updateClientTag,
     deleteClient,
+    convertClientToUser,
+    batchConvertClientsToUsers,
     assignLocalAgent,
     assignLeadToAgent,
     saveClientFinancials,

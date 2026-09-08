@@ -181,13 +181,13 @@ App.utils.generateReferralLink = function(referralCode) {
 App.utils.getClientWebinarShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
   const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#webinar');
-  return `🇪🇸 ¡Hola! Te invito con un Pase VIP Gratuito a nuestro próximo webinario en vivo el 18 de septiembre (12:00 PM EDT / 18:00 h España): "Descubre España · Cómo Comprar, Mudarse e Invertir con Seguridad".\n\n📌 Conoce las claves de compra segura, visados de residencia e hipotecas para no residentes.\n\n🎟️ Reserva tu plaza gratuita aquí: ${link}`;
+  return `🇪🇸 ¡Hola! Te invito con un Pase VIP Gratuito a nuestra Masterclass en vivo el 24 de septiembre (7:00 PM EDT / 19:00 h Miami · NY): "Beyond Borders · Cómo Comprar, Mudarse e Invertir con Seguridad en España".\n\n📌 Conoce las claves de compra segura, visados de residencia e hipotecas para no residentes con RE/MAX Inmomás.\n\n🎟️ Reserva tu plaza gratuita aquí: ${link}`;
 };
 
 App.utils.getRealtorPartnerShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
   const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#register');
-  return `🤝 ¡Hola! Te invito a unirte a la red de Realtors Partners de RE/MAX Inmomás · The Spain Connection. Conecta a tus clientes de EE.UU., Canadá y Puerto Rico interesados en comprar o invertir en España y gana un 50% de comisión de referido con soporte legal e hipotecario completo en destino.\n\n🔗 Regístrate aquí para activar tu cuenta de Realtor Partner: ${link}`;
+  return `🤝 ¡Hola! Te invito a la Masterclass VIP "Beyond Borders" el 24 de septiembre a las 7:00 PM EDT (19:00 h Miami · NY). Descubre cómo los Realtors en EE.UU., Canadá y Puerto Rico ganan un 50% de comisión de referidos en España con RE/MAX Inmomás y soporte legal/fiscal completo en destino.\n\n🔗 Reserva tu Pase VIP y activa tu cuenta de Realtor Partner: ${link}`;
 };
 
 App.utils.getBrokerPartnerShareMessage = function(referralLink) {
@@ -407,6 +407,45 @@ App.utils.handleDrop = function(event, newStatus, callbackFnName) {
   }
 };
 
+App.utils.getClientTag = function(c) {
+  if (c && c.tag) return c.tag;
+  if (!c) return 'spain_buyer';
+  
+  // Intelligent tag detection
+  const email = (c.email || '').toLowerCase();
+  const hasRemaxEmail = email.includes('remax') || email.includes('broker') || email.includes('realty') || email.includes('realestate');
+  const hasValidBudget = c.budget && c.budget !== '—' && c.budget !== 'TBD' && c.budget !== '' && c.budget !== '< €150,000' ? true : (c.budget && c.budget !== '—' && c.budget !== '');
+  const hasArea = c.interestArea && c.interestArea !== '—' && c.interestArea !== '';
+  const isVIP = c.source === 'intake' || c.source === 'vip_intake' || c.needsUCI || c.needsFuster || c.needsHolidays || c.objective || c.timeline;
+  
+  // If flagged as realtor/broker in agency/role or remax domain without buyer criteria:
+  if (hasRemaxEmail || c.agency || c.agencyName || c.role === 'realtor' || c.role === 'broker') {
+    if (!hasArea && (c.budget === '—' || !c.budget || c.budget === 'TBD')) {
+      return 'realtor_network';
+    }
+  }
+
+  if (isVIP || hasValidBudget || hasArea) {
+    return 'spain_buyer';
+  }
+  
+  if (hasRemaxEmail) {
+    return 'realtor_network';
+  }
+
+  return 'spain_buyer';
+};
+
+App.utils.getClientTagBadge = function(tag) {
+  if (tag === 'spain_buyer') {
+    return `<span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 700; font-size: 0.7rem; padding: 2px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;"><span>🇪🇸</span> <span class="lang-en">Spain Buyer</span><span class="lang-es">Comprador España</span></span>`;
+  } else if (tag === 'realtor_network') {
+    return `<span class="badge" style="background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3); font-weight: 700; font-size: 0.7rem; padding: 2px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;"><span>🏠</span> <span class="lang-en">RE/MAX Network</span><span class="lang-es">Red RE/MAX</span></span>`;
+  } else {
+    return `<span class="badge" style="background: rgba(107, 114, 128, 0.12); color: #4b5563; border: 1px solid rgba(107, 114, 128, 0.3); font-weight: 700; font-size: 0.7rem; padding: 2px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;"><span>📋</span> <span class="lang-en">General Lead</span><span class="lang-es">Lead General</span></span>`;
+  }
+};
+
 App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFnName, getRealtorNameFn = null, onDropCallbackGlobalFnName = null) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -426,12 +465,18 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
       const localAgentName = c.localAgentName || 'Sin asignar / Unassigned';
       const agentLabel = `<div style="font-size: 0.75rem; color: #b45309; margin-bottom: 0.25rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">🇪🇸 ${App.utils.escapeHtml(localAgentName)}</div>`;
 
+      const clientTag = c.tag || App.utils.getClientTag(c);
+      const tagBadge = App.utils.getClientTagBadge ? App.utils.getClientTagBadge(clientTag) : '';
+
       return `
         <div class="pipeline-card" style="cursor: ${isInteractive ? 'grab' : 'pointer'}; margin-bottom: 0.75rem; background: var(--bg-card); border-radius: var(--radius-sm); padding: 12px; box-shadow: var(--shadow-sm); border-top: 3px solid ${App.utils.columnColors[col.key]}; transition: transform 0.2s;"
              draggable="${isInteractive ? 'true' : 'false'}"
              ${isInteractive ? `ondragstart="App.utils.handleDragStart(event, '${c.id}')" ondragend="App.utils.handleDragEnd(event)"` : ''}
              onclick="${onCardClickGlobalFnName}('${c.id}')">
-          ${realtorLabel}
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 6px;">
+            <div style="flex: 1;">${realtorLabel}</div>
+            <div>${tagBadge}</div>
+          </div>
           ${agentLabel}
           <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-primary);">
             ${App.utils.escapeHtml(c.firstName)} ${App.utils.escapeHtml(c.lastName)}

@@ -285,6 +285,20 @@
             </button>
           </div>
         </div>
+        <!-- Client Pipeline Search & Quick Summary Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; background: var(--bg-card); padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <span style="font-size: 1.2rem;">🇪🇸</span>
+            <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary);">
+              <span class="lang-en">Spain Buyers & Investors</span><span class="lang-es">Compradores e Inversores en España</span>
+            </div>
+            <span class="badge badge--approved" id="admin-client-count-badge" style="font-size: 0.8rem; font-weight: 700; padding: 3px 10px; border-radius: 999px;">0 clientes</span>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center; min-width: 280px; flex: 1; max-width: 450px;">
+            <input type="text" id="admin-client-search-input" placeholder="Buscar cliente por nombre, email o zona..." class="form-input" style="margin-bottom: 0; padding: 7px 12px; font-size: 0.85rem; border-radius: 8px; width: 100%;">
+          </div>
+        </div>
+
         <div id="admin-clients-board" class="pipeline-board"></div>
         <div id="admin-clients-list" style="display:none;" class="data-table-container">
           <table class="data-table data-table--medium">
@@ -295,8 +309,11 @@
                 <th>Email</th>
                 <th><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></th>
                 <th><span class="lang-en">Budget</span><span class="lang-es">Presupuesto</span></th>
+                <th><span class="lang-en">Interest Area</span><span class="lang-es">Zona de Interés</span></th>
                 <th><span class="lang-en">Status</span><span class="lang-es">Estado</span></th>
+                <th><span class="lang-en">Assigned Agent</span><span class="lang-es">Agente Asignado</span></th>
                 <th>Realtor</th>
+                <th style="text-align: right;"><span class="lang-en">Actions</span><span class="lang-es">Acciones</span></th>
               </tr>
             </thead>
             <tbody id="admin-clients-tbody">
@@ -524,10 +541,10 @@
 
             <!-- Segmented Switch Controls -->
             <div id="admin-webinar-type-switch" style="display:inline-flex;background:#f3f4f6;padding:4px;border-radius:12px;border:1px solid #e5e7eb;">
-              <button type="button" id="switch-btn-b2b" onclick="App.views.admin.setWebinarType('b2b')" class="btn" style="border:none;border-radius:9px;padding:10px 18px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all .2s;background:transparent;color:#4b5563;">
+              <button type="button" id="switch-btn-b2b" onclick="App.views.admin.setWebinarType('b2b')" class="btn" style="border:none;border-radius:9px;padding:10px 18px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all .2s;background:#003f99;color:#fff;box-shadow:0 4px 12px rgba(0,63,153,0.25);">
                 🏢 <span class="lang-en">B2B Realtors &amp; Brokers</span><span class="lang-es">B2B Agentes &amp; Brokers</span>
               </button>
-              <button type="button" id="switch-btn-b2c" onclick="App.views.admin.setWebinarType('b2c')" class="btn" style="border:none;border-radius:9px;padding:10px 18px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all .2s;background:#003f99;color:#fff;box-shadow:0 4px 12px rgba(0,63,153,0.25);">
+              <button type="button" id="switch-btn-b2c" onclick="App.views.admin.setWebinarType('b2c')" class="btn" style="border:none;border-radius:9px;padding:10px 18px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all .2s;background:transparent;color:#4b5563;">
                 🏡 <span class="lang-en">B2C End Clients &amp; Investors</span><span class="lang-es">B2C Clientes Finales &amp; Inversores</span>
               </button>
             </div>
@@ -539,11 +556,11 @@
               <span style="width:10px;height:10px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981;animation:webinar-pulse 1.5s ease-in-out infinite;"></span>
               <span style="font-size:0.88rem;color:#1e3a8a;font-weight:600;">
                 <span class="lang-en">Live on Website:</span><span class="lang-es">Activo en la Web:</span>
-                <strong id="admin-status-text" style="color:#0f172a;margin-left:4px;">B2C (Clientes Finales e Inversores) — 18 de septiembre, 2026</strong>
+                <strong id="admin-status-text" style="color:#0f172a;margin-left:4px;">B2B (Realtors y Brokers) — Beyond Borders — 24 de septiembre, 2026 (7:00 PM EDT)</strong>
               </span>
             </div>
             <span id="admin-status-badge" style="background:#003f99;color:#fff;padding:4px 12px;border-radius:50px;font-size:0.75rem;font-weight:800;letter-spacing:0.04em;">
-              B2C ACTIVE
+              B2B ACTIVE
             </span>
           </div>
 
@@ -554,15 +571,15 @@
                 <label for="admin-webinar-date" style="display:block;font-size:0.82rem;font-weight:700;color:#374151;margin-bottom:6px;">
                   📅 <span class="lang-en">Webinar Date *</span><span class="lang-es">Fecha del Webinario *</span>
                 </label>
-                <input type="date" id="admin-webinar-date" required class="form-input" style="font-weight:600;" value="2026-09-18">
+                <input type="date" id="admin-webinar-date" required class="form-input" style="font-weight:600;" value="2026-09-24">
               </div>
 
               <div class="form-group">
                 <label for="admin-webinar-time" style="display:block;font-size:0.82rem;font-weight:700;color:#374151;margin-bottom:6px;">
                   ⏰ <span class="lang-en">Start Time (EDT / US Eastern) *</span><span class="lang-es">Hora de Inicio (EDT / Este EEUU) *</span>
                 </label>
-                <input type="time" id="admin-webinar-time" required class="form-input" style="font-weight:600;" value="12:00">
-                <small style="color:#6b7280;font-size:0.72rem;display:block;margin-top:4px;">12:00 PM EDT = 18:00 h España (CEST)</small>
+                <input type="time" id="admin-webinar-time" required class="form-input" style="font-weight:600;" value="19:00">
+                <small style="color:#6b7280;font-size:0.72rem;display:block;margin-top:4px;">7:00 PM EDT (19:00 h Miami / NY / Toronto)</small>
               </div>
 
               <div class="form-group">
@@ -703,8 +720,8 @@
         <div class="dashboard-section referral-quick">
           <h2>🔗 <span class="lang-en">Your Referral Link</span><span class="lang-es">Tu Enlace de Referido</span></h2>
           <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 12px;">
-            <span class="lang-en">Share your personal link. Contacts can register for the September 18 Webinar, or join as Realtors in your team.</span>
-            <span class="lang-es">Comparte tu enlace personal único. Tus contactos podrán registrarse al Webinario del 18 de Septiembre o unirse como Realtors a tu equipo.</span>
+            <span class="lang-en">Share your personal link. Contacts can register for the September 24 Beyond Borders Webinar, or join as Realtors in your team.</span>
+            <span class="lang-es">Comparte tu enlace personal único. Tus contactos podrán registrarse a la Masterclass Beyond Borders del 24 de Septiembre o unirse como Realtors a tu equipo.</span>
           </p>
           <div style="display: flex; align-items: center; background: rgba(0, 67, 255, 0.04); border: 1px solid rgba(0, 67, 255, 0.15); border-radius: 12px; padding: 8px; gap: 12px;">
             <div style="background: white; border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
@@ -714,22 +731,22 @@
             <button class="btn btn-primary" id="broker-dash-copy-link" style="border-radius: 8px; padding: 10px 20px; white-space: nowrap;"><span class="lang-en">Copy Link</span><span class="lang-es">Copiar Enlace</span></button>
           </div>
 
-          <!-- September 18 Webinar Promo & WhatsApp Share Card -->
+          <!-- September 24 Webinar Promo & WhatsApp Share Card -->
           <div style="background: linear-gradient(135deg, #140508 0%, #290710 45%, #480c1b 100%); border: 1.5px solid rgba(244, 63, 94, 0.45); border-radius: 16px; padding: 20px 22px; margin-top: 16px; color: #fff; box-shadow: 0 8px 24px rgba(225, 29, 72, 0.18);">
             <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-              <img src="images/webinar-client-sept18.jpg" alt="Webinario 18 de Septiembre" style="width: 72px; height: 72px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(251, 191, 36, 0.75); box-shadow: 0 4px 12px rgba(0,0,0,0.35); flex-shrink: 0;">
+              <img src="images/webinar-client-sept18.jpg" alt="Webinario Beyond Borders 24 de Septiembre" style="width: 72px; height: 72px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(251, 191, 36, 0.75); box-shadow: 0 4px 12px rgba(0,0,0,0.35); flex-shrink: 0;">
               <div style="flex: 1; min-width: 220px;">
                 <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(225,29,72,0.25); border: 1px solid rgba(244,63,94,0.6); border-radius: 50px; padding: 2px 10px; margin-bottom: 6px;">
                   <span style="width: 6px; height: 6px; border-radius: 50%; background: #ff4444;"></span>
-                  <span style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: #ffe4e6;">Webinar Activo · 18 Sep 2026</span>
+                  <span style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: #ffe4e6;">Webinar Activo · 24 Sep 2026 · 7:00 PM EDT</span>
                 </div>
                 <h4 style="font-size: 1.05rem; font-weight: 800; color: #fff; margin: 0 0 4px;">
-                  <span class="lang-en">Spain Unlocked: Living & Investing in Spain</span>
-                  <span class="lang-es">Descubre España: Guía para Comprar e Invertir</span>
+                  <span class="lang-en">Beyond Borders: How Realtors Earn 50% Referral Commissions</span>
+                  <span class="lang-es">Beyond Borders: Cómo Ganar 50% de Comisión en España</span>
                 </h4>
                 <p style="font-size: 0.8rem; color: rgba(255,255,255,0.78); margin: 0; line-height: 1.4;">
-                  <span class="lang-en">Share this webinar with buyers & investors. Leads registering through your link will appear in your pipeline!</span>
-                  <span class="lang-es">Invita a compradores e inversores. Quienes se registren con tu link aparecerán en tu cartera de clientes y registrados al webinario.</span>
+                  <span class="lang-en">Share this webinar with Realtors &amp; Brokers. Leads registering through your link will appear in your pipeline!</span>
+                  <span class="lang-es">Invita a Realtors y Brokers. Quienes se registren con tu link aparecerán en tu cartera de agentes y registrados al webinario.</span>
                 </p>
               </div>
             </div>
@@ -823,19 +840,19 @@
           <div style="margin-bottom: 14px;">
             <h2 style="margin:0 0 4px;">🔗 <span class="lang-en">Your Client Referral Link</span><span class="lang-es">Tu Enlace de Referido para Clientes</span></h2>
             <p style="color: var(--text-secondary); font-size: 0.88rem; margin:0;">
-              <span class="lang-en">Your personal referral link is linked to your Realtor ID and includes VIP access to the September 18 Webinar.</span>
-              <span class="lang-es">Tu enlace personal está vinculado a tu ID de Realtor e incluye acceso VIP al Webinario del 18 de Septiembre.</span>
+              <span class="lang-en">Your personal referral link is linked to your Realtor ID and includes VIP access to the September 24 Masterclass.</span>
+              <span class="lang-es">Tu enlace personal está vinculado a tu ID de Realtor e incluye acceso VIP a la Masterclass del 24 de Septiembre.</span>
             </p>
           </div>
 
-          <!-- September 18 Webinar Promo & WhatsApp Share Card -->
+          <!-- September 24 Webinar Promo & WhatsApp Share Card -->
           <div style="background: linear-gradient(135deg, #140508 0%, #290710 45%, #480c1b 100%); border: 1.5px solid rgba(244, 63, 94, 0.45); border-radius: 16px; padding: 20px; color: #fff; box-shadow: 0 8px 24px rgba(225, 29, 72, 0.18);">
             <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 14px;">
-              <img src="images/webinar-client-sept18.jpg" alt="Webinario 18 de Septiembre" style="width: 76px; height: 76px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(251, 191, 36, 0.8); box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex-shrink: 0;">
+              <img src="images/webinar-client-sept18.jpg" alt="Webinario 24 de Septiembre" style="width: 76px; height: 76px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(251, 191, 36, 0.8); box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex-shrink: 0;">
               <div style="flex: 1; min-width: 220px;">
                 <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(225,29,72,0.3); border: 1px solid rgba(244,63,94,0.6); border-radius: 50px; padding: 2px 10px; margin-bottom: 6px;">
                   <span style="width: 6px; height: 6px; border-radius: 50%; background: #ff4444;"></span>
-                  <span style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: #ffe4e6;">👤 Enlace para Clientes · Webinar 18 Sep</span>
+                  <span style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: #ffe4e6;">👤 Enlace para Clientes · Webinar 24 Sep · 7:00 PM EDT</span>
                 </div>
                 <h4 style="font-size: 1.05rem; font-weight: 800; color: #fff; margin: 0 0 4px;">
                   <span class="lang-en">Spain Unlocked: Living & Investing in Spain</span>
@@ -906,22 +923,22 @@
             <button class="btn btn-primary" id="realtor-copy-referral-btn" style="border-radius: 8px; padding: 10px 20px; white-space: nowrap;"><span class="lang-en">Copy Link</span><span class="lang-es">Copiar Enlace</span></button>
           </div>
 
-          <!-- September 18 Webinar Promo & WhatsApp Share Card -->
+          <!-- September 24 Webinar Promo & WhatsApp Share Card -->
           <div style="background: linear-gradient(135deg, #140508 0%, #290710 45%, #480c1b 100%); border: 1.5px solid rgba(244, 63, 94, 0.45); border-radius: 16px; padding: 20px 22px; margin-top: 18px; color: #fff; box-shadow: 0 8px 24px rgba(225, 29, 72, 0.18);">
             <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-              <img src="images/webinar-client-sept18.jpg" alt="Webinario 18 de Septiembre" style="width: 72px; height: 72px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(251, 191, 36, 0.75); box-shadow: 0 4px 12px rgba(0,0,0,0.35); flex-shrink: 0;">
+              <img src="images/webinar-client-sept18.jpg" alt="Webinario 24 de Septiembre" style="width: 72px; height: 72px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(251, 191, 36, 0.75); box-shadow: 0 4px 12px rgba(0,0,0,0.35); flex-shrink: 0;">
               <div style="flex: 1; min-width: 220px;">
                 <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(225,29,72,0.25); border: 1px solid rgba(244,63,94,0.6); border-radius: 50px; padding: 2px 10px; margin-bottom: 6px;">
                   <span style="width: 6px; height: 6px; border-radius: 50%; background: #ff4444;"></span>
-                  <span style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: #ffe4e6;">Webinar Activo · 18 Sep 2026</span>
+                  <span style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: #ffe4e6;">Webinar Activo · 24 Sep 2026 · 7:00 PM EDT</span>
                 </div>
                 <h4 style="font-size: 1.05rem; font-weight: 800; color: #fff; margin: 0 0 4px;">
-                  <span class="lang-en">Spain Unlocked: Living & Investing in Spain</span>
-                  <span class="lang-es">Descubre España: Guía para Comprar e Invertir</span>
+                  <span class="lang-en">Beyond Borders: How Realtors Earn 50% Referral Commissions</span>
+                  <span class="lang-es">Beyond Borders: Cómo Ganar 50% de Comisión en España</span>
                 </h4>
                 <p style="font-size: 0.8rem; color: rgba(255,255,255,0.78); margin: 0; line-height: 1.4;">
-                  <span class="lang-en">Share this webinar with your buyers & investors. When they register via your link, they automatically become your assigned leads!</span>
-                  <span class="lang-es">Invita a tus compradores e inversores. Al registrarse con tu link, ¡quedan asignados a tu cartera y registrados al webinario!</span>
+                  <span class="lang-en">Share this webinar with your buyers &amp; Realtors. When they register via your link, they automatically become your assigned leads!</span>
+                  <span class="lang-es">Invita a compradores y Realtors. Al registrarse con tu link, ¡quedan asignados a tu cartera y registrados al webinario!</span>
                 </p>
               </div>
             </div>
@@ -1023,8 +1040,8 @@
         <div class="dashboard-section referral-quick">
           <h2>🔗 <span class="lang-en">Your Referral Link</span><span class="lang-es">Tu Enlace de Referido</span></h2>
           <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 12px;">
-            <span class="lang-en">Share your personal link. Contacts can register for the September 18 Webinar, or apply as Realtors and Brokers.</span>
-            <span class="lang-es">Comparte tu enlace personal único. Tus contactos podrán registrarse al Webinario del 18 de Septiembre o darse de alta como Realtors y Brokers.</span>
+            <span class="lang-en">Share your personal link. Contacts can register for the September 24 Beyond Borders Webinar, or apply as Realtors and Brokers.</span>
+            <span class="lang-es">Comparte tu enlace personal único. Tus contactos podrán registrarse a la Masterclass Beyond Borders del 24 de Septiembre o darse de alta como Realtors y Brokers.</span>
           </p>
           <div style="display: flex; align-items: center; background: rgba(0, 67, 255, 0.04); border: 1px solid rgba(0, 67, 255, 0.15); border-radius: 12px; padding: 8px; gap: 12px;">
             <div style="background: white; border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
@@ -1034,22 +1051,22 @@
             <button class="btn btn-primary" id="agent-dash-copy-link" style="border-radius: 8px; padding: 10px 20px; white-space: nowrap;"><span class="lang-en">Copy Link</span><span class="lang-es">Copiar Enlace</span></button>
           </div>
 
-          <!-- September 18 Webinar Promo & WhatsApp Share Card -->
+          <!-- September 24 Webinar Promo & WhatsApp Share Card -->
           <div style="background: linear-gradient(135deg, #140508 0%, #290710 45%, #480c1b 100%); border: 1.5px solid rgba(244, 63, 94, 0.45); border-radius: 16px; padding: 20px 22px; margin-top: 16px; color: #fff; box-shadow: 0 8px 24px rgba(225, 29, 72, 0.18);">
             <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-              <img src="images/webinar-client-sept18.jpg" alt="Webinario 18 de Septiembre" style="width: 72px; height: 72px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(251, 191, 36, 0.75); box-shadow: 0 4px 12px rgba(0,0,0,0.35); flex-shrink: 0;">
+              <img src="images/webinar-client-sept18.jpg" alt="Webinario Beyond Borders 24 de Septiembre" style="width: 72px; height: 72px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(251, 191, 36, 0.75); box-shadow: 0 4px 12px rgba(0,0,0,0.35); flex-shrink: 0;">
               <div style="flex: 1; min-width: 220px;">
                 <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(225,29,72,0.25); border: 1px solid rgba(244,63,94,0.6); border-radius: 50px; padding: 2px 10px; margin-bottom: 6px;">
                   <span style="width: 6px; height: 6px; border-radius: 50%; background: #ff4444;"></span>
-                  <span style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: #ffe4e6;">Webinar Activo · 18 Sep 2026</span>
+                  <span style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: #ffe4e6;">Webinar Activo · 24 Sep 2026 · 7:00 PM EDT</span>
                 </div>
                 <h4 style="font-size: 1.05rem; font-weight: 800; color: #fff; margin: 0 0 4px;">
-                  <span class="lang-en">Spain Unlocked: Living & Investing in Spain</span>
-                  <span class="lang-es">Descubre España: Guía para Comprar e Invertir</span>
+                  <span class="lang-en">Beyond Borders: How Realtors Earn 50% Referral Commissions</span>
+                  <span class="lang-es">Beyond Borders: Cómo Ganar 50% de Comisión en España</span>
                 </h4>
                 <p style="font-size: 0.8rem; color: rgba(255,255,255,0.78); margin: 0; line-height: 1.4;">
-                  <span class="lang-en">Share your link with buyers & investors. Leads registering will appear in your pipeline and registered for the webinar!</span>
-                  <span class="lang-es">Invita a compradores e inversores. Quienes se registren con tu link aparecerán en tu cartera de clientes y registrados al webinario.</span>
+                  <span class="lang-en">Share your link with Realtors, Brokers &amp; buyers. Leads registering will appear in your pipeline and registered for the webinar!</span>
+                  <span class="lang-es">Invita a Realtors, Brokers y compradores. Quienes se registren con tu link aparecerán en tu cartera de agentes y registrados al webinario.</span>
                 </p>
               </div>
             </div>

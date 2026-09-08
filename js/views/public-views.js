@@ -141,17 +141,17 @@ App.views.public = {
                <span class="lang-es">Invitación VIP de cortesía de <strong>${refName}</strong></span>
                <span class="lang-fr">Invitation VIP offerte par <strong>${refName}</strong></span>
                <span class="lang-en-ca">Complimentary VIP invitation from <strong>${refName}</strong></span>`
-            : `<span class="lang-en">Live Webinar · September 18, 2026</span>
-               <span class="lang-es">Webinario en Vivo · 18 de Septiembre 2026</span>
-               <span class="lang-fr">Webinaire en Direct · 18 Septembre 2026</span>
-               <span class="lang-en-ca">Live Webinar · September 18, 2026</span>`;
+            : `<span class="lang-en">Live Webinar · September 24, 2026 · 7:00 PM EDT</span>
+               <span class="lang-es">Webinario en Vivo · 24 de Septiembre 2026 · 7:00 PM EDT</span>
+               <span class="lang-fr">Webinaire en Direct · 24 Septembre 2026 · 19 h EDT</span>
+               <span class="lang-en-ca">Live Webinar · September 24, 2026 · 7:00 PM EDT</span>`;
         }
         if (submitBtn) {
           submitBtn.innerHTML = `<span class="lang-en">🎟️ Claim Free VIP Pass</span><span class="lang-es">🎟️ Reservar Mi Pase VIP Gratuito</span><span class="lang-fr">🎟️ Réserver Mon Pass VIP</span><span class="lang-en-ca">🎟️ Claim Free VIP Pass</span>`;
         }
       } else if (type === 'realtor') {
         if (formTitle) {
-          formTitle.innerHTML = `<span class="lang-en">Realtor Partner Registration</span><span class="lang-es">Registro de Agente Realtor</span><span class="lang-fr">Inscription Conseiller</span><span class="lang-en-ca">Realtor Partner Registration</span>`;
+          formTitle.innerHTML = `<span class="lang-en">Beyond Borders · Realtor VIP Masterclass</span><span class="lang-es">Beyond Borders · Masterclass VIP</span><span class="lang-fr">Beyond Borders · Webinaire VIP</span><span class="lang-en-ca">Beyond Borders · Realtor VIP Masterclass</span>`;
         }
         if (welcomeMsg) {
           welcomeMsg.innerHTML = refName
@@ -159,13 +159,13 @@ App.views.public = {
                <span class="lang-es">Invitado/a por <strong>${refName}</strong> (50% de comisión de referido en España)</span>
                <span class="lang-fr">Invité(e) par <strong>${refName}</strong> (50% de commission en Espagne)</span>
                <span class="lang-en-ca">Invited by <strong>${refName}</strong> (50% referral commission in Spain)</span>`
-            : `<span class="lang-en">Join our International Realtor Network</span>
-               <span class="lang-es">Únete a nuestra Red Internacional de Realtors</span>
-               <span class="lang-fr">Rejoignez notre réseau de Courtiers</span>
-               <span class="lang-en-ca">Join our International Realtor Network</span>`;
+            : `<span class="lang-en">Live Masterclass · September 24, 2026 · 7:00 PM EDT (50% Commissions)</span>
+               <span class="lang-es">Masterclass en Vivo · 24 de Septiembre 2026 · 7:00 PM EDT (50% Comisión)</span>
+               <span class="lang-fr">Masterclass en Direct · 24 Septembre 2026 · 19 h EDT</span>
+               <span class="lang-en-ca">Live Masterclass · September 24, 2026 · 7:00 PM EDT (50% Commissions)</span>`;
         }
         if (submitBtn) {
-          submitBtn.innerHTML = `<span class="lang-en">Join as Realtor Partner</span><span class="lang-es">Unirme como Realtor Partner</span><span class="lang-fr">Rejoindre comme Conseiller</span><span class="lang-en-ca">Join as Realtor Partner</span>`;
+          submitBtn.innerHTML = `<span class="lang-en">🎟️ Claim Realtor VIP Pass</span><span class="lang-es">🎟️ Reservar Mi Pase VIP de Realtor</span><span class="lang-fr">🎟️ Réserver Mon Pass VIP Conseiller</span><span class="lang-en-ca">🎟️ Claim Realtor VIP Pass</span>`;
         }
       } else if (type === 'broker') {
         if (formTitle) {
@@ -248,22 +248,20 @@ App.views.public = {
 
     function applyReferrer(ref) {
       referrer = ref;
-      if (!referrer) {
-        console.log('[Referral] No referrer found for code:', refCode);
-        return;
-      }
-      console.log('[Referral] Referrer found:', referrer.firstName, referrer.lastName, '(' + referrer.role + ')');
+      if (referrer) {
+        console.log('[Referral] Referrer found:', referrer.firstName, referrer.lastName, '(' + referrer.role + ')');
 
-      // Update webinar spotlight banner invitee line
-      const bannerInviteeEl = document.getElementById('referral-banner-invitee');
-      if (bannerInviteeEl) {
-        bannerInviteeEl.innerHTML = `
-          <span>✨</span>
-          <span class="lang-en">VIP invitation courtesy of <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
-          <span class="lang-es">Invitación VIP de cortesía de <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
-          <span class="lang-fr">Invitation VIP offerte par <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
-          <span class="lang-en-ca">VIP invitation courtesy of <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
-        `;
+        // Update webinar spotlight banner invitee line
+        const bannerInviteeEl = document.getElementById('referral-banner-invitee');
+        if (bannerInviteeEl) {
+          bannerInviteeEl.innerHTML = `
+            <span>✨</span>
+            <span class="lang-en">VIP invitation courtesy of <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+            <span class="lang-es">Invitación VIP de cortesía de <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+            <span class="lang-fr">Invitation VIP offerte par <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+            <span class="lang-en-ca">VIP invitation courtesy of <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+          `;
+        }
       }
 
       // Pre-check webinar consents
@@ -272,27 +270,42 @@ App.views.public = {
       const profConsentBox = document.getElementById('referral-webinar-consent');
       if (profConsentBox) profConsentBox.checked = true;
 
-      // Build type options strictly based on referrer's role
-      let availableTypes = ['client'];
-      if (referrer.role === 'realtor') {
-        // Realtors ONLY register clients
-        availableTypes = ['client'];
-        selectedType = 'client';
-      } else if (referrer.role === 'broker') {
-        availableTypes = ['client', 'realtor'];
+      // Build type options based on referrer's role
+      let availableTypes = ['realtor', 'client'];
+      if (!referrer) {
+        availableTypes = ['realtor', 'broker', 'client'];
+        if (availableTypes.includes(requestedType)) {
+          selectedType = requestedType;
+        } else {
+          selectedType = 'realtor';
+        }
+      } else if (referrer.role === 'realtor') {
+        availableTypes = ['realtor', 'client'];
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
         } else if (!availableTypes.includes(selectedType)) {
-          selectedType = 'client';
+          selectedType = 'realtor';
+        }
+      } else if (referrer.role === 'broker') {
+        availableTypes = ['realtor', 'broker', 'client'];
+        if (availableTypes.includes(requestedType)) {
+          selectedType = requestedType;
+        } else if (!availableTypes.includes(selectedType)) {
+          selectedType = 'realtor';
         }
       } else if (referrer.role === 'agent_inmomas' || referrer.role === 'colaborador' || referrer.role === 'admin' || referrer.role === 'partner') {
         availableTypes = referrer.role === 'admin' 
-          ? ['client', 'realtor', 'broker', 'agent_inmomas', 'colaborador']
-          : ['client', 'realtor', 'broker'];
+          ? ['realtor', 'broker', 'client', 'agent_inmomas', 'colaborador']
+          : ['realtor', 'broker', 'client'];
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
         } else if (!availableTypes.includes(selectedType)) {
-          selectedType = 'client';
+          selectedType = 'realtor';
+        }
+      } else {
+        availableTypes = ['realtor', 'broker', 'client'];
+        if (availableTypes.includes(requestedType)) {
+          selectedType = requestedType;
         }
       }
 
@@ -378,6 +391,8 @@ App.views.public = {
     const syncResult = lookupReferrerSync();
     if (syncResult) {
       applyReferrer(syncResult);
+    } else {
+      applyReferrer(null);
     }
 
     // Always try Firestore in background (may override sync result)
