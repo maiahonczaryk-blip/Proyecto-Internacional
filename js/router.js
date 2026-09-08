@@ -72,20 +72,25 @@ App.router = (function() {
 
   /* ---- Initialize Router ---- */
   function init() {
-    // Intercept ?ref= code from URL (query string or hash params)
+    // Intercept ?ref= code and ?type= from URL (query string or hash params)
     const searchParams = new URLSearchParams(window.location.search);
     let refCode = searchParams.get('ref');
-    // Also check hash-based ref params (e.g. #referral?ref=CODE)
+    let refType = searchParams.get('type');
+    // Also check hash-based ref params (e.g. #referral?ref=CODE&type=client)
     if (!refCode) {
       const hash = window.location.hash;
       const hashQueryIdx = hash.indexOf('?');
       if (hashQueryIdx >= 0) {
         const hashParams = new URLSearchParams(hash.substring(hashQueryIdx + 1));
         refCode = hashParams.get('ref');
+        if (!refType) refType = hashParams.get('type');
       }
     }
     if (refCode) {
       sessionStorage.setItem('referralCode', refCode);
+      if (refType) {
+        sessionStorage.setItem('referralType', refType);
+      }
       window.history.replaceState({}, document.title, window.location.pathname + '#referral');
     }
 
@@ -196,12 +201,16 @@ App.router = (function() {
     const routeKey = queryIndex >= 0 ? hash.substring(0, queryIndex) : hash;
     const queryString = queryIndex >= 0 ? hash.substring(queryIndex + 1) : '';
 
-    // Capture ref code from hash-based referral links (e.g. #referral?ref=CODE)
+    // Capture ref code from hash-based referral links (e.g. #referral?ref=CODE&type=realtor)
     if (routeKey === 'referral' && queryString) {
       const hashParams = new URLSearchParams(queryString);
       const refParam = hashParams.get('ref');
+      const typeParam = hashParams.get('type');
       if (refParam) {
         sessionStorage.setItem('referralCode', refParam);
+        if (typeParam) {
+          sessionStorage.setItem('referralType', typeParam);
+        }
         // Clean the URL to remove the ref param
         window.history.replaceState({}, document.title, window.location.pathname + '#referral');
       }

@@ -709,6 +709,35 @@
             <input type="text" readonly id="broker-dash-referral-link" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--text-primary); outline: none; padding: 0; min-width: 0;">
             <button class="btn btn-primary" id="broker-dash-copy-link" style="border-radius: 8px; padding: 10px 20px; white-space: nowrap;"><span class="lang-en">Copy Link</span><span class="lang-es">Copiar Enlace</span></button>
           </div>
+
+          <!-- September 18 Webinar Promo & WhatsApp Share Card -->
+          <div style="background: linear-gradient(135deg, #140508 0%, #290710 45%, #480c1b 100%); border: 1.5px solid rgba(244, 63, 94, 0.45); border-radius: 16px; padding: 20px 22px; margin-top: 16px; color: #fff; box-shadow: 0 8px 24px rgba(225, 29, 72, 0.18);">
+            <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+              <img src="images/webinar-client-sept18.jpg" alt="Webinario 18 de Septiembre" style="width: 72px; height: 72px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(251, 191, 36, 0.75); box-shadow: 0 4px 12px rgba(0,0,0,0.35); flex-shrink: 0;">
+              <div style="flex: 1; min-width: 220px;">
+                <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(225,29,72,0.25); border: 1px solid rgba(244,63,94,0.6); border-radius: 50px; padding: 2px 10px; margin-bottom: 6px;">
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background: #ff4444;"></span>
+                  <span style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: #ffe4e6;">Webinar Activo · 18 Sep 2026</span>
+                </div>
+                <h4 style="font-size: 1.05rem; font-weight: 800; color: #fff; margin: 0 0 4px;">
+                  <span class="lang-en">Spain Unlocked: Living & Investing in Spain</span>
+                  <span class="lang-es">Descubre España: Guía para Comprar e Invertir</span>
+                </h4>
+                <p style="font-size: 0.8rem; color: rgba(255,255,255,0.78); margin: 0; line-height: 1.4;">
+                  <span class="lang-en">Share this webinar with your buyers & investors. Leads registering through your link will appear in your pipeline!</span>
+                  <span class="lang-es">Invita a compradores e inversores. Quienes se registren con tu link aparecerán en tu cartera de clientes y registrados al webinario.</span>
+                </p>
+              </div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
+              <button class="btn btn-sm" onclick="App.utils.shareWebinarWhatsApp()" style="background: #25D366; color: #fff; border: none; font-weight: 700; border-radius: 8px; padding: 8px 16px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(37,211,102,0.35); cursor: pointer;">
+                <span>💬</span> <span class="lang-en">Share on WhatsApp</span><span class="lang-es">Compartir por WhatsApp</span>
+              </button>
+              <button class="btn btn-sm btn-outline" onclick="App.utils.copyWebinarInviteText()" style="border-color: rgba(255,255,255,0.35); color: #fff; border-radius: 8px; padding: 8px 16px; cursor: pointer;">
+                <span>📋</span> <span class="lang-en">Copy Invite Text</span><span class="lang-es">Copiar Texto de Invitación</span>
+              </button>
+            </div>
+          </div>
         </div>
         <!-- Manual Add Client Button -->
         <div id="broker-dash-add-client-btn" style="margin-top: 16px;"></div>
@@ -949,43 +978,119 @@
           <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">🏠</div><div class="stat-card__body"><div class="stat-card__value" id="agent-stat-sales">0</div><div class="stat-card__label"><span class="lang-en">Closed Sales</span><span class="lang-es">Ventas Cerradas</span></div></div></div>
           <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">💰</div><div class="stat-card__body"><div class="stat-card__value" id="agent-stat-commissions">€0</div><div class="stat-card__label"><span class="lang-en">My Commission (Spain)</span><span class="lang-es">Mi Comisión (España)</span></div></div></div>
         </div>
-        <!-- Referral Link Quick Access -->
+        <!-- Referral Channels Hub for Agentes Inmomás -->
         <div class="dashboard-section referral-quick">
-          <h2>🔗 <span class="lang-en">Your Referral Link</span><span class="lang-es">Tu Enlace de Referido</span></h2>
-          <div style="display: flex; align-items: center; background: rgba(0, 67, 255, 0.04); border: 1px solid rgba(0, 67, 255, 0.15); border-radius: 12px; padding: 8px; gap: 12px; margin-top: 12px;">
-            <div style="background: white; border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-              <span style="font-size: 1.2rem;">✨</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <h2 style="margin: 0;">🔗 <span class="lang-en">Your Referral & Recruitment Hub</span><span class="lang-es">Tus Enlaces de Referidos y Captación</span></h2>
+              <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 4px 0 0;">
+                <span class="lang-en">Select the tailored link to share with Clients (Webinar Sep 18), Realtors, or Brokerages.</span>
+                <span class="lang-es">Elige el enlace optimizado para compartir con Clientes (Webinario 18 Sep), Realtors o Agencias Brokers.</span>
+              </p>
             </div>
-            <input type="text" readonly id="agent-dash-referral-link" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--text-primary); outline: none; padding: 0; min-width: 0;">
-            <button class="btn btn-primary" id="agent-dash-copy-link" style="border-radius: 8px; padding: 10px 20px; white-space: nowrap;"><span class="lang-en">Copy Link</span><span class="lang-es">Copiar Enlace</span></button>
           </div>
 
-          <!-- September 18 Webinar Promo & WhatsApp Share Card -->
-          <div style="background: linear-gradient(135deg, #140508 0%, #290710 45%, #480c1b 100%); border: 1.5px solid rgba(244, 63, 94, 0.45); border-radius: 16px; padding: 20px 22px; margin-top: 16px; color: #fff; box-shadow: 0 8px 24px rgba(225, 29, 72, 0.18);">
-            <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-              <img src="images/webinar-client-sept18.jpg" alt="Webinario 18 de Septiembre" style="width: 72px; height: 72px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(251, 191, 36, 0.75); box-shadow: 0 4px 12px rgba(0,0,0,0.35); flex-shrink: 0;">
+          <!-- Channel 1: Clients (Webinar Sep 18) -->
+          <div style="background: linear-gradient(135deg, #140508 0%, #290710 45%, #480c1b 100%); border: 1.5px solid rgba(244, 63, 94, 0.45); border-radius: 16px; padding: 18px 20px; color: #fff; box-shadow: 0 8px 24px rgba(225, 29, 72, 0.18); margin-bottom: 16px;">
+            <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 14px;">
+              <img src="images/webinar-client-sept18.jpg" alt="Webinario 18 de Septiembre" style="width: 64px; height: 64px; border-radius: 10px; object-fit: cover; border: 2px solid rgba(251, 191, 36, 0.75); box-shadow: 0 4px 12px rgba(0,0,0,0.35); flex-shrink: 0;">
               <div style="flex: 1; min-width: 220px;">
-                <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(225,29,72,0.25); border: 1px solid rgba(244,63,94,0.6); border-radius: 50px; padding: 2px 10px; margin-bottom: 6px;">
+                <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(225,29,72,0.25); border: 1px solid rgba(244,63,94,0.6); border-radius: 50px; padding: 2px 10px; margin-bottom: 4px;">
                   <span style="width: 6px; height: 6px; border-radius: 50%; background: #ff4444;"></span>
-                  <span style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: #ffe4e6;">Webinar Activo · 18 Sep 2026</span>
+                  <span style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: #ffe4e6;">👤 Clientes · Webinar 18 Sep 2026</span>
                 </div>
-                <h4 style="font-size: 1.05rem; font-weight: 800; color: #fff; margin: 0 0 4px;">
-                  <span class="lang-en">Spain Unlocked: Living & Investing in Spain</span>
-                  <span class="lang-es">Descubre España: Guía para Comprar e Invertir</span>
+                <h4 style="font-size: 1rem; font-weight: 800; color: #fff; margin: 0 0 2px;">
+                  <span class="lang-en">Spain Unlocked: Living, Moving & Investing in Spain</span>
+                  <span class="lang-es">Descubre España: Guía para Comprar, Mudarse e Invertir</span>
                 </h4>
-                <p style="font-size: 0.8rem; color: rgba(255,255,255,0.78); margin: 0; line-height: 1.4;">
-                  <span class="lang-en">Share this webinar with buyers & investors. Leads registering through your link will appear in your pipeline!</span>
-                  <span class="lang-es">Invita a compradores e inversores. Quienes se registren con tu link aparecerán en tu cartera de clientes y registrados al webinario.</span>
+                <p style="font-size: 0.78rem; color: rgba(255,255,255,0.8); margin: 0;">
+                  <span class="lang-en">Direct link for buyers & investors. They get VIP webinar access and become your assigned clients.</span>
+                  <span class="lang-es">Enlace directo para compradores e inversores. Acceden al webinar y se asignan automáticamente a tu cartera.</span>
                 </p>
               </div>
             </div>
-            <div style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
-              <button class="btn btn-sm" onclick="App.utils.shareWebinarWhatsApp()" style="background: #25D366; color: #fff; border: none; font-weight: 700; border-radius: 8px; padding: 8px 16px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(37,211,102,0.35); cursor: pointer;">
-                <span>💬</span> <span class="lang-en">Share on WhatsApp</span><span class="lang-es">Compartir por WhatsApp</span>
+            <div style="display: flex; align-items: center; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 6px 10px; gap: 8px;">
+              <input type="text" readonly id="agent-dash-link-client" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; color: #fff; outline: none; padding: 0; min-width: 0;">
+              <button class="btn btn-sm btn-primary" id="agent-dash-copy-client" style="border-radius: 6px; padding: 6px 14px; white-space: nowrap; font-size: 0.82rem;"><span class="lang-en">Copy</span><span class="lang-es">Copiar</span></button>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+              <button class="btn btn-sm" onclick="App.utils.shareWebinarWhatsApp()" style="background: #25D366; color: #fff; border: none; font-weight: 700; border-radius: 6px; padding: 6px 14px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">
+                <span>💬</span> <span class="lang-en">Share on WhatsApp</span><span class="lang-es">WhatsApp Clientes</span>
               </button>
-              <button class="btn btn-sm btn-outline" onclick="App.utils.copyWebinarInviteText()" style="border-color: rgba(255,255,255,0.35); color: #fff; border-radius: 8px; padding: 8px 16px; cursor: pointer;">
-                <span>📋</span> <span class="lang-en">Copy Invite Text</span><span class="lang-es">Copiar Texto de Invitación</span>
+              <button class="btn btn-sm btn-outline" onclick="App.utils.copyWebinarInviteText()" style="border-color: rgba(255,255,255,0.35); color: #fff; border-radius: 6px; padding: 6px 14px; font-size: 0.82rem; cursor: pointer;">
+                <span>📋</span> <span class="lang-en">Copy Invite Text</span><span class="lang-es">Copiar Invitación</span>
               </button>
+            </div>
+          </div>
+
+          <!-- Channels 2 & 3 Grid: Realtors & Brokers -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+            <!-- Channel 2: Realtors B2B -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                  <span style="font-size: 1.3rem;">🏠</span>
+                  <div>
+                    <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0;">
+                      <span class="lang-en">Realtors Partner Link</span>
+                      <span class="lang-es">Enlace para Realtors B2B</span>
+                    </h4>
+                    <span style="font-size: 0.75rem; color: var(--primary); font-weight: 600;">50% Referral Split · EE.UU. / CA / PR</span>
+                  </div>
+                </div>
+                <p style="font-size: 0.78rem; color: var(--text-secondary); margin: 0 0 10px; line-height: 1.4;">
+                  <span class="lang-en">Recruit Realtors to register and refer their buyers to Spain under your supervision.</span>
+                  <span class="lang-es">Capta Realtors para que refieran sus clientes a España bajo tu supervisión.</span>
+                </p>
+              </div>
+              <div>
+                <div style="display: flex; align-items: center; background: rgba(0, 67, 255, 0.04); border: 1px solid rgba(0, 67, 255, 0.15); border-radius: 8px; padding: 6px 8px; gap: 8px; margin-bottom: 8px;">
+                  <input type="text" readonly id="agent-dash-link-realtor" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--text-primary); outline: none; padding: 0; min-width: 0;">
+                  <button class="btn btn-sm btn-primary" id="agent-dash-copy-realtor" style="border-radius: 6px; padding: 5px 12px; font-size: 0.8rem; white-space: nowrap;"><span class="lang-en">Copy</span><span class="lang-es">Copiar</span></button>
+                </div>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                  <button class="btn btn-sm" onclick="App.utils.shareRealtorPartnerWhatsApp()" style="background: #25D366; color: #fff; border: none; font-weight: 600; border-radius: 6px; padding: 5px 12px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+                    <span>💬</span> WhatsApp Realtors
+                  </button>
+                  <button class="btn btn-sm btn-outline" onclick="App.utils.copyRealtorInviteText()" style="border-radius: 6px; padding: 5px 10px; font-size: 0.78rem; cursor: pointer;">
+                    <span>📋</span> Copiar Texto
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Channel 3: Brokers B2B -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                  <span style="font-size: 1.3rem;">🏢</span>
+                  <div>
+                    <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0;">
+                      <span class="lang-en">Brokers Partner Link</span>
+                      <span class="lang-es">Enlace para Brokers / Agencias</span>
+                    </h4>
+                    <span style="font-size: 0.75rem; color: #8b5cf6; font-weight: 600;">Agency Partnership · Multi-Agent Teams</span>
+                  </div>
+                </div>
+                <p style="font-size: 0.78rem; color: var(--text-secondary); margin: 0 0 10px; line-height: 1.4;">
+                  <span class="lang-en">Invite Broker-Owners to partner their entire agency and team with RE/MAX Inmomás.</span>
+                  <span class="lang-es">Invita a Broker-Owners a conectar su agencia completa y equipo con RE/MAX Inmomás.</span>
+                </p>
+              </div>
+              <div>
+                <div style="display: flex; align-items: center; background: rgba(139, 92, 246, 0.04); border: 1px solid rgba(139, 92, 246, 0.15); border-radius: 8px; padding: 6px 8px; gap: 8px; margin-bottom: 8px;">
+                  <input type="text" readonly id="agent-dash-link-broker" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--text-primary); outline: none; padding: 0; min-width: 0;">
+                  <button class="btn btn-sm btn-primary" id="agent-dash-copy-broker" style="border-radius: 6px; padding: 5px 12px; font-size: 0.8rem; white-space: nowrap; background: #7c3aed; border-color: #7c3aed;"><span class="lang-en">Copy</span><span class="lang-es">Copiar</span></button>
+                </div>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                  <button class="btn btn-sm" onclick="App.utils.shareBrokerPartnerWhatsApp()" style="background: #25D366; color: #fff; border: none; font-weight: 600; border-radius: 6px; padding: 5px 12px; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+                    <span>💬</span> WhatsApp Brokers
+                  </button>
+                  <button class="btn btn-sm btn-outline" onclick="App.utils.copyBrokerInviteText()" style="border-radius: 6px; padding: 5px 10px; font-size: 0.78rem; cursor: pointer;">
+                    <span>📋</span> Copiar Texto
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1072,6 +1177,53 @@
       <div class="page-header">
         <h1 class="page-title"><span class="lang-en">My Realtors / Partners</span><span class="lang-es">Mis Realtors / Partners</span></h1>
         <p class="page-subtitle"><span class="lang-en">Brokers and Realtors assigned to you or registered through your link</span><span class="lang-es">Brokers y Realtors bajo tu paraguas o registrados por tu enlace</span></p>
+      </div>
+
+      <!-- Quick Recruitment Links for Partners View -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 20px;">
+        <!-- Realtor Link Card -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <strong style="font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+              <span>🏠</span> <span class="lang-en">Realtor Partner Link</span><span class="lang-es">Enlace para Realtors</span>
+            </strong>
+            <span style="font-size: 0.72rem; color: var(--primary); font-weight: 700;">50% Split</span>
+          </div>
+          <div style="display: flex; align-items: center; background: rgba(0, 67, 255, 0.04); border: 1px solid rgba(0, 67, 255, 0.15); border-radius: 8px; padding: 5px 8px; gap: 8px; margin-bottom: 8px;">
+            <input type="text" readonly id="agent-partners-link-realtor" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-primary); outline: none; padding: 0; min-width: 0;">
+            <button class="btn btn-sm btn-primary" id="agent-partners-copy-realtor" style="border-radius: 6px; padding: 4px 10px; font-size: 0.78rem; white-space: nowrap;"><span class="lang-en">Copy</span><span class="lang-es">Copiar</span></button>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn btn-sm" onclick="App.utils.shareRealtorPartnerWhatsApp()" style="background: #25D366; color: #fff; border: none; font-weight: 600; border-radius: 6px; padding: 4px 10px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+              <span>💬</span> WhatsApp
+            </button>
+            <button class="btn btn-sm btn-outline" onclick="App.utils.copyRealtorInviteText()" style="border-radius: 6px; padding: 4px 10px; font-size: 0.75rem; cursor: pointer;">
+              <span>📋</span> <span class="lang-en">Copy Text</span><span class="lang-es">Copiar Texto</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Broker Link Card -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <strong style="font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+              <span>🏢</span> <span class="lang-en">Brokerage Partner Link</span><span class="lang-es">Enlace para Brokerages</span>
+            </strong>
+            <span style="font-size: 0.72rem; color: #8b5cf6; font-weight: 700;">Agencias</span>
+          </div>
+          <div style="display: flex; align-items: center; background: rgba(139, 92, 246, 0.04); border: 1px solid rgba(139, 92, 246, 0.15); border-radius: 8px; padding: 5px 8px; gap: 8px; margin-bottom: 8px;">
+            <input type="text" readonly id="agent-partners-link-broker" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-primary); outline: none; padding: 0; min-width: 0;">
+            <button class="btn btn-sm btn-primary" id="agent-partners-copy-broker" style="border-radius: 6px; padding: 4px 10px; font-size: 0.78rem; white-space: nowrap; background: #7c3aed; border-color: #7c3aed;"><span class="lang-en">Copy</span><span class="lang-es">Copiar</span></button>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn btn-sm" onclick="App.utils.shareBrokerPartnerWhatsApp()" style="background: #25D366; color: #fff; border: none; font-weight: 600; border-radius: 6px; padding: 4px 10px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+              <span>💬</span> WhatsApp
+            </button>
+            <button class="btn btn-sm btn-outline" onclick="App.utils.copyBrokerInviteText()" style="border-radius: 6px; padding: 4px 10px; font-size: 0.75rem; cursor: pointer;">
+              <span>📋</span> <span class="lang-en">Copy Text</span><span class="lang-es">Copiar Texto</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="card">

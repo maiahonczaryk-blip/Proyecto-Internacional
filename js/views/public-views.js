@@ -103,23 +103,98 @@ App.views.public = {
     const form = document.getElementById('referral-form');
 
     let referrer = null;
-    let selectedType = 'client';
+    const requestedType = sessionStorage.getItem('referralType') || 'client';
+    let selectedType = requestedType;
 
-    // Toggle which field sections are visible
+    // Toggle which field sections are visible and customize titles/banners
     function updateFieldVisibility(type) {
       const cf = document.getElementById('referral-client-fields');
       const pf = document.getElementById('referral-professional-fields');
       const pwGroup = document.getElementById('referral-password-group');
       const pwInput = document.getElementById('referral-password');
+      const banner = document.getElementById('referral-webinar-spotlight-banner');
+      const formTitle = document.getElementById('referral-form-title');
+      const welcomeMsg = document.getElementById('referral-welcome-msg');
+      const submitBtn = document.getElementById('referral-submit-btn');
 
       if (cf) cf.style.display = type === 'client' ? '' : 'none';
       if (pf) pf.style.display = type !== 'client' ? '' : 'none';
       if (pwGroup) pwGroup.style.display = type === 'client' ? 'none' : '';
 
+      // Webinar Spotlight Banner is specifically for client invitations
+      if (banner) banner.style.display = type === 'client' ? '' : 'none';
+
       const profWebinar = document.querySelector('.professional-webinar-group');
       const clientWebinar = document.querySelector('.client-webinar-group');
       if (profWebinar) profWebinar.style.display = type === 'client' ? 'none' : '';
       if (clientWebinar) clientWebinar.style.display = type === 'client' ? '' : 'none';
+
+      const refName = referrer ? `${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}` : '';
+
+      if (type === 'client') {
+        if (formTitle) {
+          formTitle.innerHTML = `<span class="lang-en">Spain Unlocked · VIP Webinar Registration</span><span class="lang-es">Descubre España · Registro VIP al Webinario</span><span class="lang-fr">Découvrez l'Espagne · Inscription VIP au Webinaire</span><span class="lang-en-ca">Spain Unlocked · VIP Webinar Registration</span>`;
+        }
+        if (welcomeMsg) {
+          if (refName) {
+            welcomeMsg.innerHTML = `<span class="lang-en">You've been personally invited by <strong>${refName}</strong>. Complete the form to secure your free VIP pass for the September 18 webinar.</span>
+                                    <span class="lang-es">Has sido invitado/a personalmente por <strong>${refName}</strong>. Completa el formulario para asegurar tu plaza gratuita en el webinario del 18 de septiembre.</span>
+                                    <span class="lang-fr">Vous avez été invité(e) par <strong>${refName}</strong>. Remplissez le formulaire pour réserver votre place VIP gratuite pour le webinaire du 18 septembre.</span>
+                                    <span class="lang-en-ca">You've been personally invited by <strong>${refName}</strong>. Complete the form to secure your free VIP pass for the September 18 webinar.</span>`;
+          } else {
+            welcomeMsg.innerHTML = `<span class="lang-en">Complete the form below to secure your free VIP pass for the September 18 webinar.</span>
+                                    <span class="lang-es">Completa el formulario para asegurar tu plaza gratuita en el webinario del 18 de septiembre.</span>
+                                    <span class="lang-fr">Remplissez le formulaire ci-dessous pour réserver votre place VIP gratuite pour le webinaire du 18 septembre.</span>
+                                    <span class="lang-en-ca">Complete the form below to secure your free VIP pass for the September 18 webinar.</span>`;
+          }
+        }
+        if (submitBtn) {
+          submitBtn.innerHTML = `<span class="lang-en">Register for Webinar</span><span class="lang-es">Registrarme al Webinario</span><span class="lang-fr">S'inscrire au Webinaire</span><span class="lang-en-ca">Register for Webinar</span>`;
+        }
+      } else if (type === 'realtor') {
+        if (formTitle) {
+          formTitle.innerHTML = `<span class="lang-en">Realtor Partner Registration</span><span class="lang-es">Registro de Agente Realtor Partner</span><span class="lang-fr">Inscription Conseiller Partenaire</span><span class="lang-en-ca">Realtor Partner Registration</span>`;
+        }
+        if (welcomeMsg) {
+          welcomeMsg.innerHTML = refName
+            ? `<span class="lang-en">Invited by <strong>${refName}</strong> to join the RE/MAX Inmomás International Partner Network (50% referral commission in Spain).</span>
+               <span class="lang-es">Invitado/a por <strong>${refName}</strong> para unirte a la Red de Realtors Partners de RE/MAX Inmomás (50% comisión de referido en España).</span>
+               <span class="lang-fr">Invité(e) par <strong>${refName}</strong> à rejoindre le Réseau de Partenaires RE/MAX Inmomás (50% de commission en Espagne).</span>
+               <span class="lang-en-ca">Invited by <strong>${refName}</strong> to join the RE/MAX Inmomás International Partner Network (50% referral commission in Spain).</span>`
+            : `<span class="lang-en">Join our International Realtor Network and earn 50% referral commissions in Spain.</span>
+               <span class="lang-es">Únete a nuestra Red de Realtors y gana 50% de comisión de referido en España.</span>
+               <span class="lang-fr">Rejoignez notre réseau de Courtiers et touchez 50% de commission en Espagne.</span>
+               <span class="lang-en-ca">Join our International Realtor Network and earn 50% referral commissions in Spain.</span>`;
+        }
+        if (submitBtn) {
+          submitBtn.innerHTML = `<span class="lang-en">Join as Realtor Partner</span><span class="lang-es">Unirme como Realtor Partner</span><span class="lang-fr">Rejoindre comme Conseiller</span><span class="lang-en-ca">Join as Realtor Partner</span>`;
+        }
+      } else if (type === 'broker') {
+        if (formTitle) {
+          formTitle.innerHTML = `<span class="lang-en">Brokerage Partner Registration</span><span class="lang-es">Registro de Brokerage / Agencia Partner</span><span class="lang-fr">Inscription Agence Partenaire</span><span class="lang-en-ca">Brokerage Partner Registration</span>`;
+        }
+        if (welcomeMsg) {
+          welcomeMsg.innerHTML = refName
+            ? `<span class="lang-en">Invited by <strong>${refName}</strong> to establish a strategic partnership with RE/MAX Inmomás Spain.</span>
+               <span class="lang-es">Invitado/a por <strong>${refName}</strong> para crear una alianza estratégica con RE/MAX Inmomás España.</span>
+               <span class="lang-fr">Invité(e) par <strong>${refName}</strong> pour un partenariat stratégique avec RE/MAX Inmomás Espagne.</span>
+               <span class="lang-en-ca">Invited by <strong>${refName}</strong> to establish a strategic partnership with RE/MAX Inmomás Spain.</span>`
+            : `<span class="lang-en">Register your Brokerage to open an international revenue stream for your team.</span>
+               <span class="lang-es">Registra tu Brokerage para abrir una vía de ingresos internacionales para tu equipo.</span>
+               <span class="lang-fr">Inscrivez votre Agence pour ouvrir un nouveau canal de revenus internationaux.</span>
+               <span class="lang-en-ca">Register your Brokerage to open an international revenue stream for your team.</span>`;
+        }
+        if (submitBtn) {
+          submitBtn.innerHTML = `<span class="lang-en">Register Brokerage</span><span class="lang-es">Registrar Brokerage</span><span class="lang-fr">Inscrire l'Agence</span><span class="lang-en-ca">Register Brokerage</span>`;
+        }
+      } else {
+        if (formTitle) {
+          formTitle.innerHTML = `<span class="lang-en">Partner Registration</span><span class="lang-es">Registro de Colaborador</span><span class="lang-fr">Inscription Partenaire</span><span class="lang-en-ca">Partner Registration</span>`;
+        }
+        if (submitBtn) {
+          submitBtn.innerHTML = `<span class="lang-en">Submit Application</span><span class="lang-es">Enviar Solicitud</span><span class="lang-fr">Soumettre la Demande</span><span class="lang-en-ca">Submit Application</span>`;
+        }
+      }
 
       // Disable required on hidden client fields to prevent validation blocking
       if (cf) {
@@ -199,58 +274,41 @@ App.views.public = {
       const profConsentBox = document.getElementById('referral-webinar-consent');
       if (profConsentBox) profConsentBox.checked = true;
 
-      // Update welcome message and form texts based on referrer role
-      const formTitle = document.getElementById('referral-form-title');
-      const submitBtn = document.getElementById('referral-submit-btn');
-
-      if (referrer.role === 'realtor' || referrer.role === 'broker') {
-        if (formTitle) formTitle.innerHTML = `<span class="lang-en">Register for the Next Webinar</span><span class="lang-es">Regístrate para el Próximo Webinario</span><span class="lang-fr">S'inscrire au Prochain Webinaire</span><span class="lang-en-ca">Register for the Next Webinar</span>`;
-        if (welcomeMsg) {
-          welcomeMsg.innerHTML = `<span class="lang-en">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Register to receive notifications and info about our next webinar.</span>
-                                  <span class="lang-es">Has sido referido por <strong>${referrer.firstName} ${referrer.lastName}</strong>. Regístrate para recibir notificaciones e info sobre nuestro próximo webinario.</span>
-                                  <span class="lang-fr">Vous avez été parrainé par <strong>${referrer.firstName} ${referrer.lastName}</strong>. Inscrivez-vous pour recevoir des notifications et des infos sur notre prochain webinaire.</span>
-                                  <span class="lang-en-ca">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Register to receive notifications and info about our next webinar.</span>`;
-        }
-        if (submitBtn) submitBtn.innerHTML = `<span class="lang-en">Register for Webinar</span><span class="lang-es">Registrarme al Webinario</span><span class="lang-fr">S'inscrire au Webinaire</span><span class="lang-en-ca">Register for Webinar</span>`;
-      } else {
-        if (formTitle) formTitle.innerHTML = `<span class="lang-en">VIP Webinar Registration</span><span class="lang-es">Registro VIP al Webinario</span><span class="lang-fr">Inscription VIP au Webinaire</span><span class="lang-en-ca">VIP Webinar Registration</span>`;
-        if (welcomeMsg) {
-          welcomeMsg.innerHTML = `<span class="lang-en">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Complete the form to secure your spot for the September 18 webinar.</span>
-                                  <span class="lang-es">Has sido referido por <strong>${referrer.firstName} ${referrer.lastName}</strong>. Completa el formulario para asegurar tu plaza en el webinario del 18 de septiembre.</span>
-                                  <span class="lang-fr">Vous avez été parrainé par <strong>${referrer.firstName} ${referrer.lastName}</strong>. Remplissez le formulaire pour réserver votre place.</span>
-                                  <span class="lang-en-ca">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Complete the form to secure your spot for the September 18 webinar.</span>`;
-        }
-        if (submitBtn) submitBtn.innerHTML = `<span class="lang-en">Register for Webinar</span><span class="lang-es">Registrarme al Webinario</span><span class="lang-fr">S'inscrire au Webinaire</span><span class="lang-en-ca">Register for Webinar</span>`;
-      }
-
-      // Build type options
+      // Build type options strictly based on referrer's role
       let availableTypes = ['client'];
-      if (referrer.role === 'broker') {
+      if (referrer.role === 'realtor') {
+        // Realtors ONLY register clients
+        availableTypes = ['client'];
+        selectedType = 'client';
+      } else if (referrer.role === 'broker') {
         availableTypes = ['client', 'realtor'];
+        if (!availableTypes.includes(selectedType)) selectedType = 'client';
       } else if (referrer.role === 'agent_inmomas' || referrer.role === 'colaborador' || referrer.role === 'admin' || referrer.role === 'partner') {
         availableTypes = referrer.role === 'admin' 
           ? ['client', 'realtor', 'broker', 'agent_inmomas', 'colaborador']
           : ['client', 'realtor', 'broker'];
+        if (!availableTypes.includes(selectedType)) selectedType = 'client';
       }
 
       const typeConfig = {
-        client: { icon: '👤', labelEn: 'Client', labelEs: 'Cliente', labelFr: 'Client', labelEnCa: 'Client' },
-        realtor: { icon: '🏠', labelEn: 'Realtor', labelEs: 'Realtor', labelFr: 'Realtor', labelEnCa: 'Realtor' },
-        broker: { icon: '🏢', labelEn: 'Broker', labelEs: 'Broker', labelFr: 'Courtier', labelEnCa: 'Broker' },
+        client: { icon: '👤', labelEn: 'Client (Webinar 18 Sep)', labelEs: 'Cliente (Webinario 18 Sep)', labelFr: 'Client (Webinaire 18 Sep)', labelEnCa: 'Client (Webinar 18 Sep)' },
+        realtor: { icon: '🏠', labelEn: 'Realtor Partner', labelEs: 'Realtor Partner', labelFr: 'Conseiller Partenaire', labelEnCa: 'Realtor Partner' },
+        broker: { icon: '🏢', labelEn: 'Brokerage / Agency', labelEs: 'Broker / Agencia', labelFr: 'Courtier / Agence', labelEnCa: 'Brokerage / Agency' },
         agent_inmomas: { icon: '🇪🇸', labelEn: 'RE/MAX Inmomás Agent', labelEs: 'Agente RE/MAX Inmomás', labelFr: 'Agent RE/MAX Inmomás', labelEnCa: 'RE/MAX Inmomás Agent' },
         colaborador: { icon: '🤝', labelEn: 'Collaborator', labelEs: 'Colaborador', labelFr: 'Collaborateur', labelEnCa: 'Collaborator' }
       };
 
       if (availableTypes.length > 1 && typeSelector && typeOptions) {
         typeSelector.style.display = 'block';
-        typeOptions.innerHTML = availableTypes.map((type, idx) => {
+        typeOptions.innerHTML = availableTypes.map((type) => {
           const cfg = typeConfig[type];
+          const isSelected = type === selectedType;
           return `
-            <label class="role-card referral-type-card ${idx === 0 ? 'selected' : ''}">
-              <input type="radio" name="referral-contact-type" value="${type}" ${idx === 0 ? 'checked' : ''} style="display:none;">
-              <div class="role-card__content" style="padding: 16px 12px; text-align: center;">
-                <span class="role-card__icon" style="font-size: 1.8rem;">${cfg.icon}</span>
-                <span class="role-card__title" style="font-size: 0.85rem;">
+            <label class="role-card referral-type-card ${isSelected ? 'selected' : ''}">
+              <input type="radio" name="referral-contact-type" value="${type}" ${isSelected ? 'checked' : ''} style="display:none;">
+              <div class="role-card__content" style="padding: 14px 10px; text-align: center;">
+                <span class="role-card__icon" style="font-size: 1.6rem;">${cfg.icon}</span>
+                <span class="role-card__title" style="font-size: 0.85rem; font-weight: 700;">
                   <span class="lang-en">${cfg.labelEn}</span>
                   <span class="lang-es">${cfg.labelEs}</span>
                   <span class="lang-fr">${cfg.labelFr}</span>
@@ -264,7 +322,9 @@ App.views.public = {
           card.addEventListener('click', function() {
             typeOptions.querySelectorAll('.referral-type-card').forEach(c => c.classList.remove('selected'));
             this.classList.add('selected');
-            selectedType = this.querySelector('input').value;
+            const radio = this.querySelector('input');
+            if (radio) radio.checked = true;
+            selectedType = radio ? radio.value : 'client';
             updateFieldVisibility(selectedType);
           });
         });
@@ -434,6 +494,7 @@ App.views.public = {
           );
 
           sessionStorage.removeItem('referralCode');
+          sessionStorage.removeItem('referralType');
           form.reset();
           setTimeout(() => {
             if (contactType === 'client') {

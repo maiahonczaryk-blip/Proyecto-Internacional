@@ -171,30 +171,73 @@ App.utils.copyToClipboard = async function(text) {
 };
 
 /* ---- Referral Links ---- */
-App.utils.generateReferralLink = function(referralCode) {
+App.utils.generateReferralLink = function(referralCode, type) {
   // Always use the production URL so referral links are publicly accessible
-  // (preview deployments on Vercel require authentication)
   const prodUrl = 'https://thespainconnection.com';
-  return `${prodUrl}/index.html#referral?ref=${encodeURIComponent(referralCode)}`;
+  let url = `${prodUrl}/index.html#referral?ref=${encodeURIComponent(referralCode || '')}`;
+  if (type) {
+    url += `&type=${encodeURIComponent(type)}`;
+  }
+  return url;
 };
 
-/* ---- Share Webinar Helpers ---- */
-App.utils.getWebinarShareMessage = function(referralLink) {
+/* ---- Share Webinar & Partner Helpers ---- */
+App.utils.getClientWebinarShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
-  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/#webinar');
+  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode, 'client') : 'https://thespainconnection.com/#webinar');
   return `🇪🇸 ¡Hola! Te invito con un Pase VIP Gratuito a nuestro próximo webinario en vivo el 18 de septiembre (12:00 PM EDT / 18:00 h España): "Descubre España · Cómo Comprar, Mudarse e Invertir con Seguridad".\n\n📌 Conoce las claves de compra segura, visados de residencia e hipotecas para no residentes.\n\n🎟️ Reserva tu plaza gratuita aquí: ${link}`;
 };
 
+App.utils.getRealtorPartnerShareMessage = function(referralLink) {
+  const user = App.auth ? App.auth.getCurrentUser() : null;
+  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode, 'realtor') : 'https://thespainconnection.com/#register');
+  return `🤝 ¡Hola! Te invito a unirte a la red de Realtors Partners de RE/MAX Inmomás · The Spain Connection. Conecta a tus clientes de EE.UU., Canadá y Puerto Rico interesados en comprar o invertir en España y gana un 50% de comisión de referido con soporte legal e hipotecario completo en destino.\n\n🔗 Regístrate aquí para activar tu cuenta de Realtor Partner: ${link}`;
+};
+
+App.utils.getBrokerPartnerShareMessage = function(referralLink) {
+  const user = App.auth ? App.auth.getCurrentUser() : null;
+  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode, 'broker') : 'https://thespainconnection.com/#register');
+  return `🏢 ¡Hola! Te invito a crear una alianza estratégica entre tu Brokerage/Agencia y RE/MAX Inmomás · The Spain Connection. Abre un nuevo canal de ingresos internacionales para tu equipo con 50% de split de comisión en España y respaldo institucional completo.\n\n🔗 Registra tu Brokerage aquí: ${link}`;
+};
+
+App.utils.getWebinarShareMessage = function(referralLink) {
+  return App.utils.getClientWebinarShareMessage(referralLink);
+};
+
 App.utils.shareWebinarWhatsApp = function(customLink) {
-  const message = App.utils.getWebinarShareMessage(customLink);
+  const message = App.utils.getClientWebinarShareMessage(customLink);
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+  window.open(whatsappUrl, '_blank');
+};
+
+App.utils.shareRealtorPartnerWhatsApp = function(customLink) {
+  const message = App.utils.getRealtorPartnerShareMessage(customLink);
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+  window.open(whatsappUrl, '_blank');
+};
+
+App.utils.shareBrokerPartnerWhatsApp = function(customLink) {
+  const message = App.utils.getBrokerPartnerShareMessage(customLink);
   const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
   window.open(whatsappUrl, '_blank');
 };
 
 App.utils.copyWebinarInviteText = function(customLink) {
-  const message = App.utils.getWebinarShareMessage(customLink);
+  const message = App.utils.getClientWebinarShareMessage(customLink);
   App.utils.copyToClipboard(message);
-  App.utils.showToast('¡Texto de invitación copiado al portapapeles!', 'success');
+  App.utils.showToast('¡Texto de invitación para clientes copiado al portapapeles!', 'success');
+};
+
+App.utils.copyRealtorInviteText = function(customLink) {
+  const message = App.utils.getRealtorPartnerShareMessage(customLink);
+  App.utils.copyToClipboard(message);
+  App.utils.showToast('¡Invitación para Realtors copiada al portapapeles!', 'success');
+};
+
+App.utils.copyBrokerInviteText = function(customLink) {
+  const message = App.utils.getBrokerPartnerShareMessage(customLink);
+  App.utils.copyToClipboard(message);
+  App.utils.showToast('¡Invitación para Brokers copiada al portapapeles!', 'success');
 };
 
 /* ---- Status Helpers ---- */
