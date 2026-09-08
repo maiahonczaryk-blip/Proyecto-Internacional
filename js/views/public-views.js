@@ -521,12 +521,14 @@ App.views.public = {
       // ── Apply Theme Classes on Containers ──
       const webinarViewEl = document.getElementById('view-webinar-register');
       if (webinarViewEl) {
-        webinarViewEl.className = 'app-view webinar-theme--' + activeType;
+        webinarViewEl.classList.remove('webinar-theme--b2b', 'webinar-theme--b2c');
+        webinarViewEl.classList.add('webinar-theme--' + activeType);
       }
 
       const topBannerEl = document.getElementById('webinar-top-banner');
       if (topBannerEl) {
-        topBannerEl.className = 'webinar-theme--' + activeType;
+        topBannerEl.classList.remove('webinar-theme--b2b', 'webinar-theme--b2c');
+        topBannerEl.classList.add('webinar-theme--' + activeType);
         topBannerEl.style.background = isB2C
           ? 'linear-gradient(90deg, #051329 0%, #0284c7 35%, #ea580c 70%, #051329 100%)'
           : 'linear-gradient(90deg, #04081a 0%, #003f99 35%, #880000 65%, #04081a 100%)';
