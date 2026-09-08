@@ -61,53 +61,44 @@
       // Recent webinar registrations (top 3)
       renderRecentWebinars();
 
-      // Multi-channel Personalized Referral Links
+      // Referral link
       const isPending = currentUser.status === 'pending';
       const refCode = currentUser.referralCode || 'LOC-DEFAULT';
-      const clientLink = isPending ? '' : App.utils.generateReferralLink(refCode, 'client');
-      const realtorLink = isPending ? '' : App.utils.generateReferralLink(refCode, 'realtor');
-      const brokerLink = isPending ? '' : App.utils.generateReferralLink(refCode, 'broker');
-      const generalLink = isPending ? '' : App.utils.generateReferralLink(refCode);
+      const referralLink = isPending ? '' : App.utils.generateReferralLink(refCode);
 
-      function setupLinkInput(inputId, copyBtnId, linkVal) {
-        const inputEl = document.getElementById(inputId);
-        const copyEl = document.getElementById(copyBtnId);
-        if (inputEl) {
-          if (isPending) {
-            inputEl.value = 'Enlace pendiente de aprobación por el Administrador';
-            inputEl.disabled = true;
-            inputEl.style.color = '#9ca3af';
-            inputEl.style.fontStyle = 'italic';
-          } else {
-            inputEl.value = linkVal;
-            inputEl.disabled = false;
-            inputEl.style.color = '';
-            inputEl.style.fontStyle = '';
-          }
-        }
-        if (copyEl) {
-          if (isPending) {
-            copyEl.disabled = true;
-            copyEl.style.opacity = '0.5';
-            copyEl.style.cursor = 'not-allowed';
-            copyEl.onclick = null;
-          } else {
-            copyEl.disabled = false;
-            copyEl.style.opacity = '';
-            copyEl.style.cursor = 'pointer';
-            copyEl.onclick = () => {
-              App.utils.copyToClipboard(linkVal);
-              App.utils.showToast('¡Enlace copiado al portapapeles!', 'success');
-            };
-          }
+      const linkInput = document.getElementById('agent-dash-referral-link');
+      if (linkInput) {
+        if (isPending) {
+          linkInput.value = 'Enlace pendiente de aprobación por el Administrador';
+          linkInput.disabled = true;
+          linkInput.style.color = '#9ca3af';
+          linkInput.style.fontStyle = 'italic';
+        } else {
+          linkInput.value = referralLink;
+          linkInput.disabled = false;
+          linkInput.style.color = '';
+          linkInput.style.fontStyle = '';
         }
       }
 
-      // Populate agent dashboard link inputs
-      setupLinkInput('agent-dash-link-client', 'agent-dash-copy-client', clientLink);
-      setupLinkInput('agent-dash-link-realtor', 'agent-dash-copy-realtor', realtorLink);
-      setupLinkInput('agent-dash-link-broker', 'agent-dash-copy-broker', brokerLink);
-      setupLinkInput('agent-dash-referral-link', 'agent-dash-copy-link', generalLink);
+      // Copy button handler
+      const copyBtn = document.getElementById('agent-dash-copy-link');
+      if (copyBtn) {
+        if (isPending) {
+          copyBtn.disabled = true;
+          copyBtn.style.opacity = '0.5';
+          copyBtn.style.cursor = 'not-allowed';
+          copyBtn.onclick = null;
+        } else {
+          copyBtn.disabled = false;
+          copyBtn.style.opacity = '';
+          copyBtn.style.cursor = 'pointer';
+          copyBtn.onclick = () => {
+            App.utils.copyToClipboard(referralLink);
+            App.utils.showToast('¡Enlace copiado al portapapeles!', 'success');
+          };
+        }
+      }
 
       // Manual Add Client button
       const addBtnContainer = document.getElementById('agent-dash-add-client-btn');

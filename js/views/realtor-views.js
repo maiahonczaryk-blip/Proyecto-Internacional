@@ -77,9 +77,9 @@
       setTextById('realtor-stat-sales',       completedSales.length);
       setTextById('realtor-stat-commissions', App.utils.formatCurrency(totalRealtorComm));
 
-      // Referral link (Client / Webinar)
+      // Referral link
       const isPending = currentUser.status === 'pending';
-      const referralLink = isPending ? '' : App.utils.generateReferralLink(currentUser.referralCode || 'REA-DEFAULT', 'client');
+      const referralLink = isPending ? '' : App.utils.generateReferralLink(currentUser.referralCode || 'REA-DEFAULT');
       const linkInput = document.getElementById('realtor-dash-referral-link');
       if (linkInput) {
         if (isPending) {
@@ -337,7 +337,7 @@
       realtorClients = await App.auth.getClients({ referredBy: currentUser.id });
 
       const isPending = currentUser.status === 'pending';
-      const referralLink = isPending ? '' : App.utils.generateReferralLink(currentUser.referralCode || 'REA-DEFAULT', 'client');
+      const referralLink = isPending ? '' : App.utils.generateReferralLink(currentUser.referralCode || 'REA-DEFAULT');
 
       // Display referral link
       const linkDisplay = document.getElementById('realtor-referral-link-display');
