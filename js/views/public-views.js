@@ -121,8 +121,8 @@ App.views.public = {
       if (pf) pf.style.display = type !== 'client' ? '' : 'none';
       if (pwGroup) pwGroup.style.display = type === 'client' ? 'none' : '';
 
-      // Webinar Spotlight Banner is specifically for client invitations
-      if (banner) banner.style.display = type === 'client' ? '' : 'none';
+      // Webinar Spotlight Banner is specifically for REALTOR VIP Masterclass invitations
+      if (banner) banner.style.display = type === 'realtor' ? '' : 'none';
 
       const profWebinar = document.querySelector('.professional-webinar-group');
       const clientWebinar = document.querySelector('.client-webinar-group');
@@ -133,21 +133,21 @@ App.views.public = {
 
       if (type === 'client') {
         if (formTitle) {
-          formTitle.innerHTML = `<span class="lang-en">Spain Unlocked · VIP Webinar</span><span class="lang-es">Descubre España · Webinario VIP</span><span class="lang-fr">Découvrez l'Espagne · Webinaire VIP</span><span class="lang-en-ca">Spain Unlocked · VIP Webinar</span>`;
+          formTitle.innerHTML = `<span class="lang-en">Buy &amp; Invest in Spain</span><span class="lang-es">Comprar e Invertir en España</span><span class="lang-fr">Acheter et Investir en Espagne</span><span class="lang-en-ca">Buy &amp; Invest in Spain</span>`;
         }
         if (welcomeMsg) {
           welcomeMsg.innerHTML = refName
-            ? `<span class="lang-en">Complimentary VIP invitation from <strong>${refName}</strong></span>
-               <span class="lang-es">Invitación VIP de cortesía de <strong>${refName}</strong></span>
-               <span class="lang-fr">Invitation VIP offerte par <strong>${refName}</strong></span>
-               <span class="lang-en-ca">Complimentary VIP invitation from <strong>${refName}</strong></span>`
-            : `<span class="lang-en">Live Webinar · September 24, 2026 · 7:00 PM EDT</span>
-               <span class="lang-es">Webinario en Vivo · 24 de Septiembre 2026 · 7:00 PM EDT</span>
-               <span class="lang-fr">Webinaire en Direct · 24 Septembre 2026 · 19 h EDT</span>
-               <span class="lang-en-ca">Live Webinar · September 24, 2026 · 7:00 PM EDT</span>`;
+            ? `<span class="lang-en">Complimentary invitation from <strong>${refName}</strong> · RE/MAX Inmomás</span>
+               <span class="lang-es">Invitación de cortesía de <strong>${refName}</strong> · RE/MAX Inmomás</span>
+               <span class="lang-fr">Invitation offerte par <strong>${refName}</strong> · RE/MAX Inmomás</span>
+               <span class="lang-en-ca">Complimentary invitation from <strong>${refName}</strong> · RE/MAX Inmomás</span>`
+            : `<span class="lang-en">Personalized advisory with Spain's top real estate advisors</span>
+               <span class="lang-es">Asesoría personalizada con los mejores agentes de España</span>
+               <span class="lang-fr">Conseil personnalisé avec les meilleurs agents en Espagne</span>
+               <span class="lang-en-ca">Personalized advisory with Spain's top real estate advisors</span>`;
         }
         if (submitBtn) {
-          submitBtn.innerHTML = `<span class="lang-en">🎟️ Claim Free VIP Pass</span><span class="lang-es">🎟️ Reservar Mi Pase VIP Gratuito</span><span class="lang-fr">🎟️ Réserver Mon Pass VIP</span><span class="lang-en-ca">🎟️ Claim Free VIP Pass</span>`;
+          submitBtn.innerHTML = `<span class="lang-en">Send Request</span><span class="lang-es">Enviar Solicitud</span><span class="lang-fr">Envoyer la Demande</span><span class="lang-en-ca">Send Request</span>`;
         }
       } else if (type === 'realtor') {
         if (formTitle) {
