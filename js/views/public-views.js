@@ -133,56 +133,54 @@ App.views.public = {
 
       if (type === 'client') {
         if (formTitle) {
-          formTitle.innerHTML = `<span class="lang-en">Spain Unlocked · VIP Webinar Registration</span><span class="lang-es">Descubre España · Registro VIP al Webinario</span><span class="lang-fr">Découvrez l'Espagne · Inscription VIP au Webinaire</span><span class="lang-en-ca">Spain Unlocked · VIP Webinar Registration</span>`;
-        }
-        if (welcomeMsg) {
-          if (refName) {
-            welcomeMsg.innerHTML = `<span class="lang-en">You've been personally invited by <strong>${refName}</strong>. Complete the form to secure your free VIP pass for the September 18 webinar.</span>
-                                    <span class="lang-es">Has sido invitado/a personalmente por <strong>${refName}</strong>. Completa el formulario para asegurar tu plaza gratuita en el webinario del 18 de septiembre.</span>
-                                    <span class="lang-fr">Vous avez été invité(e) par <strong>${refName}</strong>. Remplissez le formulaire pour réserver votre place VIP gratuite pour le webinaire du 18 septembre.</span>
-                                    <span class="lang-en-ca">You've been personally invited by <strong>${refName}</strong>. Complete the form to secure your free VIP pass for the September 18 webinar.</span>`;
-          } else {
-            welcomeMsg.innerHTML = `<span class="lang-en">Complete the form below to secure your free VIP pass for the September 18 webinar.</span>
-                                    <span class="lang-es">Completa el formulario para asegurar tu plaza gratuita en el webinario del 18 de septiembre.</span>
-                                    <span class="lang-fr">Remplissez le formulaire ci-dessous pour réserver votre place VIP gratuite pour le webinaire du 18 septembre.</span>
-                                    <span class="lang-en-ca">Complete the form below to secure your free VIP pass for the September 18 webinar.</span>`;
-          }
-        }
-        if (submitBtn) {
-          submitBtn.innerHTML = `<span class="lang-en">🎟️ Claim My Free VIP Webinar Pass</span><span class="lang-es">🎟️ Reservar Mi Pase VIP Gratuito</span><span class="lang-fr">🎟️ Réserver Mon Pass VIP Gratuit</span><span class="lang-en-ca">🎟️ Claim My Free VIP Webinar Pass</span>`;
-        }
-      } else if (type === 'realtor') {
-        if (formTitle) {
-          formTitle.innerHTML = `<span class="lang-en">Realtor Partner Registration</span><span class="lang-es">Registro de Agente Realtor Partner</span><span class="lang-fr">Inscription Conseiller Partenaire</span><span class="lang-en-ca">Realtor Partner Registration</span>`;
+          formTitle.innerHTML = `<span class="lang-en">Spain Unlocked · VIP Webinar</span><span class="lang-es">Descubre España · Webinario VIP</span><span class="lang-fr">Découvrez l'Espagne · Webinaire VIP</span><span class="lang-en-ca">Spain Unlocked · VIP Webinar</span>`;
         }
         if (welcomeMsg) {
           welcomeMsg.innerHTML = refName
-            ? `<span class="lang-en">Invited by <strong>${refName}</strong> to join the RE/MAX Inmomás International Partner Network (50% referral commission in Spain).</span>
-               <span class="lang-es">Invitado/a por <strong>${refName}</strong> para unirte a la Red de Realtors Partners de RE/MAX Inmomás (50% comisión de referido en España).</span>
-               <span class="lang-fr">Invité(e) par <strong>${refName}</strong> à rejoindre le Réseau de Partenaires RE/MAX Inmomás (50% de commission en Espagne).</span>
-               <span class="lang-en-ca">Invited by <strong>${refName}</strong> to join the RE/MAX Inmomás International Partner Network (50% referral commission in Spain).</span>`
-            : `<span class="lang-en">Join our International Realtor Network and earn 50% referral commissions in Spain.</span>
-               <span class="lang-es">Únete a nuestra Red de Realtors y gana 50% de comisión de referido en España.</span>
-               <span class="lang-fr">Rejoignez notre réseau de Courtiers et touchez 50% de commission en Espagne.</span>
-               <span class="lang-en-ca">Join our International Realtor Network and earn 50% referral commissions in Spain.</span>`;
+            ? `<span class="lang-en">Complimentary VIP invitation from <strong>${refName}</strong></span>
+               <span class="lang-es">Invitación VIP de cortesía de <strong>${refName}</strong></span>
+               <span class="lang-fr">Invitation VIP offerte par <strong>${refName}</strong></span>
+               <span class="lang-en-ca">Complimentary VIP invitation from <strong>${refName}</strong></span>`
+            : `<span class="lang-en">Live Webinar · September 18, 2026</span>
+               <span class="lang-es">Webinario en Vivo · 18 de Septiembre 2026</span>
+               <span class="lang-fr">Webinaire en Direct · 18 Septembre 2026</span>
+               <span class="lang-en-ca">Live Webinar · September 18, 2026</span>`;
+        }
+        if (submitBtn) {
+          submitBtn.innerHTML = `<span class="lang-en">🎟️ Claim Free VIP Pass</span><span class="lang-es">🎟️ Reservar Mi Pase VIP Gratuito</span><span class="lang-fr">🎟️ Réserver Mon Pass VIP</span><span class="lang-en-ca">🎟️ Claim Free VIP Pass</span>`;
+        }
+      } else if (type === 'realtor') {
+        if (formTitle) {
+          formTitle.innerHTML = `<span class="lang-en">Realtor Partner Registration</span><span class="lang-es">Registro de Agente Realtor</span><span class="lang-fr">Inscription Conseiller</span><span class="lang-en-ca">Realtor Partner Registration</span>`;
+        }
+        if (welcomeMsg) {
+          welcomeMsg.innerHTML = refName
+            ? `<span class="lang-en">Invited by <strong>${refName}</strong> (50% referral commission in Spain)</span>
+               <span class="lang-es">Invitado/a por <strong>${refName}</strong> (50% de comisión de referido en España)</span>
+               <span class="lang-fr">Invité(e) par <strong>${refName}</strong> (50% de commission en Espagne)</span>
+               <span class="lang-en-ca">Invited by <strong>${refName}</strong> (50% referral commission in Spain)</span>`
+            : `<span class="lang-en">Join our International Realtor Network</span>
+               <span class="lang-es">Únete a nuestra Red Internacional de Realtors</span>
+               <span class="lang-fr">Rejoignez notre réseau de Courtiers</span>
+               <span class="lang-en-ca">Join our International Realtor Network</span>`;
         }
         if (submitBtn) {
           submitBtn.innerHTML = `<span class="lang-en">Join as Realtor Partner</span><span class="lang-es">Unirme como Realtor Partner</span><span class="lang-fr">Rejoindre comme Conseiller</span><span class="lang-en-ca">Join as Realtor Partner</span>`;
         }
       } else if (type === 'broker') {
         if (formTitle) {
-          formTitle.innerHTML = `<span class="lang-en">Brokerage Partner Registration</span><span class="lang-es">Registro de Brokerage / Agencia Partner</span><span class="lang-fr">Inscription Agence Partenaire</span><span class="lang-en-ca">Brokerage Partner Registration</span>`;
+          formTitle.innerHTML = `<span class="lang-en">Brokerage Partner Registration</span><span class="lang-es">Registro de Brokerage / Agencia</span><span class="lang-fr">Inscription Agence Partenaire</span><span class="lang-en-ca">Brokerage Partner Registration</span>`;
         }
         if (welcomeMsg) {
           welcomeMsg.innerHTML = refName
-            ? `<span class="lang-en">Invited by <strong>${refName}</strong> to establish a strategic partnership with RE/MAX Inmomás Spain.</span>
-               <span class="lang-es">Invitado/a por <strong>${refName}</strong> para crear una alianza estratégica con RE/MAX Inmomás España.</span>
-               <span class="lang-fr">Invité(e) par <strong>${refName}</strong> pour un partenariat stratégique avec RE/MAX Inmomás Espagne.</span>
-               <span class="lang-en-ca">Invited by <strong>${refName}</strong> to establish a strategic partnership with RE/MAX Inmomás Spain.</span>`
-            : `<span class="lang-en">Register your Brokerage to open an international revenue stream for your team.</span>
-               <span class="lang-es">Registra tu Brokerage para abrir una vía de ingresos internacionales para tu equipo.</span>
-               <span class="lang-fr">Inscrivez votre Agence pour ouvrir un nouveau canal de revenus internationaux.</span>
-               <span class="lang-en-ca">Register your Brokerage to open an international revenue stream for your team.</span>`;
+            ? `<span class="lang-en">Strategic Partnership with <strong>${refName}</strong> · RE/MAX Inmomás</span>
+               <span class="lang-es">Alianza Estratégica con <strong>${refName}</strong> · RE/MAX Inmomás</span>
+               <span class="lang-fr">Partenariat Stratégique avec <strong>${refName}</strong> · RE/MAX Inmomás</span>
+               <span class="lang-en-ca">Strategic Partnership with <strong>${refName}</strong> · RE/MAX Inmomás</span>`
+            : `<span class="lang-en">Register your Brokerage</span>
+               <span class="lang-es">Registra tu Brokerage / Agencia</span>
+               <span class="lang-fr">Inscrivez votre Agence</span>
+               <span class="lang-en-ca">Register your Brokerage</span>`;
         }
         if (submitBtn) {
           submitBtn.innerHTML = `<span class="lang-en">Register Brokerage</span><span class="lang-es">Registrar Brokerage</span><span class="lang-fr">Inscrire l'Agence</span><span class="lang-en-ca">Register Brokerage</span>`;
@@ -261,10 +259,10 @@ App.views.public = {
       if (bannerInviteeEl) {
         bannerInviteeEl.innerHTML = `
           <span>✨</span>
-          <span class="lang-en">VIP Access complimentary invitation from <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
-          <span class="lang-es">Invitación VIP cortesía de tu asesor personal <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
-          <span class="lang-fr">Invitation VIP offerte par votre conseiller <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
-          <span class="lang-en-ca">VIP Access complimentary invitation from <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+          <span class="lang-en">VIP invitation courtesy of <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+          <span class="lang-es">Invitación VIP de cortesía de <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+          <span class="lang-fr">Invitation VIP offerte par <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+          <span class="lang-en-ca">VIP invitation courtesy of <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
         `;
       }
 
@@ -301,63 +299,43 @@ App.views.public = {
       const typeConfig = {
         client: {
           icon: '👤',
-          badge: 'Webinar 18 Sep',
-          labelEn: 'Client / Buyer',
-          labelEs: 'Cliente / Comprador',
-          labelFr: 'Client / Acheteur',
-          labelEnCa: 'Client / Buyer',
-          subEn: 'Complimentary VIP Pass to Sep 18 Webinar',
-          subEs: 'Pase VIP Gratuito al Webinario 18 Sep',
-          subFr: 'Pass VIP Gratuit au Webinaire du 18 Sep',
-          subEnCa: 'Complimentary VIP Pass to Sep 18 Webinar'
+          badge: '',
+          labelEn: 'Client',
+          labelEs: 'Cliente',
+          labelFr: 'Client',
+          labelEnCa: 'Client'
         },
         realtor: {
           icon: '🏠',
-          badge: '50% Split',
-          labelEn: 'Realtor Partner',
-          labelEs: 'Realtor Partner',
-          labelFr: 'Conseiller Partenaire',
-          labelEnCa: 'Realtor Partner',
-          subEn: 'USA & Canada Agents · 50% Referral Split',
-          subEs: 'Agentes USA y Canadá · 50% Comisión',
-          subFr: 'Courtiers USA et Canada · 50% Commission',
-          subEnCa: 'USA & Canada Agents · 50% Referral Split'
+          badge: '50%',
+          labelEn: 'Realtor',
+          labelEs: 'Realtor',
+          labelFr: 'Conseiller',
+          labelEnCa: 'Realtor'
         },
         broker: {
           icon: '🏢',
-          badge: 'Alianza B2B',
-          labelEn: 'Brokerage / Agency',
-          labelEs: 'Broker / Agencia',
-          labelFr: 'Courtier / Agence',
-          labelEnCa: 'Brokerage / Agency',
-          subEn: 'Strategic Alliance for Teams & Brokerages',
-          subEs: 'Alianza Estratégica para tu Oficina',
-          subFr: 'Partenariat Stratégique pour votre Agence',
-          subEnCa: 'Strategic Alliance for Teams & Brokerages'
+          badge: 'B2B',
+          labelEn: 'Broker',
+          labelEs: 'Broker',
+          labelFr: 'Courtier',
+          labelEnCa: 'Broker'
         },
         agent_inmomas: {
           icon: '🇪🇸',
-          badge: 'RE/MAX Inmomás',
-          labelEn: 'RE/MAX Inmomás Agent',
-          labelEs: 'Agente RE/MAX Inmomás',
-          labelFr: 'Agent RE/MAX Inmomás',
-          labelEnCa: 'RE/MAX Inmomás Agent',
-          subEn: 'Spain Inmomás Team Network',
-          subEs: 'Equipo Asesor en España',
-          subFr: 'Équipe Conseiller en Espagne',
-          subEnCa: 'Spain Inmomás Team Network'
+          badge: '',
+          labelEn: 'Inmomás Agent',
+          labelEs: 'Agente Inmomás',
+          labelFr: 'Agent Inmomás',
+          labelEnCa: 'Inmomás Agent'
         },
         colaborador: {
           icon: '🤝',
-          badge: 'Partner',
-          labelEn: 'Collaborator',
+          badge: '',
+          labelEn: 'Partner',
           labelEs: 'Colaborador',
-          labelFr: 'Collaborateur',
-          labelEnCa: 'Collaborator',
-          subEn: 'Professional Services & Alliances',
-          subEs: 'Servicios Profesionales y Alianzas',
-          subFr: 'Services Professionnels & Partenariats',
-          subEnCa: 'Professional Services & Alliances'
+          labelFr: 'Partenaire',
+          labelEnCa: 'Partner'
         }
       };
 
@@ -367,30 +345,21 @@ App.views.public = {
           const cfg = typeConfig[type] || typeConfig.client;
           const isSelected = type === selectedType;
           return `
-            <div class="referral-role-card ${isSelected ? 'selected' : ''}" data-type="${type}">
+            <button type="button" class="referral-seg-tab ${isSelected ? 'selected' : ''}" data-type="${type}">
               <input type="radio" name="referral-contact-type" value="${type}" ${isSelected ? 'checked' : ''} style="display:none;">
-              <div class="role-top-row">
-                <span class="role-icon">${cfg.icon}</span>
-                <span class="role-badge">${cfg.badge}</span>
-              </div>
-              <div class="role-main-title">
-                <span class="lang-en">${cfg.labelEn}</span>
-                <span class="lang-es">${cfg.labelEs}</span>
-                <span class="lang-fr">${cfg.labelFr}</span>
-                <span class="lang-en-ca">${cfg.labelEnCa}</span>
-              </div>
-              <div class="role-sub-desc">
-                <span class="lang-en">${cfg.subEn}</span>
-                <span class="lang-es">${cfg.subEs}</span>
-                <span class="lang-fr">${cfg.subFr}</span>
-                <span class="lang-en-ca">${cfg.subEnCa}</span>
-              </div>
-            </div>`;
+              <span>${cfg.icon}</span>
+              <span class="lang-en">${cfg.labelEn}</span>
+              <span class="lang-es">${cfg.labelEs}</span>
+              <span class="lang-fr">${cfg.labelFr}</span>
+              <span class="lang-en-ca">${cfg.labelEnCa}</span>
+              ${cfg.badge ? `<span class="seg-badge">${cfg.badge}</span>` : ''}
+            </button>`;
         }).join('');
 
-        typeOptions.querySelectorAll('.referral-role-card').forEach(card => {
-          card.addEventListener('click', function() {
-            typeOptions.querySelectorAll('.referral-role-card').forEach(c => c.classList.remove('selected'));
+        typeOptions.querySelectorAll('.referral-seg-tab').forEach(tab => {
+          tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            typeOptions.querySelectorAll('.referral-seg-tab').forEach(t => t.classList.remove('selected'));
             this.classList.add('selected');
             const radio = this.querySelector('input');
             if (radio) radio.checked = true;
