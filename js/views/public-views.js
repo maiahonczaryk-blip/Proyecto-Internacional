@@ -181,6 +181,24 @@ App.views.public = {
       }
       console.log('[Referral] Referrer found:', referrer.firstName, referrer.lastName, '(' + referrer.role + ')');
 
+      // Update webinar spotlight banner invitee line
+      const bannerInviteeEl = document.getElementById('referral-banner-invitee');
+      if (bannerInviteeEl) {
+        bannerInviteeEl.innerHTML = `
+          <span>✨</span>
+          <span class="lang-en">VIP Access complimentary invitation from <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+          <span class="lang-es">Invitación VIP cortesía de tu asesor personal <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+          <span class="lang-fr">Invitation VIP offerte par votre conseiller <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+          <span class="lang-en-ca">VIP Access complimentary invitation from <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+        `;
+      }
+
+      // Pre-check webinar consents
+      const clientConsentBox = document.getElementById('referral-client-webinar-consent');
+      if (clientConsentBox) clientConsentBox.checked = true;
+      const profConsentBox = document.getElementById('referral-webinar-consent');
+      if (profConsentBox) profConsentBox.checked = true;
+
       // Update welcome message and form texts based on referrer role
       const formTitle = document.getElementById('referral-form-title');
       const submitBtn = document.getElementById('referral-submit-btn');
@@ -193,16 +211,16 @@ App.views.public = {
                                   <span class="lang-fr">Vous avez été parrainé par <strong>${referrer.firstName} ${referrer.lastName}</strong>. Inscrivez-vous pour recevoir des notifications et des infos sur notre prochain webinaire.</span>
                                   <span class="lang-en-ca">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Register to receive notifications and info about our next webinar.</span>`;
         }
-        if (submitBtn) submitBtn.innerHTML = `<span class="lang-en">Register</span><span class="lang-es">Registrarme</span><span class="lang-fr">S'inscrire</span><span class="lang-en-ca">Register</span>`;
+        if (submitBtn) submitBtn.innerHTML = `<span class="lang-en">Register for Webinar</span><span class="lang-es">Registrarme al Webinario</span><span class="lang-fr">S'inscrire au Webinaire</span><span class="lang-en-ca">Register for Webinar</span>`;
       } else {
-        if (formTitle) formTitle.innerHTML = `<span class="lang-en">Register</span><span class="lang-es">Regístrate</span><span class="lang-fr">S'inscrire</span><span class="lang-en-ca">Register</span>`;
+        if (formTitle) formTitle.innerHTML = `<span class="lang-en">VIP Webinar Registration</span><span class="lang-es">Registro VIP al Webinario</span><span class="lang-fr">Inscription VIP au Webinaire</span><span class="lang-en-ca">VIP Webinar Registration</span>`;
         if (welcomeMsg) {
-          welcomeMsg.innerHTML = `<span class="lang-en">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Please fill out the form below to register.</span>
-                                  <span class="lang-es">Has sido referido por <strong>${referrer.firstName} ${referrer.lastName}</strong>. Completa el formulario para registrarte.</span>
-                                  <span class="lang-fr">Vous avez été parrainé par <strong>${referrer.firstName} ${referrer.lastName}</strong>. Veuillez remplir le formulaire ci-dessous pour vous inscrire.</span>
-                                  <span class="lang-en-ca">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Please fill out the form below to register.</span>`;
+          welcomeMsg.innerHTML = `<span class="lang-en">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Complete the form to secure your spot for the September 18 webinar.</span>
+                                  <span class="lang-es">Has sido referido por <strong>${referrer.firstName} ${referrer.lastName}</strong>. Completa el formulario para asegurar tu plaza en el webinario del 18 de septiembre.</span>
+                                  <span class="lang-fr">Vous avez été parrainé par <strong>${referrer.firstName} ${referrer.lastName}</strong>. Remplissez le formulaire pour réserver votre place.</span>
+                                  <span class="lang-en-ca">You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>. Complete the form to secure your spot for the September 18 webinar.</span>`;
         }
-        if (submitBtn) submitBtn.innerHTML = `<span class="lang-en">Submit</span><span class="lang-es">Enviar</span><span class="lang-fr">Soumettre</span><span class="lang-en-ca">Submit</span>`;
+        if (submitBtn) submitBtn.innerHTML = `<span class="lang-en">Register for Webinar</span><span class="lang-es">Registrarme al Webinario</span><span class="lang-fr">S'inscrire au Webinaire</span><span class="lang-en-ca">Register for Webinar</span>`;
       }
 
       // Build type options
@@ -371,63 +389,47 @@ App.views.public = {
             await App.auth.register(userPayload);
           }
 
-          // Handle webinar consent check (professional vs client events)
-          let hasConsent = false;
-          let webinarPayload = null;
+          // ---- Automatic Webinar Registration ----
+          const settings = (App.auth && App.auth.getWebinarSettings)
+            ? await App.auth.getWebinarSettings()
+            : (App.auth && App.auth.getDefaultWebinarSettings ? App.auth.getDefaultWebinarSettings() : null);
 
-          if (contactType === 'client') {
-            const clientConsent = document.getElementById('referral-client-webinar-consent');
-            if (clientConsent && clientConsent.checked) {
-              hasConsent = true;
-              webinarPayload = {
-                firstName,
-                lastName,
-                email,
-                phone,
-                agency: 'Client (Interested in Spain)',
-                country: form.querySelector('#referral-country')?.value || 'United States',
-                state: 'N/A',
-                howHeard: 'Referral Link',
-                referrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : '',
-                webinarTitle: 'Living & Investing in Spain: Relocation Guide',
-                webinarDate: 'September 15, 2026'
-              };
-            }
-          } else {
-            const profConsent = document.getElementById('referral-webinar-consent');
-            if (profConsent && profConsent.checked) {
-              hasConsent = true;
-              webinarPayload = {
-                firstName,
-                lastName,
-                email,
-                phone,
-                agency: agencyName || 'Referred Partner',
-                country: 'United States',
-                state: market || 'N/A',
-                howHeard: 'Referral Link',
-                referrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : '',
-                webinarTitle: 'Exclusive Webinar: Scale Your Business Globally',
-                webinarDate: 'August 28, 2026'
-              };
-            }
-          }
-          if (hasConsent && webinarPayload) {
-            if (referrer) {
-              webinarPayload.agentReferrerId = referrer.id;
-              webinarPayload.referralCode = referrer.referralCode;
-            }
-            try {
-              await App.auth.saveWebinarRegistration(webinarPayload);
-            } catch (webinarErr) {
-              console.warn('[Referral] Webinar registration failed:', webinarErr);
-            }
+          const activeType = settings?.activeType || 'b2c';
+          const typeConfig = settings ? (settings[activeType] || settings.b2c) : null;
+          const webinarTitle = typeConfig?.title || (contactType === 'client' ? 'Spain Unlocked (Descubre España)' : 'Beyond Borders');
+          const webinarDate = settings?.date || typeConfig?.date || '2026-09-18';
+
+          let webinarPayload = {
+            firstName,
+            lastName,
+            email,
+            phone,
+            agency: contactType === 'client' ? 'Client (Interested in Spain)' : (agencyName || 'Referred Partner'),
+            country: form.querySelector('#referral-country')?.value || (market || 'United States'),
+            state: form.querySelector('#referral-market')?.value || 'N/A',
+            howHeard: 'Referral Link',
+            referrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : '',
+            webinar: webinarTitle,
+            webinarType: (contactType === 'client' ? 'B2C' : 'B2B'),
+            webinarDate: webinarDate,
+            gdprConsent: true,
+            referralCode: referrer?.referralCode || refCode || null,
+            referrerId: referrer?.id || null,
+            agentReferrerId: referrer?.id || null,
+            agentReferrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : null,
+            agentReferrerRole: referrer?.role || null
+          };
+
+          try {
+            await App.auth.saveWebinarRegistration(webinarPayload);
+          } catch (webinarErr) {
+            console.warn('[Referral] Automatic webinar registration failed:', webinarErr);
           }
 
           App.utils.showToast(
             contactType === 'client'
-              ? '¡Registro exitoso! Nos pondremos en contacto contigo pronto.'
-              : '¡Registro exitoso! Redirigiendo a tu solicitud en revisión.',
+              ? `🎉 ¡Registro exitoso! Has quedado inscrito/a para el webinario del ${webinarDate}.`
+              : '🎉 ¡Registro exitoso! Redirigiendo a tu solicitud en revisión.',
             'success'
           );
 
@@ -439,7 +441,7 @@ App.views.public = {
             } else {
               App.router.navigateTo('pending');
             }
-          }, 1500);
+          }, 1600);
 
         } catch (err) {
           console.error('[Referral] Error submitting form:', err);

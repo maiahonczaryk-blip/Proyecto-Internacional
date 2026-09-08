@@ -178,6 +178,25 @@ App.utils.generateReferralLink = function(referralCode) {
   return `${prodUrl}/index.html#referral?ref=${encodeURIComponent(referralCode)}`;
 };
 
+/* ---- Share Webinar Helpers ---- */
+App.utils.getWebinarShareMessage = function(referralLink) {
+  const user = App.auth ? App.auth.getCurrentUser() : null;
+  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/#webinar');
+  return `🇪🇸 ¡Hola! Te invito con un Pase VIP Gratuito a nuestro próximo webinario en vivo el 18 de septiembre (12:00 PM EDT / 18:00 h España): "Descubre España · Cómo Comprar, Mudarse e Invertir con Seguridad".\n\n📌 Conoce las claves de compra segura, visados de residencia e hipotecas para no residentes.\n\n🎟️ Reserva tu plaza gratuita aquí: ${link}`;
+};
+
+App.utils.shareWebinarWhatsApp = function(customLink) {
+  const message = App.utils.getWebinarShareMessage(customLink);
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+  window.open(whatsappUrl, '_blank');
+};
+
+App.utils.copyWebinarInviteText = function(customLink) {
+  const message = App.utils.getWebinarShareMessage(customLink);
+  App.utils.copyToClipboard(message);
+  App.utils.showToast('¡Texto de invitación copiado al portapapeles!', 'success');
+};
+
 /* ---- Status Helpers ---- */
 App.utils.clientStatusLabels = {
   'contacted': 'Contactado',
