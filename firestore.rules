@@ -40,5 +40,11 @@ service cloud.firestore {
     match /agreement_notifications/{notifId} {
       allow read, write: if isAuthenticated();
     }
+
+    // System settings (e.g. webinar configuration): Anyone can read, authenticated can write
+    match /system_settings/{settingId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
   }
 }

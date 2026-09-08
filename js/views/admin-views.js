@@ -1433,69 +1433,304 @@
   }
 
   /* ============================================
-     initWebinar()
-     Shows all Beyond Borders webinar registrations
-     in a table. Admin can export to Excel (CSV).
+     WEBINAR MANAGEMENT & SETTINGS
+     B2B / B2C Switch, Date Configurator & Leads
      ============================================ */
+  let currentWebinarSettings = null;
+  let allWebinarRegistrations = [];
+  let currentWebinarFilter = 'all';
+  let currentWebinarSearch = '';
+
   async function initWebinar() {
     try {
       if (!allUsers || allUsers.length === 0) {
         allUsers = await App.auth.getAllUsers();
       }
-      const registrations = await App.auth.getWebinarRegistrations();
 
-      // Update stat
-      setTextById('admin-stat-webinar', registrations.length);
+      // 1. Fetch current webinar settings
+      currentWebinarSettings = await App.auth.getWebinarSettings();
+      if (!currentWebinarSettings) {
+        currentWebinarSettings = App.auth.getDefaultWebinarSettings();
+      }
 
-      // Render table
-      renderWebinarTable(registrations);
+      // 2. Populate Config Form & Switch UI
+      populateWebinarForm(currentWebinarSettings);
+
+      // 3. Fetch Registrations
+      allWebinarRegistrations = await App.auth.getWebinarRegistrations();
+
+      // 4. Update Stats
+      updateWebinarStats(allWebinarRegistrations);
+
+      // 5. Render Table
+      renderWebinarTable();
 
     } catch (err) {
       console.error('[Admin] initWebinar error:', err);
-      App.utils.showToast('Error loading webinar registrations.', 'error');
+      App.utils.showToast('Error loading webinar settings and registrations.', 'error');
     }
   }
 
-  function renderWebinarTable(registrations) {
+  function populateWebinarForm(settings) {
+    const activeType = settings.activeType || 'b2c';
+    const typeConfig = settings[activeType] || {};
+
+    // Update switch buttons UI
+    const b2bBtn = document.getElementById('switch-btn-b2b');
+    const b2cBtn = document.getElementById('switch-btn-b2c');
+
+    if (b2bBtn && b2cBtn) {
+      if (activeType === 'b2b') {
+        b2bBtn.style.background = '#003f99';
+        b2bBtn.style.color = '#fff';
+        b2bBtn.style.boxShadow = '0 4px 12px rgba(0,63,153,0.25)';
+        b2cBtn.style.background = 'transparent';
+        b2cBtn.style.color = '#4b5563';
+        b2cBtn.style.boxShadow = 'none';
+      } else {
+        b2cBtn.style.background = '#003f99';
+        b2cBtn.style.color = '#fff';
+        b2cBtn.style.boxShadow = '0 4px 12px rgba(0,63,153,0.25)';
+        b2bBtn.style.background = 'transparent';
+        b2bBtn.style.color = '#4b5563';
+        b2bBtn.style.boxShadow = 'none';
+      }
+    }
+
+    // Update Status Pill
+    const statusText = document.getElementById('admin-status-text');
+    const statusBadge = document.getElementById('admin-status-badge');
+    const dateVal = settings.date || typeConfig.date || '2026-09-18';
+    const timeVal = settings.time || typeConfig.time || '12:00';
+
+    if (statusText) {
+      const modeName = activeType === 'b2b' 
+        ? 'B2B (Realtors & Brokers de EE.UU., Canadá y Puerto Rico)'
+        : 'B2C (Clientes Finales e Inversores en España)';
+      statusText.textContent = `${modeName} — ${dateVal} (${timeVal} EDT / 18:00 España)`;
+    }
+
+    if (statusBadge) {
+      statusBadge.textContent = activeType === 'b2b' ? 'B2B ACTIVE' : 'B2C ACTIVE';
+      statusBadge.style.background = activeType === 'b2b' ? '#003f99' : '#059669';
+    }
+
+    // Populate Form Inputs
+    const dateInput = document.getElementById('admin-webinar-date');
+    const timeInput = document.getElementById('admin-webinar-time');
+    const spotsInput = document.getElementById('admin-webinar-spots');
+    const titleInput = document.getElementById('admin-webinar-title');
+    const targetInput = document.getElementById('admin-webinar-target');
+    const subtitleInput = document.getElementById('admin-webinar-subtitle');
+
+    if (dateInput) dateInput.value = dateVal;
+    if (timeInput) timeInput.value = timeVal;
+    if (spotsInput) spotsInput.value = settings.spotsAvailable || typeConfig.spots || 25;
+    if (titleInput) titleInput.value = typeConfig.title || (activeType === 'b2b' ? 'Beyond the Borders' : 'Spain Unlocked: Living & Investing');
+    if (targetInput) targetInput.value = typeConfig.targetAudience || (activeType === 'b2b' ? 'US, Canadian & Puerto Rico Realtors' : 'International Buyers, Expats & Investors');
+    if (subtitleInput) subtitleInput.value = typeConfig.subtitle || '';
+  }
+
+  function setWebinarType(newType) {
+    if (!currentWebinarSettings) {
+      currentWebinarSettings = App.auth.getDefaultWebinarSettings();
+    }
+    currentWebinarSettings.activeType = newType;
+
+    // Use type-specific default date/time if available
+    if (currentWebinarSettings[newType]) {
+      if (currentWebinarSettings[newType].date) {
+        currentWebinarSettings.date = currentWebinarSettings[newType].date;
+      }
+      if (currentWebinarSettings[newType].time) {
+        currentWebinarSettings.time = currentWebinarSettings[newType].time;
+      }
+    }
+
+    populateWebinarForm(currentWebinarSettings);
+    App.utils.showToast(`Modo cambiado a ${newType.toUpperCase()}. Haz clic en "Guardar y Publicar" para activarlo en la web.`, 'info');
+  }
+
+  async function saveWebinarConfig(e) {
+    if (e && e.preventDefault) e.preventDefault();
+
+    const saveBtn = document.getElementById('admin-save-webinar-btn');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span>⏳ Guardando...</span>';
+    }
+
+    try {
+      if (!currentWebinarSettings) {
+        currentWebinarSettings = App.auth.getDefaultWebinarSettings();
+      }
+
+      const activeType = currentWebinarSettings.activeType || 'b2c';
+      const dateVal = document.getElementById('admin-webinar-date')?.value || currentWebinarSettings.date;
+      const timeVal = document.getElementById('admin-webinar-time')?.value || currentWebinarSettings.time;
+      const spotsVal = parseInt(document.getElementById('admin-webinar-spots')?.value || '25', 10);
+      const titleVal = document.getElementById('admin-webinar-title')?.value || '';
+      const targetVal = document.getElementById('admin-webinar-target')?.value || '';
+      const subtitleVal = document.getElementById('admin-webinar-subtitle')?.value || '';
+
+      // Update active settings
+      currentWebinarSettings.date = dateVal;
+      currentWebinarSettings.time = timeVal;
+      currentWebinarSettings.spotsAvailable = spotsVal;
+
+      if (!currentWebinarSettings[activeType]) {
+        currentWebinarSettings[activeType] = {};
+      }
+      currentWebinarSettings[activeType].date = dateVal;
+      currentWebinarSettings[activeType].time = timeVal;
+      currentWebinarSettings[activeType].spots = spotsVal;
+      if (titleVal) currentWebinarSettings[activeType].title = titleVal;
+      if (targetVal) currentWebinarSettings[activeType].targetAudience = targetVal;
+      if (subtitleVal) currentWebinarSettings[activeType].subtitle = subtitleVal;
+
+      // Save via auth service
+      const saved = await App.auth.saveWebinarSettings(currentWebinarSettings);
+      currentWebinarSettings = saved;
+
+      populateWebinarForm(saved);
+      App.utils.showToast('✅ ¡Configuración del webinario guardada y publicada en la web con éxito!', 'success');
+
+    } catch (err) {
+      console.error('[Admin] Error saving webinar settings:', err);
+      App.utils.showToast('Error al guardar la configuración: ' + err.message, 'error');
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '💾 <span class="lang-en">Save &amp; Publish on Website</span><span class="lang-es">Guardar y Publicar en la Web</span>';
+      }
+    }
+  }
+
+  function resetWebinarDefaults() {
+    const defaults = App.auth.getDefaultWebinarSettings();
+    const activeType = currentWebinarSettings?.activeType || 'b2c';
+    defaults.activeType = activeType;
+    currentWebinarSettings = defaults;
+    populateWebinarForm(currentWebinarSettings);
+    App.utils.showToast('Valores recomendados cargados. Haz clic en "Guardar y Publicar" para confirmar.', 'info');
+  }
+
+  function updateWebinarStats(registrations) {
+    const total = registrations.length;
+    let b2bCount = 0;
+    let b2cCount = 0;
+
+    registrations.forEach(r => {
+      const type = (r.webinarType || '').toLowerCase();
+      const webTitle = (r.webinar || '').toLowerCase();
+      if (type === 'b2b' || webTitle.includes('beyond borders') || r.agency) {
+        b2bCount++;
+      } else {
+        b2cCount++;
+      }
+    });
+
+    setTextById('admin-stat-webinar', total);
+    setTextById('admin-stat-webinar-b2b', b2bCount);
+    setTextById('admin-stat-webinar-b2c', b2cCount);
+  }
+
+  function filterWebinarTable(filterType) {
+    currentWebinarFilter = filterType;
+
+    // Update filter buttons UI
+    const allBtn = document.getElementById('webinar-filter-all');
+    const b2bBtn = document.getElementById('webinar-filter-b2b');
+    const b2cBtn = document.getElementById('webinar-filter-b2c');
+
+    [allBtn, b2bBtn, b2cBtn].forEach(b => {
+      if (b) {
+        b.className = 'btn btn-sm btn-outline';
+        b.style.background = 'transparent';
+        b.style.color = '';
+      }
+    });
+
+    const activeBtn = filterType === 'b2b' ? b2bBtn : (filterType === 'b2c' ? b2cBtn : allBtn);
+    if (activeBtn) {
+      activeBtn.className = 'btn btn-sm';
+      activeBtn.style.background = '#003f99';
+      activeBtn.style.color = '#fff';
+    }
+
+    renderWebinarTable();
+  }
+
+  function searchWebinarTable(query) {
+    currentWebinarSearch = (query || '').toLowerCase().trim();
+    renderWebinarTable();
+  }
+
+  function renderWebinarTable() {
     const tbody = document.getElementById('webinar-registrations-tbody');
     if (!tbody) return;
 
-    if (registrations.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:2rem;color:#6b7280;">No registrations yet.</td></tr>`;
+    if (!allWebinarRegistrations || allWebinarRegistrations.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:2.5rem;color:#6b7280;">No hay inscripciones registradas todavía.</td></tr>`;
       return;
     }
 
     const HOW_LABELS = {
-      social: 'Social Media',
-      remax: 'RE/MAX Network',
-      agent: 'Agent Referral',
+      social: 'Redes Sociales',
+      remax: 'Red RE/MAX',
+      agent: 'Referido de Agente',
       email: 'Email / Newsletter',
-      event: 'Event / Conference',
-      other: 'Other'
+      event: 'Evento / Conferencia',
+      other: 'Otro'
     };
 
-    tbody.innerHTML = registrations.map(r => {
+    let filtered = allWebinarRegistrations.filter(r => {
+      const type = (r.webinarType || '').toLowerCase();
+      const webTitle = (r.webinar || '').toLowerCase();
+      const isB2B = type === 'b2b' || webTitle.includes('beyond borders') || (r.agency && r.agency.trim().length > 0 && !type);
+
+      if (currentWebinarFilter === 'b2b' && !isB2B) return false;
+      if (currentWebinarFilter === 'b2c' && isB2B) return false;
+
+      if (currentWebinarSearch) {
+        const searchPool = `${r.firstName} ${r.lastName} ${r.email} ${r.phone} ${r.agency} ${r.country} ${r.state} ${r.referrerName} ${r.agentReferrerName}`.toLowerCase();
+        if (!searchPool.includes(currentWebinarSearch)) return false;
+      }
+
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:2.5rem;color:#6b7280;">No se encontraron registros con los filtros seleccionados.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(r => {
       const date = App.utils.formatDate(r.createdAt);
       const how  = HOW_LABELS[r.howHeard] || r.howHeard || '—';
       const ref  = r.referrerName ? App.utils.escapeHtml(r.referrerName) : '—';
+      const isB2B = (r.webinarType || '').toLowerCase() === 'b2b' || (r.webinar || '').toLowerCase().includes('beyond borders') || (r.agency && !r.webinarType);
 
-      // Tagged agent column — auto-detected link or selected dropdown agent
+      const typeBadge = isB2B
+        ? `<span style="background:rgba(0,63,153,0.1);color:#003f99;border:1px solid rgba(0,63,153,0.2);padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏢 B2B Realtor</span>`
+        : `<span style="background:rgba(16,185,129,0.1);color:#059669;border:1px solid rgba(16,185,129,0.2);padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏡 B2C Cliente</span>`;
+
+      // Tagged agent column
       let agentTagCell = '—';
-      
       let mappedAgentName = r.agentReferrerName || '';
       let mappedAgentRole = r.agentReferrerRole || '';
 
-      if (r.referralCode && !mappedAgentName) {
-         const foundAgent = allUsers.find(u => u.referralCode && u.referralCode.toUpperCase() === r.referralCode.toUpperCase());
-         if (foundAgent) {
-           mappedAgentName = `${foundAgent.firstName} ${foundAgent.lastName}`.trim();
-           mappedAgentRole = foundAgent.role;
-         }
+      if (r.referralCode && !mappedAgentName && allUsers) {
+        const foundAgent = allUsers.find(u => u.referralCode && u.referralCode.toUpperCase() === r.referralCode.toUpperCase());
+        if (foundAgent) {
+          mappedAgentName = `${foundAgent.firstName} ${foundAgent.lastName}`.trim();
+          mappedAgentRole = foundAgent.role;
+        }
       }
 
       if (mappedAgentName || r.referralCode) {
         const agentName = mappedAgentName ? App.utils.escapeHtml(mappedAgentName) : '';
-        const code      = r.referralCode      ? App.utils.escapeHtml(r.referralCode)      : '';
+        const code = r.referralCode ? App.utils.escapeHtml(r.referralCode) : '';
         const roleBadge = mappedAgentRole
           ? `<span style="background:rgba(0,67,255,.08);color:var(--primary);border-radius:12px;padding:1px 7px;font-size:.72rem;margin-left:4px;">${mappedAgentRole}</span>`
           : '';
@@ -1515,19 +1750,21 @@
           </div>`;
       }
 
+      const agencyGoal = r.agency || r.clientInterest || (isB2B ? '—' : 'Inversión / Mudanza');
+
       return `
         <tr>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;color:var(--text-muted);">${date}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">${typeBadge}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-weight:600;">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}</td>
-          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">${App.utils.escapeHtml(r.email)}</td>
-          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">${App.utils.escapeHtml(r.phone || '—')}</td>
-          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">${App.utils.escapeHtml(r.agency || '—')}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.85rem;">${App.utils.escapeHtml(r.email)}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.85rem;">${App.utils.escapeHtml(r.phone || '—')}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.85rem;">${App.utils.escapeHtml(agencyGoal)}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">
             <span style="background:rgba(0,67,255,.07);color:var(--primary);border-radius:20px;padding:3px 10px;font-size:.8rem;font-weight:600;">${App.utils.escapeHtml(r.country || '—')}</span>
+            ${r.state ? `<small style="display:block;color:#6b7280;font-size:0.75rem;margin-top:2px;">${App.utils.escapeHtml(r.state)}</small>` : ''}
           </td>
-          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.85rem;">${App.utils.escapeHtml(r.state || '—')}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${how}</td>
-          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${ref}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">${agentTagCell}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">
             <button class="btn btn-danger btn-sm" onclick="App.views.admin.handleDeleteWebinarRegistration('${r.id}')" title="Delete Registration" style="background-color: #dc2626; border-color: #dc2626; color: white;">
@@ -1676,8 +1913,8 @@
       };
 
       const headers = [
-        'Date','First Name','Last Name','Email','Phone',
-        'Agency','Country','State / Province',
+        'Date','Event Type','Webinar Theme','Target Date','First Name','Last Name','Email','Phone',
+        'Agency / Goal','Country','State / Province',
         'How They Heard','Referring Agent (self-reported)',
         'Agent Via Link','Referral Code','Agent Role',
         'Tagged Agent','Source','GDPR Consent'
@@ -1699,13 +1936,19 @@
           ? mappedAgentName 
           : (r.howHeard === 'agent' && r.referrerName ? r.referrerName : '');
 
+        const isB2B = (r.webinarType || '').toLowerCase() === 'b2b' || (r.webinar || '').toLowerCase().includes('beyond borders') || (r.agency && !r.webinarType);
+        const eventType = isB2B ? 'B2B (Realtors & Brokers)' : 'B2C (Clientes Finales & Inversores)';
+
         return [
           r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-US') : '',
+          eventType,
+          r.webinar || '',
+          r.webinarDate || '',
           r.firstName || '',
           r.lastName || '',
           r.email || '',
           r.phone || '',
-          r.agency || '',
+          r.agency || r.clientInterest || '',
           r.country || '',
           r.state || '',
           HOW_LABELS[r.howHeard] || r.howHeard || '',
@@ -1727,7 +1970,7 @@
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement('a');
       a.href = url;
-      a.download = `Beyond-Borders-Webinar-Registrations-${new Date().toISOString().slice(0,10)}.csv`;
+      a.download = `REMAX-Webinar-Registrations-${new Date().toISOString().slice(0,10)}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -2130,6 +2373,11 @@
     handleAdminAgreementUpload,
     handleDeleteUser,
     handleDeleteWebinarRegistration,
+    setWebinarType,
+    saveWebinarConfig,
+    resetWebinarDefaults,
+    filterWebinarTable,
+    searchWebinarTable,
     initUnified
   };
 

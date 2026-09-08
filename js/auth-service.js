@@ -34,6 +34,12 @@ App.auth = (function() {
     } else {
       App.demoData.webinar_registrations = App.demoData.webinar_registrations || [];
     }
+    const savedWebinarSettings = localStorage.getItem('remax_webinar_settings');
+    if (savedWebinarSettings) {
+      try {
+        App.demoData.webinar_settings = JSON.parse(savedWebinarSettings);
+      } catch (e) {}
+    }
   }
 
   function saveDemoData() {
@@ -43,6 +49,9 @@ App.auth = (function() {
     localStorage.setItem('remax_demo_commissions', JSON.stringify(App.demoData.commissions));
     localStorage.setItem('remax_demo_dossier_leads', JSON.stringify(App.demoData.dossier_leads || []));
     localStorage.setItem('remax_demo_webinar_registrations', JSON.stringify(App.demoData.webinar_registrations || []));
+    if (App.demoData.webinar_settings) {
+      localStorage.setItem('remax_webinar_settings', JSON.stringify(App.demoData.webinar_settings));
+    }
     
     if (currentUser) {
       // Find the updated user in demoData to ensure the session gets the latest fields (e.g. agreementSigned, status)
@@ -1148,6 +1157,267 @@ App.auth = (function() {
     }
   }
 
+  /* ---- Webinar Settings (B2B vs B2C Switch & Date Config) ---- */
+  const DEFAULT_WEBINAR_SETTINGS = {
+    activeType: 'b2c', // Default next upcoming webinar: B2C (Sept 18, 2026)
+    date: '2026-09-18',
+    time: '12:00', // 12:00 PM EDT (18:00 Spain CEST)
+    timeZone: 'EDT',
+    spotsAvailable: 25,
+    updatedAt: new Date().toISOString(),
+    b2b: {
+      title: 'Beyond the Borders',
+      subtitle: 'Passive International Commissions for Realtors & Brokers',
+      targetAudience: 'US, Canadian & Puerto Rico Realtors',
+      spots: 25,
+      date: '2026-08-28',
+      time: '12:00',
+      badge: {
+        en: '🔴 LIVE WEBINAR · 🇺🇸 Exclusively for US, Canadian & Puerto Rico Realtors · 🇵🇷 FREE Registration',
+        es: '🔴 WEBINAR EN VIVO · 🇺🇸 Exclusivo para Realtors de EE.UU., Canadá y Puerto Rico · 🇵🇷 Registro GRATUITO',
+        fr: '🔴 WEBINAIRE EN DIRECT · 🇺🇸 Réservé aux Agents US, Canadiens & Porto Rico · 🇵🇷 Inscription GRATUITE',
+        'en-ca': '🔴 LIVE WEBINAR · 🇺🇸 Exclusively for US, Canadian & Puerto Rico Realtors · 🇵🇷 FREE Registration'
+      },
+      heroPill: {
+        en: 'RE/MAX Inmomás International — Realtor Partner Webinar',
+        es: 'RE/MAX Inmomás International — Webinar para Realtors Partners',
+        fr: 'RE/MAX Inmomás International — Webinaire Partenaires',
+        'en-ca': 'RE/MAX Inmomás International — Realtor Partner Webinar'
+      },
+      titlePrefix: {
+        en: 'Beyond the',
+        es: 'Más Allá de',
+        fr: 'Au-Delà des',
+        'en-ca': 'Beyond the'
+      },
+      titleHighlight: {
+        en: 'Borders',
+        es: 'las Fronteras',
+        fr: 'Frontières',
+        'en-ca': 'Borders'
+      },
+      subtitleText: {
+        en: 'The live webinar where top US, Canadian & Puerto Rico Realtors discover how to build a passive international income stream by referring clients to Spain\'s booming luxury market — with zero extra work.',
+        es: 'El webinar en vivo donde los mejores Realtors de EE.UU., Canadá y Puerto Rico descubren cómo generar ingresos internacionales pasivos refiriendo clientes al mercado de lujo de España — sin trabajo adicional.',
+        fr: 'Le webinaire en direct où les meilleurs agents US, canadiens & porto-ricains découvrent comment générer des revenus internationaux passifs en référant des clients au marché de luxe espagnol — sans travail supplémentaire.',
+        'en-ca': 'The live webinar where top US, Canadian & Puerto Rico Realtors discover how to build a passive international income stream by referring clients to Spain\'s booming luxury market — with zero extra work.'
+      },
+      sectionHeadline: {
+        en: 'Why Every US, Canadian & Puerto Rico Realtor Should Attend',
+        es: 'Por qué todo Realtor de EE.UU., Canadá y Puerto Rico debería asistir',
+        fr: 'Pourquoi chaque agent US, canadien et porto-ricain devrait assister',
+        'en-ca': 'Why Every US, Canadian & Puerto Rico Realtor Should Attend'
+      },
+      sectionSubheadline: {
+        en: 'In just 60 minutes, learn the exact system our collaborators use to close international deals from their home office.',
+        es: 'En solo 60 minutos, aprende el sistema exacto que usan nuestros colaboradores para cerrar acuerdos internacionales desde su oficina.',
+        fr: 'En 60 minutes, découvrez le système exact utilisé par nos partenaires pour conclure des transactions internationales depuis leur bureau.',
+        'en-ca': 'In just 60 minutes, learn the exact system our collaborators use to close international deals from their home office.'
+      },
+      bannerText: {
+        en: 'Beyond Borders · 12 PM EDT / 6 PM Spain · Free for Realtors & Brokers',
+        es: 'Beyond Borders · 12 PM EDT / 18 h España · Gratuito para Realtors y Brokers',
+        fr: 'Beyond Borders · 12 h EDT / 18 h Espagne · Gratuit pour les agents & courtiers',
+        'en-ca': 'Beyond Borders · 12 PM EDT / 6 PM Spain · Free for Realtors & Brokers'
+      },
+      formCardTitle: {
+        en: 'Beyond Borders · Realtor VIP Access',
+        es: 'Beyond Borders · Acceso VIP Realtors',
+        fr: 'Beyond Borders · Accès VIP Agents',
+        'en-ca': 'Beyond Borders · Realtor VIP Access'
+      },
+      organizationLabel: {
+        en: 'Real Estate Agency / Brokerage *',
+        es: 'Agencia Inmobiliaria / Brokerage *',
+        fr: 'Agence Immobilière / Brokerage *',
+        'en-ca': 'Real Estate Agency / Brokerage *'
+      },
+      organizationPlaceholder: 'e.g. RE/MAX Premier — Miami',
+      benefits: [
+        {
+          icon: '💰',
+          title: { en: 'Commission Structure', es: 'Estructura de Comisiones', fr: 'Structure des Commissions', 'en-ca': 'Commission Structure' },
+          desc: { en: 'Earn €3,000–€15,000+ per referred deal. No risk, no paperwork, no extra clients to manage.', es: 'Gana entre €3.000 y €15.000+ por referido. Sin riesgo, sin papeleo, sin clientes extra.', fr: 'Gagnez entre 3 000 € et 15 000 €+ par transaction référée.', 'en-ca': 'Earn €3,000–€15,000+ per referred deal.' }
+        },
+        {
+          icon: '🏖️',
+          title: { en: 'Spain Market Deep-Dive', es: 'Análisis del Mercado Español', fr: 'Analyse du Marché Espagnol', 'en-ca': 'Spain Market Deep-Dive' },
+          desc: { en: 'Costa Blanca, Costa del Sol, Madrid & Valencia. 35,000+ North Americans bought in Spain last year.', es: 'Costa Blanca, Costa del Sol, Madrid y Valencia. Más de 35.000 norteamericanos compraron en España el año pasado.', fr: 'Costa Blanca, Costa del Sol, Madrid et Valence.', 'en-ca': 'Costa Blanca, Costa del Sol, Madrid & Valencia.' }
+        },
+        {
+          icon: '📋',
+          title: { en: 'Step-by-Step Referral Process', es: 'Proceso de Referido Paso a Paso', fr: 'Processus de Référence Étape par Étape', 'en-ca': 'Step-by-Step Referral Process' },
+          desc: { en: 'From first conversation to closed deal. We handle everything in Spain — you just make the intro.', es: 'Desde la primera conversación hasta el cierre. Nosotros gestionamos todo en España — tú solo haces la presentación.', fr: 'De la première conversation à la signature. Nous gérons tout.', 'en-ca': 'From first conversation to closed deal.' }
+        },
+        {
+          icon: '🤝',
+          title: { en: 'Become a Certified Collaborator', es: 'Conviértete en Colaborador Certificado', fr: 'Devenez Collaborateur Certifié', 'en-ca': 'Become a Certified Collaborator' },
+          desc: { en: 'Join our exclusive network. Get your referral link, dashboard access, and co-branded marketing materials.', es: 'Únete a nuestra red exclusiva. Obtén tu enlace de referido, acceso al panel y materiales de marca compartida.', fr: 'Rejoignez notre réseau exclusif.', 'en-ca': 'Join our exclusive network.' }
+        },
+        {
+          icon: '📊',
+          title: { en: 'Live Q&A with Our Directors', es: 'Preguntas y Respuestas en Vivo', fr: 'Questions/Réponses en Direct', 'en-ca': 'Live Q&A with Our Directors' },
+          desc: { en: 'Ask our Spanish real estate specialists, legal experts and international director directly.', es: 'Pregunta directamente a nuestros especialistas inmobiliarios, expertos legales y director internacional.', fr: 'Posez vos questions à nos spécialistes.', 'en-ca': 'Ask our Spanish real estate specialists directly.' }
+        }
+      ]
+    },
+    b2c: {
+      title: 'Spain Unlocked: Living & Investing',
+      subtitle: 'The Ultimate Masterclass to Buying Property, Relocation & Visas in Spain',
+      targetAudience: 'International Buyers, Expats & Investors',
+      spots: 25,
+      date: '2026-09-18',
+      time: '12:00',
+      badge: {
+        en: '🔴 LIVE WEBINAR · 🇪🇸 Living, Moving & Investing in Spain · 🏡 FREE Masterclass',
+        es: '🔴 WEBINAR EN VIVO · 🇪🇸 Vivir, Mudarse e Invertir en España · 🏡 Masterclass GRATUITA',
+        fr: '🔴 WEBINAIRE EN DIRECT · 🇪🇸 Vivre et Investir en Espagne · 🏡 Masterclass GRATUITE',
+        'en-ca': '🔴 LIVE WEBINAR · 🇪🇸 Living, Moving & Investing in Spain · 🏡 FREE Masterclass'
+      },
+      heroPill: {
+        en: 'RE/MAX Inmomás International — Buyer & Investor Masterclass',
+        es: 'RE/MAX Inmomás International — Masterclass para Compradores e Inversores',
+        fr: 'RE/MAX Inmomás International — Masterclass Acheteurs & Investisseurs',
+        'en-ca': 'RE/MAX Inmomás International — Buyer & Investor Masterclass'
+      },
+      titlePrefix: {
+        en: 'Spain',
+        es: 'Descubre',
+        fr: 'Découvrez',
+        'en-ca': 'Spain'
+      },
+      titleHighlight: {
+        en: 'Unlocked',
+        es: 'España',
+        fr: 'l\'Espagne',
+        'en-ca': 'Unlocked'
+      },
+      subtitleText: {
+        en: 'The complete practical guide for buyers and investors from the US, Canada and Puerto Rico: how to safely buy property, obtain residence visas, and enjoy the Mediterranean lifestyle in Spain.',
+        es: 'La guía práctica integral para compradores e inversores de EE.UU., Canadá y Puerto Rico: cómo comprar propiedades de forma 100% segura, gestionar visados de residencia y disfrutar del estilo de vida mediterráneo en España.',
+        fr: 'Le guide pratique complet pour les acheteurs et investisseurs: comment acheter en toute sécurité, obtenir un visa de résidence et vivre en Espagne.',
+        'en-ca': 'The complete practical guide for buyers and investors from North America: safely buy property, obtain visas, and enjoy life in Spain.'
+      },
+      sectionHeadline: {
+        en: 'Everything You Need to Know Before Buying or Moving to Spain',
+        es: 'Todo lo que necesitas saber antes de comprar o mudarte a España',
+        fr: 'Tout ce que vous devez savoir avant d\'acheter ou vous installer en Espagne',
+        'en-ca': 'Everything You Need to Know Before Buying or Moving to Spain'
+      },
+      sectionSubheadline: {
+        en: 'Avoid costly mistakes. Learn the legal, tax, financial, and lifestyle secrets from Spain\'s leading international real estate specialists.',
+        es: 'Evita errores costosos. Conoce las claves legales, fiscales, de financiación y estilo de vida con los especialistas de RE/MAX Inmomás.',
+        fr: 'Évitez les erreurs coûteuses. Découvrez les aspects juridiques, fiscaux et financiers avec nos spécialistes RE/MAX Inmomás.',
+        'en-ca': 'Avoid costly mistakes. Learn the legal, tax, financial, and lifestyle secrets from RE/MAX Inmomás.'
+      },
+      bannerText: {
+        en: 'Spain Unlocked · 12 PM EDT / 6 PM Spain · Free Masterclass for Buyers & Investors',
+        es: 'Descubre España · 12 PM EDT / 18 h España · Masterclass Gratuita para Compradores e Inversores',
+        fr: 'Découvrez l\'Espagne · 12 h EDT / 18 h Espagne · Masterclass Gratuite pour Acheteurs & Investisseurs',
+        'en-ca': 'Spain Unlocked · 12 PM EDT / 6 PM Spain · Free Masterclass for Buyers & Investors'
+      },
+      formCardTitle: {
+        en: 'Spain Unlocked · Free Masterclass Registration',
+        es: 'Descubre España · Registro Gratuito a la Masterclass',
+        fr: 'Découvrez l\'Espagne · Inscription Gratuite',
+        'en-ca': 'Spain Unlocked · Free Masterclass Registration'
+      },
+      organizationLabel: {
+        en: 'Primary Goal / Interest in Spain *',
+        es: 'Objetivo Principal / Interés en España *',
+        fr: 'Objectif Principal / Intérêt en Espagne *',
+        'en-ca': 'Primary Goal / Interest in Spain *'
+      },
+      organizationPlaceholder: 'e.g. Buying a Holiday Home / Golden Visa / Relocating',
+      benefits: [
+        {
+          icon: '🛡️',
+          title: { en: 'Safe Buying Process & Legal Security', es: 'Compra 100% Segura y Garantías', fr: 'Achat Sécurisé & Garanties', 'en-ca': 'Safe Buying Process & Legal Security' },
+          desc: { en: 'NIE number, bank accounts, contracts (Arras), registry checks, and notary closing without surprises.', es: 'Obtención de NIE, apertura de cuenta bancaria, contratos de arras, verificación registral y firma notarial sin sorpresas.', fr: 'Numéro NIE, comptes bancaires, contrats et notaire sans surprises.', 'en-ca': 'NIE number, bank accounts, contracts and notary closing.' }
+        },
+        {
+          icon: '🛂',
+          title: { en: 'Visas & Residency Pathways', es: 'Visados y Vías de Residencia', fr: 'Visas & Chemins de Résidence', 'en-ca': 'Visas & Residency Pathways' },
+          desc: { en: 'Digital Nomad Visa, Non-Lucrative Visa, and Real Estate Investment residency requirements explained simply.', es: 'Visado de Nómada Digital, Visado No Lucrativo y requisitos de residencia por inversión inmobiliaria explicados con claridad.', fr: 'Visa Nomade Digital, Visa Non Lucratif et options de résidence.', 'en-ca': 'Digital Nomad Visa, Non-Lucrative Visa, and residency requirements.' }
+        },
+        {
+          icon: '🏖️',
+          title: { en: 'Best Areas: Coast, Sun & Cities', es: 'Mejores Zonas: Costa, Sol y Ciudades', fr: 'Meilleures Régions: Côte & Villes', 'en-ca': 'Best Areas: Coast, Sun & Cities' },
+          desc: { en: 'Compare Costa Blanca (Alicante/Jávea), Costa del Sol (Málaga/Marbella), Madrid and Valencia for lifestyle & ROI.', es: 'Compara Costa Blanca (Alicante/Jávea), Costa del Sol (Málaga/Marbella), Madrid y Valencia según estilo de vida y rentabilidad.', fr: 'Comparez Costa Blanca, Costa del Sol, Madrid et Valence.', 'en-ca': 'Compare Costa Blanca, Costa del Sol, Madrid and Valencia.' }
+        },
+        {
+          icon: '💶',
+          title: { en: 'Taxes, Mortgages & Financing', es: 'Impuestos, Hipotecas y Financiación', fr: 'Fiscalité, Prêts & Financement', 'en-ca': 'Taxes, Mortgages & Financing' },
+          desc: { en: 'How non-resident mortgages work (up to 70%), transfer taxes (ITP/IVA), tax exemptions, and running costs.', es: 'Cómo funcionan las hipotecas para no residentes (hasta el 70%), ITP/IVA, exenciones fiscales y costes de mantenimiento.', fr: 'Prêts non-résidents jusqu\'à 70%, taxes de transfert et coûts d\'entretien.', 'en-ca': 'How non-resident mortgages work (up to 70%) and taxes.' }
+        },
+        {
+          icon: '🎙️',
+          title: { en: 'Live Q&A with Relocation Advisors', es: 'Preguntas y Respuestas con Expertos', fr: 'Q&R en Direct avec nos Conseillers', 'en-ca': 'Live Q&A with Relocation Advisors' },
+          desc: { en: 'Direct access to our Spanish property consultants, bilingual lawyers, and relocation specialists.', es: 'Acceso directo y en tiempo real a nuestros consultores inmobiliarios, abogados bilingües y equipo de relocalización.', fr: 'Accès direct à nos consultants immobiliers et avocats bilingues.', 'en-ca': 'Direct access to our property consultants and lawyers.' }
+        }
+      ]
+    }
+  };
+
+  async function getWebinarSettings() {
+    // 1. Check localStorage first for instant synchronous/cached response
+    let currentSettings = null;
+    try {
+      const cached = localStorage.getItem('remax_webinar_settings');
+      if (cached) currentSettings = JSON.parse(cached);
+    } catch (e) {}
+
+    // 2. If online and not in demo mode, try fetching from Firestore
+    if (!App.demoMode && App.db) {
+      try {
+        const doc = await App.db.collection('system_settings').doc('webinar_active').get();
+        if (doc.exists) {
+          currentSettings = { ...DEFAULT_WEBINAR_SETTINGS, ...doc.data() };
+          localStorage.setItem('remax_webinar_settings', JSON.stringify(currentSettings));
+        }
+      } catch (err) {
+        console.warn('[Webinar] Could not fetch settings from Firestore, using local/default:', err);
+      }
+    }
+
+    if (!currentSettings) {
+      currentSettings = JSON.parse(JSON.stringify(DEFAULT_WEBINAR_SETTINGS));
+      try { localStorage.setItem('remax_webinar_settings', JSON.stringify(currentSettings)); } catch(e) {}
+    }
+
+    return currentSettings;
+  }
+
+  async function saveWebinarSettings(newSettings) {
+    const merged = {
+      ...DEFAULT_WEBINAR_SETTINGS,
+      ...newSettings,
+      updatedAt: new Date().toISOString()
+    };
+
+    // Save to localStorage
+    try {
+      localStorage.setItem('remax_webinar_settings', JSON.stringify(merged));
+    } catch (e) {}
+
+    if (App.demoMode) {
+      App.demoData.webinar_settings = merged;
+      saveDemoData();
+    } else if (App.db) {
+      try {
+        await App.db.collection('system_settings').doc('webinar_active').set(merged, { merge: true });
+      } catch (err) {
+        console.warn('[Webinar] Failed to save settings to Firestore, saved locally:', err);
+      }
+    }
+
+    return merged;
+  }
+
+  function getDefaultWebinarSettings() {
+    return JSON.parse(JSON.stringify(DEFAULT_WEBINAR_SETTINGS));
+  }
+
   async function deleteDossierLead(leadId) {
     if (!leadId) throw new Error('Lead ID is required.');
 
@@ -1574,6 +1844,9 @@ App.auth = (function() {
     saveWebinarRegistration,
     getWebinarRegistrations,
     deleteUser,
-    deleteWebinarRegistration
+    deleteWebinarRegistration,
+    getWebinarSettings,
+    saveWebinarSettings,
+    getDefaultWebinarSettings
   };
 })();

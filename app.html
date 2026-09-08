@@ -307,37 +307,6 @@
       </div>
     </div>
 
-    <!-- ==================== VIEW-ADMIN-WEBINAR ==================== -->
-    <div id="view-admin-webinar" class="app-view">
-      <div class="dashboard-content">
-        <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
-          <h1><span class="lang-en">Webinar Registrations</span><span class="lang-es">Registrados al Webinario</span></h1>
-          <button class="btn btn-primary" onclick="App.views.admin.exportWebinarToExcel()" style="margin-left: 1rem;">
-            <span class="lang-en">Export Registrants</span><span class="lang-es">Exportar Registrados</span>
-          </button>
-        </div>
-        <div class="data-table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
-                <th><span class="lang-en">Name</span><span class="lang-es">Nombre</span></th>
-                <th>Email</th>
-                <th><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></th>
-                <th><span class="lang-en">Agency</span><span class="lang-es">Agencia</span></th>
-                <th><span class="lang-en">Country</span><span class="lang-es">País</span></th>
-                <th><span class="lang-en">State</span><span class="lang-es">Estado</span></th>
-                <th><span class="lang-en">Source</span><span class="lang-es">Fuente</span></th>
-                <th><span class="lang-en">Referred By</span><span class="lang-es">Referido Por</span></th>
-                <th><span class="lang-en">Agent Link</span><span class="lang-es">Enlace Agente</span></th>
-                <th><span class="lang-en">Actions</span><span class="lang-es">Acciones</span></th>
-              </tr>
-            </thead>
-            <tbody id="webinar-registrations-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
 
 
     <!-- ==================== VIEW: ADMIN AGREEMENTS ==================== -->
@@ -517,47 +486,191 @@
     </div>
 
 
-    <!-- ==================== VIEW: ADMIN WEBINAR REGISTRATIONS ==================== -->
+    <!-- ==================== VIEW: ADMIN WEBINAR MANAGEMENT ==================== -->
     <div id="view-admin-webinar" class="app-view">
       <div class="dashboard-content">
         <div class="dashboard-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
           <div>
-            <h1>🎙️ Beyond Borders — Webinar Registrations</h1>
-            <p class="dashboard-subtitle">August 28, 2026 · Exclusively for US &amp; Canadian Realtors</p>
+            <h1>🎙️ <span class="lang-en">Webinar Management &amp; Settings</span><span class="lang-es">Gestión y Configuración de Webinarios</span></h1>
+            <p class="dashboard-subtitle">
+              <span class="lang-en">Switch active webinar mode (B2B vs B2C), customize event dates &amp; copy, and track live registrations.</span>
+              <span class="lang-es">Alterna el modo de webinario activo (B2B vs B2C), personaliza fechas y textos, y gestiona inscripciones.</span>
+            </p>
           </div>
-          <button onclick="App.views.admin.exportWebinarToExcel()" class="btn btn-primary" style="display:flex;align-items:center;gap:8px;padding:12px 22px;font-weight:700;">
-            📥 <span>Export to Excel</span>
-          </button>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <a href="index.html#webinar" target="_blank" class="btn btn-outline" style="display:flex;align-items:center;gap:6px;">
+              <span>👁️</span> <span class="lang-en">View Live Page</span><span class="lang-es">Ver en la Web</span>
+            </a>
+            <button onclick="App.views.admin.exportWebinarToExcel()" class="btn btn-primary" style="display:flex;align-items:center;gap:8px;padding:10px 18px;font-weight:700;">
+              <span>📥</span> <span class="lang-en">Export Registrations</span><span class="lang-es">Exportar Registrados</span>
+            </button>
+          </div>
         </div>
 
-        <!-- Stat Card -->
+        <!-- ── WEBINAR SWITCH & CONFIGURATION CONTROL CARD ── -->
+        <div class="dashboard-card" style="background:#fff;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 10px 25px -5px rgba(0,0,0,0.05);padding:24px;margin-bottom:28px;">
+          
+          <!-- Mode Switch Bar -->
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f3f4f6;">
+            <div>
+              <div style="font-size:0.78rem;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">
+                <span class="lang-en">Active Target Mode</span><span class="lang-es">Modalidad Activa del Webinario</span>
+              </div>
+              <div style="font-size:1.05rem;font-weight:700;color:#111827;">
+                <span class="lang-en">Choose which audience the portal and registration page are currently targeting:</span>
+                <span class="lang-es">Selecciona a qué audiencia está dirigida actualmente la web y el formulario:</span>
+              </div>
+            </div>
+
+            <!-- Segmented Switch Controls -->
+            <div id="admin-webinar-type-switch" style="display:inline-flex;background:#f3f4f6;padding:4px;border-radius:12px;border:1px solid #e5e7eb;">
+              <button type="button" id="switch-btn-b2b" onclick="App.views.admin.setWebinarType('b2b')" class="btn" style="border:none;border-radius:9px;padding:10px 18px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all .2s;background:transparent;color:#4b5563;">
+                🏢 <span class="lang-en">B2B Realtors &amp; Brokers</span><span class="lang-es">B2B Agentes &amp; Brokers</span>
+              </button>
+              <button type="button" id="switch-btn-b2c" onclick="App.views.admin.setWebinarType('b2c')" class="btn" style="border:none;border-radius:9px;padding:10px 18px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all .2s;background:#003f99;color:#fff;box-shadow:0 4px 12px rgba(0,63,153,0.25);">
+                🏡 <span class="lang-en">B2C End Clients &amp; Investors</span><span class="lang-es">B2C Clientes Finales &amp; Inversores</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Live Status Bar -->
+          <div id="admin-webinar-status-pill" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:linear-gradient(90deg,rgba(0,63,153,0.06) 0%,rgba(16,185,129,0.08) 100%);border:1px solid rgba(0,63,153,0.15);border-radius:12px;padding:12px 18px;margin-bottom:24px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="width:10px;height:10px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981;animation:webinar-pulse 1.5s ease-in-out infinite;"></span>
+              <span style="font-size:0.88rem;color:#1e3a8a;font-weight:600;">
+                <span class="lang-en">Live on Website:</span><span class="lang-es">Activo en la Web:</span>
+                <strong id="admin-status-text" style="color:#0f172a;margin-left:4px;">B2C (Clientes Finales e Inversores) — 18 de septiembre, 2026</strong>
+              </span>
+            </div>
+            <span id="admin-status-badge" style="background:#003f99;color:#fff;padding:4px 12px;border-radius:50px;font-size:0.75rem;font-weight:800;letter-spacing:0.04em;">
+              B2C ACTIVE
+            </span>
+          </div>
+
+          <!-- Configuration Form Grid -->
+          <form id="admin-webinar-config-form" onsubmit="App.views.admin.saveWebinarConfig(event)">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:18px;">
+              <div class="form-group">
+                <label for="admin-webinar-date" style="display:block;font-size:0.82rem;font-weight:700;color:#374151;margin-bottom:6px;">
+                  📅 <span class="lang-en">Webinar Date *</span><span class="lang-es">Fecha del Webinario *</span>
+                </label>
+                <input type="date" id="admin-webinar-date" required class="form-input" style="font-weight:600;" value="2026-09-18">
+              </div>
+
+              <div class="form-group">
+                <label for="admin-webinar-time" style="display:block;font-size:0.82rem;font-weight:700;color:#374151;margin-bottom:6px;">
+                  ⏰ <span class="lang-en">Start Time (EDT / US Eastern) *</span><span class="lang-es">Hora de Inicio (EDT / Este EEUU) *</span>
+                </label>
+                <input type="time" id="admin-webinar-time" required class="form-input" style="font-weight:600;" value="12:00">
+                <small style="color:#6b7280;font-size:0.72rem;display:block;margin-top:4px;">12:00 PM EDT = 18:00 h España (CEST)</small>
+              </div>
+
+              <div class="form-group">
+                <label for="admin-webinar-spots" style="display:block;font-size:0.82rem;font-weight:700;color:#374151;margin-bottom:6px;">
+                  🔥 <span class="lang-en">Available Spots (Urgency Badge) *</span><span class="lang-es">Plazas Disponibles (Urgencia) *</span>
+                </label>
+                <input type="number" id="admin-webinar-spots" min="5" max="500" required class="form-input" style="font-weight:600;" value="25">
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:18px;">
+              <div class="form-group">
+                <label for="admin-webinar-title" style="display:block;font-size:0.82rem;font-weight:700;color:#374151;margin-bottom:6px;">
+                  🏷️ <span class="lang-en">Webinar Title / Theme *</span><span class="lang-es">Título / Tema del Webinario *</span>
+                </label>
+                <input type="text" id="admin-webinar-title" required class="form-input" style="font-weight:600;" placeholder="e.g. Spain Unlocked: Vivir e Invertir en España">
+              </div>
+
+              <div class="form-group">
+                <label for="admin-webinar-target" style="display:block;font-size:0.82rem;font-weight:700;color:#374151;margin-bottom:6px;">
+                  🎯 <span class="lang-en">Target Audience Label</span><span class="lang-es">Etiqueta de Audiencia Objetivo</span>
+                </label>
+                <input type="text" id="admin-webinar-target" class="form-input" placeholder="e.g. Compradores, Expats e Inversores de EE.UU., Canadá y Puerto Rico">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:20px;">
+              <label for="admin-webinar-subtitle" style="display:block;font-size:0.82rem;font-weight:700;color:#374151;margin-bottom:6px;">
+                📝 <span class="lang-en">Webinar Description / Subtitle</span><span class="lang-es">Descripción / Subtítulo del Webinario</span>
+              </label>
+              <textarea id="admin-webinar-subtitle" class="form-input" rows="2" placeholder="Breve resumen del contenido y valor del evento..."></textarea>
+            </div>
+
+            <!-- Form Actions -->
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-top:12px;border-top:1px solid #f3f4f6;">
+              <button type="button" onclick="App.views.admin.resetWebinarDefaults()" class="btn btn-outline" style="font-size:0.85rem;">
+                🔄 <span class="lang-en">Load Recommended Defaults</span><span class="lang-es">Cargar Valores Recomendados</span>
+              </button>
+              <button type="submit" id="admin-save-webinar-btn" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;font-weight:800;font-size:0.92rem;background:#003f99;border-color:#003f99;box-shadow:0 4px 14px rgba(0,63,153,0.3);">
+                💾 <span class="lang-en">Save &amp; Publish on Website</span><span class="lang-es">Guardar y Publicar en la Web</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ── STAT CARDS GRID ── -->
         <div class="stat-cards-grid stat-cards-grid--autofit" style="margin-bottom:28px;">
           <div class="stat-card stat-card--blue">
             <div class="stat-card__icon stat-card__icon--blue">🎙️</div>
             <div class="stat-card__body">
               <div class="stat-card__value" id="admin-stat-webinar">0</div>
-              <div class="stat-card__label">Total Registrations</div>
+              <div class="stat-card__label"><span class="lang-en">Total Registrations</span><span class="lang-es">Total Registrados</span></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__icon" style="background:rgba(0,63,153,0.1);color:#003f99;">🏢</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="admin-stat-webinar-b2b" style="color:#003f99;">0</div>
+              <div class="stat-card__label"><span class="lang-en">B2B Realtors</span><span class="lang-es">B2B Realtors / Brokers</span></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__icon" style="background:rgba(16,185,129,0.1);color:#059669;">🏡</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="admin-stat-webinar-b2c" style="color:#059669;">0</div>
+              <div class="stat-card__label"><span class="lang-en">B2C End Clients</span><span class="lang-es">B2C Clientes Finales</span></div>
             </div>
           </div>
         </div>
 
-        <!-- Registrations Table -->
-        <div class="dashboard-section">
+        <!-- ── REGISTRATIONS TABLE & FILTERS ── -->
+        <div class="dashboard-section" style="background:#fff;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 4px 15px rgba(0,0,0,0.03);padding:24px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px;">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span style="font-size:0.85rem;font-weight:700;color:#4b5563;margin-right:4px;">
+                <span class="lang-en">Filter:</span><span class="lang-es">Filtrar:</span>
+              </span>
+              <button type="button" id="webinar-filter-all" onclick="App.views.admin.filterWebinarTable('all')" class="btn btn-sm" style="background:#003f99;color:#fff;border-radius:20px;padding:6px 14px;font-weight:700;">
+                <span class="lang-en">All Registrations</span><span class="lang-es">Todos</span>
+              </button>
+              <button type="button" id="webinar-filter-b2b" onclick="App.views.admin.filterWebinarTable('b2b')" class="btn btn-sm btn-outline" style="border-radius:20px;padding:6px 14px;font-weight:700;">
+                🏢 <span class="lang-en">B2B Realtors</span><span class="lang-es">B2B Realtors</span>
+              </button>
+              <button type="button" id="webinar-filter-b2c" onclick="App.views.admin.filterWebinarTable('b2c')" class="btn btn-sm btn-outline" style="border-radius:20px;padding:6px 14px;font-weight:700;">
+                🏡 <span class="lang-en">B2C End Clients</span><span class="lang-es">B2C Clientes</span>
+              </button>
+            </div>
+
+            <!-- Search Filter -->
+            <div style="min-width:240px;">
+              <input type="text" id="admin-webinar-search" oninput="App.views.admin.searchWebinarTable(this.value)" placeholder="🔍 Buscar por nombre, email, país..." class="form-input" style="font-size:0.85rem;padding:7px 14px;border-radius:8px;">
+            </div>
+          </div>
+
           <div class="data-table-container">
             <table class="data-table data-table--wide">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Name</th>
+                  <th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
+                  <th><span class="lang-en">Event Type</span><span class="lang-es">Tipo</span></th>
+                  <th><span class="lang-en">Name</span><span class="lang-es">Nombre</span></th>
                   <th>Email</th>
-                  <th>Phone</th>
-                  <th>Agency</th>
-                  <th>Country</th>
-                  <th>State / Province</th>
-                  <th>How They Heard</th>
-                  <th>Referring Agent</th>
-                  <th>Tagged Agent</th>
-                  <th>Actions</th>
+                  <th><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></th>
+                  <th><span class="lang-en">Agency / Goal</span><span class="lang-es">Agencia / Interés</span></th>
+                  <th><span class="lang-en">Country / State</span><span class="lang-es">País / Estado</span></th>
+                  <th><span class="lang-en">How Heard</span><span class="lang-es">Origen</span></th>
+                  <th><span class="lang-en">Referrer Agent</span><span class="lang-es">Agente Referente</span></th>
+                  <th><span class="lang-en">Actions</span><span class="lang-es">Acciones</span></th>
                 </tr>
               </thead>
               <tbody id="webinar-registrations-tbody">
@@ -568,6 +681,7 @@
         </div>
       </div>
     </div>
+
 
 
     <!-- ==================== VIEW: BROKER DASHBOARD ==================== -->

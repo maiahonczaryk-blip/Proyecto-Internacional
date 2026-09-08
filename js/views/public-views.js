@@ -455,10 +455,430 @@ App.views.public = {
   },
 
   /* ============================================
-     WEBINAR REGISTRATION FORM — Beyond Borders
-     August 28, 2026 | For US & Canadian Realtors
+     DYNAMIC WEBINAR CONTENT & REGISTRATION
+     B2B (Realtors & Brokers) ⟷ B2C (Buyers & Investors)
      ============================================ */
-  initWebinarRegister: function() {
+  renderWebinarDynamicContent: async function() {
+    try {
+      const settings = (App.auth && App.auth.getWebinarSettings)
+        ? await App.auth.getWebinarSettings()
+        : (App.auth && App.auth.getDefaultWebinarSettings ? App.auth.getDefaultWebinarSettings() : null);
+
+      if (!settings) return;
+
+      const activeType = settings.activeType || 'b2c';
+      const config = settings[activeType] || settings.b2c || {};
+      const dateStr = settings.date || config.date || '2026-09-18';
+      const timeStr = settings.time || config.time || '12:00';
+      const spots = settings.spotsAvailable || config.spots || 25;
+
+      // ── Date Formatting ──
+      const [y, m, d] = dateStr.split('-').map(Number);
+      const dateObj = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+
+      const monthsEn = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const monthsEs = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+      const monthsFr = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+
+      const daysEn = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const daysEs = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+      const daysFr = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+
+      const dayOfWeek = dateObj.getUTCDay();
+      const monthIndex = dateObj.getUTCMonth();
+      const dayNum = dateObj.getUTCDate();
+      const yearNum = dateObj.getUTCFullYear();
+
+      const formattedDateEn = `${monthsEn[monthIndex]} ${dayNum}, ${yearNum}`;
+      const formattedDateEs = `${dayNum} de ${monthsEs[monthIndex]}, ${yearNum}`;
+      const formattedDateFr = `${dayNum} ${monthsFr[monthIndex]} ${yearNum}`;
+
+      const dayDateEn = `${daysEn[dayOfWeek]}, ${monthsEn[monthIndex]} ${dayNum}, ${yearNum}`;
+      const dayDateEs = `${daysEs[dayOfWeek]}, ${dayNum} de ${monthsEs[monthIndex]} de ${yearNum}`;
+      const dayDateFr = `${daysFr[dayOfWeek]} ${dayNum} ${monthsFr[monthIndex]} ${yearNum}`;
+
+      // ── Timezone Conversions ──
+      const [hourRef, minRef] = timeStr.split(':').map(Number);
+      function formatTime12(h, min) {
+        const period = h >= 12 ? 'PM' : 'AM';
+        let displayH = h % 12;
+        if (displayH === 0) displayH = 12;
+        const displayM = min === 0 ? ':00' : `:${String(min).padStart(2, '0')}`;
+        return `${displayH}${displayM} ${period}`;
+      }
+
+      const pdtTime = formatTime12((hourRef - 3 + 24) % 24, minRef);
+      const mdtTime = formatTime12((hourRef - 2 + 24) % 24, minRef);
+      const cdtTime = formatTime12((hourRef - 1 + 24) % 24, minRef);
+      const edtTime = formatTime12(hourRef, minRef);
+      const adtTime = formatTime12((hourRef + 1) % 24, minRef);
+      const cestTime = formatTime12((hourRef + 6) % 24, minRef);
+      const cestHour24 = (hourRef + 6) % 24;
+      const cestTime24 = minRef === 0 ? `${cestHour24} h` : `${cestHour24}:${String(minRef).padStart(2, '0')} h`;
+
+      const isB2C = activeType === 'b2c';
+
+      // ── Apply Theme Classes on Containers ──
+      const webinarViewEl = document.getElementById('view-webinar-register');
+      if (webinarViewEl) {
+        webinarViewEl.className = 'app-view webinar-theme--' + activeType;
+      }
+
+      const topBannerEl = document.getElementById('webinar-top-banner');
+      if (topBannerEl) {
+        topBannerEl.className = 'webinar-theme--' + activeType;
+        topBannerEl.style.background = isB2C
+          ? 'linear-gradient(90deg, #051329 0%, #0284c7 35%, #ea580c 70%, #051329 100%)'
+          : 'linear-gradient(90deg, #04081a 0%, #003f99 35%, #880000 65%, #04081a 100%)';
+      }
+
+      const topBannerBtn = document.getElementById('webinar-top-banner-btn');
+      if (topBannerBtn) {
+        topBannerBtn.style.background = isB2C ? '#fef08a' : '#ffffff';
+        topBannerBtn.style.color = isB2C ? '#7c2d12' : '#003f99';
+        topBannerBtn.style.boxShadow = isB2C ? '0 2px 14px rgba(245,158,11,.4)' : 'none';
+      }
+
+      // ── Section & Ambient Glow Orbs Styling ──
+      const sectionEl = document.getElementById('webinar-section');
+      if (sectionEl) {
+        sectionEl.style.background = isB2C
+          ? 'linear-gradient(160deg, #040d1e 0%, #09203c 28%, #0d3b66 58%, #20132a 100%)'
+          : 'linear-gradient(160deg, #030718 0%, #061530 35%, #0e051c 70%, #030718 100%)';
+      }
+
+      const orb1 = document.getElementById('webinar-orb-1');
+      const orb2 = document.getElementById('webinar-orb-2');
+      const orb3 = document.getElementById('webinar-orb-3');
+      if (orb1) orb1.style.background = isB2C ? 'radial-gradient(circle, rgba(245,158,11,.32) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(0,63,153,.28) 0%, transparent 70%)';
+      if (orb2) orb2.style.background = isB2C ? 'radial-gradient(circle, rgba(234,88,12,.25) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(204,0,0,.16) 0%, transparent 70%)';
+      if (orb3) orb3.style.background = isB2C ? 'radial-gradient(ellipse, rgba(14,165,233,.30) 0%, transparent 70%)' : 'radial-gradient(ellipse, rgba(0,63,153,.15) 0%, transparent 70%)';
+
+      const topBandWrap = document.getElementById('webinar-top-announcement-band-wrap');
+      if (topBandWrap) {
+        topBandWrap.style.background = isB2C
+          ? 'linear-gradient(90deg, #b45309 0%, #ea580c 25%, #0284c7 65%, #b45309 100%)'
+          : 'linear-gradient(90deg, #cc0000 0%, #003f99 50%, #cc0000 100%)';
+      }
+
+      // ── 1. Top Fixed Announcement Banner (#webinar-top-banner) ──
+      const bannerTextEl = document.getElementById('webinar-top-banner-text');
+      if (bannerTextEl && config.titlePrefix && config.titleHighlight) {
+        const targetDescEn = activeType === 'b2b' ? 'Free for Agents & Brokers' : 'Free for Buyers & Investors';
+        const targetDescEs = activeType === 'b2b' ? 'Gratuito para Agentes y Brokers' : 'Gratuito para Compradores e Inversores';
+        const targetDescFr = activeType === 'b2b' ? 'Gratuit pour Agents & Courtiers' : 'Gratuit pour Acheteurs & Investisseurs';
+
+        bannerTextEl.innerHTML = `
+          <span class="lang-en">🎙️ <strong>${config.titlePrefix.en} ${config.titleHighlight.en}</strong> &nbsp;&middot;&nbsp; ${monthsEn[monthIndex]} ${dayNum} &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime} Spain &nbsp;&middot;&nbsp; ${targetDescEn}</span>
+          <span class="lang-es">🎙️ <strong>${config.titlePrefix.es} ${config.titleHighlight.es}</strong> &nbsp;&middot;&nbsp; ${dayNum} de ${monthsEs[monthIndex]} &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime24} España &nbsp;&middot;&nbsp; ${targetDescEs}</span>
+          <span class="lang-fr">🎙️ <strong>${config.titlePrefix.fr} ${config.titleHighlight.fr}</strong> &nbsp;&middot;&nbsp; ${dayNum} ${monthsFr[monthIndex]} &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime24} Espagne &nbsp;&middot;&nbsp; ${targetDescFr}</span>
+          <span class="lang-en-ca">🎙️ <strong>${config.titlePrefix['en-ca'] || config.titlePrefix.en} ${config.titleHighlight['en-ca'] || config.titleHighlight.en}</strong> &nbsp;&middot;&nbsp; ${monthsEn[monthIndex]} ${dayNum} &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime} Spain &nbsp;&middot;&nbsp; ${targetDescEn}</span>
+        `;
+      }
+
+      const bannerSpotsEl = document.getElementById('webinar-top-banner-spots');
+      if (bannerSpotsEl) {
+        bannerSpotsEl.innerHTML = `
+          🔥
+          <span class="lang-en">${spots} spots only</span>
+          <span class="lang-es">Solo ${spots} plazas</span>
+          <span class="lang-fr">${spots} places seulement</span>
+          <span class="lang-en-ca">${spots} spots only</span>
+        `;
+      }
+
+      // ── 2. Top Hero Announcement Band ──
+      const topBandEl = document.getElementById('webinar-top-announcement-band');
+      if (topBandEl && config.badge) {
+        topBandEl.innerHTML = `
+          <span class="lang-en">🔴 LIVE WEBINAR &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Exclusive Masterclass for US, Canadian & PR Realtors' : 'Living, Moving & Investing in Spain'} &nbsp;&middot;&nbsp; ${formattedDateEn} &nbsp;&middot;&nbsp; FREE Registration</span>
+          <span class="lang-es">🔴 WEBINAR EN VIVO &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Masterclass Exclusiva para Agentes y Brokers de EE.UU., Canadá y PR' : 'Vivir, Mudarse e Invertir en España'} &nbsp;&middot;&nbsp; ${formattedDateEs} &nbsp;&middot;&nbsp; Registro GRATUITO</span>
+          <span class="lang-fr">🔴 WEBINAIRE EN DIRECT &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Masterclass Exclusive pour Courtiers et Agents' : 'Vivre et Investir en Espagne'} &nbsp;&middot;&nbsp; ${formattedDateFr} &nbsp;&middot;&nbsp; Inscription GRATUITE</span>
+          <span class="lang-en-ca">🔴 LIVE WEBINAR &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Exclusive Masterclass for North American Realtors' : 'Living, Moving & Investing in Spain'} &nbsp;&middot;&nbsp; ${formattedDateEn} &nbsp;&middot;&nbsp; FREE Registration</span>
+        `;
+      }
+
+      // ── 3. Hero Label Pill ──
+      const heroPillWrap = document.getElementById('webinar-hero-pill-wrap');
+      if (heroPillWrap) {
+        heroPillWrap.style.background = isB2C ? 'rgba(245,158,11,.12)' : 'rgba(255,255,255,.07)';
+        heroPillWrap.style.border = isB2C ? '1.5px solid rgba(245,158,11,.45)' : '1px solid rgba(255,255,255,.15)';
+        heroPillWrap.style.boxShadow = isB2C ? '0 0 24px rgba(245,158,11,.22)' : 'none';
+      }
+
+      const heroPillEl = document.getElementById('webinar-hero-pill');
+      if (heroPillEl && config.heroPill) {
+        heroPillEl.style.color = isB2C ? '#fef08a' : 'rgba(255,255,255,.85)';
+        heroPillEl.innerHTML = `
+          <span class="lang-en">${config.heroPill.en}</span>
+          <span class="lang-es">${config.heroPill.es}</span>
+          <span class="lang-fr">${config.heroPill.fr}</span>
+          <span class="lang-en-ca">${config.heroPill['en-ca'] || config.heroPill.en}</span>
+        `;
+      }
+
+      // ── 4. Hero Main Titles & Highlight Gradients ──
+      const setPrefixHighlight = (lang, prefix, highlight) => {
+        const pEl = document.getElementById(`webinar-title-prefix-${lang}`);
+        const hEl = document.getElementById(`webinar-title-highlight-${lang}`);
+        if (pEl && prefix) pEl.textContent = prefix;
+        if (hEl && highlight) {
+          hEl.textContent = highlight;
+          hEl.style.background = isB2C
+            ? 'linear-gradient(90deg, #fbbf24 0%, #f97316 45%, #38bdf8 100%)'
+            : 'linear-gradient(90deg, #5badff 0%, #cc0000 50%, #ff8c42 100%)';
+          hEl.style.webkitBackgroundClip = 'text';
+          hEl.style.webkitTextFillColor = 'transparent';
+          hEl.style.backgroundClip = 'text';
+        }
+      };
+      if (config.titlePrefix && config.titleHighlight) {
+        setPrefixHighlight('en', config.titlePrefix.en, config.titleHighlight.en);
+        setPrefixHighlight('es', config.titlePrefix.es, config.titleHighlight.es);
+        setPrefixHighlight('fr', config.titlePrefix.fr, config.titleHighlight.fr);
+        setPrefixHighlight('en-ca', config.titlePrefix['en-ca'] || config.titlePrefix.en, config.titleHighlight['en-ca'] || config.titleHighlight.en);
+      }
+
+      // ── 5. Hero Subtitle ──
+      const heroSubEl = document.getElementById('webinar-hero-subtitle');
+      if (heroSubEl && config.subtitleText) {
+        heroSubEl.innerHTML = `
+          <span class="lang-en">${config.subtitleText.en}</span>
+          <span class="lang-es">${config.subtitleText.es}</span>
+          <span class="lang-fr">${config.subtitleText.fr}</span>
+          <span class="lang-en-ca">${config.subtitleText['en-ca'] || config.subtitleText.en}</span>
+        `;
+      }
+
+      // ── 6. Hero Spots Urgency Pill ──
+      const heroSpotsEl = document.getElementById('webinar-hero-spots-pill');
+      if (heroSpotsEl) {
+        heroSpotsEl.style.background = isB2C ? 'rgba(255,180,0,.18)' : 'rgba(255,180,0,.12)';
+        heroSpotsEl.style.border = isB2C ? '1px solid rgba(255,180,0,.5)' : '1px solid rgba(255,180,0,.35)';
+        heroSpotsEl.style.color = isB2C ? '#fef08a' : '#ffe066';
+        heroSpotsEl.style.boxShadow = isB2C ? '0 0 16px rgba(245,158,11,.25)' : 'none';
+        heroSpotsEl.innerHTML = `
+          🔥
+          <span class="lang-en">Only ${spots} spots available</span>
+          <span class="lang-es">Solo ${spots} plazas disponibles</span>
+          <span class="lang-fr">Seulement ${spots} places disponibles</span>
+          <span class="lang-en-ca">Only ${spots} spots available</span>
+        `;
+      }
+
+      // ── 7. Timezone Date & Hours ──
+      const tzDateEl = document.getElementById('webinar-tz-date-label');
+      if (tzDateEl) {
+        tzDateEl.innerHTML = `
+          📅
+          <span class="lang-en">${dayDateEn} &mdash; Your Local Time</span>
+          <span class="lang-es">${dayDateEs} &mdash; Tu hora local</span>
+          <span class="lang-fr">${dayDateFr} &mdash; Votre heure locale</span>
+          <span class="lang-en-ca">${dayDateEn} &mdash; Your Local Time</span>
+        `;
+      }
+
+      const setTzText = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      };
+      setTzText('webinar-time-pdt', pdtTime);
+      setTzText('webinar-time-mdt', mdtTime);
+      setTzText('webinar-time-cdt', cdtTime);
+      setTzText('webinar-time-edt', edtTime);
+      setTzText('webinar-time-adt', adtTime);
+      setTzText('webinar-time-cest', cestTime);
+
+      const refCard = document.getElementById('webinar-reference-card');
+      if (refCard) {
+        refCard.style.background = isB2C
+          ? 'linear-gradient(135deg, rgba(234,88,12,.35), rgba(245,158,11,.22))'
+          : 'linear-gradient(135deg, rgba(0,63,153,.45), rgba(0,85,204,.28))';
+        refCard.style.border = isB2C ? '2px solid rgba(251,191,36,.6)' : '2px solid rgba(91,173,255,.45)';
+        refCard.style.boxShadow = isB2C ? '0 0 35px rgba(245,158,11,.3)' : '0 0 28px rgba(0,63,153,.35)';
+      }
+
+      const refBadge = document.getElementById('webinar-reference-badge');
+      if (refBadge) {
+        refBadge.style.background = isB2C ? 'linear-gradient(90deg, #d97706, #ea580c)' : 'linear-gradient(90deg, #003f99, #0055cc)';
+        refBadge.style.boxShadow = isB2C ? '0 2px 10px rgba(234,88,12,.4)' : 'none';
+      }
+
+      // ── 8. What You'll Learn Section ──
+      const headlineEl = document.getElementById('webinar-section-headline');
+      if (headlineEl && config.sectionHeadline) {
+        headlineEl.innerHTML = `
+          <span class="lang-en">${config.sectionHeadline.en}</span>
+          <span class="lang-es">${config.sectionHeadline.es}</span>
+          <span class="lang-fr">${config.sectionHeadline.fr}</span>
+          <span class="lang-en-ca">${config.sectionHeadline['en-ca'] || config.sectionHeadline.en}</span>
+        `;
+      }
+
+      const subheadlineEl = document.getElementById('webinar-section-subheadline');
+      if (subheadlineEl && config.sectionSubheadline) {
+        subheadlineEl.innerHTML = `
+          <span class="lang-en">${config.sectionSubheadline.en}</span>
+          <span class="lang-es">${config.sectionSubheadline.es}</span>
+          <span class="lang-fr">${config.sectionSubheadline.fr}</span>
+          <span class="lang-en-ca">${config.sectionSubheadline['en-ca'] || config.sectionSubheadline.en}</span>
+        `;
+      }
+
+      const hoverBorderColor = isB2C ? 'rgba(251,191,36,.35)' : 'rgba(91,173,255,.3)';
+      const benefitsContainer = document.getElementById('webinar-benefits-container');
+      if (benefitsContainer && Array.isArray(config.benefits)) {
+        benefitsContainer.innerHTML = config.benefits.map(b => `
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;display:flex;gap:14px;align-items:flex-start;transition:transform .2s,border-color .2s,box-shadow .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='${hoverBorderColor}';this.style.boxShadow='0 8px 24px rgba(0,0,0,.25)';" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.08)';this.style.boxShadow='none';">
+            <div style="font-size:1.8rem;flex-shrink:0;">${b.icon || '✨'}</div>
+            <div>
+              <div style="font-weight:700;color:#fff;font-size:.92rem;margin-bottom:5px;">
+                <span class="lang-en">${b.title?.en || ''}</span>
+                <span class="lang-es">${b.title?.es || ''}</span>
+                <span class="lang-fr">${b.title?.fr || ''}</span>
+                <span class="lang-en-ca">${b.title?.['en-ca'] || b.title?.en || ''}</span>
+              </div>
+              <div style="color:rgba(255,255,255,.42);font-size:.8rem;line-height:1.55;">
+                <span class="lang-en">${b.desc?.en || ''}</span>
+                <span class="lang-es">${b.desc?.es || ''}</span>
+                <span class="lang-fr">${b.desc?.fr || ''}</span>
+                <span class="lang-en-ca">${b.desc?.['en-ca'] || b.desc?.en || ''}</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // ── Urgency CTA Bar & Button ──
+      const urgencyBar = document.getElementById('webinar-urgency-bar');
+      if (urgencyBar) {
+        urgencyBar.style.background = isB2C
+          ? 'linear-gradient(135deg, rgba(245,158,11,.18), rgba(2,132,199,.24))'
+          : 'linear-gradient(135deg, rgba(204,0,0,.15), rgba(0,63,153,.25))';
+        urgencyBar.style.border = isB2C ? '1px solid rgba(251,191,36,.35)' : '1px solid rgba(255,255,255,.12)';
+        urgencyBar.style.boxShadow = isB2C ? '0 10px 35px rgba(245,158,11,.15)' : 'none';
+      }
+
+      const urgencyBtn = document.getElementById('webinar-urgency-btn');
+      if (urgencyBtn) {
+        urgencyBtn.style.background = isB2C
+          ? 'linear-gradient(135deg, #ea580c 0%, #f97316 40%, #e11d48 100%)'
+          : 'linear-gradient(135deg, #003f99 0%, #cc0000 100%)';
+        urgencyBtn.style.boxShadow = isB2C ? '0 8px 32px rgba(234,88,12,.5)' : '0 6px 28px rgba(0,63,153,.35)';
+      }
+
+      // ── 9. Form Card Header, Inputs & Submit Button ──
+      const cardHeader = document.getElementById('webinar-card-header');
+      if (cardHeader) {
+        cardHeader.style.background = isB2C
+          ? 'linear-gradient(135deg, #0284c7 0%, #0369a1 35%, #d97706 75%, #ea580c 115%)'
+          : 'linear-gradient(135deg, #003f99 0%, #004ab5 40%, #880000 130%)';
+      }
+
+      const cardHeaderTitle = document.getElementById('webinar-card-header-title');
+      if (cardHeaderTitle && config.titlePrefix && config.titleHighlight) {
+        cardHeaderTitle.textContent = `${config.titlePrefix.en} ${config.titleHighlight.en} · ${formattedDateEn}`;
+      }
+
+      const cardHeaderSubtitle = document.getElementById('webinar-card-header-subtitle');
+      if (cardHeaderSubtitle) {
+        cardHeaderSubtitle.textContent = `${edtTime} EDT | ${cestTime} Spain`;
+      }
+
+      const submitBtn = document.getElementById('webinar-submit-btn');
+      if (submitBtn) {
+        submitBtn.style.background = isB2C
+          ? 'linear-gradient(135deg, #ea580c 0%, #f97316 40%, #e11d48 100%)'
+          : 'linear-gradient(135deg, #003f99 0%, #cc0000 100%)';
+        submitBtn.style.boxShadow = isB2C ? '0 8px 30px rgba(234,88,12,.45)' : '0 6px 28px rgba(0,63,153,.35)';
+      }
+
+      const agencyLabel = document.getElementById('webinar-agency-label');
+      if (agencyLabel && config.organizationLabel) {
+        agencyLabel.innerHTML = `
+          <span class="lang-en">${config.organizationLabel.en}</span>
+          <span class="lang-es">${config.organizationLabel.es}</span>
+          <span class="lang-fr">${config.organizationLabel.fr}</span>
+          <span class="lang-en-ca">${config.organizationLabel['en-ca'] || config.organizationLabel.en}</span>
+        `;
+      }
+
+      const agencyInput = document.getElementById('webinar-agency');
+      if (agencyInput && config.organizationPlaceholder) {
+        agencyInput.placeholder = config.organizationPlaceholder;
+      }
+
+      // ── 10. Referral View info checkbox texts ──
+      const refWebinarDetails = document.getElementById('webinar-info-details');
+      if (refWebinarDetails && config.titlePrefix && config.titleHighlight) {
+        refWebinarDetails.innerHTML = `
+          <span class="lang-en">Join the "${config.titlePrefix.en} ${config.titleHighlight.en}" live webinar on ${formattedDateEn}. ${config.subtitleText?.en || ''}</span>
+          <span class="lang-es">Únete al webinar en vivo "${config.titlePrefix.es} ${config.titleHighlight.es}" el ${formattedDateEs}. ${config.subtitleText?.es || ''}</span>
+          <span class="lang-fr">Rejoignez le webinaire en direct "${config.titlePrefix.fr} ${config.titleHighlight.fr}" le ${formattedDateFr}. ${config.subtitleText?.fr || ''}</span>
+          <span class="lang-en-ca">Join the "${config.titlePrefix['en-ca'] || config.titlePrefix.en} ${config.titleHighlight['en-ca'] || config.titleHighlight.en}" live webinar on ${formattedDateEn}. ${config.subtitleText?.['en-ca'] || config.subtitleText?.en || ''}</span>
+        `;
+      }
+
+      // ── 11. Live Countdown Timer ──
+      if (window._webinarCountdownInterval) {
+        clearInterval(window._webinarCountdownInterval);
+        window._webinarCountdownInterval = null;
+      }
+
+      const countdownEl = document.getElementById('webinar-countdown');
+      if (countdownEl) {
+        const targetDate = new Date(`${dateStr}T${timeStr}:00-04:00`);
+        function tick() {
+          const now = new Date();
+          const diff = targetDate - now;
+          if (diff <= 0) {
+            countdownEl.innerHTML = '<span style="font-size:1.4rem;font-weight:700;color:#fff;">🎙️ The webinar is LIVE!</span>';
+            return;
+          }
+          const d = Math.floor(diff / 86400000);
+          const h = Math.floor((diff % 86400000) / 3600000);
+          const m = Math.floor((diff % 3600000) / 60000);
+          const s = Math.floor((diff % 60000) / 1000);
+          const pad = n => String(n).padStart(2, '0');
+          countdownEl.innerHTML = `
+            <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;align-items:center;">
+              <div style="text-align:center;min-width:52px;">
+                <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${d}</div>
+                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Days</span><span class="lang-es">Días</span><span class="lang-fr">Jours</span><span class="lang-en-ca">Days</span></div>
+              </div>
+              <div style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
+              <div style="text-align:center;min-width:52px;">
+                <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(h)}</div>
+                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Hours</span><span class="lang-es">Horas</span><span class="lang-fr">Heures</span><span class="lang-en-ca">Hours</span></div>
+              </div>
+              <div style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
+              <div style="text-align:center;min-width:52px;">
+                <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(m)}</div>
+                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Min</span><span class="lang-es">Min</span><span class="lang-fr">Min</span><span class="lang-en-ca">Min</span></div>
+              </div>
+              <div style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
+              <div style="text-align:center;min-width:52px;">
+                <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(s)}</div>
+                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Sec</span><span class="lang-es">Seg</span><span class="lang-fr">Sec</span><span class="lang-en-ca">Sec</span></div>
+              </div>
+            </div>`;
+        }
+        tick();
+        window._webinarCountdownInterval = setInterval(tick, 1000);
+      }
+
+    } catch (err) {
+      console.warn('[Webinar] Error rendering dynamic webinar content:', err);
+    }
+  },
+
+  /* ============================================
+     WEBINAR REGISTRATION FORM CONTROLLER
+     ============================================ */
+  initWebinarRegister: async function() {
+    // Render dynamic content immediately
+    await this.renderWebinarDynamicContent();
+
     // ---- US States ----
     const US_STATES = [
       'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut',
@@ -476,52 +896,12 @@ App.views.public = {
       'Newfoundland and Labrador','Northwest Territories','Nova Scotia','Nunavut',
       'Ontario','Prince Edward Island','Quebec','Saskatchewan','Yukon'
     ];
-
-    // ---- Live Countdown ----
-    function startCountdown() {
-      const countdownEl = document.getElementById('webinar-countdown');
-      if (!countdownEl) return;
-      const TARGET = new Date('2026-08-28T12:00:00-04:00'); // 12pm EDT = 18:00 Spain CEST
-
-      function tick() {
-        const now = new Date();
-        const diff = TARGET - now;
-        if (diff <= 0) {
-          countdownEl.innerHTML = '<span style="font-size:1.4rem;font-weight:700;color:#fff;">🎙️ The webinar is LIVE!</span>';
-          return;
-        }
-        const d = Math.floor(diff / 86400000);
-        const h = Math.floor((diff % 86400000) / 3600000);
-        const m = Math.floor((diff % 3600000) / 60000);
-        const s = Math.floor((diff % 60000) / 1000);
-        const pad = n => String(n).padStart(2, '0');
-        countdownEl.innerHTML = `
-          <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;align-items:center;">
-            <div style="text-align:center;min-width:52px;">
-              <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${d}</div>
-              <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;">Days</div>
-            </div>
-            <div style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
-            <div style="text-align:center;min-width:52px;">
-              <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(h)}</div>
-              <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;">Hours</div>
-            </div>
-            <div style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
-            <div style="text-align:center;min-width:52px;">
-              <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(m)}</div>
-              <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;">Min</div>
-            </div>
-            <div style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
-            <div style="text-align:center;min-width:52px;">
-              <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(s)}</div>
-              <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;">Sec</div>
-            </div>
-          </div>`;
-      }
-      tick();
-      setInterval(tick, 1000);
-    }
-    startCountdown();
+    // ---- Puerto Rico Areas ----
+    const PR_AREAS = [
+      'San Juan Metro', 'Bayamón / Guaynabo', 'Carolina / Isla Verde', 'Dorado / Vega Alta',
+      'Ponce / South Coast', 'Mayagüez / West Coast', 'Rincón / Aguadilla', 'Caguas / Central',
+      'Humacao / Palmas del Mar', 'Other Puerto Rico'
+    ];
 
     // ---- Country → State/Province dynamic list ----
     const countrySelect = document.getElementById('webinar-country');
@@ -529,14 +909,22 @@ App.views.public = {
 
     function populateStates(country) {
       if (!stateSelect) return;
-      const list = country === 'Canada' ? CA_PROVINCES : US_STATES;
-      const label = country === 'Canada' ? 'Province / Territory' : 'State';
-      stateSelect.innerHTML = `<option value="">— Select ${label} —</option>` +
-        list.map(s => `<option value="${s}">${s}</option>`).join('');
+      if (country === 'Canada') {
+        stateSelect.innerHTML = `<option value="">— Select Province / Territory —</option>` +
+          CA_PROVINCES.map(s => `<option value="${s}">${s}</option>`).join('');
+      } else if (country === 'Puerto Rico') {
+        stateSelect.innerHTML = `<option value="">— Select Region / Municipality —</option>` +
+          PR_AREAS.map(s => `<option value="${s}">${s}</option>`).join('');
+      } else if (country === 'Other') {
+        stateSelect.innerHTML = `<option value="International">International</option>`;
+      } else {
+        stateSelect.innerHTML = `<option value="">— Select State —</option>` +
+          US_STATES.map(s => `<option value="${s}">${s}</option>`).join('');
+      }
     }
 
     if (countrySelect && stateSelect) {
-      populateStates('United States'); // default
+      populateStates(countrySelect.value || 'United States');
       countrySelect.addEventListener('change', () => populateStates(countrySelect.value));
     }
 
@@ -587,7 +975,7 @@ App.views.public = {
           return;
         }
         if (howHeard === 'agent' && !referrerName) {
-          App.utils.showToast('Please enter the name of the agent who referred you.', 'error');
+          App.utils.showToast('Please enter or select the name of the referring agent.', 'error');
           if (btn) { btn.disabled = false; btn.textContent = 'Register Now'; }
           return;
         }
@@ -600,7 +988,6 @@ App.views.public = {
         let agentReferrerRole = null;
 
         if (refCode) {
-          // Try demoData first (fast, sync)
           if (App.demoMode && App.demoData && App.demoData.users) {
             const ref = App.demoData.users.find(u => u.referralCode === refCode);
             if (ref) {
@@ -610,7 +997,6 @@ App.views.public = {
               agentReferrerRole = ref.role;
             }
           } else if (!App.demoMode && App.db) {
-            // Live Firestore lookup
             try {
               const snap = await App.db.collection('users')
                 .where('referralCode', '==', refCode)
@@ -627,18 +1013,26 @@ App.views.public = {
               console.warn('[Webinar] Agent referral lookup failed:', lookupErr);
             }
           }
-          console.log('[Webinar] Referral context:', agentReferrerName || 'not found', '/', refCode);
         }
-        // ---------------------------------------------------------------
+
+        // ---- Get Current Active Webinar Settings ----
+        const settings = (App.auth && App.auth.getWebinarSettings)
+          ? await App.auth.getWebinarSettings()
+          : (App.auth && App.auth.getDefaultWebinarSettings ? App.auth.getDefaultWebinarSettings() : null);
+
+        const activeType = settings?.activeType || 'b2c';
+        const typeConfig = settings ? (settings[activeType] || settings.b2c) : null;
+        const webinarTitle = typeConfig?.title || (activeType === 'b2b' ? 'Beyond Borders' : 'Spain Unlocked');
+        const webinarDate = settings?.date || typeConfig?.date || '2026-09-18';
 
         await App.auth.saveWebinarRegistration({
           firstName, lastName, phone, email, agency, country, state,
           howHeard,
           referrerName: howHeard === 'agent' ? referrerName : '',
-          webinar: 'Beyond Borders',
-          webinarDate: '2026-08-28',
+          webinar: webinarTitle,
+          webinarType: activeType.toUpperCase(),
+          webinarDate: webinarDate,
           gdprConsent: true,
-          // Referral link tracking — populated when visitor arrived via agent's link
           referralCode:     agentReferralCode || null,
           referrerId:       agentReferrerId   || null,
           agentReferrerName: agentReferrerName || null,
@@ -653,7 +1047,7 @@ App.views.public = {
           formPanel.style.display = 'none';
           successPanel.style.display = 'flex';
         } else {
-          App.utils.showToast('🎉 You are registered! See you on August 28th.', 'success');
+          App.utils.showToast(`🎉 You are registered! See you on ${webinarDate}.`, 'success');
           form.reset();
         }
 
@@ -666,3 +1060,13 @@ App.views.public = {
   }
 
 };
+
+// Auto-render webinar dynamic content on page initialization
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (App.views && App.views.public && typeof App.views.public.renderWebinarDynamicContent === 'function') {
+      App.views.public.renderWebinarDynamicContent();
+    }
+  });
+}
+
