@@ -1214,10 +1214,10 @@ App.auth = (function() {
         'en-ca': 'Borders'
       },
       subtitleText: {
-        en: 'The live masterclass where top US, Canadian & Puerto Rico Realtors discover how to earn 50% referral commissions in Spain\'s booming luxury market — with zero extra work.',
-        es: 'La masterclass en vivo donde los mejores Realtors de EE.UU., Canadá y Puerto Rico descubren cómo ganar el 50% de comisión de referidos en España — sin listados ni trabajo adicional.',
-        fr: 'La masterclass en direct où les meilleurs agents découvrent comment gagner 50% de commission de référence en Espagne — sans effort supplémentaire.',
-        'en-ca': 'The live masterclass where top US, Canadian & Puerto Rico Realtors discover how to earn 50% referral commissions in Spain\'s booming luxury market — with zero extra work.'
+        en: 'The live masterclass where top US, Canadian & Puerto Rico Realtors discover how to earn 25% referral commissions in Spain\'s booming luxury market — with zero extra work.',
+        es: 'La masterclass en vivo donde los mejores Realtors de EE.UU., Canadá y Puerto Rico descubren cómo ganar el 25% de comisión de referidos en España — sin listados ni trabajo adicional.',
+        fr: 'La masterclass en direct où les meilleurs agents découvrent comment gagner 25% de commission de référence en Espagne — sans effort supplémentaire.',
+        'en-ca': 'The live masterclass where top US, Canadian & Puerto Rico Realtors discover how to earn 25% referral commissions in Spain\'s booming luxury market — with zero extra work.'
       },
       sectionHeadline: {
         en: 'Why Every US, Canadian & Puerto Rico Realtor Should Attend',
@@ -1226,10 +1226,10 @@ App.auth = (function() {
         'en-ca': 'Why Every US, Canadian & Puerto Rico Realtor Should Attend'
       },
       sectionSubheadline: {
-        en: 'In just 60 minutes, learn the exact system our collaborators use to close international deals and earn 50% commissions from their home office.',
-        es: 'En solo 60 minutos, aprende el sistema exacto que usan nuestros colaboradores para cerrar acuerdos internacionales y ganar el 50% de comisión desde su oficina.',
+        en: 'In just 60 minutes, learn the exact system our collaborators use to close international deals and earn 25% commissions from their home office.',
+        es: 'En solo 60 minutos, aprende el sistema exacto que usan nuestros colaboradores para cerrar acuerdos internacionales y ganar el 25% de comisión desde su oficina.',
         fr: 'En 60 minutes, découvrez le système exact utilisé par nos partenaires pour conclure des transactions internationales.',
-        'en-ca': 'In just 60 minutes, learn the exact system our collaborators use to close international deals and earn 50% commissions.'
+        'en-ca': 'In just 60 minutes, learn the exact system our collaborators use to close international deals and earn 25% commissions.'
       },
       bannerText: {
         en: 'Beyond Borders · September 24 · 7 PM EDT / 19:00 h Miami · Free for Realtors & Brokers',

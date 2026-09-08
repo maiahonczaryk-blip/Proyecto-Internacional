@@ -187,13 +187,13 @@ App.utils.getClientWebinarShareMessage = function(referralLink) {
 App.utils.getRealtorPartnerShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
   const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#register');
-  return `🤝 ¡Hola! Te invito a la Masterclass VIP "Beyond Borders" el 24 de septiembre a las 7:00 PM EDT (19:00 h Miami · NY). Descubre cómo los Realtors en EE.UU., Canadá y Puerto Rico ganan un 50% de comisión de referidos en España con RE/MAX Inmomás y soporte legal/fiscal completo en destino.\n\n🔗 Reserva tu Pase VIP y activa tu cuenta de Realtor Partner: ${link}`;
+  return `🤝 ¡Hola! Te invito a la Masterclass VIP "Beyond Borders" el 24 de septiembre a las 7:00 PM EDT (19:00 h Miami · NY). Descubre cómo los Realtors en EE.UU., Canadá y Puerto Rico ganan un 25% de comisión de referidos en España con RE/MAX Inmomás y soporte legal/fiscal completo en destino.\n\n🔗 Reserva tu Pase VIP y activa tu cuenta de Realtor Partner: ${link}`;
 };
 
 App.utils.getBrokerPartnerShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
   const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#register');
-  return `🏢 ¡Hola! Te invito a crear una alianza estratégica entre tu Brokerage/Agencia y RE/MAX Inmomás · The Spain Connection. Abre un nuevo canal de ingresos internacionales para tu equipo con 50% de split de comisión en España y respaldo institucional completo.\n\n🔗 Registra tu Brokerage aquí: ${link}`;
+  return `🏢 ¡Hola! Te invito a crear una alianza estratégica entre tu Brokerage/Agencia y RE/MAX Inmomás · The Spain Connection. Abre un nuevo canal de ingresos internacionales para tu equipo con 25% de split de comisión en España y respaldo institucional completo.\n\n🔗 Registra tu Brokerage aquí: ${link}`;
 };
 
 App.utils.getWebinarShareMessage = function(referralLink) {

@@ -155,14 +155,14 @@ App.views.public = {
         }
         if (welcomeMsg) {
           welcomeMsg.innerHTML = refName
-            ? `<span class="lang-en">Invited by <strong>${refName}</strong> (50% referral commission in Spain)</span>
-               <span class="lang-es">Invitado/a por <strong>${refName}</strong> (50% de comisión de referido en España)</span>
-               <span class="lang-fr">Invité(e) par <strong>${refName}</strong> (50% de commission en Espagne)</span>
-               <span class="lang-en-ca">Invited by <strong>${refName}</strong> (50% referral commission in Spain)</span>`
-            : `<span class="lang-en">Live Masterclass · September 24, 2026 · 7:00 PM EDT (50% Commissions)</span>
-               <span class="lang-es">Masterclass en Vivo · 24 de Septiembre 2026 · 7:00 PM EDT (50% Comisión)</span>
+            ? `<span class="lang-en">Invited by <strong>${refName}</strong> (25% referral commission in Spain)</span>
+               <span class="lang-es">Invitado/a por <strong>${refName}</strong> (25% de comisión de referido en España)</span>
+               <span class="lang-fr">Invité(e) par <strong>${refName}</strong> (25% de commission en Espagne)</span>
+               <span class="lang-en-ca">Invited by <strong>${refName}</strong> (25% referral commission in Spain)</span>`
+            : `<span class="lang-en">Live Masterclass · September 24, 2026 · 7:00 PM EDT (25% Commissions)</span>
+               <span class="lang-es">Masterclass en Vivo · 24 de Septiembre 2026 · 7:00 PM EDT (25% Comisión)</span>
                <span class="lang-fr">Masterclass en Direct · 24 Septembre 2026 · 19 h EDT</span>
-               <span class="lang-en-ca">Live Masterclass · September 24, 2026 · 7:00 PM EDT (50% Commissions)</span>`;
+               <span class="lang-en-ca">Live Masterclass · September 24, 2026 · 7:00 PM EDT (25% Commissions)</span>`;
         }
         if (submitBtn) {
           submitBtn.innerHTML = `<span class="lang-en">🎟️ Claim Realtor VIP Pass</span><span class="lang-es">🎟️ Reservar Mi Pase VIP de Realtor</span><span class="lang-fr">🎟️ Réserver Mon Pass VIP Conseiller</span><span class="lang-en-ca">🎟️ Claim Realtor VIP Pass</span>`;
@@ -320,7 +320,7 @@ App.views.public = {
         },
         realtor: {
           icon: '🏠',
-          badge: '50%',
+          badge: '25%',
           labelEn: 'Realtor',
           labelEs: 'Realtor',
           labelFr: 'Conseiller',
