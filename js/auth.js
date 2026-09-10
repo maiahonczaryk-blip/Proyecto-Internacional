@@ -75,7 +75,7 @@ function loginPartner(event) {
 function loginAdmin(event) {
     if (event) event.preventDefault();
     const email = document.getElementById('email').value;
-    const allowed = ['admin@remax-inmomas.com', 'spainconnection0@remax.es'];
+    const allowed = ['admin@remax-inmomas.com', 'spainconnection0@remax.es', 'spainconnection0@gmail.com'];
     if (allowed.includes(email.toLowerCase().trim())) {
         localStorage.setItem('remax_admin', email.toLowerCase().trim());
         window.location.href = 'admin.html';

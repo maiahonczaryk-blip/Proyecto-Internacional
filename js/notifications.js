@@ -1,6 +1,6 @@
 /* ============================================================
    RE/MAX Inmomás — Admin Notification Emails
-   Sends alerts to maia.honczaryk@remax.es via EmailJS.
+   Sends alerts to spainconnection0@gmail.com via EmailJS.
 
    --- HOW TO ACTIVATE ---
    1. Create a free account at https://www.emailjs.com
