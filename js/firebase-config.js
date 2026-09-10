@@ -61,6 +61,20 @@ App.demoData = {
       createdAt: '2025-01-15T10:00:00Z'
     },
     {
+      id: 'admin-002',
+      email: 'spainconnection0@remax.es',
+      password: 'proyectointernacional2026',
+      role: 'admin',
+      status: 'active',
+      firstName: 'The Spain',
+      lastName: 'Connection',
+      agencyName: 'RE/MAX Inmomás',
+      phone: '+34 965 123 456',
+      country: 'Spain',
+      profileImage: null,
+      createdAt: '2026-09-09T09:41:26Z'
+    },
+    {
       id: 'broker-001',
       email: 'john.broker@remaxusa.com',
       password: 'broker123',

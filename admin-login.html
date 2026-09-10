@@ -106,9 +106,12 @@
       const email = document.getElementById('email').value.toLowerCase().trim();
       const password = document.getElementById('password').value;
       
-      const allowedEmails = ['admin@remax-inmomas.com'];
+      const allowedAdmins = {
+        'admin@remax-inmomas.com': 'admin123',
+        'spainconnection0@remax.es': 'proyectointernacional2026'
+      };
       
-      if(allowedEmails.includes(email) && password === 'admin123') {
+      if(allowedAdmins[email] && allowedAdmins[email] === password) {
         localStorage.setItem('remax_admin', email);
         window.location.href = 'admin.html';
       } else {

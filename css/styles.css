@@ -3821,6 +3821,57 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   color: #ffffff;
 }
 
+@media (max-width: 580px) {
+  .referral-segmented-wrapper {
+    margin: 0 auto 16px auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .referral-segmented-bar {
+    padding: 3px;
+    border-radius: 12px;
+    gap: 3px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .referral-seg-tab {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 7px 4px;
+    font-size: 0.76rem;
+    gap: 3px;
+    border-radius: 9px;
+  }
+
+  .referral-seg-tab span:not(.seg-badge) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .referral-seg-tab .seg-badge {
+    font-size: 0.58rem;
+    padding: 1px 4px;
+    border-radius: 6px;
+    margin-left: 1px;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .referral-seg-tab {
+    padding: 6px 2px;
+    font-size: 0.70rem;
+    gap: 2px;
+  }
+
+  .referral-seg-tab .seg-badge {
+    display: none;
+  }
+}
+
 /* ---- Sleek Luxury Webinar Pass Card ---- */
 .luxury-webinar-pass {
   background: linear-gradient(135deg, #091a32 0%, #0d284e 60%, #103463 100%);
@@ -3917,6 +3968,39 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   background: rgba(212, 175, 55, 0.12);
   border-radius: 50px;
   border: 1px solid rgba(212, 175, 55, 0.28);
+}
+
+@media (max-width: 580px) {
+  .luxury-webinar-pass {
+    padding: 14px 12px;
+    border-radius: 14px;
+    margin-bottom: 18px;
+  }
+  .luxury-webinar-pass .pass-title {
+    font-size: 1.02rem;
+    line-height: 1.35;
+    margin-bottom: 8px;
+  }
+  .luxury-webinar-pass .pass-meta-strip {
+    font-size: 0.75rem;
+    gap: 6px;
+    padding: 8px 10px;
+    flex-direction: column;
+    align-items: center;
+  }
+  .luxury-webinar-pass .pass-badge-row {
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .luxury-webinar-pass .live-pill,
+  .luxury-webinar-pass .vip-pill {
+    font-size: 0.68rem;
+    padding: 3px 8px;
+  }
+  .luxury-webinar-pass .pass-invitee-chip {
+    font-size: 0.74rem;
+    padding: 3px 10px;
+  }
 }
 
 #referral-form textarea:focus,
@@ -5999,6 +6083,69 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   .dashboard-grid-2col {
     grid-template-columns: 1fr !important;
   }
+
+  /* Auth / Intake view mobile optimization */
+  .auth-section {
+    padding: 75px 12px calc(80px + env(safe-area-inset-bottom, 0px)) !important;
+    min-height: 100vh;
+    box-sizing: border-box;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .auth-card,
+  .auth-card--wide {
+    padding: 24px 16px !important;
+    border-radius: 16px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 auto !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .auth-card__title {
+    font-size: 1.25rem !important;
+  }
+
+  .auth-card__subtitle {
+    font-size: 0.82rem !important;
+    margin-bottom: 20px !important;
+  }
+
+  #referral-form-title {
+    font-size: 1.25rem !important;
+  }
+
+  #referral-welcome-msg {
+    font-size: 0.82rem !important;
+  }
+
+  .auth-form input,
+  .auth-form select,
+  .auth-form textarea,
+  #referral-form input,
+  #referral-form select,
+  #referral-form textarea,
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 16px !important;
+    padding: 10px 14px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+
+  .form-row {
+    display: flex;
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  .form-group {
+    margin-bottom: 14px !important;
+    width: 100% !important;
+  }
 }
 
 /* (sidebar-backdrop styles are defined in Section 16 above) */
@@ -6959,6 +7106,37 @@ body.nav-open {
     text-overflow: ellipsis;
     white-space: nowrap;
     line-height: 1;
+  }
+
+  .bnav-icon-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bnav-live-dot {
+    position: absolute;
+    top: -2px;
+    right: -3px;
+    width: 7px;
+    height: 7px;
+    background: #ff4444;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #ff4444;
+    animation: webinar-pulse 1.5s ease-in-out infinite;
+  }
+
+  @media (max-width: 400px) {
+    .bnav-item {
+      padding: 6px 1px;
+      font-size: 0.58rem;
+      gap: 2px;
+    }
+    .bnav-item svg {
+      width: 20px;
+      height: 20px;
+    }
   }
 }
 

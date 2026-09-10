@@ -75,8 +75,9 @@ function loginPartner(event) {
 function loginAdmin(event) {
     if (event) event.preventDefault();
     const email = document.getElementById('email').value;
-    if (email === 'admin@remax-inmomas.com') {
-        localStorage.setItem('remax_admin', email);
+    const allowed = ['admin@remax-inmomas.com', 'spainconnection0@remax.es'];
+    if (allowed.includes(email.toLowerCase().trim())) {
+        localStorage.setItem('remax_admin', email.toLowerCase().trim());
         window.location.href = 'admin.html';
     } else {
         alert('Unauthorized. Please use a valid admin email.');
