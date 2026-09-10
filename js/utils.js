@@ -181,19 +181,31 @@ App.utils.generateReferralLink = function(referralCode) {
 App.utils.getClientWebinarShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
   const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#webinar');
-  return `🇪🇸 ¡Hola! Te invito con un Pase VIP Gratuito a nuestra Masterclass en vivo el 24 de septiembre (7:00 PM EDT / 19:00 h Miami · NY): "Beyond Borders · Cómo Comprar, Mudarse e Invertir con Seguridad en España".\n\n📌 Conoce las claves de compra segura, visados de residencia e hipotecas para no residentes con RE/MAX Inmomás.\n\n🎟️ Reserva tu plaza gratuita aquí: ${link}`;
+  const lang = (document.documentElement.lang || 'en').toLowerCase();
+  if (lang.startsWith('es')) {
+    return `🇪🇸 ¡Hola! Te invito con un Pase VIP Gratuito a nuestra Masterclass en vivo el 24 de septiembre (19:00 h España / 1:00 PM EDT Miami · NY · Toronto · Puerto Rico / 10:00 AM PDT): "Beyond Borders · Cómo Comprar, Mudarse e Invertir con Seguridad en España".\n\n📌 Conoce las claves de compra segura, visados de residencia e hipotecas para no residentes con RE/MAX Inmomás.\n\n🎟️ Reserva tu plaza gratuita aquí: ${link}`;
+  }
+  return `🇪🇸 Hello! You're invited with a Complimentary VIP Pass to our live Masterclass on September 24 (7:00 PM CEST Spain / 1:00 PM EDT Miami · NY · Toronto / 1:00 PM AST Puerto Rico / 10:00 AM PDT): "Beyond Borders · How to Buy, Move & Invest Safely in Spain".\n\n📌 Discover the keys to safe property acquisition, residency visas, and non-resident mortgages with RE/MAX Inmomás.\n\n🎟️ Reserve your free spot here: ${link}`;
 };
 
 App.utils.getRealtorPartnerShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
   const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#register');
-  return `🤝 ¡Hola! Te invito a la Masterclass VIP "Beyond Borders" el 24 de septiembre a las 7:00 PM EDT (19:00 h Miami · NY). Descubre cómo los Realtors en EE.UU., Canadá y Puerto Rico ganan un 25% de comisión de referidos en España con RE/MAX Inmomás y soporte legal/fiscal completo en destino.\n\n🔗 Reserva tu Pase VIP y activa tu cuenta de Realtor Partner: ${link}`;
+  const lang = (document.documentElement.lang || 'en').toLowerCase();
+  if (lang.startsWith('es')) {
+    return `🤝 ¡Hola! Te invito a la Masterclass VIP "Beyond Borders" el 24 de septiembre a las 19:00 h España (1:00 PM EDT Miami · NY · Toronto · Puerto Rico / 10:00 AM PDT Los Ángeles). Descubre cómo los Realtors en EE.UU., Canadá y Puerto Rico ganan un 25% de comisión de referidos en España con RE/MAX Inmomás y soporte legal/fiscal completo en destino.\n\n🔗 Reserva tu Pase VIP y activa tu cuenta de Realtor Partner: ${link}`;
+  }
+  return `🤝 Hello! You're invited to the VIP Masterclass "Beyond Borders" on September 24 at 7:00 PM CEST Spain (1:00 PM EDT Miami · NY · Toronto / 1:00 PM AST Puerto Rico / 10:00 AM PDT). Discover how US, Canadian & Puerto Rico Realtors earn 25% referral commissions in Spain with RE/MAX Inmomás and full turnkey destination support.\n\n🔗 Claim your VIP Pass & activate your Realtor Partner account: ${link}`;
 };
 
 App.utils.getBrokerPartnerShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
   const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#register');
-  return `🏢 ¡Hola! Te invito a crear una alianza estratégica entre tu Brokerage/Agencia y RE/MAX Inmomás · The Spain Connection. Abre un nuevo canal de ingresos internacionales para tu equipo con 25% de split de comisión en España y respaldo institucional completo.\n\n🔗 Registra tu Brokerage aquí: ${link}`;
+  const lang = (document.documentElement.lang || 'en').toLowerCase();
+  if (lang.startsWith('es')) {
+    return `🏢 ¡Hola! Te invito a crear una alianza estratégica entre tu Brokerage/Agencia y RE/MAX Inmomás · The Spain Connection. Abre un nuevo canal de ingresos internacionales para tu equipo con 25% de split de comisión en España y respaldo institucional completo.\n\n🔗 Registra tu Brokerage aquí: ${link}`;
+  }
+  return `🏢 Hello! We invite you to create a strategic partnership between your Brokerage and RE/MAX Inmomás · The Spain Connection. Open a high-yield international revenue channel for your agents with a 25% commission split in Spain and full institutional backing.\n\n🔗 Register your Brokerage here: ${link}`;
 };
 
 App.utils.getWebinarShareMessage = function(referralLink) {

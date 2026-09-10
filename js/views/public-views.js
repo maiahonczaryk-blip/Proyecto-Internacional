@@ -159,10 +159,10 @@ App.views.public = {
                <span class="lang-es">Invitado/a por <strong>${refName}</strong> (25% de comisión de referido en España)</span>
                <span class="lang-fr">Invité(e) par <strong>${refName}</strong> (25% de commission en Espagne)</span>
                <span class="lang-en-ca">Invited by <strong>${refName}</strong> (25% referral commission in Spain)</span>`
-            : `<span class="lang-en">Live Masterclass · September 24, 2026 · 7:00 PM EDT (25% Commissions)</span>
-               <span class="lang-es">Masterclass en Vivo · 24 de Septiembre 2026 · 7:00 PM EDT (25% Comisión)</span>
-               <span class="lang-fr">Masterclass en Direct · 24 Septembre 2026 · 19 h EDT</span>
-               <span class="lang-en-ca">Live Masterclass · September 24, 2026 · 7:00 PM EDT (25% Commissions)</span>`;
+            : `<span class="lang-en">Live Masterclass · September 24, 2026 · 7:00 PM CEST (1:00 PM EDT / 10:00 AM PDT)</span>
+               <span class="lang-es">Masterclass en Vivo · 24 de Septiembre 2026 · 19:00 h España (1:00 PM EDT / Miami · NY · PR)</span>
+               <span class="lang-fr">Masterclass en Direct · 24 Septembre 2026 · 19 h CEST (13 h EDT)</span>
+               <span class="lang-en-ca">Live Masterclass · September 24, 2026 · 7:00 PM CEST (1:00 PM EDT / 10:00 AM PDT)</span>`;
         }
         if (submitBtn) {
           submitBtn.innerHTML = `<span class="lang-en">🎟️ Claim Realtor VIP Pass</span><span class="lang-es">🎟️ Reservar Mi Pase VIP de Realtor</span><span class="lang-fr">🎟️ Réserver Mon Pass VIP Conseiller</span><span class="lang-en-ca">🎟️ Claim Realtor VIP Pass</span>`;
@@ -624,14 +624,14 @@ App.views.public = {
         return `${displayH}${displayM} ${period}`;
       }
 
-      const pdtTime = formatTime12((hourRef - 3 + 24) % 24, minRef);
-      const mdtTime = formatTime12((hourRef - 2 + 24) % 24, minRef);
-      const cdtTime = formatTime12((hourRef - 1 + 24) % 24, minRef);
-      const edtTime = formatTime12(hourRef, minRef);
-      const adtTime = formatTime12((hourRef + 1) % 24, minRef);
-      const cestTime = formatTime12((hourRef + 6) % 24, minRef);
-      const cestHour24 = (hourRef + 6) % 24;
+      const cestTime = formatTime12(hourRef, minRef);
+      const cestHour24 = hourRef;
       const cestTime24 = minRef === 0 ? `${cestHour24} h` : `${cestHour24}:${String(minRef).padStart(2, '0')} h`;
+      const adtTime = formatTime12((hourRef - 5 + 24) % 24, minRef);
+      const edtTime = formatTime12((hourRef - 6 + 24) % 24, minRef);
+      const cdtTime = formatTime12((hourRef - 7 + 24) % 24, minRef);
+      const mdtTime = formatTime12((hourRef - 8 + 24) % 24, minRef);
+      const pdtTime = formatTime12((hourRef - 9 + 24) % 24, minRef);
 
       const isB2C = activeType === 'b2c';
 
@@ -902,7 +902,7 @@ App.views.public = {
 
       const cardHeaderSubtitle = document.getElementById('webinar-card-header-subtitle');
       if (cardHeaderSubtitle) {
-        cardHeaderSubtitle.textContent = `${edtTime} EDT | ${cestTime} Spain`;
+        cardHeaderSubtitle.textContent = `${cestTime} CEST (Spain) | ${edtTime} EDT (Miami/NY/PR) | ${pdtTime} PDT`;
       }
 
       const submitBtn = document.getElementById('webinar-submit-btn');
@@ -947,7 +947,7 @@ App.views.public = {
 
       const countdownEl = document.getElementById('webinar-countdown');
       if (countdownEl) {
-        const targetDate = new Date(`${dateStr}T${timeStr}:00-04:00`);
+        const targetDate = new Date(`${dateStr}T${timeStr}:00+02:00`);
         function tick() {
           const now = new Date();
           const diff = targetDate - now;

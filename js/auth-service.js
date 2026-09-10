@@ -1176,10 +1176,10 @@ App.auth = (function() {
 
   /* ---- Webinar Settings (B2B vs B2C Switch & Date Config) ---- */
   const DEFAULT_WEBINAR_SETTINGS = {
-    activeType: 'b2b', // Default next upcoming webinar: B2B for Realtors (Sept 24, 2026 at 7:00 PM EDT)
+    activeType: 'b2b', // Default next upcoming webinar: B2B for Realtors (Sept 24, 2026 at 7:00 PM CEST / 1:00 PM EDT)
     date: '2026-09-24',
-    time: '19:00', // 7:00 PM EDT (19:00 h Miami / NY / Toronto)
-    timeZone: 'EDT',
+    time: '19:00', // 7:00 PM CEST (19:00 h Spain / 1:00 PM EDT / 10:00 AM PDT)
+    timeZone: 'CEST',
     spotsAvailable: 25,
     updatedAt: new Date().toISOString(),
     b2b: {
@@ -1232,10 +1232,10 @@ App.auth = (function() {
         'en-ca': 'In just 60 minutes, learn the exact system our collaborators use to close international deals and earn 25% commissions.'
       },
       bannerText: {
-        en: 'Beyond Borders · September 24 · 7 PM EDT / 19:00 h Miami · Free for Realtors & Brokers',
-        es: 'Beyond Borders · 24 de Septiembre · 7 PM EDT / 19:00 h Miami · Gratuito para Realtors y Brokers',
-        fr: 'Beyond Borders · 24 Septembre · 19 h EDT · Gratuit pour les Agents & Courtiers',
-        'en-ca': 'Beyond Borders · September 24 · 7 PM EDT · Free for Realtors & Brokers'
+        en: 'Beyond Borders · September 24 · 7:00 PM CEST (1:00 PM EDT / 10:00 AM PDT) · Free for Realtors & Brokers',
+        es: 'Beyond Borders · 24 de Septiembre · 19:00 h España (1:00 PM EDT / Miami · NY · PR) · Gratuito para Realtors y Brokers',
+        fr: 'Beyond Borders · 24 Septembre · 19 h CEST (13 h EDT) · Gratuit pour les Agents & Courtiers',
+        'en-ca': 'Beyond Borders · September 24 · 7:00 PM CEST (1:00 PM EDT / 10:00 AM PDT) · Free for Realtors & Brokers'
       },
       formCardTitle: {
         en: 'Beyond Borders · Realtor VIP Pass',
