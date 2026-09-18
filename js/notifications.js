@@ -126,7 +126,6 @@
       await emailjs.send(EMAILJS_SERVICE_ID, templateId, { to_email: toEmail, ...params });
       console.info('[Notifications] Email enviado a', toEmail, '— template:', templateId);
     } catch (err) {
-      alert("⚠️ Error de EmailJS: No se pudo enviar el correo. Revisa la consola para más detalles.");
       console.warn('[Notifications] Error al enviar email:', err);
     }
   }
@@ -240,6 +239,25 @@
     }, ADMIN_EMAIL);
   }
 
+  async function onNewSurveyFeedback(data) {
+    const stars = '⭐'.repeat(data.rating || 5);
+    const hasClientsText = (data.has_clients === 'Yes' || data.has_clients === '🔥 Sí') 
+      ? `🔥 SÍ (Plazo: ${data.client_timeframe || 'No especificado'})` 
+      : (data.has_clients || 'No');
+      
+    await sendEmail(EMAILJS_TEMPLATE_NEW_REG, {
+      user_type:     `Encuesta Webinar (${stars} - ${data.rating}/5)`,
+      user_name:     data.name || 'Anónimo',
+      user_email:    data.email || '—',
+      user_country:  data.location_or_agency || '—',
+      user_agency:   `Clientes: ${hasClientsText}`,
+      user_phone:    data.phone || '—',
+      registered_at: fmtDate(data.submitted_at || new Date().toISOString()),
+      source:        `Utilidad: ${data.usefulness || '—'} | Notas: ${data.comments || 'Sin comentarios'}`,
+      admin_url:     'https://proyecto-internacional.vercel.app/app.html#admin/webinar'
+    });
+  }
+
   // ── Expose on App namespace ────────────────────────────────────────────────
   window.App = window.App || {};
   window.App.notifications = {
@@ -248,6 +266,7 @@
     onNewDossierLead,
     onNewWebinarRegistration,
     onUserStatusChange,
-    onAdminChangeRequested
+    onAdminChangeRequested,
+    onNewSurveyFeedback
   };
 })();

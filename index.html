@@ -2762,6 +2762,16 @@
           localStorage.setItem('webinar_feedback_list', JSON.stringify(saved));
         }
 
+        // Send Email Notification to spainconnection0@gmail.com
+        try {
+          if (window.App && App.notifications && typeof App.notifications.onNewSurveyFeedback === 'function') {
+            await App.notifications.onNewSurveyFeedback(feedbackData);
+            console.log('[Feedback] Email notification sent successfully');
+          }
+        } catch (notifErr) {
+          console.warn('[Feedback] Could not send email notification:', notifErr);
+        }
+
         const form = document.getElementById('spa-feedback-form');
         const successPanel = document.getElementById('spa-success-panel');
         if (form) form.style.display = 'none';

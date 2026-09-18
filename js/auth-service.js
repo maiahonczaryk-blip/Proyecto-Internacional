@@ -1174,6 +1174,45 @@ App.auth = (function() {
     }
   }
 
+  /* ---- Masterclass Feedback Surveys ---- */
+  async function getWebinarFeedbacks() {
+    let list = [];
+    if (!App.demoMode && App.db) {
+      try {
+        const snapshot = await App.db.collection('webinar_feedback').orderBy('submitted_at', 'desc').get();
+        list = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      } catch (err) {
+        console.warn('[Feedback] Could not fetch from Firestore, checking local:', err);
+      }
+    }
+    // Also include local storage items if any are missing
+    try {
+      const local = JSON.parse(localStorage.getItem('webinar_feedback_list') || '[]');
+      local.forEach(locItem => {
+        if (!list.some(item => item.id === locItem.id || (item.email === locItem.email && item.submitted_at === locItem.submitted_at))) {
+          list.push(locItem);
+        }
+      });
+    } catch (_) {}
+    return list;
+  }
+
+  async function deleteWebinarFeedback(feedbackId) {
+    if (!App.demoMode && App.db) {
+      try {
+        await App.db.collection('webinar_feedback').doc(feedbackId).delete();
+      } catch (err) {
+        console.warn('[Feedback] Could not delete from Firestore:', err);
+      }
+    }
+    try {
+      const local = JSON.parse(localStorage.getItem('webinar_feedback_list') || '[]');
+      const filtered = local.filter(item => item.id !== feedbackId);
+      localStorage.setItem('webinar_feedback_list', JSON.stringify(filtered));
+    } catch (_) {}
+    return true;
+  }
+
   /* ---- Webinar Settings (B2B vs B2C Switch & Date Config) ---- */
   const DEFAULT_WEBINAR_SETTINGS = {
     activeType: 'b2b', // Default next upcoming webinar: B2B for Realtors (Sept 24, 2026 at 7:00 PM CEST / 1:00 PM EDT)
@@ -2014,6 +2053,8 @@ App.auth = (function() {
     deleteWebinarRegistration,
     getWebinarSettings,
     saveWebinarSettings,
-    getDefaultWebinarSettings
+    getDefaultWebinarSettings,
+    getWebinarFeedbacks,
+    deleteWebinarFeedback
   };
 })();

@@ -416,10 +416,14 @@
 
   </div>
 
-  <!-- FIREBASE SDKs -->
+  <!-- EMAIL & FIREBASE SDKs -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
   <script src="js/firebase-config.js"></script>
+  <script src="js/notifications.js"></script>
 
   <script>
     let currentRating = 0;
@@ -511,6 +515,16 @@
         const saved = JSON.parse(localStorage.getItem('webinar_feedback_list') || '[]');
         saved.push(feedbackData);
         localStorage.setItem('webinar_feedback_list', JSON.stringify(saved));
+      }
+
+      // Send Email Notification to spainconnection0@gmail.com
+      try {
+        if (window.App && App.notifications && typeof App.notifications.onNewSurveyFeedback === 'function') {
+          await App.notifications.onNewSurveyFeedback(feedbackData);
+          console.log('[Feedback] Email notification sent successfully');
+        }
+      } catch (notifErr) {
+        console.warn('[Feedback] Could not send email notification:', notifErr);
       }
 
       // Show success screen

@@ -30,10 +30,12 @@ const firebaseConfig = {
 
 // Initialize Firebase (only if not in demo mode)
 if (!App.demoMode && typeof firebase !== 'undefined') {
-  firebase.initializeApp(firebaseConfig);
-  App.db = firebase.firestore();
-  App.storage = firebase.storage();
-  App.firebaseAuth = firebase.auth();
+  if (!firebase.apps || !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  App.db = typeof firebase.firestore === 'function' ? firebase.firestore() : null;
+  App.storage = typeof firebase.storage === 'function' ? firebase.storage() : null;
+  App.firebaseAuth = typeof firebase.auth === 'function' ? firebase.auth() : null;
   console.log('[Firebase] Initialized successfully');
 } else {
   console.log('[App] Running in DEMO MODE — no Firebase connection');

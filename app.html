@@ -710,6 +710,89 @@
             </table>
           </div>
         </div>
+
+        <!-- ── MASTERCLASS FEEDBACK & CLIENT PROJECTIONS SECTION ── -->
+        <div class="dashboard-section" style="background:#fff;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 4px 15px rgba(0,0,0,0.03);padding:24px;margin-top:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f3f4f6;">
+            <div>
+              <h2 style="font-size:1.25rem;font-weight:800;color:#0f172a;margin:0 0 4px;display:flex;align-items:center;gap:8px;">
+                <span>⭐</span>
+                <span class="lang-en">Masterclass Feedback &amp; Client Projections</span>
+                <span class="lang-es">Encuestas de Feedback y Proyecciones de Clientes</span>
+              </h2>
+              <p style="font-size:0.85rem;color:#64748b;margin:0;">
+                <span class="lang-en">Responses from attendees regarding session satisfaction and immediate purchasing interest in Spain.</span>
+                <span class="lang-es">Respuestas de los asistentes sobre la satisfacción del evento e interés de compra de sus clientes en España.</span>
+              </p>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              <button type="button" onclick="App.views.admin.exportSurveyToExcel()" class="btn btn-outline" style="display:flex;align-items:center;gap:6px;padding:8px 16px;font-weight:700;font-size:0.85rem;">
+                <span>📥</span>
+                <span class="lang-en">Export Feedback (CSV)</span>
+                <span class="lang-es">Exportar Encuestas</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Feedback KPI Cards -->
+          <div class="stat-cards-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:14px;margin-bottom:20px;">
+            <div class="stat-card" style="padding:16px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;">
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="admin-stat-feedback-total" style="font-size:1.6rem;color:#003f99;">0</div>
+                <div class="stat-card__label" style="font-size:0.75rem;font-weight:700;color:#64748b;text-transform:uppercase;">
+                  <span class="lang-en">Total Responses</span><span class="lang-es">Total Respuestas</span>
+                </div>
+              </div>
+            </div>
+            <div class="stat-card" style="padding:16px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;">
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="admin-stat-feedback-avg-rating" style="font-size:1.6rem;color:#eab308;">—</div>
+                <div class="stat-card__label" style="font-size:0.75rem;font-weight:700;color:#64748b;text-transform:uppercase;">
+                  <span class="lang-en">Average Rating</span><span class="lang-es">Valoración Media</span>
+                </div>
+              </div>
+            </div>
+            <div class="stat-card" style="padding:16px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;">
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="admin-stat-feedback-clients-yes" style="font-size:1.6rem;color:#10b981;">0</div>
+                <div class="stat-card__label" style="font-size:0.75rem;font-weight:700;color:#64748b;text-transform:uppercase;">
+                  <span class="lang-en">With Active Clients</span><span class="lang-es">Con Clientes Activos</span>
+                </div>
+              </div>
+            </div>
+            <div class="stat-card" style="padding:16px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;">
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="admin-stat-feedback-timeframe-hot" style="font-size:1.6rem;color:#d97706;">0</div>
+                <div class="stat-card__label" style="font-size:0.75rem;font-weight:700;color:#64748b;text-transform:uppercase;">
+                  <span class="lang-en">0 - 3 Months Pipeline</span><span class="lang-es">Plazo 0 - 3 Meses</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="data-table-container">
+            <table class="data-table data-table--wide">
+              <thead>
+                <tr>
+                  <th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
+                  <th><span class="lang-en">Rating</span><span class="lang-es">Valoración</span></th>
+                  <th><span class="lang-en">Realtor / Name</span><span class="lang-es">Nombre</span></th>
+                  <th>Email</th>
+                  <th><span class="lang-en">Phone / WhatsApp</span><span class="lang-es">Teléfono / WhatsApp</span></th>
+                  <th><span class="lang-en">Agency / Location</span><span class="lang-es">Agencia / Ubicación</span></th>
+                  <th><span class="lang-en">Active Clients?</span><span class="lang-es">¿Tiene Clientes?</span></th>
+                  <th><span class="lang-en">Buying Timeframe</span><span class="lang-es">Plazo de Compra</span></th>
+                  <th><span class="lang-en">Usefulness &amp; Notes</span><span class="lang-es">Utilidad &amp; Comentarios</span></th>
+                  <th><span class="lang-en">Actions</span><span class="lang-es">Acciones</span></th>
+                </tr>
+              </thead>
+              <tbody id="webinar-feedback-tbody">
+                <tr><td colspan="10" style="text-align:center;padding:2rem;color:#6b7280;">Cargando respuestas de la encuesta…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 

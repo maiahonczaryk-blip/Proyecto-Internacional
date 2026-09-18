@@ -1837,6 +1837,9 @@
       // 5. Render Table
       renderWebinarTable();
 
+      // 6. Fetch & Render Feedback Surveys
+      await loadWebinarFeedbacks();
+
     } catch (err) {
       console.error('[Admin] initWebinar error:', err);
       App.utils.showToast('Error loading webinar settings and registrations.', 'error');
@@ -2361,6 +2364,157 @@
     } catch (err) {
       console.error('[Admin] exportWebinar error:', err);
       App.utils.showToast('Error exporting registrations.', 'error');
+    }
+  }
+
+  /* ============================================
+     MASTERCLASS SURVEY RESPONSES & PROJECTIONS
+     ============================================ */
+  let allWebinarFeedbacks = [];
+
+  async function loadWebinarFeedbacks() {
+    try {
+      allWebinarFeedbacks = await App.auth.getWebinarFeedbacks();
+      updateWebinarFeedbackStats(allWebinarFeedbacks);
+      renderWebinarFeedbackTable(allWebinarFeedbacks);
+    } catch (err) {
+      console.error('[Admin] loadWebinarFeedbacks error:', err);
+    }
+  }
+
+  function updateWebinarFeedbackStats(feedbacks) {
+    const totalEl = document.getElementById('admin-stat-feedback-total');
+    const ratingEl = document.getElementById('admin-stat-feedback-avg-rating');
+    const clientsEl = document.getElementById('admin-stat-feedback-clients-yes');
+    const hotEl = document.getElementById('admin-stat-feedback-timeframe-hot');
+
+    const total = feedbacks.length;
+    if (totalEl) totalEl.textContent = total;
+
+    if (total === 0) {
+      if (ratingEl) ratingEl.textContent = '—';
+      if (clientsEl) clientsEl.textContent = '0';
+      if (hotEl) hotEl.textContent = '0';
+      return;
+    }
+
+    const sumRatings = feedbacks.reduce((acc, f) => acc + (parseInt(f.rating, 10) || 0), 0);
+    const avg = (sumRatings / total).toFixed(1);
+    if (ratingEl) ratingEl.textContent = `⭐ ${avg} / 5`;
+
+    const yesClients = feedbacks.filter(f => (f.has_clients || '').toLowerCase().includes('yes') || (f.has_clients || '').toLowerCase().includes('sí')).length;
+    if (clientsEl) clientsEl.textContent = yesClients;
+
+    const hotClients = feedbacks.filter(f => (f.client_timeframe || '').includes('0 to 3') || (f.client_timeframe || '').includes('0-3') || (f.client_timeframe || '').includes('0 a 3')).length;
+    if (hotEl) hotEl.textContent = hotClients;
+  }
+
+  function renderWebinarFeedbackTable(feedbacks) {
+    const tbody = document.getElementById('webinar-feedback-tbody');
+    if (!tbody) return;
+
+    if (!feedbacks || feedbacks.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:2.5rem;color:#6b7280;font-size:0.95rem;">No se han registrado respuestas a la encuesta de feedback todavía.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = feedbacks.map(item => {
+      const dateStr = item.submitted_at ? App.utils.formatDate(item.submitted_at) : '—';
+      const ratingStars = '⭐'.repeat(item.rating || 5);
+      
+      let clientBadge = '<span style="display:inline-block;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;background:rgba(107,114,128,0.1);color:#4b5563;">👤 No</span>';
+      if ((item.has_clients || '').toLowerCase().includes('yes') || (item.has_clients || '').toLowerCase().includes('sí')) {
+        clientBadge = '<span style="display:inline-block;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;background:rgba(16,185,129,0.15);color:#059669;">🔥 SÍ, Clientes Activos</span>';
+      } else if ((item.has_clients || '').toLowerCase().includes('expecting') || (item.has_clients || '').toLowerCase().includes('soon') || (item.has_clients || '').toLowerCase().includes('pronto')) {
+        clientBadge = '<span style="display:inline-block;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;background:rgba(245,158,11,0.15);color:#d97706;">⏳ Pronto / Esperando</span>';
+      }
+
+      let tfBadge = `<span style="font-size:0.8rem;color:#64748b;">${App.utils.escapeHtml(item.client_timeframe || 'N/A')}</span>`;
+      if ((item.client_timeframe || '').includes('0 to 3') || (item.client_timeframe || '').includes('0-3') || (item.client_timeframe || '').includes('0 a 3')) {
+        tfBadge = `<span style="display:inline-block;padding:3px 8px;border-radius:6px;font-size:0.78rem;font-weight:700;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;">⚡ 0 a 3 Meses</span>`;
+      } else if ((item.client_timeframe || '').includes('3 to 6') || (item.client_timeframe || '').includes('3-6') || (item.client_timeframe || '').includes('3 a 6')) {
+        tfBadge = `<span style="display:inline-block;padding:3px 8px;border-radius:6px;font-size:0.78rem;font-weight:700;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;">📅 3 a 6 Meses</span>`;
+      } else if ((item.client_timeframe || '').includes('6 to 9') || (item.client_timeframe || '').includes('6-9') || (item.client_timeframe || '').includes('6 a 9')) {
+        tfBadge = `<span style="display:inline-block;padding:3px 8px;border-radius:6px;font-size:0.78rem;font-weight:700;background:#fefce8;color:#a16207;border:1px solid #fef08a;">🏖️ 6 a 9 Meses</span>`;
+      } else if ((item.client_timeframe || '').includes('9') || (item.client_timeframe || '').includes('More than')) {
+        tfBadge = `<span style="display:inline-block;padding:3px 8px;border-radius:6px;font-size:0.78rem;font-weight:700;background:#f8fafc;color:#475569;border:1px solid #e2e8f0;">🔍 +9 Meses</span>`;
+      }
+
+      const cleanPhone = (item.phone || '').replace(/[^0-9]/g, '');
+      const phoneLink = cleanPhone ? `<a href="https://wa.me/${cleanPhone}" target="_blank" style="color:#059669;font-weight:600;text-decoration:none;">💬 ${App.utils.escapeHtml(item.phone)}</a>` : (item.phone || '—');
+      const notes = `${item.usefulness ? `<strong>${App.utils.escapeHtml(item.usefulness)}</strong><br>` : ''}${item.comments ? `<em>"${App.utils.escapeHtml(item.comments)}"</em>` : ''}` || '—';
+
+      return `
+        <tr>
+          <td style="font-size:0.82rem;white-space:nowrap;color:#475569;">${dateStr}</td>
+          <td style="white-space:nowrap;"><span title="${item.rating || 5}/5">${ratingStars}</span></td>
+          <td style="font-weight:700;color:var(--text-primary);">${App.utils.escapeHtml(item.name || '—')}</td>
+          <td><a href="mailto:${App.utils.escapeHtml(item.email || '')}" style="color:var(--blue);text-decoration:none;font-size:0.88rem;">${App.utils.escapeHtml(item.email || '—')}</a></td>
+          <td style="font-size:0.85rem;white-space:nowrap;">${phoneLink}</td>
+          <td style="font-size:0.85rem;color:#475569;">${App.utils.escapeHtml(item.location_or_agency || '—')}</td>
+          <td>${clientBadge}</td>
+          <td>${tfBadge}</td>
+          <td style="font-size:0.82rem;max-width:220px;color:#334155;line-height:1.4;">${notes}</td>
+          <td style="white-space:nowrap;">
+            <button onclick="App.views.admin.deleteFeedbackSurvey('${item.id}')" class="btn btn-sm" style="background:#fee2e2;color:#991b1b;border:none;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:0.75rem;" title="Eliminar respuesta">🗑️</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function deleteFeedbackSurvey(id) {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta respuesta de la encuesta?')) return;
+    try {
+      await App.auth.deleteWebinarFeedback(id);
+      App.utils.showToast('Respuesta eliminada con éxito.', 'success');
+      await loadWebinarFeedbacks();
+    } catch (err) {
+      console.error('[Admin] deleteFeedbackSurvey error:', err);
+      App.utils.showToast('Error al eliminar respuesta.', 'error');
+    }
+  }
+
+  async function exportSurveyToExcel() {
+    try {
+      const list = await App.auth.getWebinarFeedbacks();
+      if (!list || list.length === 0) {
+        App.utils.showToast('No hay respuestas de encuesta para exportar.', 'error');
+        return;
+      }
+      const headers = ['Fecha', 'Calificacion (1-5)', 'Nombre', 'Email', 'Telefono', 'Agencia_o_Ubicacion', 'Tiene_Clientes', 'Plazo_Estimado', 'Utilidad', 'Comentarios'];
+      const rows = list.map(item => [
+        item.submitted_at || '',
+        item.rating || '',
+        item.name || '',
+        item.email || '',
+        item.phone || '',
+        item.location_or_agency || '',
+        item.has_clients || '',
+        item.client_timeframe || '',
+        item.usefulness || '',
+        item.comments || ''
+      ]);
+
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))
+      ].join('\n');
+
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Encuestas_Feedback_Webinar_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      App.utils.showToast(`✅ Exportadas ${list.length} encuestas a CSV/Excel.`, 'success');
+    } catch (err) {
+      console.error('[Admin] exportSurveyToExcel error:', err);
+      App.utils.showToast('Error exportando encuestas.', 'error');
     }
   }
 
@@ -3010,7 +3164,10 @@
     setClientTagFilter,
     handleUpdateClientTag,
     confirmConvertClient,
-    handleConvertClient
+    handleConvertClient,
+    loadWebinarFeedbacks,
+    deleteFeedbackSurvey,
+    exportSurveyToExcel
   };
 
 })();
