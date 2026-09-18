@@ -92,6 +92,21 @@ App.demoData = {
       createdAt: '2026-09-10T12:06:56Z'
     },
     {
+      id: 'admin-004',
+      email: 'maia.honczaryk@remax.es',
+      password: 'proyectointernacional2026',
+      role: 'admin',
+      status: 'active',
+      firstName: 'Maia Belén',
+      lastName: 'Honczaryk',
+      agencyName: 'RE/MAX Inmomás',
+      phone: '+34 965 123 456',
+      country: 'Spain',
+      referralCode: 'ADM-INMOMAS',
+      profileImage: null,
+      createdAt: '2026-09-18T10:00:00Z'
+    },
+    {
       id: 'broker-001',
       email: 'john.broker@remaxusa.com',
       password: 'broker123',
