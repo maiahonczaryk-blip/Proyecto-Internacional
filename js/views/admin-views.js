@@ -18,6 +18,50 @@
   let activeClientTag = 'spain_buyer'; // 'spain_buyer' | 'realtor_network' | 'all'
   let clientSearchQuery = '';
 
+  function isMaiaOrSuperAdmin() {
+    const user = App.auth.getCurrentUser();
+    if (!user) return false;
+    const email = (user.email || '').toLowerCase().trim();
+    return email === 'spainconnection0@gmail.com' || email === 'maia.honczaryk@remax.es' || email === 'admin@remax-inmomas.com';
+  }
+
+  async function requestChangeApproval(actionTitle, actionDetails) {
+    const currentUser = App.auth.getCurrentUser();
+    const requesterName = (currentUser ? (currentUser.name || `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || currentUser.email) : 'The Spain Connection');
+    
+    // Notify Maia
+    if (window.App && window.App.notifications && window.App.notifications.onAdminChangeRequested) {
+      window.App.notifications.onAdminChangeRequested({
+        requester: requesterName,
+        action: actionTitle,
+        details: actionDetails,
+        date: new Date().toISOString()
+      }).catch(console.warn);
+    }
+
+    App.utils.showModal({
+      title: '🔒 Aprobación de Maia Requerida',
+      body: `
+        <div style="text-align: center; padding: 1.5rem 0.5rem;">
+          <div style="font-size: 3rem; margin-bottom: 0.75rem;">🛡️</div>
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #1e3a8a; margin-bottom: 0.5rem;">Solicitud enviada a Maia Honczaryk</h3>
+          <p style="color: #4b5563; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.25rem;">
+            El usuario <strong>${App.utils.escapeHtml(requesterName)}</strong> ha solicitado la siguiente acción:
+            <br><span style="display:inline-block; margin-top: 6px; font-weight: 700; color: #1e40af; background: #eff6ff; padding: 4px 10px; border-radius: 6px;">${App.utils.escapeHtml(actionTitle)}</span>
+          </p>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.85rem; text-align: left; font-size: 0.875rem; color: #475569; margin-bottom: 1.25rem;">
+            <strong style="color: #1e293b;">Detalles del cambio:</strong><br>${App.utils.escapeHtml(actionDetails)}
+          </div>
+          <p style="color: #64748b; font-size: 0.82rem; margin: 0;">
+            ✉️ Se ha enviado un aviso a <strong>spainconnection0@gmail.com</strong> para que Maia pueda revisar y validar este cambio en el portal.
+          </p>
+        </div>
+      `,
+      footer: `<button class="btn btn-primary btn-sm" onclick="App.utils.closeModal()">Entendido</button>`,
+      onClose: () => {}
+    });
+  }
+
   /* ============================================
      initDashboard()
      Populates #view-admin-dashboard with stat
@@ -77,6 +121,28 @@
               App.utils.showToast('Admin referral link copied to clipboard!', 'success');
             }
           };
+        }
+      }
+
+      // 8. Role Notification Banner if non-SuperAdmin
+      const header = document.querySelector('#view-admin-dashboard .dashboard-header');
+      if (header) {
+        let banner = document.getElementById('admin-maia-approval-banner');
+        if (!isMaiaOrSuperAdmin()) {
+          if (!banner) {
+            banner = document.createElement('div');
+            banner.id = 'admin-maia-approval-banner';
+            banner.style.cssText = 'background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 12px 16px; margin-top: 14px; display: flex; align-items: center; gap: 12px; font-size: 0.875rem; color: #1e40af;';
+            banner.innerHTML = `
+              <span style="font-size: 1.4rem;">🛡️</span>
+              <div>
+                <strong>Sesión Administrador: José Martínez (The Spain Connection):</strong> Visualización completa activa con tu enlace de referido unificado. Cualquier cambio o aprobación de registros enviará una solicitud directa a <strong>Maia Honczaryk</strong> (<code style="background:white; padding:2px 6px; border-radius:4px; border:1px solid #dbeafe;">spainconnection0@gmail.com</code>) para su validación.
+              </div>
+            `;
+            header.appendChild(banner);
+          }
+        } else if (banner) {
+          banner.remove();
         }
       }
 
@@ -308,6 +374,28 @@
       bindFilterStatus();
       bindSearchInput();
 
+      // 4. Role Notification Banner if non-SuperAdmin
+      const header = document.querySelector('#view-admin-users .dashboard-header');
+      if (header) {
+        let banner = document.getElementById('admin-users-maia-banner');
+        if (!isMaiaOrSuperAdmin()) {
+          if (!banner) {
+            banner = document.createElement('div');
+            banner.id = 'admin-users-maia-banner';
+            banner.style.cssText = 'background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 10px 14px; margin-top: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #1e40af; width: 100%;';
+            banner.innerHTML = `
+              <span style="font-size: 1.2rem;">🛡️</span>
+              <div>
+                <strong>Modo Administrador: José Martínez (The Spain Connection):</strong> Visualización completa activa. Las aprobaciones, rechazos o cambios de rol requerirán validación directa de <strong>Maia Honczaryk</strong> (<code style="background:white; padding:2px 6px; border-radius:4px; border:1px solid #dbeafe;">spainconnection0@gmail.com</code>).
+              </div>
+            `;
+            header.parentNode.insertBefore(banner, header.nextSibling);
+          }
+        } else if (banner) {
+          banner.remove();
+        }
+      }
+
     } catch (err) {
       console.error('[Admin] initUsers error:', err);
       const tbody = document.getElementById('admin-users-table-body');
@@ -502,6 +590,18 @@
     try {
       // If modal is open, close it
       App.utils.closeModal();
+
+      // Check if current user is Maia (Super Admin)
+      if (!isMaiaOrSuperAdmin()) {
+        const targetUser = allUsers.find(u => u.id === userId);
+        const name = targetUser ? `${targetUser.firstName || ''} ${targetUser.lastName || ''}`.trim() : userId;
+        const email = targetUser ? targetUser.email : '';
+        await requestChangeApproval(
+          'Aprobación de Usuario',
+          `Aprobar y activar al usuario "${name}" (${email}) con el rol de "${role.toUpperCase()}".`
+        );
+        return;
+      }
       
       // Update role
       await App.auth.updateUserRole(userId, role);
@@ -629,6 +729,15 @@
     const user = allUsers.find(u => u.id === userId);
     const userName = user ? `${user.firstName} ${user.lastName}` : 'this user';
 
+    // Check if current user is Maia (Super Admin)
+    if (!isMaiaOrSuperAdmin()) {
+      await requestChangeApproval(
+        'Rechazo de Solicitud de Usuario',
+        `Rechazar la solicitud de acceso del usuario "${userName}" (${user ? user.email : userId}).`
+      );
+      return;
+    }
+
     App.utils.showModal({
       title: 'Confirm Rejection',
       body: `
@@ -672,6 +781,16 @@
   }
 
   async function handleDeleteUser(userId) {
+    if (!isMaiaOrSuperAdmin()) {
+      const targetUser = allUsers.find(u => u.id === userId);
+      const name = targetUser ? `${targetUser.firstName || ''} ${targetUser.lastName || ''}`.trim() : userId;
+      await requestChangeApproval(
+        'Eliminación de Usuario',
+        `Eliminar permanentemente la cuenta del usuario "${name}" (${targetUser ? targetUser.email : userId}).`
+      );
+      return;
+    }
+
     if (confirm('Are you sure you want to permanently delete this user? This action cannot be undone.')) {
       try {
         await App.auth.deleteUser(userId);
@@ -817,6 +936,15 @@
         saveRoleBtn.addEventListener('click', async () => {
           const selectedRole = document.getElementById('user-role-select').value;
           App.utils.closeModal();
+
+          if (!isMaiaOrSuperAdmin()) {
+            await requestChangeApproval(
+              'Cambio de Rol de Usuario',
+              `Cambiar el rol del usuario "${user.firstName} ${user.lastName}" (${user.email}) al rol "${selectedRole.toUpperCase()}".`
+            );
+            return;
+          }
+
           try {
             await App.auth.updateUserRole(userId, selectedRole);
             App.utils.showToast('User role updated successfully!', 'success');
@@ -840,6 +968,15 @@
         saveReferralBtn.addEventListener('click', async () => {
           const selectedReferral = document.getElementById('user-referral-select').value;
           App.utils.closeModal();
+
+          if (!isMaiaOrSuperAdmin()) {
+            await requestChangeApproval(
+              'Asignación de Referido / Agente',
+              `Asignar referidor "${selectedReferral || 'Ninguno'}" al usuario "${user.firstName} ${user.lastName}" (${user.email}).`
+            );
+            return;
+          }
+
           try {
             await App.auth.updateUserReferral(userId, selectedReferral || null);
             App.utils.showToast('User referral/agent assigned successfully!', 'success');
@@ -865,6 +1002,17 @@
             return;
           }
           App.utils.closeModal();
+
+          if (!isMaiaOrSuperAdmin()) {
+            const targetRealtor = allSysUsers.find(u => u.id === selectedRealtorId);
+            const rName = targetRealtor ? `${targetRealtor.firstName} ${targetRealtor.lastName}` : selectedRealtorId;
+            await requestChangeApproval(
+              'Añadir Realtor al Paraguas del Agente',
+              `Añadir al Realtor "${rName}" bajo el agente "${user.firstName} ${user.lastName}".`
+            );
+            return;
+          }
+
           try {
             const assignmentCode = user.referralCode || user.id;
             await App.auth.updateUserReferral(selectedRealtorId, assignmentCode);
@@ -1006,6 +1154,18 @@
       const select = document.getElementById('client-tag-select');
       if (!select) return;
       const newTag = select.value;
+
+      if (!isMaiaOrSuperAdmin()) {
+        const client = allClients.find(c => c.id === clientId);
+        const clientName = client ? `${client.firstName || ''} ${client.lastName || ''}`.trim() : clientId;
+        App.utils.closeModal();
+        await requestChangeApproval(
+          'Actualizar Etiqueta de Cliente',
+          `Cambiar la etiqueta del cliente "${clientName}" a "${newTag}".`
+        );
+        return;
+      }
+
       await App.auth.updateClientTag(clientId, newTag);
       
       const client = allClients.find(c => c.id === clientId);
@@ -1025,6 +1185,17 @@
 
   async function handleClientDrop(clientId, newStatus) {
     try {
+      if (!isMaiaOrSuperAdmin()) {
+        const client = allClients.find(c => c.id === clientId);
+        const clientName = client ? `${client.firstName || ''} ${client.lastName || ''}`.trim() : clientId;
+        await requestChangeApproval(
+          'Mover Estado de Cliente',
+          `Mover al cliente "${clientName}" a la fase "${newStatus}".`
+        );
+        initClients();
+        return;
+      }
+
       await App.auth.updateClientStatus(clientId, newStatus, 'Moved by Broker Inmomás (Admin)');
       initClients();
     } catch (err) {
@@ -1193,6 +1364,17 @@
         const agent = allUsers.find(u => u.id === agentId);
         if (agent) agentName = `${agent.firstName} ${agent.lastName}`;
       }
+
+      if (!isMaiaOrSuperAdmin()) {
+        const client = allClients.find(c => c.id === clientId);
+        const clientName = client ? `${client.firstName || ''} ${client.lastName || ''}`.trim() : clientId;
+        App.utils.closeModal();
+        await requestChangeApproval(
+          'Asignar Agente Local a Cliente',
+          `Asignar el agente "${agentName || 'Sin agente'}" al cliente "${clientName}".`
+        );
+        return;
+      }
       
       await App.auth.assignLocalAgent(clientId, agentId || null, agentName || null);
       App.utils.showToast('Local agent assigned successfully!', 'success');
@@ -1209,6 +1391,17 @@
       const salePrice = document.getElementById('financial-sale-price').value;
       const agencyFeePct = document.getElementById('financial-fee-pct').value;
       const referralSharePct = document.getElementById('financial-referral-pct').value;
+
+      if (!isMaiaOrSuperAdmin()) {
+        const client = allClients.find(c => c.id === clientId);
+        const clientName = client ? `${client.firstName || ''} ${client.lastName || ''}`.trim() : clientId;
+        App.utils.closeModal();
+        await requestChangeApproval(
+          'Guardar Ajustes Financieros',
+          `Actualizar datos financieros para el cliente "${clientName}": Precio Venta: €${salePrice}, Fee Agencia: ${agencyFeePct}%, Comisión Referido: ${referralSharePct}%.`
+        );
+        return;
+      }
       
       await App.auth.saveClientFinancials(clientId, salePrice, agencyFeePct, referralSharePct);
       App.utils.showToast('Financial settings saved successfully!', 'success');
@@ -1222,6 +1415,15 @@
 
   async function confirmConvertClient(clientId, clientName, targetRole = 'realtor') {
     const roleLabel = targetRole === 'broker' ? 'Broker' : 'Agente (Realtor)';
+
+    if (!isMaiaOrSuperAdmin()) {
+      await requestChangeApproval(
+        `Convertir Cliente a ${roleLabel}`,
+        `Crear cuenta de ${roleLabel} para el contacto "${clientName}" y registrar su código de referido.`
+      );
+      return;
+    }
+
     if (!confirm(`¿Deseas convertir a "${clientName}" en ${roleLabel}?\n\n• Se creará su cuenta en el panel de Gestión de Usuarios con su código de referido.\n• Se eliminará del pipeline de clientes.`)) {
       return;
     }
@@ -1230,6 +1432,16 @@
 
   async function handleConvertClient(clientId, targetRole = 'realtor') {
     try {
+      if (!isMaiaOrSuperAdmin()) {
+        const client = allClients.find(c => c.id === clientId);
+        const clientName = client ? `${client.firstName || ''} ${client.lastName || ''}`.trim() : clientId;
+        await requestChangeApproval(
+          `Convertir Cliente a ${targetRole === 'broker' ? 'Broker' : 'Realtor'}`,
+          `Crear cuenta de ${targetRole} para "${clientName}".`
+        );
+        return;
+      }
+
       const res = await App.auth.convertClientToUser(clientId, targetRole);
       App.utils.showToast(`¡Contacto convertido exitosamente a ${targetRole === 'broker' ? 'Broker' : 'Realtor'}! Ahora aparece en Gestión de Usuarios. 🎉`, 'success');
       App.utils.closeModal();
@@ -1354,6 +1566,17 @@
 
   async function confirmDeleteLead(leadId) {
     try {
+      if (!isMaiaOrSuperAdmin()) {
+        const lead = allLeads.find(l => l.id === leadId);
+        const leadName = lead ? `${lead.firstName} ${lead.lastName}` : leadId;
+        App.utils.closeModal();
+        await requestChangeApproval(
+          'Eliminar Lead de Guía',
+          `Eliminar el registro de descarga/lead de "${leadName}".`
+        );
+        return;
+      }
+
       await App.auth.deleteDossierLead(leadId);
       allLeads = allLeads.filter(l => l.id !== leadId);
       setTextById('admin-stat-leads', allLeads.length);
@@ -1374,6 +1597,17 @@
       if (agentId) {
         const agent = allUsers.find(u => u.id === agentId);
         if (agent) agentName = `${agent.firstName} ${agent.lastName}`;
+      }
+
+      if (!isMaiaOrSuperAdmin()) {
+        const lead = allLeads.find(l => l.id === leadId);
+        const leadName = lead ? `${lead.firstName} ${lead.lastName}` : leadId;
+        App.utils.closeModal();
+        await requestChangeApproval(
+          'Asignar Agente Local a Lead',
+          `Asignar el agente "${agentName || 'Sin asignar'}" al lead "${leadName}".`
+        );
+        return;
       }
       
       await App.auth.assignLeadToAgent(leadId, agentId || null, agentName || null);
@@ -1691,6 +1925,14 @@
 
   async function saveWebinarConfig(e) {
     if (e && e.preventDefault) e.preventDefault();
+
+    if (!isMaiaOrSuperAdmin()) {
+      await requestChangeApproval(
+        'Actualizar Configuración de Webinar',
+        'Guardar y publicar nueva fecha, hora, cupos o textos del webinario en la web.'
+      );
+      return;
+    }
 
     const saveBtn = document.getElementById('admin-save-webinar-btn');
     if (saveBtn) {
@@ -2257,6 +2499,15 @@
     const file = input.files[0];
     if (!file) return;
 
+    if (!isMaiaOrSuperAdmin()) {
+      input.value = '';
+      await requestChangeApproval(
+        'Firma y Carga de Acuerdo de Colaborador',
+        `Subir documento de acuerdo firmado (${file.name}) para el usuario ${userId}.`
+      );
+      return;
+    }
+
     const statusEl = notifId 
       ? document.getElementById(`admin-upload-status-${notifId}`) 
       : document.getElementById(`admin-reupload-status-${userId}`);
@@ -2324,26 +2575,56 @@
      Shows a unified directory merging users,
      clients, and webinar registrations.
      Always sorted with newest records first.
+     Includes real-time agent & status filters.
      ============================================ */
   let currentUnifiedData = [];
 
+  const KNOWN_AGENT_MAP = {
+    'HmfMyuSCbyOIQqi29DiP4v5CKop2': 'James Lavoie / Isabelle',
+    'LOC-LAVOIE MONTERO-HmfM': 'James Lavoie / Isabelle',
+    'James Lavoie Montero': 'James Lavoie / Isabelle',
+    'LOC-LUÍS RODRIGUEZ-zHUD': 'Ángel Luís Rodriguez',
+    'zHUDljXCeEaNgFxq45PTLw4SCq82': 'Ángel Luís Rodriguez',
+    'LOC-MARTINEZ -GBPi': 'José Martínez',
+    'GBPiUDjC5RVLru7Paw6T14iSD0k1': 'José Martínez',
+    'jose martinez ': 'José Martínez',
+    'José Martínez Sánchez': 'José Martínez',
+    'LOC-SEYED HOSSEINI-o6tP': 'Sepehr Seyed Hosseini',
+    'o6tPXBtmTnW3pP3QtTr3rP1Q6rG3': 'Sepehr Seyed Hosseini',
+    'Sepehr seyed hosseini': 'Sepehr Seyed Hosseini',
+    'Sepehr Hosseini': 'Sepehr Seyed Hosseini',
+    'LOC-MCNEAL-opTD': 'Denise McNeal',
+    'opTDoczG6ZVKwnNYp2sDVYbCOVz1': 'Denise McNeal',
+    'Denise McNeal ': 'Denise McNeal',
+    'LOC-ESCARABAJAL-XAyK': 'Dionisio Escarabajal Asensio',
+    'XAyKZzGVmdZB8KOWIPqGDHhyRHm1': 'Dionisio Escarabajal Asensio',
+    'LOC-LLERAS-inTN': 'Ozzie Lleras',
+    'inTN2iHJIrc3zouiDS4mJfkkaV02': 'Ozzie Lleras',
+    'Ozzie Llleras': 'Ozzie Lleras',
+    'admin-001': 'Admin Inmomás'
+  };
+
   async function initUnified() {
     try {
-      if (!allUsers || allUsers.length === 0) {
-        allUsers = await App.auth.getAllUsers();
-      }
-      if (!allClients || allClients.length === 0) {
-        allClients = await App.auth.getClients();
-      }
+      // Always fetch freshest data from store
+      allUsers = await App.auth.getAllUsers();
+      allClients = await App.auth.getClients();
       const webinarRegs = await App.auth.getWebinarRegistrations();
       
       const unifiedMap = new Map();
-      const userLookup = {};
+      const userLookup = { ...KNOWN_AGENT_MAP };
       
-      // Build lookup for referrer names
+      // Build omnidirectional lookup for referrer names
       allUsers.forEach(u => {
-        if (u.id) {
-          userLookup[u.id] = u.name || (u.firstName ? u.firstName + ' ' + (u.lastName || '') : '');
+        const fullName = (u.name || (u.firstName ? (u.firstName + ' ' + (u.lastName || '')) : '')).trim();
+        if (u.id && fullName && !userLookup[u.id]) userLookup[u.id] = fullName;
+        if (u.referralCode && fullName) {
+          userLookup[u.referralCode] = userLookup[u.referralCode] || fullName;
+          userLookup[u.referralCode.toUpperCase()] = userLookup[u.referralCode.toUpperCase()] || fullName;
+          userLookup[u.referralCode.trim()] = userLookup[u.referralCode.trim()] || fullName;
+        }
+        if (u.email && fullName) {
+          userLookup[u.email.toLowerCase().trim()] = fullName;
         }
       });
       
@@ -2352,20 +2633,27 @@
         let email = (u.email || '').toLowerCase().trim();
         if (!email) return;
         
-        let userName = u.name || (u.firstName ? u.firstName + ' ' + (u.lastName || '') : 'Sin Nombre');
-        let referrerId = u.referredBy || u.registeredBy || '';
-        let referrerName = referrerId ? (userLookup[referrerId] || referrerId) : 'N/A';
-        if (referrerName === 'admin-001') referrerName = 'admin-001';
+        let userName = (u.name || (u.firstName ? (u.firstName + ' ' + (u.lastName || '')) : 'Sin Nombre')).trim();
+        let refKey = u.referredBy || u.registeredBy || '';
+        let referrerName = refKey ? (userLookup[refKey] || userLookup[refKey.toUpperCase()] || refKey) : 'N/A';
+        if (referrerName === 'admin-001') referrerName = 'Admin Inmomás';
         if (referrerName === 'N/A' && u.partnerCode) referrerName = u.partnerCode;
 
         unifiedMap.set(email, {
+          id: u.id,
           name: userName,
           email: u.email, // preserve original case
           phone: u.phone || 'N/A',
-          status: 'Solo Plataforma (Colaborador/Agente)',
+          status: 'Solo Plataforma',
           role: u.role || 'colaborador',
           referrer: referrerName,
-          origin: 'Directo / Plataforma',
+          referralCode: u.referralCode || '',
+          agency: u.agencyName || '',
+          country: u.country || '',
+          origin: u.source || 'Plataforma Directa',
+          hasPlatform: true,
+          hasWebinar: !!u.isWebinarRegistered,
+          hasClient: false,
           createdAt: u.createdAt || '',
           _timestamp: new Date(u.createdAt || 0).getTime()
         });
@@ -2376,13 +2664,14 @@
         let email = (c.email || '').toLowerCase().trim();
         if (!email) return;
 
-        let userName = `${c.firstName || ''} ${c.lastName || ''}`.trim() || 'Sin Nombre';
-        let realtor = allUsers.find(u => u.id === (c.realtorId || c.referredBy));
-        let referrerName = realtor ? `${realtor.firstName || ''} ${realtor.lastName || ''}`.trim() : 'N/A';
+        let userName = ((c.firstName || '') + ' ' + (c.lastName || '')).trim() || 'Sin Nombre';
+        let refKey = c.realtorId || c.referredBy || c.localAgentId || '';
+        let referrerName = refKey ? (userLookup[refKey] || userLookup[refKey.toUpperCase()] || refKey) : 'N/A';
 
         let existing = unifiedMap.get(email);
         if (existing) {
-          existing.status = 'Ambos (Plataforma y Cliente)';
+          existing.hasClient = true;
+          existing.status = existing.hasWebinar ? 'Ambos (Plataforma + Webinar + Cliente)' : 'Ambos (Plataforma + Cliente)';
           if (existing.referrer === 'N/A' && referrerName !== 'N/A') existing.referrer = referrerName;
           if (existing.phone === 'N/A' && c.phone) existing.phone = c.phone;
           if (!existing.createdAt && c.createdAt) {
@@ -2391,13 +2680,20 @@
           }
         } else {
           unifiedMap.set(email, {
+            id: c.id,
             name: userName,
             email: c.email,
             phone: c.phone || 'N/A',
             status: 'Cliente Comprador',
             role: 'Cliente Comprador España',
             referrer: referrerName,
+            referralCode: '',
+            agency: '',
+            country: c.country || '',
             origin: c.source || 'Referido / Intake',
+            hasPlatform: false,
+            hasWebinar: false,
+            hasClient: true,
             createdAt: c.createdAt || '',
             _timestamp: new Date(c.createdAt || 0).getTime()
           });
@@ -2411,33 +2707,48 @@
         
         let existing = unifiedMap.get(email);
         
-        let userName = w.name || (w.firstName ? w.firstName + ' ' + (w.lastName || '') : 'Sin Nombre');
+        let userName = (w.name || (w.firstName ? (w.firstName + ' ' + (w.lastName || '')) : 'Sin Nombre')).trim();
         let phone = w.phone || 'N/A';
         let origin = w.source || (w.isReferral ? 'referral' : (w.howDidYouHear || 'direct'));
-        let referrer = (w.referredByAgentName || 'N/A').trim();
+        
+        let rawRef = w.agentReferrerName || w.referrerName || w.referredByAgentName || w.referralCode || w.agentReferrerId || w.referrerId || '';
+        let referrer = 'N/A';
+        if (rawRef) {
+          referrer = userLookup[rawRef] || userLookup[rawRef.toUpperCase()] || rawRef;
+        }
         if (!referrer || referrer.toLowerCase() === 'n/a' || referrer === '') referrer = 'N/A';
 
         const isB2B = (w.webinarType || '').toLowerCase() === 'b2b' || (w.webinar || '').toLowerCase().includes('beyond borders') || (w.agency && (w.agency.toLowerCase().includes('remax') || w.agency.toLowerCase().includes('broker')));
         const webinarRole = isB2B ? 'Realtor / Broker (B2B)' : 'Invitado Webinar';
 
         if (existing) {
-          existing.status = 'Ambos (Registrado y Webinar)';
+          existing.hasWebinar = true;
+          existing.status = existing.hasClient ? 'Ambos (Plataforma + Webinar + Cliente)' : 'Ambos (Plataforma + Webinar)';
           if (existing.referrer === 'N/A' && referrer !== 'N/A') {
             existing.referrer = referrer;
-            existing.origin = origin;
           }
           if (existing.phone === 'N/A' && phone !== 'N/A') {
             existing.phone = phone;
           }
+          if (!existing.agency && w.agency) existing.agency = w.agency;
+          if (!existing.country && w.country) existing.country = w.country;
+          if (existing.origin === 'Plataforma Directa' && origin !== 'direct') existing.origin = origin;
         } else {
           unifiedMap.set(email, {
+            id: w.id,
             name: userName,
             email: w.email,
             phone: phone,
             status: 'Solo Webinar',
             role: webinarRole,
             referrer: referrer,
+            referralCode: w.referralCode || '',
+            agency: w.agency || '',
+            country: w.country || '',
             origin: origin,
+            hasPlatform: false,
+            hasWebinar: true,
+            hasClient: false,
             createdAt: w.createdAt || '',
             _timestamp: new Date(w.createdAt || 0).getTime()
           });
@@ -2449,35 +2760,82 @@
       unifiedArray.sort((a, b) => (b._timestamp || 0) - (a._timestamp || 0));
       
       currentUnifiedData = unifiedArray;
-      setTextById('admin-unified-count', unifiedArray.length);
+
+      // Populate Agent filter options dynamically with counts
+      const agentFilterSelect = document.getElementById('admin-unified-filter-agent');
+      if (agentFilterSelect) {
+        const agentCounts = {};
+        unifiedArray.forEach(item => {
+          const ref = item.referrer || 'N/A';
+          agentCounts[ref] = (agentCounts[ref] || 0) + 1;
+        });
+
+        // Sort agents by count descending
+        const sortedAgents = Object.keys(agentCounts).sort((a, b) => {
+          if (a === 'N/A') return 1;
+          if (b === 'N/A') return -1;
+          return agentCounts[b] - agentCounts[a];
+        });
+
+        const currentAgentVal = agentFilterSelect.value || '';
+        let optionsHtml = '<option value="">👤 Todos los Agentes / Referidos</option>';
+        sortedAgents.forEach(agent => {
+          const count = agentCounts[agent];
+          const isSelected = agent === currentAgentVal ? 'selected' : '';
+          optionsHtml += `<option value="${App.utils.escapeHtml(agent)}" ${isSelected}>${App.utils.escapeHtml(agent)} (${count})</option>`;
+        });
+        agentFilterSelect.innerHTML = optionsHtml;
+      }
       
+      const updateCountBadge = (filteredCount, totalCount) => {
+        const countEl = document.getElementById('admin-unified-count');
+        if (countEl) {
+          countEl.textContent = filteredCount === totalCount ? `${totalCount}` : `${filteredCount} / ${totalCount}`;
+        }
+      };
+
+      updateCountBadge(unifiedArray.length, unifiedArray.length);
       renderUnifiedTable(unifiedArray);
       
       // Search and Filter Events
       const searchInput = document.getElementById('admin-unified-search');
-      const filterSelect = document.getElementById('admin-unified-filter-status');
+      const statusSelect = document.getElementById('admin-unified-filter-status');
+      const agentSelect = document.getElementById('admin-unified-filter-agent');
       
       const filterData = () => {
         const term = (searchInput?.value || '').toLowerCase().trim();
-        const stat = filterSelect?.value || '';
+        const stat = statusSelect?.value || '';
+        const selectedAgent = agentSelect?.value || '';
+
         const filtered = unifiedArray.filter(item => {
           const matchTerm = !term || 
             (item.name || '').toLowerCase().includes(term) || 
             (item.email || '').toLowerCase().includes(term) || 
-            (item.phone || '').toLowerCase().includes(term) ||
-            (item.referrer || '').toLowerCase().includes(term) ||
-            (item.origin || '').toLowerCase().includes(term) ||
+            (item.phone || '').toLowerCase().includes(term) || 
+            (item.referrer || '').toLowerCase().includes(term) || 
+            (item.referralCode || '').toLowerCase().includes(term) || 
+            (item.agency || '').toLowerCase().includes(term) || 
+            (item.country || '').toLowerCase().includes(term) || 
+            (item.origin || '').toLowerCase().includes(term) || 
             (item.role || '').toLowerCase().includes(term);
 
-          const matchStat = !stat || 
-            item.status === stat || 
-            (stat === 'Ambos' && item.status.includes('Ambos')) || 
-            (stat === 'Solo Plataforma' && item.status.includes('Plataforma')) ||
-            (stat === 'Solo Webinar' && item.status.includes('Webinar')) ||
-            (stat === 'Cliente Comprador' && item.status.includes('Cliente'));
+          let matchStat = true;
+          if (stat) {
+            if (stat === 'Ambos') matchStat = (item.status || '').includes('Ambos');
+            else if (stat === 'Solo Plataforma') matchStat = item.status === 'Solo Plataforma';
+            else if (stat === 'Solo Webinar') matchStat = item.status === 'Solo Webinar';
+            else if (stat === 'Cliente Comprador') matchStat = (item.status || '').includes('Cliente');
+            else if (stat === 'all_webinar') matchStat = !!item.hasWebinar;
+            else if (stat === 'all_platform') matchStat = !!item.hasPlatform;
+            else matchStat = item.status === stat;
+          }
 
-          return matchTerm && matchStat;
+          const matchAgent = !selectedAgent || item.referrer === selectedAgent;
+
+          return matchTerm && matchStat && matchAgent;
         });
+
+        updateCountBadge(filtered.length, unifiedArray.length);
         renderUnifiedTable(filtered);
       };
       
@@ -2486,10 +2844,15 @@
         searchInput.parentNode.replaceChild(newSearch, searchInput);
         newSearch.addEventListener('input', filterData);
       }
-      if (filterSelect) {
-        const newSelect = filterSelect.cloneNode(true);
-        filterSelect.parentNode.replaceChild(newSelect, filterSelect);
+      if (statusSelect) {
+        const newSelect = statusSelect.cloneNode(true);
+        statusSelect.parentNode.replaceChild(newSelect, statusSelect);
         newSelect.addEventListener('change', filterData);
+      }
+      if (agentSelect) {
+        const newAgent = agentSelect.cloneNode(true);
+        agentSelect.parentNode.replaceChild(newAgent, agentSelect);
+        newAgent.addEventListener('change', filterData);
       }
       
     } catch (err) {
@@ -2503,7 +2866,7 @@
     if (!tbody) return;
 
     if (!data || data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:#6b7280;">No hay registros coincidentes.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:#6b7280;font-size:0.95rem;">No hay registros coincidentes con los filtros seleccionados.</td></tr>`;
       return;
     }
 
@@ -2511,31 +2874,50 @@
     data.forEach(item => {
       try {
         let statusColor = '#6b7280';
-        if (item.status.includes('Ambos')) statusColor = '#10b981'; // Green
-        else if (item.status.includes('Webinar')) statusColor = '#f59e0b'; // Yellow/Orange
-        else if (item.status.includes('Plataforma')) statusColor = '#3b82f6'; // Blue
-        else if (item.status.includes('Cliente')) statusColor = '#8b5cf6'; // Purple
+        let statusBg = 'rgba(107,114,128,0.12)';
+        if (item.status.includes('Ambos')) {
+          statusColor = '#059669'; // Emerald
+          statusBg = 'rgba(16,185,129,0.12)';
+        } else if (item.status.includes('Webinar')) {
+          statusColor = '#d97706'; // Amber
+          statusBg = 'rgba(245,158,11,0.12)';
+        } else if (item.status.includes('Plataforma')) {
+          statusColor = '#2563eb'; // Blue
+          statusBg = 'rgba(37,99,235,0.12)';
+        } else if (item.status.includes('Cliente')) {
+          statusColor = '#7c3aed'; // Purple
+          statusBg = 'rgba(124,58,237,0.12)';
+        }
         
         const dateStr = item.createdAt ? App.utils.formatDate(item.createdAt) : '—';
+        const agencyPill = item.agency ? `<div style="font-size:0.75rem;color:#6b7280;margin-top:2px;">🏢 ${App.utils.escapeHtml(item.agency)}</div>` : '';
+        const countryPill = item.country ? `<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:0.75rem;background:#f3f4f6;color:#4b5563;margin-left:4px;">${App.utils.escapeHtml(item.country)}</span>` : '';
 
         html += `
           <tr>
             <td>
-              <div style="font-weight:600; color:var(--text-primary);">${App.utils.escapeHtml(item.name || '')}</div>
+              <div style="font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
+                ${App.utils.escapeHtml(item.name || '')}
+                ${countryPill}
+              </div>
+              ${agencyPill}
             </td>
             <td>
-              <a href="mailto:${App.utils.escapeHtml(item.email || '')}" style="color:var(--blue); text-decoration:none;">${App.utils.escapeHtml(item.email || '')}</a>
+              <a href="mailto:${App.utils.escapeHtml(item.email || '')}" style="color:var(--blue); text-decoration:none; font-size:0.88rem;">${App.utils.escapeHtml(item.email || '')}</a>
             </td>
-            <td>${App.utils.escapeHtml(item.phone || '')}</td>
+            <td style="font-size:0.85rem; white-space:nowrap;">${App.utils.escapeHtml(item.phone || '')}</td>
             <td>
-              <span style="display:inline-block; padding:4px 8px; border-radius:12px; font-size:0.75rem; font-weight:600; background-color:${statusColor}22; color:${statusColor};">
+              <span style="display:inline-block; padding:4px 9px; border-radius:12px; font-size:0.75rem; font-weight:700; background-color:${statusBg}; color:${statusColor};">
                 ${App.utils.escapeHtml(item.status)}
               </span>
             </td>
-            <td style="text-transform:capitalize;">${App.utils.escapeHtml(item.role || '')}</td>
-            <td>${App.utils.escapeHtml(item.referrer || 'N/A')}</td>
-            <td><span style="font-size:0.8rem; color:var(--text-secondary); background:#f3f4f6; padding:2px 6px; border-radius:4px;">${App.utils.escapeHtml(item.origin || 'N/A')}</span></td>
-            <td style="font-size:0.85rem; color:#4b5563; white-space:nowrap;">${dateStr}</td>
+            <td style="text-transform:capitalize; font-size:0.85rem; font-weight:500;">${App.utils.escapeHtml(item.role || '')}</td>
+            <td>
+              <div style="font-weight:600; font-size:0.85rem; color:var(--primary);">${App.utils.escapeHtml(item.referrer || 'N/A')}</div>
+              ${item.referralCode ? `<div style="font-size:0.72rem;color:#6b7280;font-family:monospace;">${App.utils.escapeHtml(item.referralCode)}</div>` : ''}
+            </td>
+            <td><span style="font-size:0.78rem; color:var(--text-secondary); background:#f3f4f6; padding:2px 7px; border-radius:4px;">${App.utils.escapeHtml(item.origin || 'N/A')}</span></td>
+            <td style="font-size:0.82rem; color:#4b5563; white-space:nowrap;">${dateStr}</td>
           </tr>
         `;
       } catch (rowErr) {
@@ -2553,14 +2935,17 @@
         return;
       }
 
-      const headers = ['Nombre', 'Email', 'Telefono', 'Estado', 'Rol', 'Referido Por', 'Origen', 'Fecha Registro'];
+      const headers = ['Nombre', 'Email', 'Telefono', 'Agencia', 'Pais', 'Estado', 'Rol', 'Referido Por', 'Codigo Referido', 'Origen', 'Fecha Registro'];
       const rows = currentUnifiedData.map(item => [
         item.name || '',
         item.email || '',
         item.phone || '',
+        item.agency || '',
+        item.country || '',
         item.status || '',
         item.role || '',
         item.referrer || '',
+        item.referralCode || '',
         item.origin || '',
         item.createdAt || ''
       ]);
@@ -2579,7 +2964,7 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      App.utils.showToast(`✅ Exportados ${currentUnifiedData.length} contactos.`, 'success');
+      App.utils.showToast(`✅ Exportados ${currentUnifiedData.length} contactos del Directorio Unificado.`, 'success');
     } catch (err) {
       console.error('[Admin] exportUnified error:', err);
       App.utils.showToast('Error exporting directory.', 'error');

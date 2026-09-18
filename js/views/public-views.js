@@ -1177,6 +1177,27 @@ App.views.public = {
         if (btn) { btn.disabled = false; btn.textContent = 'Register Now'; }
       }
     });
+  },
+
+  /* ============================================
+     MASTERCLASS FEEDBACK SURVEY
+     ============================================ */
+  initSurvey: function() {
+    try {
+      const currentUser = App.auth && App.auth.getCurrentUser ? App.auth.getCurrentUser() : null;
+      if (currentUser) {
+        const nameInput = document.getElementById('spa-resp-name');
+        const emailInput = document.getElementById('spa-resp-email');
+        if (nameInput && !nameInput.value) {
+          nameInput.value = `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim();
+        }
+        if (emailInput && !emailInput.value) {
+          emailInput.value = currentUser.email || '';
+        }
+      }
+    } catch(e) {
+      console.warn('[Survey] Could not prefill user:', e);
+    }
   }
 
 };

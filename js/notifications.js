@@ -229,6 +229,17 @@
     }
   }
 
+  async function onAdminChangeRequested({ requester, action, details, date }) {
+    await sendEmail(EMAILJS_TEMPLATE_STATUS, {
+      user_name:  requester || 'The Spain Connection',
+      user_email: ADMIN_EMAIL,
+      user_role:  'Admin Solicitante',
+      new_status: `Solicitud de aprobación: ${action} — ${details || ''}`,
+      updated_at: fmtDate(date || new Date().toISOString()),
+      admin_url:  ADMIN_URL
+    }, ADMIN_EMAIL);
+  }
+
   // ── Expose on App namespace ────────────────────────────────────────────────
   window.App = window.App || {};
   window.App.notifications = {
@@ -236,6 +247,7 @@
     onNewReferredCollaborator,
     onNewDossierLead,
     onNewWebinarRegistration,
-    onUserStatusChange
+    onUserStatusChange,
+    onAdminChangeRequested
   };
 })();

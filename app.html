@@ -239,17 +239,24 @@
             </div>
           </div>
         </div>
-        <div class="dashboard-filters">
-          <div class="form-group" style="margin-bottom:0; flex:1;">
-            <input type="text" id="admin-unified-search" placeholder="Search by name, email, phone or agent..." class="form-input">
+        <div class="dashboard-filters" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+          <div class="form-group" style="margin-bottom:0; flex:1; min-width:240px;">
+            <input type="text" id="admin-unified-search" placeholder="🔍 Buscar por nombre, email, teléfono, agencia, país o agente..." class="form-input">
           </div>
-          <div class="form-group" style="margin-bottom:0;">
+          <div class="form-group" style="margin-bottom:0; min-width:200px;">
+            <select id="admin-unified-filter-agent" class="form-select">
+              <option value="">👤 Todos los Agentes / Referidos</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0; min-width:180px;">
             <select id="admin-unified-filter-status" class="form-select">
-              <option value="">All Status / Todos</option>
-              <option value="Ambos">Ambos (Plataforma y Web.)</option>
+              <option value="">📊 Todos los Estados</option>
+              <option value="Ambos">Ambos (Plataforma + Webinar)</option>
               <option value="Solo Plataforma">Solo Plataforma</option>
               <option value="Solo Webinar">Solo Webinar</option>
               <option value="Cliente Comprador">Cliente Comprador</option>
+              <option value="all_webinar">Todos del Webinar (Inscritos)</option>
+              <option value="all_platform">Todos de Plataforma (Usuarios)</option>
             </select>
           </div>
         </div>

@@ -22,6 +22,7 @@ App.router = (function() {
     'intake':         { view: 'view-intake',         role: null,      sidebar: false, title: 'VIP Client Intake' },
     'referral':       { view: 'view-referral-form',   role: null,      sidebar: false, title: 'Referral Form' },
     'webinar':        { view: 'view-webinar-register', role: null,      sidebar: false, title: 'Beyond Borders Webinar' },
+    'survey':         { view: 'view-survey-feedback',  role: null,      sidebar: false, title: 'Masterclass Feedback Survey' },
 
     // Profile route
     'profile':        { view: 'view-profile',        role: 'authenticated', sidebar: 'user',  title: 'My Profile' },
@@ -414,7 +415,8 @@ App.router = (function() {
       'colaborador/webinar':   () => App.views.agentInmomas && App.views.agentInmomas.initWebinar(),
       'colaborador/partners':  () => App.views.agentInmomas && App.views.agentInmomas.initPartners(),
       'partner/dashboard': () => App.views.partner && App.views.partner.initDashboard(),
-      'profile':           () => App.views.auth && App.views.auth.initProfile()
+      'profile':           () => App.views.auth && App.views.auth.initProfile(),
+      'survey':            () => App.views.public && App.views.public.initSurvey && App.views.public.initSurvey()
     };
 
     const initFn = viewInits[routeKey];
