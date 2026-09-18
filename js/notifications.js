@@ -278,7 +278,7 @@
       ? `🔥 SÍ (Plazo: ${data.client_timeframe || 'No especificado'})` 
       : (data.has_clients || 'No');
       
-    await sendEmail(EMAILJS_TEMPLATE_NEW_REG, {
+    const emailData = {
       user_type:     `Encuesta Webinar (${stars} - ${data.rating}/5)`,
       user_name:     data.name || 'Anónimo',
       user_email:    data.email || '—',
@@ -288,7 +288,12 @@
       registered_at: fmtDate(data.submitted_at || new Date().toISOString()),
       source:        `Utilidad: ${data.usefulness || '—'} | Notas: ${data.comments || 'Sin comentarios'}`,
       admin_url:     'https://proyecto-internacional.vercel.app/app.html#admin/webinar'
-    });
+    };
+
+    const targetList = Array.isArray(ADMIN_EMAILS) && ADMIN_EMAILS.length ? ADMIN_EMAILS : [ADMIN_EMAIL];
+    for (const target of targetList) {
+      await sendEmail(EMAILJS_TEMPLATE_NEW_REG, emailData, target);
+    }
   }
 
   // ── Expose on App namespace ────────────────────────────────────────────────
