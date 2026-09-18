@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masterclass Feedback & Client Projection Survey · The Spain Connection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #0033A0;
+      --navy: #07152b;
+      --red: #C00000;
+      --gold: #f59e0b;
+      --bg: #f8fafc;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(160deg, #07152b 0%, #0d2247 40%, #0f172a 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 40px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .survey-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 620px;
+      border-radius: 20px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #07152b 0%, #0033A0 70%, #990000 100%);
+      padding: 32px 30px;
+      text-align: center;
+      color: #ffffff;
+      position: relative;
+    }
+    .logo-container {
+      background: #ffffff;
+      display: inline-block;
+      padding: 8px 18px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+      margin-bottom: 16px;
+    }
+    .logo-img {
+      height: 42px;
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+    .card-header h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      margin: 6px 0;
+      letter-spacing: -0.3px;
+    }
+    .card-header p {
+      font-size: 13.5px;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .card-body {
+      padding: 32px 32px 36px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+    .form-label {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+    .form-sublabel {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: -4px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    /* STAR RATING */
+    .star-rating-wrap {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      padding: 10px 0 4px;
+    }
+    .star-btn {
+      background: none;
+      border: none;
+      font-size: 38px;
+      cursor: pointer;
+      color: #cbd5e1;
+      transition: all 0.15s ease;
+      line-height: 1;
+      padding: 4px;
+    }
+    .star-btn:hover,
+    .star-btn.active {
+      color: #f59e0b;
+      transform: scale(1.15);
+    }
+    .rating-caption {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #d97706;
+      min-height: 18px;
+      margin-top: 4px;
+    }
+
+    /* RADIO OPTIONS */
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: #f8fafc;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .radio-option:hover {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+    }
+    .radio-option input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--blue);
+      cursor: pointer;
+    }
+    .radio-option span {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    /* DROPDOWN */
+    .custom-select {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #0f172a;
+      background: #ffffff;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .custom-select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(0, 51, 160, 0.15);
+    }
+
+    /* CONDITIONAL TIMEFRAME HIGHLIGHT BOX */
+    .timeframe-box {
+      background: #f0f7ff;
+      border: 2px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 14px;
+      transition: all 0.3s;
+    }
+
+    /* TEXT INPUTS */
+    .text-input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-family: inherit;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .text-input:focus {
+      border-color: var(--blue);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* SUBMIT BUTTON */
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, #0033A0 0%, #0052cc 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 51, 160, 0.35);
+      transition: all 0.2s;
+      letter-spacing: 0.3px;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 51, 160, 0.45);
+    }
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* SUCCESS SCREEN */
+    .success-panel {
+      display: none;
+      text-align: center;
+      padding: 40px 24px;
+    }
+    .success-icon {
+      font-size: 54px;
+      margin-bottom: 14px;
+    }
+    .success-panel h2 {
+      font-size: 22px;
+      color: #0f172a;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .success-panel p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .btn-resource {
+      display: block;
+      background: #f8fafc;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      text-decoration: none;
+      color: #1e293b;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn-resource:hover {
+      background: #eff6ff;
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    @media (max-width: 540px) {
+      .card-body { padding: 24px 18px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="survey-card">
+    
+    <!-- HEADER -->
+    <div class="card-header">
+      <div style="text-align: center; margin-bottom: 16px;">
+        <img src="https://proyecto-internacional.vercel.app/images/spain-connection-logo-white.png" alt="The Spain Connection" style="height: 50px; width: auto; max-width: 240px; display: inline-block; object-fit: contain;">
+      </div>
+      <h1>Beyond Borders · Masterclass Feedback</h1>
+      <p>Please take 60 seconds to rate the session and let us know if you have clients interested in Spanish real estate.</p>
+    </div>
+
+    <!-- FORM BODY -->
+    <div class="card-body">
+      
+      <form id="feedback-form" onsubmit="submitFeedback(event)">
+        
+        <!-- QUESTION 1: RATING -->
+        <div class="form-group">
+          <label class="form-label">1. How would you rate the masterclass presentation? *</label>
+          <div class="star-rating-wrap" id="star-wrap">
+            <button type="button" class="star-btn" onclick="setRating(1)">★</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">★</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">★</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">★</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">★</button>
+          </div>
+          <div class="rating-caption" id="rating-caption">Tap to select your rating</div>
+          <input type="hidden" id="input-rating" required value="">
+        </div>
+
+        <!-- QUESTION 2: USEFULNESS -->
+        <div class="form-group">
+          <label class="form-label">2. Did you find the presentation useful? *</label>
+          
+          <label class="radio-option">
+            <input type="radio" name="usefulness" value="Extremely Useful" required>
+            <span>⭐️ Yes, extremely useful and informative</span>
+          </label>
+
+          <label class="radio-option">
+            <input type="radio" name="usefulness" value="Very Useful">
+            <span>👍 Yes, gave me a clear roadmap for Spain</span>
+          </label>
+
+          <label class="radio-option">
+            <input type="radio" name="usefulness" value="Somewhat Useful">
+            <span>⚖️ Somewhat useful, needed more details</span>
+          </label>
+
+          <label class="radio-option">
+            <input type="radio" name="usefulness" value="Not Useful">
+            <span>❌ Not what I was expecting</span>
+          </label>
+        </div>
+
+        <!-- QUESTION 3: ACTIVE CLIENTS -->
+        <div class="form-group">
+          <label class="form-label">3. Do you currently have clients interested in buying or investing in Spain? *</label>
+          
+          <label class="radio-option" onclick="toggleTimeline(true)">
+            <input type="radio" name="has_clients" value="Yes" required id="clients-yes">
+            <span>🔥 <strong>Yes</strong>, I currently have clients interested in Spain</span>
+          </label>
+
+          <label class="radio-option" onclick="toggleTimeline(false)">
+            <input type="radio" name="has_clients" value="Not Yet, Expecting Soon" id="clients-maybe">
+            <span>⏳ Not right now, but I expect interested buyers soon</span>
+          </label>
+
+          <label class="radio-option" onclick="toggleTimeline(false)">
+            <input type="radio" name="has_clients" value="No / Personal Interest" id="clients-no">
+            <span>👤 No, I attended purely for personal exploration</span>
+          </label>
+        </div>
+
+        <!-- QUESTION 4: TIMELINE (4 DROPDOWN OPTIONS AS REQUESTED) -->
+        <div class="form-group timeframe-box" id="timeframe-container" style="display: none;">
+          <label class="form-label" for="timeframe-select" style="color: #1e3a8a;">
+            ⏱️ Expected Client Purchasing Timeframe: *
+          </label>
+          <span class="form-sublabel" style="color: #3b82f6;">
+            Select the projection window that best fits your clients' timeline:
+          </span>
+
+          <select id="timeframe-select" class="custom-select">
+            <option value="">-- Please select a timeframe --</option>
+            <option value="0 to 3 months">⚡ 0 to 3 months (Immediate / Ready to buy)</option>
+            <option value="3 to 6 months">📅 3 to 6 months (Mid-term planning)</option>
+            <option value="6 to 9 months">🏖️ 6 to 9 months (Pipeline / Future relocation)</option>
+            <option value="More than 9 months">🔍 More than 9 months (Long-term exploration)</option>
+          </select>
+        </div>
+
+        <!-- CONTACT DETAILS -->
+        <div class="form-group" style="border-top: 1px solid var(--border); padding-top: 20px;">
+          <label class="form-label">Your Contact Information *</label>
+          
+          <div class="form-row" style="margin-bottom: 12px;">
+            <input type="text" id="resp-name" class="text-input" placeholder="Full Name *" required>
+            <input type="email" id="resp-email" class="text-input" placeholder="Email Address *" required>
+          </div>
+
+          <div class="form-row">
+            <input type="tel" id="resp-phone" class="text-input" placeholder="Phone / WhatsApp (Optional)">
+            <input type="text" id="resp-location" class="text-input" placeholder="City / State / Agency (Optional)">
+          </div>
+        </div>
+
+        <!-- OPTIONAL FEEDBACK COMMENT -->
+        <div class="form-group">
+          <label class="form-label">Any specific questions or property requirements? (Optional)</label>
+          <textarea id="resp-comments" class="text-input" rows="3" placeholder="e.g. Budget range, preferred area (Costa Blanca, Madrid, etc.), or specific visa questions..."></textarea>
+        </div>
+
+        <!-- SUBMIT -->
+        <button type="submit" id="submit-btn" class="btn-submit">
+          🚀 SUBMIT FEEDBACK & PROJECTIONS
+        </button>
+
+      </form>
+
+      <!-- SUCCESS CONFIRMATION PANEL -->
+      <div id="success-panel" class="success-panel">
+        <div class="success-icon">🎉</div>
+        <h2>Thank You for Your Feedback!</h2>
+        <p>Your responses have been recorded successfully. Our advisory team at The Spain Connection & RE/MAX Inmomás is ready to assist you and your clients.</p>
+
+        <a href="https://proyecto-internacional.vercel.app/dossier.html" target="_blank" class="btn-resource">
+          📘 Download International Buyer's Dossier (PDF) &rarr;
+        </a>
+
+        <a href="https://proyecto-internacional.vercel.app/#webinar" target="_blank" class="btn-resource">
+          🎬 Watch Webinar Video Replay (60 min) &rarr;
+        </a>
+
+        <a href="https://calendly.com" target="_blank" class="btn-resource" style="background: #eff6ff; border-color: #0033A0; color: #0033A0;">
+          📅 Schedule a 1-on-1 Call with José "Pepe" Martínez &rarr;
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- FIREBASE SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="js/firebase-config.js"></script>
+
+  <script>
+    let currentRating = 0;
+    const ratingLabels = [
+      '',
+      '⭐ Needs Improvement',
+      '⭐⭐ Fair / Average',
+      '⭐⭐⭐ Good Session',
+      '⭐⭐⭐⭐ Very Good & Useful',
+      '⭐⭐⭐⭐⭐ Excellent Masterclass!'
+    ];
+
+    function setRating(stars) {
+      currentRating = stars;
+      document.getElementById('input-rating').value = stars;
+      
+      const buttons = document.querySelectorAll('.star-btn');
+      buttons.forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < stars);
+      });
+
+      document.getElementById('rating-caption').innerText = ratingLabels[stars];
+    }
+
+    function toggleTimeline(show) {
+      const box = document.getElementById('timeframe-container');
+      const select = document.getElementById('timeframe-select');
+      if (show) {
+        box.style.display = 'block';
+        select.required = true;
+      } else {
+        box.style.display = 'none';
+        select.required = false;
+        select.value = '';
+      }
+    }
+
+    async function submitFeedback(e) {
+      e.preventDefault();
+      
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerText = 'Submitting your feedback...';
+
+      const rating = document.getElementById('input-rating').value;
+      if (!rating) {
+        alert('Please select a star rating between 1 and 5.');
+        btn.disabled = false;
+        btn.innerText = '🚀 SUBMIT FEEDBACK & PROJECTIONS';
+        return;
+      }
+
+      const usefulness = document.querySelector('input[name="usefulness"]:checked')?.value || '';
+      const hasClients = document.querySelector('input[name="has_clients"]:checked')?.value || '';
+      const timeframe = document.getElementById('timeframe-select').value || 'N/A';
+      const name = document.getElementById('resp-name').value.trim();
+      const email = document.getElementById('resp-email').value.trim();
+      const phone = document.getElementById('resp-phone').value.trim();
+      const location = document.getElementById('resp-location').value.trim();
+      const comments = document.getElementById('resp-comments').value.trim();
+
+      const feedbackData = {
+        rating: parseInt(rating, 10),
+        usefulness: usefulness,
+        has_clients: hasClients,
+        client_timeframe: timeframe,
+        name: name,
+        email: email,
+        phone: phone,
+        location_or_agency: location,
+        comments: comments,
+        submitted_at: new Date().toISOString()
+      };
+
+      try {
+        // Save to Firebase Firestore if initialized
+        if (window.App && App.db) {
+          await App.db.collection('webinar_feedback').add(feedbackData);
+          console.log('[Feedback] Successfully saved to Firestore');
+        } else {
+          // Fallback to localStorage
+          const saved = JSON.parse(localStorage.getItem('webinar_feedback_list') || '[]');
+          saved.push(feedbackData);
+          localStorage.setItem('webinar_feedback_list', JSON.stringify(saved));
+          console.log('[Feedback] Saved locally');
+        }
+      } catch (err) {
+        console.warn('[Feedback] Error saving to Firestore, fallback local:', err);
+        const saved = JSON.parse(localStorage.getItem('webinar_feedback_list') || '[]');
+        saved.push(feedbackData);
+        localStorage.setItem('webinar_feedback_list', JSON.stringify(saved));
+      }
+
+      // Show success screen
+      document.getElementById('feedback-form').style.display = 'none';
+      document.getElementById('success-panel').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
