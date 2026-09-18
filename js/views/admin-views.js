@@ -19,10 +19,64 @@
   let clientSearchQuery = '';
 
   function isMaiaOrSuperAdmin() {
-    const user = App.auth.getCurrentUser();
-    if (!user) return false;
-    const email = (user.email || '').toLowerCase().trim();
-    return email === 'spainconnection0@gmail.com' || email === 'maia.honczaryk@remax.es' || email === 'admin@remax-inmomas.com';
+    let email = '';
+    let fullName = '';
+
+    const user = App.auth ? App.auth.getCurrentUser() : null;
+    if (user) {
+      email = (user.email || '').toLowerCase().trim();
+      fullName = `${user.firstName || ''} ${user.lastName || ''} ${user.name || ''}`.toLowerCase();
+    }
+
+    // Direct Firebase auth check fallback
+    if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+      const fbEmail = (firebase.auth().currentUser.email || '').toLowerCase().trim();
+      if (fbEmail) email = email || fbEmail;
+      const fbName = (firebase.auth().currentUser.displayName || '').toLowerCase();
+      if (fbName) fullName = fullName || fbName;
+    }
+
+    // LocalStorage fallback
+    if (!email) {
+      try {
+        const session = JSON.parse(localStorage.getItem('remax_session') || localStorage.getItem('remax_current_user') || '{}');
+        if (session.email) email = (session.email || '').toLowerCase().trim();
+        if (session.firstName || session.lastName || session.name) {
+          fullName = `${session.firstName || ''} ${session.lastName || ''} ${session.name || ''}`.toLowerCase();
+        }
+      } catch (_) {}
+    }
+
+    // SuperAdmin email list
+    const superAdminEmails = [
+      'maia.honczaryk@remax.es',
+      'spainconnection0@gmail.com',
+      'inmomas@remax.es',
+      'admin@remax-inmomas.com'
+    ];
+
+    if (superAdminEmails.includes(email)) return true;
+
+    // SuperAdmin name check
+    if (fullName.includes('maia') && (fullName.includes('honczaryk') || fullName.includes('belen') || fullName.includes('belón'))) {
+      return true;
+    }
+
+    return false;
+  }
+
+  function isJoseMartinezSession() {
+    if (isMaiaOrSuperAdmin()) return false;
+    const user = App.auth ? App.auth.getCurrentUser() : null;
+    let email = (user && user.email ? user.email : '').toLowerCase().trim();
+    let name = (user ? `${user.firstName || ''} ${user.lastName || ''} ${user.name || ''}` : '').toLowerCase();
+
+    if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+      const fbEmail = (firebase.auth().currentUser.email || '').toLowerCase().trim();
+      if (fbEmail) email = email || fbEmail;
+    }
+
+    return email === 'spainconnection0@remax.es' || (name.includes('josé') && name.includes('martínez'));
   }
 
   async function requestChangeApproval(actionTitle, actionDetails) {
@@ -53,7 +107,7 @@
             <strong style="color: #1e293b;">Detalles del cambio:</strong><br>${App.utils.escapeHtml(actionDetails)}
           </div>
           <p style="color: #64748b; font-size: 0.82rem; margin: 0;">
-            ✉️ Se ha enviado un aviso a <strong>spainconnection0@gmail.com</strong> para que Maia pueda revisar y validar este cambio en el portal.
+            ✉️ Se ha enviado un aviso a <strong>maia.honczaryk@remax.es</strong> (y spainconnection0@gmail.com) para que Maia pueda revisar y validar este cambio en el portal.
           </p>
         </div>
       `,
@@ -104,7 +158,9 @@
       // 7. Setup Admin Referral Link
       const currentUser = App.auth.getCurrentUser();
       if (currentUser) {
-        if (!currentUser.referralCode) {
+        if (isMaiaOrSuperAdmin() && (!currentUser.referralCode || currentUser.referralCode.startsWith('BRK-') || currentUser.referralCode.startsWith('REA-'))) {
+          currentUser.referralCode = 'ADM-INMOMAS';
+        } else if (!currentUser.referralCode) {
           currentUser.referralCode = 'ADM-INMOMAS';
         }
         const referralLink = App.utils.generateReferralLink(currentUser.referralCode);
@@ -124,11 +180,11 @@
         }
       }
 
-      // 8. Role Notification Banner if non-SuperAdmin
+      // 8. Role Notification Banner (ONLY for José Martínez, NEVER for Maia / Super Admin)
       const header = document.querySelector('#view-admin-dashboard .dashboard-header');
       if (header) {
         let banner = document.getElementById('admin-maia-approval-banner');
-        if (!isMaiaOrSuperAdmin()) {
+        if (isJoseMartinezSession()) {
           if (!banner) {
             banner = document.createElement('div');
             banner.id = 'admin-maia-approval-banner';
@@ -136,7 +192,7 @@
             banner.innerHTML = `
               <span style="font-size: 1.4rem;">🛡️</span>
               <div>
-                <strong>Sesión Administrador: José Martínez (The Spain Connection):</strong> Visualización completa activa con tu enlace de referido unificado. Cualquier cambio o aprobación de registros enviará una solicitud directa a <strong>Maia Honczaryk</strong> (<code style="background:white; padding:2px 6px; border-radius:4px; border:1px solid #dbeafe;">spainconnection0@gmail.com</code>) para su validación.
+                <strong>Sesión Administrador: José Martínez (The Spain Connection):</strong> Visualización completa activa con tu enlace de referido unificado. Cualquier cambio o aprobación de registros enviará una solicitud directa a <strong>Maia Honczaryk</strong> (<code style="background:white; padding:2px 6px; border-radius:4px; border:1px solid #dbeafe;">maia.honczaryk@remax.es</code>) para su validación.
               </div>
             `;
             header.appendChild(banner);
@@ -374,11 +430,11 @@
       bindFilterStatus();
       bindSearchInput();
 
-      // 4. Role Notification Banner if non-SuperAdmin
+      // 4. Role Notification Banner (ONLY for José Martínez, NEVER for Maia / Super Admin)
       const header = document.querySelector('#view-admin-users .dashboard-header');
       if (header) {
         let banner = document.getElementById('admin-users-maia-banner');
-        if (!isMaiaOrSuperAdmin()) {
+        if (isJoseMartinezSession()) {
           if (!banner) {
             banner = document.createElement('div');
             banner.id = 'admin-users-maia-banner';
@@ -386,7 +442,7 @@
             banner.innerHTML = `
               <span style="font-size: 1.2rem;">🛡️</span>
               <div>
-                <strong>Modo Administrador: José Martínez (The Spain Connection):</strong> Visualización completa activa. Las aprobaciones, rechazos o cambios de rol requerirán validación directa de <strong>Maia Honczaryk</strong> (<code style="background:white; padding:2px 6px; border-radius:4px; border:1px solid #dbeafe;">spainconnection0@gmail.com</code>).
+                <strong>Modo Administrador: José Martínez (The Spain Connection):</strong> Visualización completa activa. Las aprobaciones, rechazos o cambios de rol requerirán validación directa de <strong>Maia Honczaryk</strong> (<code style="background:white; padding:2px 6px; border-radius:4px; border:1px solid #dbeafe;">maia.honczaryk@remax.es</code>).
               </div>
             `;
             header.parentNode.insertBefore(banner, header.nextSibling);

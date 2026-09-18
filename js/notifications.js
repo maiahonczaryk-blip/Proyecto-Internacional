@@ -72,8 +72,9 @@
   const EMAILJS_TEMPLATE_STATUS   = 'YOUR_TEMPLATE_STATUS';  // e.g. 'template_xyz456'
   const EMAILJS_TEMPLATE_USER_APPROVED = 'template_giaoa5e'; // Listo! (Plantilla C)
   // ── Admin Destination ─────────────────────────────────────────────────────
-  const ADMIN_EMAIL = 'spainconnection0@gmail.com';
-  const ADMIN_URL   = 'https://remax-inmomas-international.vercel.app/app.html#admin/users';
+  const ADMIN_EMAIL  = 'maia.honczaryk@remax.es';
+  const ADMIN_EMAILS = ['maia.honczaryk@remax.es', 'spainconnection0@gmail.com'];
+  const ADMIN_URL    = 'https://thespainconnection.com/app.html#admin/users';
   // ──────────────────────────────────────────────────────────────────────────
 
   function isReady() {
@@ -84,9 +85,21 @@
     );
   }
 
+  function getActiveTemplate(templateId) {
+    if (templateId && !templateId.startsWith('YOUR_TEMPLATE')) {
+      return templateId;
+    }
+    // Fallback to active template_dr41flj for reliable delivery
+    return EMAILJS_TEMPLATE_NEW_REG;
+  }
+
   function initEmailJS() {
     if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
-      try { emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY }); } catch (_) {}
+      try { 
+        if (typeof emailjs.init === 'function') {
+          emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY }); 
+        }
+      } catch (_) {}
     }
   }
 
@@ -115,7 +128,8 @@
 
   async function sendEmail(templateId, params, toEmail = ADMIN_EMAIL) {
     initEmailJS();
-    if (!isReady() || templateId.startsWith('YOUR_TEMPLATE')) {
+    const effectiveTemplate = getActiveTemplate(templateId);
+    if (!isReady() || !effectiveTemplate) {
       console.info(
         '[Notifications] EmailJS no configurado o no detectado para este template — notificación simulada.\n' +
         'Se hubiese enviado a:', toEmail, ' con template:', templateId, ' y params:', params
@@ -123,8 +137,12 @@
       return;
     }
     try {
-      await emailjs.send(EMAILJS_SERVICE_ID, templateId, { to_email: toEmail, ...params });
-      console.info('[Notifications] Email enviado a', toEmail, '— template:', templateId);
+      await emailjs.send(EMAILJS_SERVICE_ID, effectiveTemplate, { 
+        to_email: toEmail, 
+        admin_email: ADMIN_EMAIL,
+        ...params 
+      }, EMAILJS_PUBLIC_KEY);
+      console.info('[Notifications] Email enviado a', toEmail, '— template:', effectiveTemplate);
     } catch (err) {
       console.warn('[Notifications] Error al enviar email:', err);
     }
@@ -163,7 +181,7 @@
       user_phone:    newUser.phone || '—',
       registered_at: fmtDate(newUser.createdAt),
       source:        newUser.source || '—',
-      admin_url:     'https://remax-inmomas-international.vercel.app/app.html#agent/clients'
+      admin_url:     'https://proyecto-internacional.vercel.app/app.html#agent/clients'
     }, referrerAgent.email);
   }
 
@@ -209,34 +227,49 @@
     const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
     
     // 1. Notificar al Admin del cambio de estado
-    await sendEmail(EMAILJS_TEMPLATE_STATUS, {
-      user_name:  name,
-      user_email: user.email || '—',
-      user_role:  roleLabel(user.role),
-      new_status: statusLabel(newStatus),
-      updated_at: fmtDate(new Date().toISOString()),
-      admin_url:  ADMIN_URL
-    }, ADMIN_EMAIL);
+    for (const targetEmail of ADMIN_EMAILS) {
+      await sendEmail(EMAILJS_TEMPLATE_STATUS, {
+        user_type:   `Cambio Estado Usuario (${statusLabel(newStatus)})`,
+        user_name:   name,
+        user_email:  user.email || '—',
+        user_role:   roleLabel(user.role),
+        user_country:user.country || '—',
+        user_agency: user.agencyName || '—',
+        user_phone:  user.phone || '—',
+        new_status:  statusLabel(newStatus),
+        source:      `Estado actualizado a: ${newStatus}`,
+        registered_at: fmtDate(new Date().toISOString()),
+        updated_at:  fmtDate(new Date().toISOString()),
+        admin_url:   ADMIN_URL
+      }, targetEmail);
+    }
 
     // 2. Si el usuario ha sido aprobado ('active'), enviarle correo a él
     if (newStatus === 'active' && user.email) {
       await sendEmail(EMAILJS_TEMPLATE_USER_APPROVED, {
         user_name: name,
         user_email: user.email,
-        login_url: 'https://remax-inmomas-international.vercel.app/#login'
+        login_url: 'https://thespainconnection.com/index.html#login'
       }, user.email);
     }
   }
 
   async function onAdminChangeRequested({ requester, action, details, date }) {
-    await sendEmail(EMAILJS_TEMPLATE_STATUS, {
-      user_name:  requester || 'The Spain Connection',
-      user_email: ADMIN_EMAIL,
-      user_role:  'Admin Solicitante',
-      new_status: `Solicitud de aprobación: ${action} — ${details || ''}`,
-      updated_at: fmtDate(date || new Date().toISOString()),
-      admin_url:  ADMIN_URL
-    }, ADMIN_EMAIL);
+    for (const targetEmail of ADMIN_EMAILS) {
+      await sendEmail(EMAILJS_TEMPLATE_STATUS, {
+        user_type:   'Solicitud Aprobación Admin',
+        user_name:   requester || 'The Spain Connection',
+        user_email:  targetEmail,
+        user_role:   'Admin Solicitante',
+        user_country:'España',
+        user_agency: 'RE/MAX Inmomás',
+        user_phone:  '—',
+        new_status:  `Solicitud: ${action} — ${details || ''}`,
+        source:      `ACCIÓN: ${action} | DETALLES: ${details || ''}`,
+        registered_at: fmtDate(date || new Date().toISOString()),
+        admin_url:   ADMIN_URL
+      }, targetEmail);
+    }
   }
 
   async function onNewSurveyFeedback(data) {

@@ -102,7 +102,48 @@ App.auth = (function() {
             try {
               const doc = await App.db.collection('users').doc(firebaseUser.uid).get();
               if (doc.exists) {
-                currentUser = { id: firebaseUser.uid, ...doc.data() };
+                const userData = doc.data() || {};
+                currentUser = { id: firebaseUser.uid, email: firebaseUser.email, ...userData };
+                if (!currentUser.email) currentUser.email = firebaseUser.email;
+
+                // Super Admin auto-elevation and normalization for Maia Honczaryk
+                const emailLower = (currentUser.email || '').toLowerCase().trim();
+                const fullNameLower = `${currentUser.firstName || ''} ${currentUser.lastName || ''} ${currentUser.name || ''}`.toLowerCase();
+                const isMaiaAccount = (
+                  emailLower === 'maia.honczaryk@remax.es' ||
+                  emailLower === 'spainconnection0@gmail.com' ||
+                  emailLower === 'inmomas@remax.es' ||
+                  emailLower === 'admin@remax-inmomas.com' ||
+                  (fullNameLower.includes('maia') && (fullNameLower.includes('honczaryk') || fullNameLower.includes('belen') || fullNameLower.includes('belón')))
+                );
+
+                if (isMaiaAccount) {
+                  let needUpdate = false;
+                  const updates = {};
+                  if (currentUser.role !== 'admin') {
+                    currentUser.role = 'admin';
+                    updates.role = 'admin';
+                    needUpdate = true;
+                  }
+                  if (currentUser.status !== 'active') {
+                    currentUser.status = 'active';
+                    updates.status = 'active';
+                    needUpdate = true;
+                  }
+                  if (!currentUser.referralCode || currentUser.referralCode.startsWith('BRK-') || currentUser.referralCode.startsWith('REA-')) {
+                    currentUser.referralCode = 'ADM-INMOMAS';
+                    updates.referralCode = 'ADM-INMOMAS';
+                    needUpdate = true;
+                  }
+                  if (needUpdate) {
+                    try {
+                      await App.db.collection('users').doc(firebaseUser.uid).update(updates);
+                      console.info('[Auth] Maia SuperAdmin profile normalized in Firestore.');
+                    } catch(e) {
+                      console.warn('[Auth] Firestore update for SuperAdmin sync:', e);
+                    }
+                  }
+                }
               } else {
                 currentUser = null;
               }
@@ -204,21 +245,35 @@ App.auth = (function() {
       const credential = await App.firebaseAuth.createUserWithEmailAndPassword(email, password);
       const uid = credential.user.uid;
 
+      const emailLower = email.toLowerCase().trim();
+      const fullNameLower = `${firstName || ''} ${lastName || ''}`.toLowerCase();
+      const isMaiaAccount = (
+        emailLower === 'maia.honczaryk@remax.es' ||
+        emailLower === 'spainconnection0@gmail.com' ||
+        emailLower === 'inmomas@remax.es' ||
+        emailLower === 'admin@remax-inmomas.com' ||
+        (fullNameLower.includes('maia') && (fullNameLower.includes('honczaryk') || fullNameLower.includes('belen') || fullNameLower.includes('belón')))
+      );
+
+      const finalRole = isMaiaAccount ? 'admin' : role;
+      const finalStatus = isMaiaAccount ? 'active' : 'pending';
+      const finalReferralCode = isMaiaAccount ? 'ADM-INMOMAS' : `${role === 'admin' ? 'ADM' : (role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : (role === 'colaborador' ? 'COL' : 'REA')))}-${lastName.toUpperCase()}-${uid.substring(0, 4)}`;
+
       const userData = {
-        email: email.toLowerCase(),
-        role,
-        status: 'pending',
-        brokerStatus: role === 'realtor' && brokerId ? 'pending' : null,
+        email: emailLower,
+        role: finalRole,
+        status: finalStatus,
+        brokerStatus: finalRole === 'realtor' && brokerId ? 'pending' : null,
         firstName,
         lastName,
-        agencyName: agencyName || '',
+        agencyName: agencyName || (isMaiaAccount ? 'RE/MAX Inmomás' : ''),
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
-        referralCode: `${role === 'admin' ? 'ADM' : (role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : (role === 'colaborador' ? 'COL' : 'REA')))}-${lastName.toUpperCase()}-${uid.substring(0, 4)}`,
+        referralCode: finalReferralCode,
         profileImage: null,
-        agreementSigned: false,
-        agreementSignedAt: null,
+        agreementSigned: isMaiaAccount ? true : false,
+        agreementSignedAt: isMaiaAccount ? new Date().toISOString() : null,
         newsletterConsent: data.newsletterConsent || false,
         newsletterConsentAt: data.newsletterConsent ? new Date().toISOString() : null,
         referredBy: referredBy || null,
@@ -318,7 +373,43 @@ App.auth = (function() {
           console.log('[Auth] Auto-generated referralCode:', userData.referralCode);
         }
 
-        currentUser = { id: credential.user.uid, ...userData };
+        // Super Admin auto-elevation and normalization for Maia Honczaryk
+        const emailLower = (userData.email || credential.user.email || '').toLowerCase().trim();
+        const fullNameLower = `${userData.firstName || ''} ${userData.lastName || ''} ${userData.name || ''}`.toLowerCase();
+        const isMaiaAccount = (
+          emailLower === 'maia.honczaryk@remax.es' ||
+          emailLower === 'spainconnection0@gmail.com' ||
+          emailLower === 'inmomas@remax.es' ||
+          emailLower === 'admin@remax-inmomas.com' ||
+          (fullNameLower.includes('maia') && (fullNameLower.includes('honczaryk') || fullNameLower.includes('belen') || fullNameLower.includes('belón')))
+        );
+
+        if (isMaiaAccount) {
+          let needUpdate = false;
+          const updates = {};
+          if (userData.role !== 'admin') {
+            userData.role = 'admin';
+            updates.role = 'admin';
+            needUpdate = true;
+          }
+          if (userData.status !== 'active') {
+            userData.status = 'active';
+            updates.status = 'active';
+            needUpdate = true;
+          }
+          if (!userData.referralCode || userData.referralCode.startsWith('BRK-') || userData.referralCode.startsWith('REA-')) {
+            userData.referralCode = 'ADM-INMOMAS';
+            updates.referralCode = 'ADM-INMOMAS';
+            needUpdate = true;
+          }
+          if (needUpdate) {
+            try {
+              await App.db.collection('users').doc(credential.user.uid).update(updates);
+            } catch (_) {}
+          }
+        }
+
+        currentUser = { id: credential.user.uid, email: credential.user.email, ...userData };
         notifyAuthChange();
         return currentUser;
 
