@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[3 Days Out] 🇪🇸 Visas, NIE & Legal Security in Spain</title>
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <style>
+    :root {
+      color-scheme: light dark;
+      supported-color-schemes: light dark;
+    }
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+    body { margin: 0; padding: 0; width: 100% !important; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    
+    /* MOBILE RESPONSIVENESS */
+    @media only screen and (max-width: 620px) {
+      .email-container { width: 100% !important; }
+      .mobile-p-20 { padding: 24px 18px !important; }
+      .tz-col { display: block !important; width: 100% !important; margin-bottom: 8px !important; }
+      .btn-primary { width: 100% !important; text-align: center !important; }
+    }
+
+    /* DARK MODE OVERRIDES (iOS Mail, Apple Mail, Outlook Mobile, Android) */
+    @media (prefers-color-scheme: dark) {
+      body, .email-body { background-color: #0b1120 !important; }
+      .email-container { background-color: #111827 !important; border-color: #1f2937 !important; }
+      .header-title, .header-title * { color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
+      .header-sub, .header-sub * { color: #e2e8f0 !important; -webkit-text-fill-color: #e2e8f0 !important; }
+      .header-pill { background-color: rgba(255,255,255,0.22) !important; border-color: rgba(255,255,255,0.4) !important; color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
+      .dm-text-title { color: #ffffff !important; }
+      .dm-text-body { color: #e2e8f0 !important; }
+      .dm-text-muted { color: #94a3b8 !important; }
+      .dm-card-bg { background-color: #1f2937 !important; border-color: #374151 !important; }
+      .dm-tz-box { background-color: #172554 !important; border-left-color: #38bdf8 !important; }
+      .dm-tz-text { color: #f8fafc !important; }
+      .dm-box-item { background-color: #1e293b !important; border-color: #334155 !important; }
+      .dm-btn-calendar { background-color: #1f2937 !important; color: #f1f5f9 !important; border-color: #4b5563 !important; }
+      .dm-footer { background-color: #030712 !important; }
+      .dm-zoom-btn { background: #0033A0 !important; color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
+    }
+
+    /* GMAIL APP ANTI-INVERSION TRICKS */
+    u + #body .header-title,
+    u + #body .header-title *,
+    u + #body h1 {
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff !important;
+    }
+    u + #body .header-sub,
+    u + #body .header-sub * {
+      color: #e2e8f0 !important;
+      -webkit-text-fill-color: #e2e8f0 !important;
+    }
+    u + #body .header-pill {
+      background-color: #1e3a8a !important;
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff !important;
+      border: 1px solid #60a5fa !important;
+    }
+
+    /* OUTLOOK & GMAIL APP DARK MODE SUPPORT */
+    [data-ogsc] .email-container { background-color: #111827 !important; }
+    [data-ogsc] .header-title { color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
+    [data-ogsc] .header-sub { color: #e2e8f0 !important; -webkit-text-fill-color: #e2e8f0 !important; }
+    [data-ogsc] .dm-text-title { color: #ffffff !important; }
+    [data-ogsc] .dm-text-body { color: #e2e8f0 !important; }
+    [data-ogsc] .dm-card-bg { background-color: #1f2937 !important; }
+    [data-ogsc] .dm-tz-box { background-color: #172554 !important; }
+  </style>
+</head>
+<body id="body" style="margin: 0; padding: 0; background-color: #f1f5f9;">
+
+  <!-- FLOATING TOOLBAR TO COPY DIRECTLY TO GMAIL -->
+  <div id="copy-toolbar" style="position: sticky; top: 0; z-index: 99999; background: #07152b; border-bottom: 2px solid #0033A0; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 20px rgba(0,0,0,0.3); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="background: #d97706; color: #fff; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase;">
+        Email 2 de 6 · 3 Days Out
+      </span>
+      <span style="color: #ffffff; font-size: 14px; font-weight: 700;">
+        Subject: <span style="color: #93c5fd; font-weight: 500;">[3 Days Out] 🇪🇸 Visas, NIE & Legal Security in Spain</span>
+      </span>
+    </div>
+    
+    <button onclick="copyEmailDesign()" style="background: linear-gradient(135deg, #0033A0 0%, #2563eb 100%); color: #ffffff; border: 1.5px solid #93c5fd; border-radius: 10px; padding: 12px 26px; font-size: 15px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,51,160,0.5); transition: transform 0.15s;">
+      📋 COPIAR PARA GMAIL
+    </button>
+  </div>
+
+  <div style="padding: 24px 10px 40px;">
+
+    <!-- Pre-header text for inbox preview -->
+    <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
+      3 days until the live masterclass. Today we unpack residency options (Digital Nomad & Non-Lucrative) and key legal protections.
+    </div>
+
+    <!-- TARGET CONTENT -->
+    <div id="email-content">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td align="center">
+            <!-- Main Email Container -->
+            <table class="email-container" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+              
+              <!-- BRAND HEADER WITH THE SPAIN CONNECTION LOGO -->
+              <tr>
+                <td style="background: linear-gradient(135deg, #07152b 0%, #0033A0 70%, #d4af37 100%); padding: 32px 30px 26px; text-align: center;">
+                  <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                      <td align="center">
+                        
+                        <!-- The Spain Connection Logo Card -->
+                        <!-- The Spain Connection Logo (Integrated on Blue Background) -->
+                        <div style="text-align: center; margin-bottom: 18px;">
+                          <img src="https://proyecto-internacional.vercel.app/images/spain-connection-logo-white.png" alt="The Spain Connection" width="210" style="display: inline-block; height: auto; max-height: 50px; object-fit: contain;">
+                        </div>
+
+                        <span class="header-pill" style="display: inline-block; background-color: #0d2757; color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; text-shadow: 0 0 1px #000000; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; padding: 6px 16px; border-radius: 30px; margin-bottom: 10px; border: 1.5px solid #60a5fa;">
+                          ⏳ DAILY BRIEFING · 3 DAYS TO GO
+                        </span>
+                        
+                        <h1 class="header-title" style="color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.6); font-size: 24px; font-weight: 800; margin: 6px 0 6px; letter-spacing: -0.5px; line-height: 1.2;">
+                          <span style="color: #ffffff !important; -webkit-text-fill-color: #ffffff !important;">Visas & The Legal Blueprint in Spain</span>
+                        </h1>
+                        <p class="header-sub" style="color: #f1f5f9 !important; -webkit-text-fill-color: #f1f5f9 !important; text-shadow: 0 1px 2px rgba(0,0,0,0.5); font-size: 14px; margin: 0; font-weight: 400;">
+                          Beyond Borders Masterclass · Thursday, September 24 at 19:00 h (Madrid)
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <!-- MAIN BODY -->
+              <tr>
+                <td class="mobile-p-20" style="padding: 36px 36px 20px;">
+                  <p class="dm-text-title" style="font-size: 16px; color: #1e293b; line-height: 1.6; margin: 0 0 16px;">
+                    Hi there,
+                  </p>
+                  <p class="dm-text-body" style="font-size: 15px; color: #334155; line-height: 1.6; margin: 0 0 20px;">
+                    We are just <strong>3 days away</strong> from our live masterclass. The question we hear most often from American, Canadian, and Puerto Rican clients is:
+                  </p>
+
+                  <!-- QUOTE HIGHLIGHT -->
+                  <div class="dm-tz-box" style="background-color: #eff6ff; border-left: 4px solid #0033A0; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px;">
+                    <p style="margin: 0; font-style: italic; color: #1e3a8a; font-size: 15px; line-height: 1.5; font-weight: 600;">
+                      "Can I legally live, work, or retire in Spain as a North American, and how complicated is the paperwork?"
+                    </p>
+                  </div>
+
+                  <p class="dm-text-body" style="font-size: 15px; color: #334155; line-height: 1.6; margin: 0 0 20px;">
+                    The short answer is: <strong>Yes, and it is far more straightforward than most people assume</strong> when you follow the right legal track. Here is what our bilingual legal partners will break down in detail during the webinar:
+                  </p>
+
+                  <!-- 3 PATHWAYS BOXES -->
+                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px;">
+                    <tr>
+                      <td style="padding-bottom: 14px;">
+                        <div class="dm-box-item" style="border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; background-color: #f8fafc;">
+                          <span style="display: inline-block; background-color: #dbeafe; color: #1e40af; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">VISA #1</span>
+                          <h4 class="dm-text-title" style="margin: 0 0 4px; font-size: 15px; color: #0f172a;">Digital Nomad Visa (Teleworking)</h4>
+                          <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.5;">
+                            Work remotely for your US or Canadian clients while paying a flat, reduced tax rate in Spain under the special Beckham regime.
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding-bottom: 14px;">
+                        <div class="dm-box-item" style="border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; background-color: #f8fafc;">
+                          <span style="display: inline-block; background-color: #dbeafe; color: #1e40af; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">VISA #2</span>
+                          <h4 class="dm-text-title" style="margin: 0 0 4px; font-size: 15px; color: #0f172a;">Non-Lucrative Residency Visa (Retirees & Investors)</h4>
+                          <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.5;">
+                            Ideal for retirees or individuals with passive income (pensions, investments, dividends) wanting to enjoy 300+ days of Mediterranean sunshine.
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="dm-box-item" style="border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; background-color: #f8fafc;">
+                          <span style="display: inline-block; background-color: #dbeafe; color: #1e40af; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">CRUCIAL STEP</span>
+                          <h4 class="dm-text-title" style="margin: 0 0 4px; font-size: 15px; color: #0f172a;">The NIE & The "Nota Simple" Registry Check</h4>
+                          <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.5;">
+                            Why you must NEVER pay a deposit on a Spanish home until a lawyer certifies that the property is free of liens, urban debts, and registered properly.
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+
+                  <!-- ZOOM ACCESS REMINDER CARD -->
+                  <table class="dm-card-bg" bgcolor="#f8fafc" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 12px; margin-bottom: 24px; padding: 18px 20px; text-align: center;">
+                    <tr>
+                      <td>
+                        <p style="font-size: 13px; color: #475569; margin: 0 0 12px; font-weight: 600;">
+                          Have your Zoom link ready for Thursday?
+                        </p>
+                        <table border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 10px;">
+                          <tr>
+                            <td align="center" style="border-radius: 8px; background: #0033A0;">
+                              <a href="https://zoom.us/j/99317776550" class="dm-zoom-btn" target="_blank" style="display: inline-block; padding: 13px 30px; background-color: #0033A0 !important; color: #ffffff !important; font-size: 14px; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 8px;">
+                                👉 DIRECT ZOOM ACCESS LINK
+                              </a>
+                            </td>
+                          </tr>
+                        </table>
+                        <p style="font-size: 12px; color: #64748b; margin: 0;">
+                          Meeting ID: <strong style="color: #0f172a;">993 1777 6550</strong> &nbsp;|&nbsp; Thursday, Sept 24 at 19:00 h (Madrid) / 1:00 PM EDT
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+
+                  <p style="font-size: 14px; color: #475569; line-height: 1.6; margin: 0 0 24px;">
+                    Tomorrow, we'll look at the financial side: <strong>how non-resident mortgages work in Spain (up to 70% LTV)</strong> and how our US clients fund their European dream homes.
+                  </p>
+
+                  <!-- SIGNATURE -->
+                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px solid #e2e8f0; padding-top: 20px;">
+                    <tr>
+                      <td>
+                        <p style="font-size: 14px; color: #1e293b; font-weight: 700; margin: 0 0 4px;">
+                          See you in 3 days,
+                        </p>
+                        <p style="font-size: 14px; color: #1e293b; font-weight: 700; margin: 0 0 4px;">
+                          José "Pepe" Martínez
+                        </p>
+                        <p style="font-size: 13px; color: #64748b; margin: 0;">
+                          The Spain Connection · RE/MAX Inmomás<br>
+                          <a href="mailto:spainconnection0@gmail.com" style="color: #0033A0; text-decoration: none;">spainconnection0@gmail.com</a>
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+
+                </td>
+              </tr>
+
+              <!-- FOOTER -->
+              <tr>
+                <td style="background-color: #07152b; padding: 22px 30px; text-align: center;">
+                  <p style="color: #94a3b8; font-size: 11px; line-height: 1.6; margin: 0;">
+                    © 2026 The Spain Connection · RE/MAX Inmomás · All rights reserved.
+                  </p>
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- FLOATING CONFIRMATION TOAST -->
+  <div id="copy-toast" style="position: fixed; bottom: 30px; right: 30px; background: #07152b; color: #ffffff; padding: 16px 28px; border-radius: 12px; font-weight: 700; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); display: none; align-items: center; gap: 12px; z-index: 999999; border-left: 5px solid #10b981; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <span style="font-size: 20px;">✅</span>
+    <div>
+      <div style="color: #10b981; font-size: 12px; text-transform: uppercase; font-weight: 800;">¡Diseño Copiado con Éxito!</div>
+      <div style="color: #e2e8f0; font-size: 13.5px; font-weight: 500; margin-top: 2px;">Ve a Gmail, pulsa "Redactar" y presiona <strong>Cmd + V</strong> (o Ctrl + V).</div>
+    </div>
+  </div>
+
+  <script>
+    async function copyEmailDesign() {
+      const content = document.getElementById('email-content');
+      const range = document.createRange();
+      range.selectNode(content);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+
+      let copied = false;
+      try {
+        const html = content.innerHTML;
+        const text = content.innerText;
+        const blobHtml = new Blob([html], { type: 'text/html' });
+        const blobText = new Blob([text], { type: 'text/plain' });
+        const item = new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText });
+        await navigator.clipboard.write([item]);
+        copied = true;
+      } catch (err) {
+        try {
+          copied = document.execCommand('copy');
+        } catch (e) {
+          copied = false;
+        }
+      }
+
+      const toast = document.getElementById('copy-toast');
+      toast.style.display = 'flex';
+      setTimeout(() => {
+        toast.style.display = 'none';
+        sel.removeAllRanges();
+      }, 5000);
+    }
+  </script>
+
+</body>
+</html>
