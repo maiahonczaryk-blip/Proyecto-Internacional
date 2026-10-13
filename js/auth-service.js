@@ -1511,24 +1511,13 @@ App.auth = (function() {
     let currentSettings = null;
     try {
       const cached = localStorage.getItem('remax_webinar_settings');
-      if (cached) {
+       if (cached) {
         currentSettings = JSON.parse(cached);
-        // Auto-migrate stale dates: only update date fields, preserve activeType and other saved settings
+        // Auto-migrate stale dates AND activeType: wipe old cached settings if date is stale
         const staleDates = ['2026-09-18', '2026-08-28', '2026-09-24'];
         if (staleDates.includes(currentSettings.date) || (currentSettings.b2b && staleDates.includes(currentSettings.b2b.date))) {
-          const savedActiveType = currentSettings.activeType;
-          const freshDefaults = JSON.parse(JSON.stringify(DEFAULT_WEBINAR_SETTINGS));
-          // Merge defaults as base, then overlay saved settings to preserve admin changes
-          currentSettings = { ...freshDefaults, ...currentSettings };
-          // Ensure stale date is updated to current default
-          if (staleDates.includes(currentSettings.date)) {
-            currentSettings.date = freshDefaults.date;
-          }
-          if (currentSettings.b2b && staleDates.includes(currentSettings.b2b.date)) {
-            currentSettings.b2b.date = freshDefaults.b2b.date;
-          }
-          // Always preserve the explicitly saved activeType
-          if (savedActiveType) currentSettings.activeType = savedActiveType;
+          // Stale cache detected — reset fully to fresh defaults so activeType switches to b2c
+          currentSettings = JSON.parse(JSON.stringify(DEFAULT_WEBINAR_SETTINGS));
           localStorage.setItem('remax_webinar_settings', JSON.stringify(currentSettings));
         }
       }
@@ -1539,9 +1528,15 @@ App.auth = (function() {
       try {
         const doc = await App.db.collection('system_settings').doc('webinar_active').get();
         if (doc.exists) {
-          // Merge with defaults as base, but let Firestore data (including activeType) take priority
           const firestoreData = doc.data();
-          currentSettings = { ...DEFAULT_WEBINAR_SETTINGS, ...firestoreData };
+          const staleDates = ['2026-09-18', '2026-08-28', '2026-09-24'];
+          // If Firestore has stale date data, ignore it and fall back to fresh defaults
+          if (firestoreData.date && staleDates.includes(firestoreData.date)) {
+            currentSettings = JSON.parse(JSON.stringify(DEFAULT_WEBINAR_SETTINGS));
+          } else {
+            // Merge with defaults as base, but let Firestore data take priority
+            currentSettings = { ...DEFAULT_WEBINAR_SETTINGS, ...firestoreData };
+          }
           localStorage.setItem('remax_webinar_settings', JSON.stringify(currentSettings));
         }
       } catch (err) {
