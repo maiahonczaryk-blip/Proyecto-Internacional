@@ -1169,16 +1169,115 @@ App.views.public = {
       countrySelect.addEventListener('change', () => populateStates(countrySelect.value));
     }
 
-    // ---- "How did you hear" → show/hide Referrer Name field ----
-    const hearSelect   = document.getElementById('webinar-how-heard');
-    const referrerWrap = document.getElementById('webinar-referrer-wrap');
+    // ---- "How did you hear" → show/hide Referrer Name / Collaborator fields ----
+    const hearSelect        = document.getElementById('webinar-how-heard');
+    const referrerWrap      = document.getElementById('webinar-referrer-wrap');
+    const collaboratorWrap  = document.getElementById('webinar-collaborator-wrap');
 
-    if (hearSelect && referrerWrap) {
-      hearSelect.addEventListener('change', () => {
-        const show = hearSelect.value === 'agent';
-        referrerWrap.style.display = show ? '' : 'none';
-        const inp = document.getElementById('webinar-referrer-name');
-        if (inp) inp.required = show;
+    // Populate collaborator dropdown from active users with roles colaborador | realtor | broker
+    async function populateCollaboratorDropdown() {
+      const sel = document.getElementById('webinar-collaborator-name');
+      if (!sel) return;
+
+      // Preserve current blank placeholder options (lang-xx value="")
+      const placeholders = Array.from(sel.querySelectorAll('option[value=""]'));
+      sel.innerHTML = '';
+      placeholders.forEach(p => sel.appendChild(p));
+
+      try {
+        let collaborators = [];
+
+        if (App.demoMode && App.demoData && App.demoData.users) {
+          collaborators = App.demoData.users.filter(u =>
+            ['colaborador', 'realtor', 'broker'].includes(u.role) &&
+            u.status === 'active'
+          );
+        } else if (!App.demoMode && App.db) {
+          // Firestore: query each role separately (Firestore doesn't support array-contains for 'in' on role without composite index)
+          const roles = ['colaborador', 'realtor', 'broker'];
+          const snaps = await Promise.all(
+            roles.map(r => App.db.collection('users').where('role', '==', r).where('status', '==', 'active').get())
+          );
+          snaps.forEach(snap => {
+            snap.docs.forEach(doc => collaborators.push({ id: doc.id, ...doc.data() }));
+          });
+        }
+
+        // Fallback: if empty, use hardcoded seed list from known platform users
+        if (!collaborators.length) {
+          collaborators = [
+            { id: 'seed-1', firstName: 'Ana', lastName: 'Cerruti', role: 'realtor' },
+            { id: 'seed-2', firstName: 'Mariela', lastName: 'Zapiola', role: 'realtor' },
+            { id: 'seed-3', firstName: 'Melanie', lastName: 'Santana', role: 'broker' },
+            { id: 'seed-4', firstName: 'Flor', lastName: 'Diaz', role: 'realtor' },
+            { id: 'seed-5', firstName: 'Cesar', lastName: 'Arteaga', role: 'realtor' },
+            { id: 'seed-6', firstName: 'Raul', lastName: 'Dominguez', role: 'colaborador' },
+            { id: 'seed-7', firstName: 'Martha C', lastName: 'Nasser', role: 'realtor' },
+            { id: 'seed-8', firstName: 'Natalie', lastName: 'Gutierrez', role: 'realtor' },
+            { id: 'seed-9', firstName: 'Ayden', lastName: 'Banibashar', role: 'realtor' },
+            { id: 'seed-10', firstName: 'Jacqueline', lastName: 'Caballero', role: 'realtor' },
+            { id: 'seed-11', firstName: 'Pouria', lastName: 'Mirazimi', role: 'realtor' },
+            { id: 'seed-12', firstName: "Santos Lou's", lastName: 'Rodriguez', role: 'realtor' },
+            { id: 'seed-13', firstName: 'Marta', lastName: 'Lajas', role: 'realtor' },
+            { id: 'seed-14', firstName: 'Gil A.', lastName: 'Medina', role: 'realtor' },
+            { id: 'seed-15', firstName: 'May', lastName: 'Morejon', role: 'realtor' },
+            { id: 'seed-16', firstName: 'Arvin', lastName: 'Kiami', role: 'realtor' },
+            { id: 'seed-17', firstName: 'Debra', lastName: 'Nadal', role: 'realtor' },
+            { id: 'seed-18', firstName: 'Debora', lastName: 'Clavell', role: 'realtor' }
+          ];
+        }
+
+        // Sort alphabetically by last name
+        collaborators.sort((a, b) => {
+          const la = (a.lastName || a.name || '').toLowerCase();
+          const lb = (b.lastName || b.name || '').toLowerCase();
+          return la.localeCompare(lb);
+        });
+
+        const roleBadge = { colaborador: '🤝', realtor: '🏠', broker: '🏢' };
+
+        collaborators.forEach(u => {
+          const name = u.name ? u.name.trim() : `${u.firstName || ''} ${u.lastName || ''}`.trim();
+          if (!name) return;
+          const badge = roleBadge[u.role] || '👤';
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.dataset.userId = u.id || '';
+          opt.dataset.userRole = u.role || '';
+          opt.dataset.referralCode = u.referralCode || '';
+          opt.textContent = `${badge} ${name}`;
+          sel.appendChild(opt);
+        });
+
+      } catch (err) {
+        console.warn('[Webinar] populateCollaboratorDropdown error:', err);
+      }
+    }
+
+    if (hearSelect) {
+      hearSelect.addEventListener('change', async () => {
+        const val = hearSelect.value;
+
+        // Show/hide RE/MAX agent referrer wrap
+        if (referrerWrap) {
+          const showAgent = val === 'agent';
+          referrerWrap.style.display = showAgent ? '' : 'none';
+          const agentInp = document.getElementById('webinar-referrer-name');
+          if (agentInp) agentInp.required = showAgent;
+        }
+
+        // Show/hide collaborator wrap
+        if (collaboratorWrap) {
+          const showCollab = val === 'collaborator';
+          collaboratorWrap.style.display = showCollab ? '' : 'none';
+          const collabSel = document.getElementById('webinar-collaborator-name');
+          if (collabSel) collabSel.required = showCollab;
+
+          // Populate dropdown on first open (lazy load)
+          if (showCollab && collabSel && collabSel.options.length <= 4) {
+            await populateCollaboratorDropdown();
+          }
+        }
       });
     }
 
@@ -1205,6 +1304,13 @@ App.views.public = {
         const referrerName = get('webinar-referrer-name');
         const gdpr         = document.getElementById('webinar-gdpr')?.checked;
 
+        // Collaborator selection
+        const collabSel    = document.getElementById('webinar-collaborator-name');
+        const collaboratorName = (collabSel?.value || '').trim();
+        const collaboratorId   = collabSel?.selectedOptions?.[0]?.dataset?.userId   || null;
+        const collaboratorRole = collabSel?.selectedOptions?.[0]?.dataset?.userRole || null;
+        const collaboratorCode = collabSel?.selectedOptions?.[0]?.dataset?.referralCode || null;
+
         if (!firstName || !lastName || !phone || !email || !agency || !country || !state || !howHeard) {
           App.utils.showToast('Please fill in all required fields.', 'error');
           if (btn) { btn.disabled = false; btn.textContent = 'Register Now'; }
@@ -1220,6 +1326,11 @@ App.views.public = {
           if (btn) { btn.disabled = false; btn.textContent = 'Register Now'; }
           return;
         }
+        if (howHeard === 'collaborator' && !collaboratorName) {
+          App.utils.showToast('Please select your Realtor / Broker from the list.', 'error');
+          if (btn) { btn.disabled = false; btn.textContent = 'Register Now'; }
+          return;
+        }
 
         // ---- Resolve referral link context (agent who shared the link) ----
         const refCode = sessionStorage.getItem('referralCode');
@@ -1228,7 +1339,13 @@ App.views.public = {
         let agentReferrerName = null;
         let agentReferrerRole = null;
 
-        if (refCode) {
+        // If howHeard === 'collaborator', use the selected collaborator as the referrer attribution
+        if (howHeard === 'collaborator' && collaboratorName) {
+          agentReferralCode = collaboratorCode  || null;
+          agentReferrerId   = collaboratorId    || null;
+          agentReferrerName = collaboratorName;
+          agentReferrerRole = collaboratorRole  || 'realtor';
+        } else if (refCode) {
           if (App.demoMode && App.demoData && App.demoData.users) {
             const ref = App.demoData.users.find(u => u.referralCode === refCode);
             if (ref) {
@@ -1266,10 +1383,15 @@ App.views.public = {
         const webinarTitle = typeConfig?.title || (activeType === 'b2b' ? 'Beyond Borders' : 'Spain Unlocked');
         const webinarDate = settings?.date || typeConfig?.date || '2026-09-18';
 
+        // Determine referrerName for the record
+        let finalReferrerName = '';
+        if (howHeard === 'agent') finalReferrerName = referrerName;
+        else if (howHeard === 'collaborator') finalReferrerName = collaboratorName;
+
         await App.auth.saveWebinarRegistration({
           firstName, lastName, phone, email, agency, country, state,
           howHeard,
-          referrerName: howHeard === 'agent' ? referrerName : '',
+          referrerName: finalReferrerName,
           webinar: webinarTitle,
           webinarType: activeType.toUpperCase(),
           webinarDate: webinarDate,
