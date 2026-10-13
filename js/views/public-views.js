@@ -113,6 +113,7 @@ App.views.public = {
       const pwGroup = document.getElementById('referral-password-group');
       const pwInput = document.getElementById('referral-password');
       const banner = document.getElementById('referral-webinar-spotlight-banner');
+      const clientBanner = document.getElementById('referral-client-webinar-banner');
       const formTitle = document.getElementById('referral-form-title');
       const welcomeMsg = document.getElementById('referral-welcome-msg');
       const submitBtn = document.getElementById('referral-submit-btn');
@@ -121,8 +122,12 @@ App.views.public = {
       if (pf) pf.style.display = type !== 'client' ? '' : 'none';
       if (pwGroup) pwGroup.style.display = type === 'client' ? 'none' : '';
 
-      // Webinar Spotlight Banner is specifically for REALTOR VIP Masterclass invitations
+      // Webinar Spotlight Banners:
+      // When type is 'client' -> Show CLIENT webinar banner, HIDE Realtor banner.
+      // When type is 'realtor' -> Show REALTOR webinar banner, HIDE Client banner.
+      // Otherwise (broker, partner, etc.) -> HIDE both banners.
       if (banner) banner.style.display = type === 'realtor' ? '' : 'none';
+      if (clientBanner) clientBanner.style.display = type === 'client' ? '' : 'none';
 
       const profWebinar = document.querySelector('.professional-webinar-group');
       const clientWebinar = document.querySelector('.client-webinar-group');
@@ -255,6 +260,17 @@ App.views.public = {
         const bannerInviteeEl = document.getElementById('referral-banner-invitee');
         if (bannerInviteeEl) {
           bannerInviteeEl.innerHTML = `
+            <span>✨</span>
+            <span class="lang-en">VIP invitation courtesy of <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+            <span class="lang-es">Invitación VIP de cortesía de <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+            <span class="lang-fr">Invitation VIP offerte par <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+            <span class="lang-en-ca">VIP invitation courtesy of <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+          `;
+        }
+
+        const clientBannerInviteeEl = document.getElementById('referral-client-banner-invitee');
+        if (clientBannerInviteeEl) {
+          clientBannerInviteeEl.innerHTML = `
             <span>✨</span>
             <span class="lang-en">VIP invitation courtesy of <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
             <span class="lang-es">Invitación VIP de cortesía de <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
@@ -408,6 +424,111 @@ App.views.public = {
 
     // Initial visibility
     updateFieldVisibility(selectedType);
+
+    // ---- Dynamic Webinar Dates for Banners ----
+    async function loadDynamicWebinarDates() {
+      try {
+        const settings = (App.auth && App.auth.getWebinarSettings)
+          ? await App.auth.getWebinarSettings()
+          : (App.auth && App.auth.getDefaultWebinarSettings ? App.auth.getDefaultWebinarSettings() : null);
+
+        if (!settings) return;
+
+        // 1. Populate Client Banner from B2C webinar settings
+        const b2cConfig = settings.b2c || {};
+        const b2cDate = (settings.activeType === 'b2c' && settings.date) ? settings.date : (b2cConfig.date || '2026-09-18');
+        const b2cTime = (settings.activeType === 'b2c' && settings.time) ? settings.time : (b2cConfig.time || '12:00');
+
+        if (b2cDate) {
+          const [cy, cm, cd] = b2cDate.split('-').map(Number);
+          const cDateObj = new Date(Date.UTC(cy, cm - 1, cd, 12, 0, 0));
+          const monthsEn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          const monthsFullEs = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+          const cmIdx = cDateObj.getUTCMonth();
+          const cdNum = cDateObj.getUTCDate();
+          const cyNum = cDateObj.getUTCFullYear();
+
+          const [chRef, cminRef] = (b2cTime || '12:00').split(':').map(Number);
+          function fmt12(h, mn) {
+            const period = h >= 12 ? 'PM' : 'AM';
+            let dh = h % 12;
+            if (dh === 0) dh = 12;
+            const dm = mn === 0 ? ':00' : `:${String(mn).padStart(2, '0')}`;
+            return `${dh}${dm} ${period}`;
+          }
+
+          const cedtStr = fmt12(chRef, cminRef);
+          const ccestHour = (chRef + 6) % 24;
+          const ccestStr = fmt12(ccestHour, cminRef);
+          const cpdtHour = (chRef - 3 + 24) % 24;
+          const cpdtStr = fmt12(cpdtHour, cminRef);
+
+          const cLivePill = document.getElementById('client-webinar-live-pill-text');
+          if (cLivePill) {
+            cLivePill.textContent = `${cdNum} ${monthsEn[cmIdx].toUpperCase()} ${cyNum} · ${ccestStr} CEST / ${cedtStr} EDT`;
+          }
+
+          const cDateVal = document.getElementById('client-webinar-date-val');
+          if (cDateVal) {
+            cDateVal.innerHTML = `<span class="lang-en">${cdNum} ${monthsEn[cmIdx]} ${cyNum}</span><span class="lang-es">${cdNum} de ${monthsFullEs[cmIdx]}, ${cyNum}</span><span class="lang-en-ca">${cdNum} ${monthsEn[cmIdx]} ${cyNum}</span>`;
+          }
+
+          const cTimeVal = document.getElementById('client-webinar-time-val');
+          if (cTimeVal) {
+            cTimeVal.innerHTML = `${cedtStr} EDT (Miami/NY) &middot; ${ccestStr} CEST (Spain) &middot; ${cpdtStr} PDT`;
+          }
+        }
+
+        // 2. Populate Realtor Banner from B2B webinar settings
+        const b2bConfig = settings.b2b || {};
+        const b2bDate = (settings.activeType === 'b2b' && settings.date) ? settings.date : (b2bConfig.date || '2026-09-24');
+        const b2bTime = (settings.activeType === 'b2b' && settings.time) ? settings.time : (b2bConfig.time || '19:00');
+
+        if (b2bDate) {
+          const [by, bm, bd] = b2bDate.split('-').map(Number);
+          const bDateObj = new Date(Date.UTC(by, bm - 1, bd, 12, 0, 0));
+          const monthsEn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          const bmIdx = bDateObj.getUTCMonth();
+          const bdNum = bDateObj.getUTCDate();
+          const byNum = bDateObj.getUTCFullYear();
+
+          const [bhRef, bminRef] = (b2bTime || '19:00').split(':').map(Number);
+          function fmt12(h, mn) {
+            const period = h >= 12 ? 'PM' : 'AM';
+            let dh = h % 12;
+            if (dh === 0) dh = 12;
+            const dm = mn === 0 ? ':00' : `:${String(mn).padStart(2, '0')}`;
+            return `${dh}${dm} ${period}`;
+          }
+
+          const bcestStr = fmt12(bhRef, bminRef);
+          const bedtHour = (bhRef - 6 + 24) % 24;
+          const bedtStr = fmt12(bedtHour, bminRef);
+          const bpdtHour = (bhRef - 9 + 24) % 24;
+          const bpdtStr = fmt12(bpdtHour, bminRef);
+
+          const rLivePill = document.querySelector('#referral-webinar-spotlight-banner .live-pill');
+          if (rLivePill) {
+            rLivePill.innerHTML = `<span class="pulse-dot"></span> ${bdNum} ${monthsEn[bmIdx].toUpperCase()} ${byNum} · ${bcestStr} CEST / ${bedtStr} EDT`;
+          }
+
+          const rDateStr = document.querySelector('#referral-webinar-spotlight-banner .pass-meta-strip span:first-child strong');
+          if (rDateStr) {
+            rDateStr.textContent = `${bdNum} ${monthsEn[bmIdx]} ${byNum}`;
+          }
+
+          const rTimeStr = document.querySelector('#referral-webinar-spotlight-banner .pass-meta-strip span:nth-child(2) strong');
+          if (rTimeStr) {
+            rTimeStr.innerHTML = `${bcestStr} CEST (Spain) &middot; ${bedtStr} EDT (Miami/NY/PR) &middot; ${bpdtStr} PDT`;
+          }
+        }
+      } catch (err) {
+        console.warn('[Referral] Error dynamically populating webinar banner dates:', err);
+      }
+    }
+
+    loadDynamicWebinarDates();
 
 
 
