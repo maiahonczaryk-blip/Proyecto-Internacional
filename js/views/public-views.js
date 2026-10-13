@@ -1227,12 +1227,15 @@ App.views.public = {
           ];
         }
 
-        // Sort alphabetically by last name
-        collaborators.sort((a, b) => {
-          const la = (a.lastName || a.name || '').toLowerCase();
-          const lb = (b.lastName || b.name || '').toLowerCase();
-          return la.localeCompare(lb);
-        });
+        // Sort alphabetically by last name (case-insensitive)
+        // If lastName is missing, extract the last word of the full name field
+        const getSortKey = u => {
+          if (u.lastName) return u.lastName.trim().toLowerCase();
+          const full = (u.name || `${u.firstName || ''} ${u.lastName || ''}`).trim();
+          const parts = full.split(/\s+/);
+          return (parts[parts.length - 1] || full).toLowerCase();
+        };
+        collaborators.sort((a, b) => getSortKey(a).localeCompare(getSortKey(b), undefined, { sensitivity: 'base' }));
 
         const roleBadge = { colaborador: '🤝', realtor: '🏠', broker: '🏢' };
 
