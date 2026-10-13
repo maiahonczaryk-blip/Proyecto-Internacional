@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ficha de Calificación e Indagación de Cliente (USA & Canadá) · RE/MAX Inmomás</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --remax-blue: #0033A0;
+      --remax-red: #C00000;
+      --navy: #07152b;
+      --navy-light: #0f2347;
+      --gold: #d97706;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #cbd5e1;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --section-header: #f1f5f9;
+      --tag-bg: #eff6ff;
+      --tag-border: #bfdbfe;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 30px 15px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+    }
+
+    /* HEADER */
+    .header {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--remax-blue) 70%, var(--remax-red) 100%);
+      color: white;
+      padding: 35px 40px;
+      position: relative;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .header-branding {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-badge {
+      background: white;
+      padding: 8px 16px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .logo-badge img {
+      height: 38px;
+      width: auto;
+    }
+
+    .header-badge-tag {
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .header h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 14.5px;
+      color: #e2e8f0;
+      max-width: 720px;
+    }
+
+    .agent-meta-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      background: rgba(0,0,0,0.25);
+      border-radius: 10px;
+      padding: 15px 20px;
+      margin-top: 25px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .meta-field label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #93c5fd;
+      margin-bottom: 4px;
+    }
+
+    .meta-field input {
+      width: 100%;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* INSTRUCTIONS CALLOUT */
+    .agent-tip-banner {
+      background: #eff6ff;
+      border-left: 5px solid var(--remax-blue);
+      padding: 16px 24px;
+      margin: 25px 35px 10px;
+      border-radius: 0 10px 10px 0;
+      font-size: 13.5px;
+      color: #1e3a8a;
+    }
+
+    .agent-tip-banner strong {
+      color: var(--navy);
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    /* SECTIONS */
+    .content-body {
+      padding: 25px 35px 40px;
+    }
+
+    .form-section {
+      margin-bottom: 35px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .section-title-bar {
+      background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+      padding: 14px 20px;
+      border-bottom: 2px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--remax-blue);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--navy);
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .section-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: auto;
+      font-style: italic;
+    }
+
+    .section-body {
+      padding: 20px;
+    }
+
+    /* GRID & INPUTS */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .field-group {
+      margin-bottom: 16px;
+    }
+
+    .field-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+
+    .field-hint {
+      display: block;
+      font-size: 11.5px;
+      color: #64748b;
+      margin-bottom: 6px;
+      font-style: italic;
+    }
+
+    .input-text, select.input-select {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13.5px;
+      color: var(--text);
+      font-family: inherit;
+      background: #fafafa;
+      transition: all 0.2s;
+    }
+
+    .input-text:focus, select.input-select:focus {
+      outline: none;
+      border-color: var(--remax-blue);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(0, 51, 160, 0.12);
+    }
+
+    textarea.input-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text);
+      font-family: inherit;
+      min-height: 70px;
+      background: #fafafa;
+    }
+
+    /* CHECKBOXES & PILLS */
+    .options-cluster {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .option-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      flex: 1 1 calc(50% - 10px);
+      min-width: 240px;
+    }
+
+    .option-card:hover {
+      border-color: #94a3b8;
+      background: #f1f5f9;
+    }
+
+    .option-card input[type="radio"],
+    .option-card input[type="checkbox"] {
+      margin-top: 3px;
+      accent-color: var(--remax-blue);
+    }
+
+    .option-card-content strong {
+      display: block;
+      color: var(--navy);
+      font-size: 13px;
+    }
+
+    .option-card-content span {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.3;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* CRITICAL AGENT ALERTS */
+    .agent-critical-box {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-left: 4px solid #f59e0b;
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-top: 12px;
+      font-size: 12.5px;
+      color: #92400e;
+    }
+
+    .agent-critical-box strong {
+      color: #78350f;
+    }
+
+    /* SCORING BAR */
+    .scoring-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .score-card {
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      background: #fafafa;
+    }
+
+    .score-card.tier-a {
+      border-color: #10b981;
+      background: #ecfdf5;
+    }
+
+    .score-card.tier-b {
+      border-color: #f59e0b;
+      background: #fffbeb;
+    }
+
+    .score-card.tier-c {
+      border-color: #94a3b8;
+      background: #f8fafc;
+    }
+
+    .score-badge {
+      display: inline-block;
+      font-weight: 800;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .tier-a .score-badge { color: #065f46; }
+    .tier-b .score-badge { color: #92400e; }
+    .tier-c .score-badge { color: #475569; }
+
+    .score-card p {
+      font-size: 11.5px;
+      color: #475569;
+      line-height: 1.3;
+    }
+
+    /* ACTION BUTTONS / PRINT BAR */
+    .action-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-print {
+      background: var(--navy);
+      color: white;
+    }
+
+    .btn-print:hover {
+      background: var(--remax-blue);
+    }
+
+    .btn-clear {
+      background: #f1f5f9;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-clear:hover {
+      background: #e2e8f0;
+      color: var(--text);
+    }
+
+    /* PRINT SPECIFICS */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .container {
+        box-shadow: none;
+        border: none;
+        max-width: 100%;
+      }
+      .action-bar, .agent-tip-banner {
+        display: none !important;
+      }
+      .form-section {
+        break-inside: avoid;
+        margin-bottom: 20px;
+      }
+      .header {
+        padding: 20px 25px;
+      }
+      .content-body {
+        padding: 15px 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .grid-2, .grid-3, .scoring-grid {
+        grid-template-columns: 1fr;
+      }
+      .content-body {
+        padding: 18px 16px;
+      }
+      .header {
+        padding: 25px 18px;
+      }
+      .agent-tip-banner {
+        margin: 15px 18px 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <!-- ==================== HEADER ==================== -->
+  <header class="header">
+    <div class="header-top">
+      <div class="header-branding">
+        <div class="logo-badge">
+          <img src="images/remax-logo.png" alt="RE/MAX Inmomás">
+        </div>
+        <div class="logo-badge">
+          <img src="images/spain-connection-logo.png" alt="The Spain Connection">
+        </div>
+      </div>
+      <div class="header-badge-tag">Lead Discovery &amp; Qualification Protocol</div>
+    </div>
+    
+    <h1>Ficha de Calificación e Indagación de Cliente (USA &amp; Canadá)</h1>
+    <p>Guía de entrevista consultiva para agentes de RE/MAX Inmomás. Diseñada para evaluar las necesidades jurídicas, fiscales, migratorias, financieras y habitacionales de compradores norteamericanos.</p>
+
+    <!-- METADATOS DE LA ENTREVISTA -->
+    <div class="agent-meta-bar">
+      <div class="meta-field">
+        <label>Agente Responsable</label>
+        <input type="text" placeholder="Nombre del agente RE/MAX">
+      </div>
+      <div class="meta-field">
+        <label>Fecha de la Entrevista</label>
+        <input type="date">
+      </div>
+      <div class="meta-field">
+        <label>Canal de Contacto</label>
+        <input type="text" placeholder="Zoom / Teléfono / Presencial / B2B">
+      </div>
+      <div class="meta-field">
+        <label>Referred By (Si aplica)</label>
+        <input type="text" placeholder="Agente USA/Canadá / Web / Evento">
+      </div>
+    </div>
+  </header>
+
+  <!-- RECOMENDACIÓN PARA EL AGENTE -->
+  <div class="agent-tip-banner">
+    <strong>💡 Mindset para el Agente RE/MAX Inmomás:</strong>
+    El cliente norteamericano está habituado a sistemas con alta protección (Escrow, MLS, contingencias de inspección/tasación). Comprar en España les genera incertidumbre por la burocracia, los idiomas y las leyes fiscales. Posiciónate como su <em>Trusted Advisor</em> con el respaldo de nuestro ecosistema integral (Legal/Fiscal con Fuster &amp; Associates, Financiación con UCI/Bancos, y Selección de Producto con RE/MAX).
+  </div>
+
+  <main class="content-body">
+
+    <!-- ==================== SECCIÓN 1: DATOS Y PERFIL GENERAL ==================== -->
+    <section class="form-section">
+      <div class="section-title-bar">
+        <span class="section-num">1</span>
+        <h2 class="section-title">Datos Generales &amp; Perfil del Comprador</h2>
+        <span class="section-sub">Perfil sociodemográfico del lead</span>
+      </div>
+      <div class="section-body">
+        <div class="grid-2">
+          <div class="field-group">
+            <label class="field-label">Nombre y Apellidos del Titular(es)</label>
+            <input type="text" class="input-text" placeholder="Ej. John &amp; Sarah Smith">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Email Principal &amp; Teléfono (con código +1)</label>
+            <input type="text" class="input-text" placeholder="Ej. john@domain.com | +1 (305) 555-0199">
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="field-group">
+            <label class="field-label">Ciudad &amp; Estado / Provincia Actual</label>
+            <input type="text" class="input-text" placeholder="Ej. Austin, Texas / Toronto, ON">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Nacionalidad &amp; Pasaporte Actual</label>
+            <input type="text" class="input-text" placeholder="USA / Canadiense / ¿Pasaporte UE?">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Profesión / Situación Laboral</label>
+            <input type="text" class="input-text" placeholder="Jubilado / Remoto / Empresario">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field-group">
+            <label class="field-label">Composición Familiar</label>
+            <input type="text" class="input-text" placeholder="¿Viaja solo, en pareja, con hijos? (Edades de los hijos)">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Nivel de Idioma Español</label>
+            <select class="input-select">
+              <option value="">Seleccionar nivel...</option>
+              <option value="none">Ninguno (Sólo habla inglés)</option>
+              <option value="basic">Básico / Conversacional rudimentario</option>
+              <option value="intermediate">Intermedio (Entiende y se comunica)</option>
+              <option value="native">Avanzado / Nativo / Bilingüe</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SECCIÓN 2: PROPÓSITO & ESTILO DE VIDA ==================== -->
+    <section class="form-section">
+      <div class="section-title-bar">
+        <span class="section-num">2</span>
+        <h2 class="section-title">Propósito de la Compra &amp; Estilo de Vida</h2>
+        <span class="section-sub">Intención de uso e integración</span>
+      </div>
+      <div class="section-body">
+        <div class="field-group">
+          <label class="field-label">¿Cuál es el objetivo principal del cliente en España?</label>
+          <div class="options-cluster">
+            <label class="option-card">
+              <input type="radio" name="purpose" value="relocation">
+              <div class="option-card-content">
+                <strong>Mudanza Definitiva (Relocalización Full-Time)</strong>
+                <span>Establecer su residencia habitual en España permanentemente (>183 días/año).</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="purpose" value="vacation">
+              <div class="option-card-content">
+                <strong>Segunda Residencia / "Snowbird" (Vacacional)</strong>
+                <span>Venir 1 a 5 meses al año (escapar del frío) y regresar a EE.UU./Canadá.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="purpose" value="investment">
+              <div class="option-card-content">
+                <strong>Inversión Pura (Yield / Rentabilidad)</strong>
+                <span>Generar ingresos por alquiler (larga duración o vacacional con licencia).</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="purpose" value="hybrid">
+              <div class="option-card-content">
+                <strong>Uso Mixto (Disfrute propio + Rentabilizar)</strong>
+                <span>Disfrutar 4-8 semanas al año y alquilar el resto del año.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="agent-critical-box">
+          <strong>⚠️ Alerta para el Agente sobre la Regla Schengen (90/180 días):</strong>
+          Si el cliente NO tramita un visado de residencia y viaja sólo con pasaporte estadounidense o canadiense, sólo puede permanecer un máximo de <strong>90 días continuos dentro de un período de 180 días</strong> en el espacio Schengen. Indagar de inmediato si planea estancias superiores.
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SECCIÓN 3: PLAZOS & MADUREZ (TIMELINE) ==================== -->
+    <section class="form-section">
+      <div class="section-title-bar">
+        <span class="section-num">3</span>
+        <h2 class="section-title">Plazos, Madurez &amp; Urgencia (Timeline)</h2>
+        <span class="section-sub">Horizonte temporal y planes de viaje</span>
+      </div>
+      <div class="section-body">
+        <div class="field-group">
+          <label class="field-label">¿En qué horizonte temporal planifica comprar?</label>
+          <div class="options-cluster">
+            <label class="option-card">
+              <input type="radio" name="timeline" value="immediate">
+              <div class="option-card-content">
+                <strong>Corto Plazo: 0 a 3 meses (Inmediato)</strong>
+                <span>Fondos disponibles. Listo para reservar en su próxima visita o en remoto.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="timeline" value="medium">
+              <div class="option-card-content">
+                <strong>Medio Plazo: 3 a 6 meses</strong>
+                <span>Preparando trámites de visado, liquidando activos o programando viaje.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="timeline" value="medium_long">
+              <div class="option-card-content">
+                <strong>Medio-Largo Plazo: 6 a 12 meses</strong>
+                <span>Plan de jubilación cercano o esperando vender propiedad en Norteamérica.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="timeline" value="exploratory">
+              <div class="option-card-content">
+                <strong>Largo Plazo / Exploratorio: +12 meses</strong>
+                <span>Recopilando información preliminar para el futuro (fase educativa).</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top: 16px;">
+          <div class="field-group">
+            <label class="field-label">¿Tiene fechas previstas para viajar a España? (Discovery Trip)</label>
+            <input type="text" class="input-text" placeholder="Ej. Sí, del 15 al 28 de Noviembre / Aún sin billetes">
+          </div>
+          <div class="field-group">
+            <label class="field-label">¿Ha visitado antes la Costa Blanca o España?</label>
+            <input type="text" class="input-text" placeholder="Ej. Conoce Alicante y Valencia / Primera vez en España">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SECCIÓN 4: SITUACIÓN LEGAL, VISADOS & PAPELES ==================== -->
+    <section class="form-section">
+      <div class="section-title-bar">
+        <span class="section-num">4</span>
+        <h2 class="section-title">Situación Legal, Visados &amp; Papeles</h2>
+        <span class="section-sub">Estatus migratorio y trámites previos</span>
+      </div>
+      <div class="section-body">
+        <div class="field-group">
+          <label class="field-label">Vía migratoria / Visado contemplado:</label>
+          <div class="options-cluster">
+            <label class="option-card">
+              <input type="checkbox" value="eu_passport">
+              <div class="option-card-content">
+                <strong>Pasaporte Comunitario (UE)</strong>
+                <span>El cliente o su cónyuge posee nacionalidad europea (sin visado).</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="nlv">
+              <div class="option-card-content">
+                <strong>Visado No Lucrativo (NLV)</strong>
+                <span>Para jubilados o personas con ingresos pasivos (~28.800€/año titular). Prohíbe trabajar en ES.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="dnv">
+              <div class="option-card-content">
+                <strong>Visado Nómada Digital (DNV)</strong>
+                <span>Teletrabaja para empresa o clientes fuera de España. Aplica Ley Beckham.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="tourist">
+              <div class="option-card-content">
+                <strong>Sin Visado (Estancia Turística)</strong>
+                <span>Uso máx. 90 días por semestre como segunda residencia.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top: 16px;">
+          <div class="field-group">
+            <label class="field-label">¿Dispone de NIE español?</label>
+            <select class="input-select">
+              <option value="">Seleccionar...</option>
+              <option value="yes">Sí, ya lo tiene</option>
+              <option value="no">No, necesita tramitarlo</option>
+              <option value="process">En trámite consular</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Poder Notarial (Power of Attorney - POA)</label>
+            <select class="input-select">
+              <option value="">Seleccionar...</option>
+              <option value="willing">Dispuesto a otorgarlo a abogado</option>
+              <option value="already_done">Ya otorgado a despacho</option>
+              <option value="hesitant">Prefiere firmar todo en persona</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">¿Cuenta con abogado independiente en España?</label>
+            <select class="input-select">
+              <option value="">Seleccionar...</option>
+              <option value="fuster">Derivar a Fuster &amp; Associates (Aliado)</option>
+              <option value="own">Ya tiene abogado en España</option>
+              <option value="none">No tiene, busca recomendación</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="agent-critical-box">
+          <strong>📌 Consejo del Agente:</strong> Recomienda encarecidamente el <strong>Power of Attorney (POA)</strong> con nuestro partner Fuster &amp; Associates. Les permite obtener el NIE, abrir la cuenta bancaria española y realizar la Due Diligence jurídica sin que el cliente tenga que viajar múltiples veces.
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SECCIÓN 5: SITUACIÓN FISCAL & TRIBUTARIA ==================== -->
+    <section class="form-section">
+      <div class="section-title-bar">
+        <span class="section-num">5</span>
+        <h2 class="section-title">Situación Fiscal &amp; Tributaria</h2>
+        <span class="section-sub">Cross-border taxation y costes de cierre</span>
+      </div>
+      <div class="section-body">
+        <div class="grid-2">
+          <div class="field-group">
+            <label class="field-label">Residencia Fiscal Prevista</label>
+            <select class="input-select">
+              <option value="">Seleccionar...</option>
+              <option value="non_resident">No Residente Fiscal (< 183 días en España)</option>
+              <option value="resident">Residente Fiscal en España (> 183 días al año)</option>
+              <option value="beckham">Especial: Ley Beckham (Régimen Impatriados)</option>
+              <option value="undecided">Indeciso / Requiere asesoramiento previo</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Obligaciones Tributarias en Origen</label>
+            <select class="input-select">
+              <option value="">Seleccionar...</option>
+              <option value="irs">EE.UU. (IRS: Ciudadano/Green Card sujeto a FATCA/FBAR)</option>
+              <option value="cra">Canadá (CRA: Posible Departure Tax si traslada residencia)</option>
+              <option value="other">Otro / Doble nacionalidad</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Conocimiento de Gastos de Cierre e Impuestos en España (+12% a 14% extra):</label>
+          <div class="options-cluster">
+            <label class="option-card">
+              <input type="checkbox" value="itp_iva_known">
+              <div class="option-card-content">
+                <strong>Conoce ITP / IVA (10%)</strong>
+                <span>Entiende que en España el comprador paga 10% de impuesto de compra.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="closing_costs_accepted">
+              <div class="option-card-content">
+                <strong>Asume Gastos Notaría/Registro/Legal (2-4%)</strong>
+                <span>Sabe que debe calcular un ~12-14% total por encima del precio acordado.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" value="wealth_tax_inquiry">
+              <div class="option-card-content">
+                <strong>Impuesto de Patrimonio / Grandes Fortunas</strong>
+                <span>Patrimonio neto global >2-3M€ (Requiere estructuración fiscal previa).</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="agent-critical-box">
+          <strong>⚖️ Regla de Oro para el Agente:</strong> NUNCA des asesoramiento fiscal vinculante como agente inmobiliario. Si el cliente tiene dudas sobre residencia fiscal, pensiones o tributación en origen/destino, ofrécele una videollamada directa con el departamento fiscal de <strong>Fuster &amp; Associates</strong>.
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SECCIÓN 6: CAPACIDAD & ESTRUCTURA FINANCIERA ==================== -->
+    <section class="form-section">
+      <div class="section-title-bar">
+        <span class="section-num">6</span>
+        <h2 class="section-title">Capacidad &amp; Estructura Financiera (AML / KYC)</h2>
+        <span class="section-sub">Presupuesto, fondos e hipotecas</span>
+      </div>
+      <div class="section-body">
+        <div class="grid-3">
+          <div class="field-group">
+            <label class="field-label">Presupuesto Máximo de Compra (EUR)</label>
+            <input type="text" class="input-text" placeholder="Ej. 450.000 € a 600.000 €">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Equivalente en USD o CAD</label>
+            <input type="text" class="input-text" placeholder="Ej. $500k - $650k USD">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Disponibilidad del +13% de Gastos</label>
+            <select class="input-select">
+              <option value="">Seleccionar...</option>
+              <option value="yes">Sí, tiene fondos líquidos adicionales</option>
+              <option value="tight">Ajustado (debe incluirse en el techo máx.)</option>
+              <option value="unknown">No lo había considerado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Estructura de Fondos y Pago:</label>
+          <div class="options-cluster">
+            <label class="option-card">
+              <input type="radio" name="payment_mode" value="all_cash">
+              <div class="option-card-content">
+                <strong>100% Fondos Propios (All-Cash)</strong>
+                <span>Fondos líquidos disponibles en cuenta bancaria en EE.UU./Canadá listos para transferir.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="payment_mode" value="mortgage_spain">
+              <div class="option-card-content">
+                <strong>Hipoteca en España para No Residentes</strong>
+                <span>Requiere financiación (UCI / Banco). Típicamente máx. 60%-70% LTV (necesita 40-45% líquido).</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="payment_mode" value="contingency_sale">
+              <div class="option-card-content">
+                <strong>Sujeto a Venta de Casa en Norteamérica</strong>
+                <span>Depende de vender su propiedad actual para liquidar fondos (¡Atención: arras en España no esperan!).</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="payment_mode" value="heloc_us">
+              <div class="option-card-content">
+                <strong>Refinanciación / HELOC en EE.UU./Canadá</strong>
+                <span>Toma fondos de su vivienda en origen y compra como All-Cash en España.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top: 16px;">
+          <div class="field-group">
+            <label class="field-label">Prevención de Blanqueo (Proof of Funds / AML)</label>
+            <select class="input-select">
+              <option value="">Seleccionar...</option>
+              <option value="ready">Puede aportar W-2 / Tax Returns / Extractos bancarios</option>
+              <option value="complex">Fondos en fideicomisos / cripto / venta de empresa</option>
+              <option value="not_ready">Aún no tiene fondos justificados</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Cuenta Bancaria Española &amp; Divisas (Forex)</label>
+            <select class="input-select">
+              <option value="">Seleccionar...</option>
+              <option value="need_account">Necesita apertura de cuenta española</option>
+              <option value="has_account">Ya tiene cuenta bancaria en España</option>
+              <option value="forex_support">Requiere asesoramiento para cambio USD/CAD a EUR</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SECCIÓN 7: CRITERIOS DEL INMUEBLE (QUÉ BUSCAN) ==================== -->
+    <section class="form-section">
+      <div class="section-title-bar">
+        <span class="section-num">7</span>
+        <h2 class="section-title">Criterios del Inmueble Deseado</h2>
+        <span class="section-sub">Preferencias de búsqueda y características</span>
+      </div>
+      <div class="section-body">
+        <div class="grid-2">
+          <div class="field-group">
+            <label class="field-label">Zona o Localización Preferida</label>
+            <input type="text" class="input-text" placeholder="Ej. Costa Blanca Norte (Jávea/Altea) / Alicante Ciudad / Costa del Sol">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Entorno Deseado</label>
+            <select class="input-select">
+              <option value="">Seleccionar...</option>
+              <option value="beach_walk">A distancia a pie de playa y restaurantes</option>
+              <option value="residential">Residencial tranquilo / Urbanización privada</option>
+              <option value="golf">Primera línea de golf / Resort con amenities</option>
+              <option value="city">Centro urbano / Ciudad vibrante con servicios</option>
+              <option value="countryside">Rústico / Campo / Mayor privacidad y terreno</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="field-group">
+            <label class="field-label">Tipo de Propiedad</label>
+            <select class="input-select">
+              <option value="">Seleccionar tipo...</option>
+              <option value="villa">Villa / Chalet Independiente</option>
+              <option value="penthouse">Ático (Penthouse) con Solárium</option>
+              <option value="apartment">Apartamento / Piso con Terraza</option>
+              <option value="townhouse">Adosado / Pareado (Townhouse)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Estado de la Construcción</label>
+            <select class="input-select">
+              <option value="">Seleccionar estado...</option>
+              <option value="new_ready">Obra Nueva Terminada (Key-Ready)</option>
+              <option value="new_offplan">Obra Nueva Sobre Plano (Off-Plan)</option>
+              <option value="resale_perfect">Segunda Mano en Excelente Estado</option>
+              <option value="resale_renovate">Segunda Mano para Reformar</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Dormitorios &amp; Baños Mínimos</label>
+            <input type="text" class="input-text" placeholder="Ej. 3 Dorms (1 para oficina) + 2 Baños">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Elementos "Must-Have" (Imprescindibles para el cliente):</label>
+          <div class="options-cluster">
+            <label class="option-card"><input type="checkbox"> <span>Piscina Privada</span></label>
+            <label class="option-card"><input type="checkbox"> <span>Piscina Comunitaria tipo Resort</span></label>
+            <label class="option-card"><input type="checkbox"> <span>Vistas al Mar Panorámicas</span></label>
+            <label class="option-card"><input type="checkbox"> <span>Terraza Amplia / Solárium (Orientación Sur)</span></label>
+            <label class="option-card"><input type="checkbox"> <span>Ascensor (Clave para jubilados / séniors)</span></label>
+            <label class="option-card"><input type="checkbox"> <span>Plaza de Garaje / Parking Privado</span></label>
+            <label class="option-card"><input type="checkbox"> <span>Climatización Central / Suelo Radiante</span></label>
+            <label class="option-card"><input type="checkbox"> <span>Colegios Internacionales cerca</span></label>
+            <label class="option-card"><input type="checkbox"> <span>Cerca de Hospitales / Centros Médicos</span></label>
+            <label class="option-card"><input type="checkbox"> <span>Pet-Friendly (Jardín vallado para perro)</span></label>
+          </div>
+        </div>
+
+        <div class="field-group" style="margin-top: 16px;">
+          <label class="field-label">"Deal-Breakers" (Lo que descartaría una propiedad por completo):</label>
+          <textarea class="input-textarea" placeholder="Ej. Escaleras empinadas sin ascensor, ruido de carreteras, orientación norte sin sol, comunidades con gastos desmedidos..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SECCIÓN 8: SCORING & PLAN DE ACCIÓN ==================== -->
+    <section class="form-section">
+      <div class="section-title-bar">
+        <span class="section-num">8</span>
+        <h2 class="section-title">Termómetro de Cualificación &amp; Próximos Pasos</h2>
+        <span class="section-sub">Lead Scoring y protocolo de seguimiento</span>
+      </div>
+      <div class="section-body">
+        <label class="field-label">Clasificación del Lead:</label>
+        <div class="scoring-grid">
+          <label class="score-card tier-a">
+            <input type="radio" name="lead_tier" value="A">
+            <div class="score-badge">TIER A: COMPRADOR CALIENTE</div>
+            <p>Presupuesto y fondos líquidos comprobados. Plazo 0-3 meses. Viaje programado o listo para reservar en remoto. ¡Prioridad Máxima!</p>
+          </label>
+          <label class="score-card tier-b">
+            <input type="radio" name="lead_tier" value="B">
+            <div class="score-badge">TIER B: TEMPLADO / PRE-CALIFICADO</div>
+            <p>Plazo 3-6 meses. Requiere estructuración hipotecaria o visado NLV/DNV. Planeando viaje de prospección. Seguimiento semanal.</p>
+          </label>
+          <label class="score-card tier-c">
+            <input type="radio" name="lead_tier" value="C">
+            <div class="score-badge">TIER C: PROSPECTO LARGO PLAZO</div>
+            <p>Plazo +6 a 12 meses. Depende de venta en origen o jubilación futura. Integrar en cadena de valor de email y webinars mensuales.</p>
+          </label>
+        </div>
+
+        <div class="field-group" style="margin-top: 20px;">
+          <label class="field-label">Acciones Inmediatas a Ejecutar por el Agente:</label>
+          <div class="options-cluster">
+            <label class="option-card">
+              <input type="checkbox" checked>
+              <div class="option-card-content">
+                <strong>Derivar a Fuster &amp; Associates (Legal/Fiscal)</strong>
+                <span>Enviar datos del cliente para consulta de visado, NIE y Due Diligence.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox">
+              <div class="option-card-content">
+                <strong>Derivar a UCI / Broker Hipotecario</strong>
+                <span>Iniciar estudio de scoring de viabilidad de hipoteca de no residente.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox" checked>
+              <div class="option-card-content">
+                <strong>Enviar Dossier Personalizado &amp; Selección de Inmuebles</strong>
+                <span>Preparar selección de 3 a 5 propiedades alineadas con sus criterios en 24h.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="checkbox">
+              <div class="option-card-content">
+                <strong>Agendar "Discovery Trip" / Visitas Presenciales</strong>
+                <span>Fijar fechas en agenda del agente para recibirlos en Alicante/Costa Blanca.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="field-group" style="margin-top: 16px;">
+          <label class="field-label">Notas Adicionales del Agente:</label>
+          <textarea class="input-textarea" style="min-height: 85px;" placeholder="Detalles de la personalidad del cliente, motivaciones personales, miedos expresados, etc."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- BARRA DE ACCIÓN -->
+    <div class="action-bar">
+      <button type="button" class="btn btn-clear" onclick="window.location.reload();">Limpiar Ficha</button>
+      <button type="button" class="btn btn-print" onclick="window.print();">🖨️ Imprimir / Guardar en PDF</button>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>
