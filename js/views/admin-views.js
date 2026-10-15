@@ -1875,6 +1875,11 @@
         allUsers = await App.auth.getAllUsers();
       }
 
+      // Auto-sync any registered clients or realtors who aren't yet in webinar_registrations
+      if (App.auth && App.auth.syncMissingWebinarRegistrations) {
+        await App.auth.syncMissingWebinarRegistrations();
+      }
+
       // 1. Fetch current webinar settings
       currentWebinarSettings = await App.auth.getWebinarSettings();
       if (!currentWebinarSettings) {
@@ -2062,7 +2067,8 @@
     registrations.forEach(r => {
       const type = (r.webinarType || '').toLowerCase();
       const webTitle = (r.webinar || '').toLowerCase();
-      if (type === 'b2b' || webTitle.includes('beyond borders') || r.agency) {
+      const isB2B = type === 'b2b' || webTitle.includes('beyond borders') || (!type && r.agency && r.agency.trim().length > 0);
+      if (isB2B) {
         b2bCount++;
       } else {
         b2cCount++;

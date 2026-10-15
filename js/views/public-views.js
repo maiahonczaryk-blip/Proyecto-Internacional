@@ -629,30 +629,32 @@ App.views.public = {
             ? await App.auth.getWebinarSettings()
             : (App.auth && App.auth.getDefaultWebinarSettings ? App.auth.getDefaultWebinarSettings() : null);
 
-          const activeType = settings?.activeType || 'b2c';
-          const typeConfig = settings ? (settings[activeType] || settings.b2c) : null;
-          const webinarTitle = typeConfig?.title || (contactType === 'client' ? 'Spain Unlocked (Descubre España)' : 'Beyond Borders');
-          const webinarDate = settings?.date || typeConfig?.date || '2026-09-18';
+          const isClientType = contactType === 'client';
+          const typeConfig = isClientType ? (settings?.b2c || {}) : (settings?.b2b || {});
+          const webinarTitle = typeConfig?.title || (isClientType ? 'Spain Unlocked: Living & Investing' : 'Beyond Borders');
+          const webinarDate = typeConfig?.date || (isClientType ? (settings?.b2c?.date || '2026-10-29') : (settings?.b2b?.date || '2026-09-24'));
 
           let webinarPayload = {
             firstName,
             lastName,
             email,
             phone,
-            agency: contactType === 'client' ? 'Client (Interested in Spain)' : (agencyName || 'Referred Partner'),
+            agency: isClientType ? (form.querySelector('#referral-objective')?.value || 'Client (Interested in Spain)') : (agencyName || 'Referred Partner'),
+            clientInterest: isClientType ? (form.querySelector('#referral-objective')?.value || form.querySelector('#referral-interestArea')?.value || 'Inversión / Mudanza') : null,
             country: form.querySelector('#referral-country')?.value || (market || 'United States'),
             state: form.querySelector('#referral-market')?.value || 'N/A',
             howHeard: 'Referral Link',
             referrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : '',
             webinar: webinarTitle,
-            webinarType: (contactType === 'client' ? 'B2C' : 'B2B'),
+            webinarType: (isClientType ? 'B2C' : 'B2B'),
             webinarDate: webinarDate,
             gdprConsent: true,
             referralCode: referrer?.referralCode || refCode || null,
             referrerId: referrer?.id || null,
             agentReferrerId: referrer?.id || null,
             agentReferrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : null,
-            agentReferrerRole: referrer?.role || null
+            agentReferrerRole: referrer?.role || null,
+            status: 'pending'
           };
 
           try {

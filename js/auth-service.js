@@ -176,7 +176,7 @@ App.auth = (function() {
       throw new Error('Password must be at least 6 characters.');
     }
 
-    if (!['broker', 'realtor'].includes(role)) {
+    if (!['broker', 'realtor', 'client'].includes(role)) {
       throw new Error('Invalid role selected.');
     }
 
@@ -237,6 +237,13 @@ App.auth = (function() {
             console.warn('[Notifications] Error finding referrer agent:', e);
           }
         }
+      }
+
+      // Auto-enroll user/client in upcoming webinar
+      if (newUser.role === 'client') {
+        await autoEnrollClientWebinar(newUser);
+      } else if (['realtor', 'broker'].includes(newUser.role)) {
+        await autoEnrollRealtorWebinar(newUser);
       }
 
       return { success: true, user: newUser };
@@ -301,6 +308,14 @@ App.auth = (function() {
             console.warn('[Notifications] Error finding referrer agent:', e);
           }
         }
+      }
+
+      // Auto-enroll user/client in upcoming webinar
+      const fullUser = { id: uid, ...userData };
+      if (finalRole === 'client') {
+        await autoEnrollClientWebinar(fullUser);
+      } else if (['realtor', 'broker'].includes(finalRole)) {
+        await autoEnrollRealtorWebinar(fullUser);
       }
 
       currentUser = { id: uid, ...userData };
@@ -503,7 +518,7 @@ App.auth = (function() {
       throw new Error('Please select a role (Broker or Realtor).');
     }
 
-    if (!['broker', 'realtor'].includes(role)) {
+    if (!['broker', 'realtor', 'client'].includes(role)) {
       throw new Error('Invalid role selected.');
     }
 
@@ -557,6 +572,13 @@ App.auth = (function() {
             console.warn('[Notifications] Error finding referrer agent:', e);
           }
         }
+      }
+
+      // Auto-enroll in webinar
+      if (newUser.role === 'client') {
+        await autoEnrollClientWebinar(newUser);
+      } else if (['realtor', 'broker'].includes(newUser.role)) {
+        await autoEnrollRealtorWebinar(newUser);
       }
 
       return { success: true, user: newUser };
@@ -622,6 +644,14 @@ App.auth = (function() {
             console.warn('[Notifications] Error finding referrer agent:', e);
           }
         }
+      }
+
+      // Auto-enroll in webinar
+      const fullUser = { id: uid, ...userData };
+      if (role === 'client') {
+        await autoEnrollClientWebinar(fullUser);
+      } else if (['realtor', 'broker'].includes(role)) {
+        await autoEnrollRealtorWebinar(fullUser);
       }
 
       currentUser = { id: uid, ...userData };
@@ -1207,8 +1237,11 @@ App.auth = (function() {
   async function saveWebinarRegistration(data) {
     const payload = {
       ...data,
-      createdAt: new Date().toISOString()
+      createdAt: data.createdAt || new Date().toISOString()
     };
+
+    const emailNorm = (payload.email || '').toLowerCase().trim();
+    const typeNorm = (payload.webinarType || '').toUpperCase().trim();
 
     let agentEmail = null;
     if (payload.agentReferrerId) {
@@ -1223,7 +1256,15 @@ App.auth = (function() {
 
     if (App.demoMode) {
       if (!App.demoData.webinar_registrations) App.demoData.webinar_registrations = [];
-      payload.id = 'wreg-' + Date.now();
+      const existing = App.demoData.webinar_registrations.find(r => 
+        (r.email || '').toLowerCase().trim() === emailNorm && 
+        (!typeNorm || (r.webinarType || '').toUpperCase().trim() === typeNorm)
+      );
+      if (existing) {
+        return existing.id;
+      }
+
+      payload.id = 'wreg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
       App.demoData.webinar_registrations.push(payload);
       saveDemoData();
       // Notify admin of new webinar registration
@@ -1232,6 +1273,23 @@ App.auth = (function() {
       }
       return payload.id;
     } else {
+      if (emailNorm) {
+        try {
+          const dupQuery = await App.db.collection('webinar_registrations')
+            .where('email', '==', emailNorm)
+            .get();
+          const existingDoc = dupQuery.docs.find(d => {
+            const dType = (d.data().webinarType || '').toUpperCase().trim();
+            return !typeNorm || dType === typeNorm;
+          });
+          if (existingDoc) {
+            return existingDoc.id;
+          }
+        } catch (e) {
+          console.warn('[Webinar] Duplicate check error:', e);
+        }
+      }
+
       const docRef = await App.db.collection('webinar_registrations').add(payload);
       // Notify admin of new webinar registration
       if (window.App && window.App.notifications) {
@@ -1262,6 +1320,168 @@ App.auth = (function() {
     } else {
       await App.db.collection('webinar_registrations').doc(regId).delete();
       return true;
+    }
+  }
+
+  /* ---- Auto-Enroll Client in B2C Webinar ---- */
+  async function autoEnrollClientWebinar(client, extraOptions = {}) {
+    try {
+      if (!client || !client.email) return;
+      const emailNorm = client.email.toLowerCase().trim();
+
+      const settings = (await getWebinarSettings()) || getDefaultWebinarSettings();
+      const b2cConfig = settings?.b2c || {};
+      const webinarTitle = b2cConfig.title || (settings.activeType === 'b2c' ? settings.title : 'Spain Unlocked: Living & Investing');
+      const webinarDate = b2cConfig.date || (settings.activeType === 'b2c' ? settings.date : '2026-10-29');
+
+      let agentReferrerId = client.localAgentId || client.realtorId || extraOptions.agentReferrerId || null;
+      let agentReferrerName = client.localAgentName || client.realtorName || extraOptions.agentReferrerName || null;
+      let agentReferrerRole = extraOptions.agentReferrerRole || null;
+      let referrerName = extraOptions.referrerName || agentReferrerName || '';
+
+      if (!agentReferrerName && client.referredBy) {
+        try {
+          const allUsers = await getAllUsers();
+          const refUser = allUsers.find(u => u.id === client.referredBy || (u.referralCode && u.referralCode.toUpperCase() === (client.referredBy || '').toUpperCase()));
+          if (refUser) {
+            agentReferrerId = refUser.id;
+            agentReferrerName = `${refUser.firstName} ${refUser.lastName}`.trim();
+            agentReferrerRole = refUser.role;
+            referrerName = agentReferrerName;
+          }
+        } catch (_) {}
+      }
+
+      const clientInterestParts = [client.objective, client.interestArea].filter(x => x && x !== '—');
+      const clientInterest = clientInterestParts.length > 0 ? clientInterestParts.join(' · ') : 'Inversión / Mudanza';
+
+      const webinarPayload = {
+        firstName: client.firstName || '',
+        lastName: client.lastName || '',
+        email: emailNorm,
+        phone: client.phone || '—',
+        agency: client.objective || client.budget || 'Client (Interested in Spain)',
+        clientInterest: clientInterest,
+        country: client.currentLocation || client.country || 'Puerto Rico',
+        state: client.state || 'N/A',
+        howHeard: extraOptions.howHeard || (client.source === 'referral' ? 'Referral Link' : 'agent'),
+        referrerName: referrerName,
+        referrerId: client.referredBy || client.addedManuallyBy || extraOptions.referrerId || null,
+        agentReferrerId: agentReferrerId,
+        agentReferrerName: agentReferrerName,
+        agentReferrerRole: agentReferrerRole,
+        referralCode: extraOptions.referralCode || client.referralCode || null,
+        webinar: webinarTitle,
+        webinarType: 'B2C',
+        webinarDate: webinarDate,
+        gdprConsent: true,
+        role: 'client',
+        contactType: 'client',
+        source: client.source || 'client_registration',
+        status: 'pending',
+        createdAt: client.createdAt || new Date().toISOString()
+      };
+
+      await saveWebinarRegistration(webinarPayload);
+    } catch (err) {
+      console.warn('[Auth] Error auto-enrolling client in webinar:', err);
+    }
+  }
+
+  /* ---- Auto-Enroll Realtor / Partner in B2B Webinar ---- */
+  async function autoEnrollRealtorWebinar(user, extraOptions = {}) {
+    try {
+      if (!user || !user.email) return;
+      const emailNorm = user.email.toLowerCase().trim();
+
+      const settings = (await getWebinarSettings()) || getDefaultWebinarSettings();
+      const b2bConfig = settings?.b2b || {};
+      const webinarTitle = b2bConfig.title || (settings.activeType === 'b2b' ? settings.title : 'Beyond Borders');
+      const webinarDate = b2bConfig.date || (settings.activeType === 'b2b' ? settings.date : '2026-09-24');
+
+      let agentReferrerId = extraOptions.agentReferrerId || null;
+      let agentReferrerName = extraOptions.agentReferrerName || null;
+      let agentReferrerRole = extraOptions.agentReferrerRole || null;
+      let referrerName = extraOptions.referrerName || '';
+
+      if (user.referredBy) {
+        try {
+          const allUsers = await getAllUsers();
+          const refUser = allUsers.find(u => u.id === user.referredBy || (u.referralCode && u.referralCode.toUpperCase() === (user.referredBy || '').toUpperCase()));
+          if (refUser) {
+            agentReferrerId = refUser.id;
+            agentReferrerName = `${refUser.firstName} ${refUser.lastName}`.trim();
+            agentReferrerRole = refUser.role;
+            referrerName = agentReferrerName;
+          }
+        } catch (_) {}
+      }
+
+      const webinarPayload = {
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: emailNorm,
+        phone: user.phone || '—',
+        agency: user.agencyName || (user.role === 'broker' ? 'Brokerage' : 'Realtor Network'),
+        country: user.country || 'United States',
+        state: user.market || user.state || 'N/A',
+        howHeard: user.referredBy ? 'Referral Link' : 'Website Registration',
+        referrerName: referrerName,
+        referrerId: user.referredBy || extraOptions.referrerId || null,
+        agentReferrerId: agentReferrerId,
+        agentReferrerName: agentReferrerName,
+        agentReferrerRole: agentReferrerRole,
+        referralCode: user.referredBy || extraOptions.referralCode || null,
+        webinar: webinarTitle,
+        webinarType: 'B2B',
+        webinarDate: webinarDate,
+        gdprConsent: true,
+        role: user.role || 'realtor',
+        contactType: user.role || 'realtor',
+        source: user.source || 'website_registration',
+        status: 'pending',
+        createdAt: user.createdAt || new Date().toISOString()
+      };
+
+      await saveWebinarRegistration(webinarPayload);
+    } catch (err) {
+      console.warn('[Auth] Error auto-enrolling realtor in webinar:', err);
+    }
+  }
+
+  /* ---- Sync Missing Webinar Registrations ---- */
+  async function syncMissingWebinarRegistrations() {
+    try {
+      const existing = await getWebinarRegistrations();
+      const existingMap = new Set();
+      existing.forEach(r => {
+        const em = (r.email || '').toLowerCase().trim();
+        const ty = (r.webinarType || '').toUpperCase().trim();
+        if (em) existingMap.add(`${em}::${ty}`);
+      });
+
+      // 1. Sync Clients to B2C Webinar
+      const clients = await getClients();
+      for (const c of clients) {
+        const em = (c.email || '').toLowerCase().trim();
+        if (em && !existingMap.has(`${em}::B2C`)) {
+          await autoEnrollClientWebinar(c);
+          existingMap.add(`${em}::B2C`);
+        }
+      }
+
+      // 2. Sync Realtors / Brokers to B2B Webinar
+      const users = await getAllUsers();
+      for (const u of users) {
+        if (!['realtor', 'broker'].includes(u.role)) continue;
+        const em = (u.email || '').toLowerCase().trim();
+        if (em && !existingMap.has(`${em}::B2B`)) {
+          await autoEnrollRealtorWebinar(u);
+          existingMap.add(`${em}::B2B`);
+        }
+      }
+    } catch (err) {
+      console.warn('[Webinar] Error syncing missing webinar registrations:', err);
     }
   }
 
@@ -1753,6 +1973,16 @@ App.auth = (function() {
       await App.db.collection('clients').doc(newClient.id).set(newClient);
     }
 
+    // Auto-enroll client in B2C client webinar
+    await autoEnrollClientWebinar(newClient, {
+      referrerName: `${user.firstName} ${user.lastName}`.trim(),
+      referrerId: user.id,
+      agentReferrerId: user.id,
+      agentReferrerName: `${user.firstName} ${user.lastName}`.trim(),
+      agentReferrerRole: user.role,
+      howHeard: 'agent'
+    });
+
     return newClient;
   }
 
@@ -1798,6 +2028,14 @@ App.auth = (function() {
     } else {
       await App.db.collection('clients').doc(newClient.id).set(newClient);
     }
+
+    // Auto-enroll client in B2C client webinar
+    await autoEnrollClientWebinar(newClient, {
+      howHeard: 'Referral Link',
+      referrerId: clientData.referredBy || null,
+      agentReferrerId: clientData.localAgentId || clientData.realtorId || null,
+      agentReferrerName: clientData.localAgentName || clientData.realtorName || null
+    });
 
     return newClient;
   }
@@ -1845,6 +2083,13 @@ App.auth = (function() {
           console.warn('[Notifications] Error finding referrer agent:', e);
         }
       }
+    }
+
+    // Auto-enroll referred user in webinar
+    if (newUser.role === 'client') {
+      await autoEnrollClientWebinar(newUser);
+    } else if (['realtor', 'broker'].includes(newUser.role)) {
+      await autoEnrollRealtorWebinar(newUser);
     }
 
     return newUser;
@@ -2158,6 +2403,9 @@ App.auth = (function() {
     saveWebinarSettings,
     getDefaultWebinarSettings,
     getWebinarFeedbacks,
-    deleteWebinarFeedback
+    deleteWebinarFeedback,
+    autoEnrollClientWebinar,
+    autoEnrollRealtorWebinar,
+    syncMissingWebinarRegistrations
   };
 })();
