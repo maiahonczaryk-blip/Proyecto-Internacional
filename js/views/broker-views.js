@@ -886,11 +886,10 @@
             <div>
               <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Timeline *</label>
               <select id="mc-timeline" class="form-input" required style="margin-bottom: 0;">
-                <option value="">Select timeline</option>
-                <option value="0-3 months">0 - 3 months</option>
-                <option value="3-6 months">3 - 6 months</option>
-                <option value="6-12 months">6 - 12 months</option>
-                <option value="+1 year">+1 year</option>
+                <option value="">Select timeline / Seleccionar plazo</option>
+                <option value="0 a 6 meses">0 a 6 meses / 0 to 6 months</option>
+                <option value="6 a 12 meses">6 a 12 meses / 6 to 12 months</option>
+                <option value="+12 meses">+12 meses / +12 months</option>
               </select>
             </div>
             <div>
