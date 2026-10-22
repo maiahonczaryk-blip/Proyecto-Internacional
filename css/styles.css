@@ -6000,14 +6000,16 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
     margin-left: 0 !important;
   }
 
-  /* Give content top padding for mobile topbar and bottom padding for bottom nav */
+  /* Give content clean padding below mobile-section-switcher and above bottom nav */
+  .dashboard-body .dashboard-content,
   .dashboard-content {
-    padding: 76px 16px calc(88px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: 14px 12px calc(88px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   /* Clean balanced header without hamburger left offset */
+  .dashboard-body .dashboard-header,
   .dashboard-header {
-    padding: 12px 4px 16px 4px;
+    padding: 14px 16px !important;
     flex-wrap: wrap;
     gap: 10px;
   }
@@ -8205,14 +8207,21 @@ textarea:focus-visible {
 
 /* Hidden on Desktop (> 991px) */
 .mobile-dashboard-topbar,
-.dashboard-bottom-nav {
+.mobile-section-switcher,
+.dashboard-bottom-nav,
+.sidebar-mobile-close-btn {
+  display: none;
+}
+
+.dashboard-bnav-group,
+.mobile-section-group {
   display: none;
 }
 
 @media (max-width: 991px) {
   /* 1. Mobile Top Bar */
   .mobile-dashboard-topbar {
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: space-between;
     position: fixed;
@@ -8220,20 +8229,46 @@ textarea:focus-visible {
     left: 0;
     right: 0;
     height: 60px;
-    padding: 0 14px;
-    background: rgba(11, 20, 38, 0.96);
+    padding: 0 12px;
+    background: rgba(11, 20, 38, 0.97);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.22);
     z-index: 1005;
     box-sizing: border-box;
   }
 
-  .mobile-topbar-logo {
+  .mobile-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .mobile-topbar-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     height: 36px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(96, 165, 250, 0.45);
+    background: rgba(0, 67, 255, 0.25);
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-topbar-logo {
+    height: 30px;
     width: auto;
     object-fit: contain;
+    filter: brightness(0) invert(1);
     flex-shrink: 0;
   }
 
@@ -8245,7 +8280,7 @@ textarea:focus-visible {
   }
 
   .mobile-topbar-title {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 700;
     color: rgba(255, 255, 255, 0.92);
     letter-spacing: 0.3px;
@@ -8255,18 +8290,20 @@ textarea:focus-visible {
   }
 
   .mobile-topbar-role {
-    font-size: 0.65rem;
-    font-weight: 600;
+    font-size: 0.62rem;
+    font-weight: 700;
     color: #60a5fa;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .mobile-topbar-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-shrink: 0;
   }
 
@@ -8323,9 +8360,92 @@ textarea:focus-visible {
     box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.35);
   }
 
-  /* 2. Mobile Bottom Navigation Bar (Dashboard) */
+  /* 2. Mobile Top Section Switcher Grid */
+  .mobile-section-switcher {
+    display: block !important;
+    margin-top: 60px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 10px 12px;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  }
+
+  .mobile-section-switcher-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    margin-bottom: 8px;
+  }
+
+  .mobile-section-group {
+    display: none;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    width: 100%;
+  }
+
+  .mobile-section-group--3cols {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .mobile-section-group--2cols {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mobile-section-group.active,
+  body[data-role="admin"] #msec-group-admin,
+  body[data-route^="admin/"] #msec-group-admin,
+  body[data-role="agent_inmomas"] #msec-group-agent_inmomas,
+  body[data-route^="agent_inmomas/"] #msec-group-agent_inmomas,
+  body[data-role="colaborador"] #msec-group-colaborador,
+  body[data-route^="colaborador/"] #msec-group-colaborador,
+  body[data-role="broker"] #msec-group-broker,
+  body[data-route^="broker/"] #msec-group-broker,
+  body[data-role="realtor"] #msec-group-realtor,
+  body[data-route^="realtor/"] #msec-group-realtor,
+  body[data-role="partner"] #msec-group-partner,
+  body[data-route^="partner/"] #msec-group-partner {
+    display: grid !important;
+  }
+
+  .mobile-section-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 8px 4px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    text-decoration: none;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.15;
+    transition: all 0.18s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-section-pill__icon {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  .mobile-section-pill.active {
+    background: #003da5;
+    border-color: #003da5;
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 3px 10px rgba(0, 61, 165, 0.25);
+  }
+
+  /* 3. Mobile Bottom Navigation Bar (Dashboard) */
   .dashboard-bottom-nav {
-    display: block;
+    display: block !important;
     position: fixed;
     bottom: 0;
     left: 0;
@@ -8341,46 +8461,43 @@ textarea:focus-visible {
   }
 
   .dashboard-bnav-group {
-    display: flex;
+    display: none;
     align-items: stretch;
     justify-content: space-around;
     width: 100%;
-    height: 64px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox */
+    height: 62px;
     padding: 0 4px;
     box-sizing: border-box;
   }
 
-  .dashboard-bnav-group::-webkit-scrollbar {
-    display: none; /* Safari/Chrome */
-  }
-
-  /* When a role has > 6 items (e.g. Admin has 8), allow clean horizontal scroll */
-  #bnav-group-admin {
-    justify-content: flex-start;
-  }
-
-  #bnav-group-admin .dashboard-bnav-item {
-    flex: 0 0 auto;
-    min-width: 66px;
-    padding: 6px 8px;
+  .dashboard-bnav-group.active,
+  body[data-role="admin"] #bnav-group-admin,
+  body[data-route^="admin/"] #bnav-group-admin,
+  body[data-role="agent_inmomas"] #bnav-group-agent_inmomas,
+  body[data-route^="agent_inmomas/"] #bnav-group-agent_inmomas,
+  body[data-role="colaborador"] #bnav-group-colaborador,
+  body[data-route^="colaborador/"] #bnav-group-colaborador,
+  body[data-role="broker"] #bnav-group-broker,
+  body[data-route^="broker/"] #bnav-group-broker,
+  body[data-role="realtor"] #bnav-group-realtor,
+  body[data-route^="realtor/"] #bnav-group-realtor,
+  body[data-role="partner"] #bnav-group-partner,
+  body[data-route^="partner/"] #bnav-group-partner {
+    display: flex !important;
   }
 
   .dashboard-bnav-item {
     flex: 1 1 0;
-    min-width: 54px;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 3px;
-    padding: 6px 4px;
+    padding: 4px 2px;
     text-decoration: none;
     color: #64748b;
-    font-size: 0.65rem;
+    font-size: 0.63rem;
     font-weight: 600;
     letter-spacing: 0.1px;
     position: relative;
@@ -8389,6 +8506,11 @@ textarea:focus-visible {
     border-radius: 10px;
     margin: 4px 1px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: none;
+    background: transparent;
+    cursor: pointer;
   }
 
   .dashboard-bnav-icon {
@@ -8399,7 +8521,7 @@ textarea:focus-visible {
 
   .dashboard-bnav-item.active {
     color: #0043ff;
-    background: rgba(0, 67, 255, 0.07);
+    background: rgba(0, 67, 255, 0.08);
     font-weight: 700;
   }
 
@@ -8412,8 +8534,8 @@ textarea:focus-visible {
     content: '';
     position: absolute;
     top: 0;
-    left: 25%;
-    right: 25%;
+    left: 22%;
+    right: 22%;
     height: 3px;
     background: #0043ff;
     border-radius: 0 0 4px 4px;
@@ -8423,16 +8545,56 @@ textarea:focus-visible {
     transform: scale(0.95);
   }
 
-  /* 3. Dashboard Sections & Cards Mobile Polish */
+  /* 4. Dashboard Sections, Referral Link Cards, Webinar & Newsletter Panels Mobile Polish */
+  .dashboard-body .dashboard-section,
   .dashboard-section {
-    padding: 16px !important;
+    padding: 16px 14px !important;
     border-radius: 14px !important;
-    margin-bottom: 16px !important;
+    margin-bottom: 14px !important;
   }
 
+  .dashboard-body .dashboard-section h2,
   .dashboard-section h2 {
-    font-size: 1.05rem !important;
+    font-size: 1.02rem !important;
     line-height: 1.3;
+  }
+
+  /* Referral Link Box: stack cleanly on mobile so URL and Copy button are full width */
+  .dashboard-body .referral-quick > div[style*="display: flex"] {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .dashboard-body .referral-quick input[type="text"] {
+    min-width: 180px !important;
+    font-size: 0.82rem !important;
+  }
+
+  .dashboard-body .referral-quick .btn-primary {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Admin Webinar Config & Mode Switch Mobile Polish */
+  #admin-webinar-type-switch {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 6px !important;
+  }
+
+  #admin-webinar-type-switch .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  #admin-webinar-config-form div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Admin Newsletter 2-col layout stack on mobile */
+  #view-admin-newsletter .dashboard-grid-2col {
+    grid-template-columns: 1fr !important;
   }
 
   /* Profile View Mobile Responsiveness */

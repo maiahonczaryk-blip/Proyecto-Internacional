@@ -2,31 +2,426 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>RE/MAX Inmomás — International Advisory Division</title>
   <meta name="description" content="Expert advisory for Americans buying property in Spain. 30+ years on the Costa Blanca. Legal, tax, residency & real estate — one trusted team.">
   <meta property="og:title" content="REMAX Inmomás — International Advisory Division">
   <meta property="og:description" content="Your trusted team for buying property on Spain's Costa Blanca. Legal, tax & real estate advisory for international buyers.">
   <meta property="og:type" content="website">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=20261022_v4">
   <link rel="icon" type="image/png" href="Globo_CMYK.png">
   <!-- EmailJS SDK — free email sending from the browser (200 emails/month) -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
     (function() { emailjs.init({ publicKey: 'JTCb2ReY646jaDW4r' }); })();
   </script>
+  <style id="mobile-dashboard-critical-css">
+    /* Critical inline mobile navigation & dashboard rules (cache-proof) */
+    .mobile-dashboard-topbar,
+    .mobile-section-switcher,
+    .dashboard-bottom-nav,
+    .sidebar-mobile-close-btn {
+      display: none;
+    }
+    .dashboard-bnav-group,
+    .mobile-section-group {
+      display: none;
+    }
+    @media (max-width: 991px) {
+      .sidebar-toggle {
+        display: none !important;
+      }
+      /* 1. Fixed Top Bar */
+      .mobile-dashboard-topbar {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        padding: 0 12px;
+        background: #0b1426;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+        z-index: 1005;
+        box-sizing: border-box;
+      }
+      .mobile-topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        flex: 1;
+      }
+      .mobile-topbar-menu-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        height: 36px;
+        padding: 0 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(96, 165, 250, 0.45);
+        background: rgba(0, 67, 255, 0.25);
+        color: #ffffff;
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+        flex-shrink: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .mobile-topbar-menu-btn .menu-icon-bars {
+        font-size: 1.05rem;
+        line-height: 1;
+      }
+      .mobile-topbar-logo {
+        height: 30px;
+        width: auto;
+        object-fit: contain;
+        filter: brightness(0) invert(1);
+        flex-shrink: 0;
+      }
+      .mobile-topbar-meta {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        line-height: 1.15;
+      }
+      .mobile-topbar-title {
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.9);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .mobile-topbar-role {
+        font-size: 0.62rem;
+        font-weight: 700;
+        color: #60a5fa;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .mobile-topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+      .mobile-topbar-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 34px;
+        min-width: 34px;
+        padding: 0 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .mobile-topbar-logout {
+        color: #fca5a5;
+        border-color: rgba(248, 113, 113, 0.35);
+        background: rgba(239, 68, 68, 0.15);
+        font-size: 0.95rem;
+      }
+      .mobile-topbar-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0043ff, #2563eb);
+        color: #ffffff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-decoration: none;
+        border: 2px solid rgba(255, 255, 255, 0.25);
+      }
+
+      /* 2. Slide-out Sidebar Drawer above topbar & bottom nav */
+      .dashboard-body .dashboard-sidebar,
+      .dashboard-sidebar {
+        z-index: 1025 !important;
+        width: 280px !important;
+        max-width: 84vw !important;
+      }
+      .sidebar-backdrop {
+        z-index: 1020 !important;
+      }
+      .sidebar-mobile-close-btn {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-left: auto;
+      }
+
+      /* 3. Top In-Page Section Switcher (Visible immediately below topbar) */
+      .mobile-section-switcher {
+        display: block !important;
+        margin-top: 60px;
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 10px 12px;
+        box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+      }
+      .mobile-section-switcher-label {
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #64748b;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .mobile-section-group {
+        display: none;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        width: 100%;
+      }
+      .mobile-section-group--3cols {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .mobile-section-group--2cols {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      /* Show active group via JS class OR CSS route/role fallback */
+      .mobile-section-group.active,
+      body[data-role="admin"] #msec-group-admin,
+      body[data-route^="admin/"] #msec-group-admin,
+      body[data-role="agent_inmomas"] #msec-group-agent_inmomas,
+      body[data-route^="agent_inmomas/"] #msec-group-agent_inmomas,
+      body[data-role="colaborador"] #msec-group-colaborador,
+      body[data-route^="colaborador/"] #msec-group-colaborador,
+      body[data-role="broker"] #msec-group-broker,
+      body[data-route^="broker/"] #msec-group-broker,
+      body[data-role="realtor"] #msec-group-realtor,
+      body[data-route^="realtor/"] #msec-group-realtor,
+      body[data-role="partner"] #msec-group-partner,
+      body[data-route^="partner/"] #msec-group-partner {
+        display: grid !important;
+      }
+      .mobile-section-pill {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        padding: 8px 4px;
+        border-radius: 10px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        color: #334155;
+        text-decoration: none;
+        font-size: 0.68rem;
+        font-weight: 600;
+        text-align: center;
+        line-height: 1.15;
+        transition: all 0.18s ease;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .mobile-section-pill__icon {
+        font-size: 1.1rem;
+        line-height: 1;
+      }
+      .mobile-section-pill.active {
+        background: #003da5;
+        border-color: #003da5;
+        color: #ffffff;
+        font-weight: 700;
+        box-shadow: 0 3px 10px rgba(0, 61, 165, 0.25);
+      }
+
+      /* 4. Fixed Bottom Navigation Bar */
+      .dashboard-bottom-nav {
+        display: block !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 1005;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid #cbd5e1;
+        box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.1);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      .dashboard-bnav-group {
+        display: none;
+        align-items: stretch;
+        justify-content: space-around;
+        width: 100%;
+        height: 62px;
+        padding: 0 4px;
+        box-sizing: border-box;
+      }
+      .dashboard-bnav-group.active,
+      body[data-role="admin"] #bnav-group-admin,
+      body[data-route^="admin/"] #bnav-group-admin,
+      body[data-role="agent_inmomas"] #bnav-group-agent_inmomas,
+      body[data-route^="agent_inmomas/"] #bnav-group-agent_inmomas,
+      body[data-role="colaborador"] #bnav-group-colaborador,
+      body[data-route^="colaborador/"] #bnav-group-colaborador,
+      body[data-role="broker"] #bnav-group-broker,
+      body[data-route^="broker/"] #bnav-group-broker,
+      body[data-role="realtor"] #bnav-group-realtor,
+      body[data-route^="realtor/"] #bnav-group-realtor,
+      body[data-role="partner"] #bnav-group-partner,
+      body[data-route^="partner/"] #bnav-group-partner {
+        display: flex !important;
+      }
+      .dashboard-bnav-item {
+        flex: 1 1 0;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        padding: 4px 2px;
+        text-decoration: none;
+        color: #64748b;
+        font-size: 0.63rem;
+        font-weight: 600;
+        border-radius: 10px;
+        margin: 4px 1px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        position: relative;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .dashboard-bnav-icon {
+        font-size: 1.15rem;
+        line-height: 1;
+      }
+      .dashboard-bnav-item.active {
+        color: #003da5;
+        background: rgba(0, 61, 165, 0.08);
+        font-weight: 700;
+      }
+      .dashboard-bnav-item.active::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 22%;
+        right: 22%;
+        height: 3px;
+        background: #003da5;
+        border-radius: 0 0 4px 4px;
+      }
+
+      /* 5. Dashboard Content & Cards Mobile Layout Overrides (.dashboard-body specificity) */
+      .dashboard-body .app-main,
+      .app-main.has-sidebar {
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+      }
+      .dashboard-body .dashboard-content,
+      .dashboard-content {
+        padding: 14px 12px calc(86px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+      .dashboard-body .dashboard-header,
+      .dashboard-header {
+        padding: 14px 16px !important;
+        border-radius: 12px;
+        margin-bottom: 14px;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+      }
+      .dashboard-body .dashboard-header h1 {
+        font-size: 1.25rem !important;
+        line-height: 1.25 !important;
+      }
+      .dashboard-body .dashboard-subtitle {
+        font-size: 0.8rem !important;
+      }
+      .dashboard-body .stat-cards-grid,
+      .stat-cards-grid.stat-cards-grid--5cols,
+      .stat-cards-grid.stat-cards-grid--4cols,
+      .stat-cards-grid.stat-cards-grid--3cols,
+      .stat-cards-grid.stat-cards-grid--autofit {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+      }
+      .dashboard-body .stat-card {
+        padding: 12px 14px !important;
+        border-radius: 12px !important;
+      }
+      .dashboard-body .stat-card__icon {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 1rem !important;
+      }
+      .dashboard-body .stat-card__value {
+        font-size: 1.3rem !important;
+      }
+      .dashboard-body .stat-card__label {
+        font-size: 0.72rem !important;
+      }
+      .dashboard-body .dashboard-section,
+      .dashboard-body .referral-quick {
+        padding: 16px 14px !important;
+        border-radius: 14px !important;
+        margin-top: 14px !important;
+      }
+      .dashboard-body .dashboard-grid-2col {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+      }
+      .dashboard-body .pipeline-board {
+        flex-direction: column !important;
+      }
+      .dashboard-body .pipeline-column {
+        min-width: 100% !important;
+        max-width: 100% !important;
+        max-height: none !important;
+      }
+    }
+  </style>
 </head>
 <body class="lang-en dashboard-body">
 
   <!-- ===================== MOBILE DASHBOARD TOPBAR ===================== -->
   <header class="mobile-dashboard-topbar" id="mobile-dashboard-topbar">
-    <a href="#profile" class="mobile-topbar-brand" style="text-decoration: none; display: flex; align-items: center; gap: 10px; min-width: 0;">
-      <img src="images/spain-connection-logo.png" alt="The Spain Connection" class="mobile-topbar-logo">
-      <div class="mobile-topbar-meta">
-        <span class="mobile-topbar-title">Partner Portal</span>
-        <span class="mobile-topbar-role" id="mobile-topbar-role">—</span>
-      </div>
-    </a>
+    <div class="mobile-topbar-left">
+      <button type="button" class="mobile-topbar-menu-btn" id="mobile-topbar-menu-btn" aria-label="Open Menu">
+        <span class="menu-icon-bars">☰</span>
+        <span><span class="lang-en">Menu</span><span class="lang-es">Menú</span></span>
+      </button>
+      <a href="#profile" class="mobile-topbar-brand" style="text-decoration: none; display: flex; align-items: center; gap: 8px; min-width: 0;">
+        <img src="images/spain-connection-logo.png" alt="The Spain Connection" class="mobile-topbar-logo">
+        <div class="mobile-topbar-meta">
+          <span class="mobile-topbar-title">Spain Connection</span>
+          <span class="mobile-topbar-role" id="mobile-topbar-role">—</span>
+        </div>
+      </a>
+    </div>
     <div class="mobile-topbar-actions">
       <button class="mobile-topbar-btn" id="mobile-lang-toggle" aria-label="Switch language" title="Switch Language">
         <span class="lang-label">ES</span>
@@ -43,9 +438,12 @@
 
   <!-- ===================== DASHBOARD SIDEBAR ===================== -->
   <aside class="dashboard-sidebar" id="dashboard-sidebar">
-    <div class="sidebar-logo">
-      <img src="images/spain-connection-logo.png" alt="The Spain Connection" style="max-height: 60px; padding: 5px;">
-      <span>Partner Portal</span>
+    <div class="sidebar-logo" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+      <div>
+        <img src="images/spain-connection-logo.png" alt="The Spain Connection" style="max-height: 60px; padding: 5px;">
+        <span>Partner Portal</span>
+      </div>
+      <button type="button" class="sidebar-mobile-close-btn" id="sidebar-mobile-close-btn" aria-label="Close Menu">✕</button>
     </div>
 
     <!-- Admin Sidebar Nav (Broker Inmomás) -->
@@ -137,6 +535,70 @@
   <!-- ===================== MAIN CONTENT AREA ===================== -->
   <main class="app-main" id="app-main">
 
+    <!-- ===================== MOBILE TOP SECTION SWITCHER BAR ===================== -->
+    <div class="mobile-section-switcher" id="mobile-section-switcher">
+      <div class="mobile-section-switcher-label">
+        <span>🧭 <span class="lang-en">Navigate Sections</span><span class="lang-es">Secciones de tu Espacio Personal</span></span>
+      </div>
+
+      <!-- Admin Section Grid (8 items: 2 rows of 4) -->
+      <div class="mobile-section-group" id="msec-group-admin">
+        <a href="#admin/dashboard" class="mobile-section-pill"><span class="mobile-section-pill__icon">📊</span><span>Panel</span></a>
+        <a href="#admin/users" class="mobile-section-pill"><span class="mobile-section-pill__icon">👥</span><span><span class="lang-en">Users</span><span class="lang-es">Usuarios</span></span></a>
+        <a href="#admin/clients" class="mobile-section-pill"><span class="mobile-section-pill__icon">🤝</span><span><span class="lang-en">Clients</span><span class="lang-es">Clientes</span></span></a>
+        <a href="#admin/agreements" class="mobile-section-pill"><span class="mobile-section-pill__icon">📋</span><span><span class="lang-en">Contracts</span><span class="lang-es">Acuerdos</span></span></a>
+        <a href="#admin/newsletter" class="mobile-section-pill"><span class="mobile-section-pill__icon">📧</span><span>Newsletter</span></a>
+        <a href="#admin/webinar" class="mobile-section-pill"><span class="mobile-section-pill__icon">🎙️</span><span>Webinar</span></a>
+        <a href="#admin/unified" class="mobile-section-pill"><span class="mobile-section-pill__icon">🗂️</span><span><span class="lang-en">Directory</span><span class="lang-es">Directorio</span></span></a>
+        <a href="#profile" class="mobile-section-pill"><span class="mobile-section-pill__icon">👤</span><span><span class="lang-en">Profile</span><span class="lang-es">Mi Perfil</span></span></a>
+      </div>
+
+      <!-- Agente Inmomás Section Grid (6 items: 2 rows of 3) -->
+      <div class="mobile-section-group mobile-section-group--3cols" id="msec-group-agent_inmomas">
+        <a href="#agent_inmomas/dashboard" class="mobile-section-pill"><span class="mobile-section-pill__icon">📊</span><span>Panel</span></a>
+        <a href="#agent_inmomas/clients" class="mobile-section-pill"><span class="mobile-section-pill__icon">🤝</span><span><span class="lang-en">Clients</span><span class="lang-es">Clientes</span></span></a>
+        <a href="#agent_inmomas/finances" class="mobile-section-pill"><span class="mobile-section-pill__icon">💰</span><span><span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></span></a>
+        <a href="#agent_inmomas/webinar" class="mobile-section-pill"><span class="mobile-section-pill__icon">🎙️</span><span>Webinar</span></a>
+        <a href="#agent_inmomas/partners" class="mobile-section-pill"><span class="mobile-section-pill__icon">👥</span><span>Realtors</span></a>
+        <a href="#profile" class="mobile-section-pill"><span class="mobile-section-pill__icon">👤</span><span><span class="lang-en">Profile</span><span class="lang-es">Mi Perfil</span></span></a>
+      </div>
+
+      <!-- Colaborador Section Grid (6 items: 2 rows of 3) -->
+      <div class="mobile-section-group mobile-section-group--3cols" id="msec-group-colaborador">
+        <a href="#colaborador/dashboard" class="mobile-section-pill"><span class="mobile-section-pill__icon">📊</span><span>Panel</span></a>
+        <a href="#colaborador/clients" class="mobile-section-pill"><span class="mobile-section-pill__icon">🤝</span><span><span class="lang-en">Clients</span><span class="lang-es">Clientes</span></span></a>
+        <a href="#colaborador/finances" class="mobile-section-pill"><span class="mobile-section-pill__icon">💰</span><span><span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></span></a>
+        <a href="#colaborador/webinar" class="mobile-section-pill"><span class="mobile-section-pill__icon">🎙️</span><span>Webinar</span></a>
+        <a href="#colaborador/partners" class="mobile-section-pill"><span class="mobile-section-pill__icon">👥</span><span>Partners</span></a>
+        <a href="#profile" class="mobile-section-pill"><span class="mobile-section-pill__icon">👤</span><span><span class="lang-en">Profile</span><span class="lang-es">Mi Perfil</span></span></a>
+      </div>
+
+      <!-- Broker Section Grid (6 items: 2 rows of 3) -->
+      <div class="mobile-section-group mobile-section-group--3cols" id="msec-group-broker">
+        <a href="#broker/dashboard" class="mobile-section-pill"><span class="mobile-section-pill__icon">📊</span><span>Panel</span></a>
+        <a href="#broker/team" class="mobile-section-pill"><span class="mobile-section-pill__icon">👥</span><span><span class="lang-en">My Team</span><span class="lang-es">Mi Equipo</span></span></a>
+        <a href="#broker/clients" class="mobile-section-pill"><span class="mobile-section-pill__icon">🤝</span><span><span class="lang-en">Clients</span><span class="lang-es">Clientes</span></span></a>
+        <a href="#broker/documents" class="mobile-section-pill"><span class="mobile-section-pill__icon">📄</span><span><span class="lang-en">Docs</span><span class="lang-es">Documentos</span></span></a>
+        <a href="#broker/finances" class="mobile-section-pill"><span class="mobile-section-pill__icon">💰</span><span><span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></span></a>
+        <a href="#profile" class="mobile-section-pill"><span class="mobile-section-pill__icon">👤</span><span><span class="lang-en">Profile</span><span class="lang-es">Mi Perfil</span></span></a>
+      </div>
+
+      <!-- Realtor Section Grid (6 items: 2 rows of 3) -->
+      <div class="mobile-section-group mobile-section-group--3cols" id="msec-group-realtor">
+        <a href="#realtor/dashboard" class="mobile-section-pill"><span class="mobile-section-pill__icon">📊</span><span>Panel</span></a>
+        <a href="#realtor/clients" class="mobile-section-pill"><span class="mobile-section-pill__icon">🤝</span><span><span class="lang-en">Clients</span><span class="lang-es">Clientes</span></span></a>
+        <a href="#realtor/referral" class="mobile-section-pill"><span class="mobile-section-pill__icon">🔗</span><span><span class="lang-en">Referrals</span><span class="lang-es">Referidos</span></span></a>
+        <a href="#realtor/documents" class="mobile-section-pill"><span class="mobile-section-pill__icon">📄</span><span><span class="lang-en">Docs</span><span class="lang-es">Documentos</span></span></a>
+        <a href="#realtor/finances" class="mobile-section-pill"><span class="mobile-section-pill__icon">💰</span><span><span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></span></a>
+        <a href="#profile" class="mobile-section-pill"><span class="mobile-section-pill__icon">👤</span><span><span class="lang-en">Profile</span><span class="lang-es">Mi Perfil</span></span></a>
+      </div>
+
+      <!-- Partner Section Grid (2 items: 1 row of 2) -->
+      <div class="mobile-section-group mobile-section-group--2cols" id="msec-group-partner">
+        <a href="#partner/dashboard" class="mobile-section-pill"><span class="mobile-section-pill__icon">📊</span><span><span class="lang-en">Dashboard</span><span class="lang-es">Mi Panel</span></span></a>
+        <a href="#profile" class="mobile-section-pill"><span class="mobile-section-pill__icon">👤</span><span><span class="lang-en">My Profile</span><span class="lang-es">Mi Perfil</span></span></a>
+      </div>
+    </div>
 
     <!-- ==================== VIEW: ADMIN DASHBOARD ==================== -->
     <div id="view-admin-dashboard" class="app-view">
@@ -1456,8 +1918,8 @@
   <!-- ===================== MOBILE DASHBOARD BOTTOM NAV ===================== -->
   <nav class="dashboard-bottom-nav" id="dashboard-bottom-nav" aria-label="Dashboard Navigation">
 
-    <!-- Admin Bottom Nav -->
-    <div class="dashboard-bnav-group" id="bnav-group-admin" style="display:none;">
+    <!-- Admin Bottom Nav (6 items that fit 100% on screen + top grid has all 8) -->
+    <div class="dashboard-bnav-group" id="bnav-group-admin">
       <a href="#admin/dashboard" class="dashboard-bnav-item">
         <span class="dashboard-bnav-icon">📊</span>
         <span class="lang-en">Panel</span><span class="lang-es">Panel</span>
@@ -1472,28 +1934,20 @@
       </a>
       <a href="#admin/agreements" class="dashboard-bnav-item">
         <span class="dashboard-bnav-icon">📋</span>
-        <span class="lang-en">Agreements</span><span class="lang-es">Acuerdos</span>
-      </a>
-      <a href="#admin/newsletter" class="dashboard-bnav-item">
-        <span class="dashboard-bnav-icon">📧</span>
-        <span class="lang-en">Newsletter</span><span class="lang-es">Newsletter</span>
+        <span class="lang-en">Contracts</span><span class="lang-es">Acuerdos</span>
       </a>
       <a href="#admin/webinar" class="dashboard-bnav-item">
         <span class="dashboard-bnav-icon">🎙️</span>
         <span class="lang-en">Webinar</span><span class="lang-es">Webinar</span>
       </a>
-      <a href="#admin/unified" class="dashboard-bnav-item">
-        <span class="dashboard-bnav-icon">🗂️</span>
-        <span class="lang-en">Directory</span><span class="lang-es">Directorio</span>
-      </a>
-      <a href="#profile" class="dashboard-bnav-item">
-        <span class="dashboard-bnav-icon">👤</span>
-        <span class="lang-en">Profile</span><span class="lang-es">Perfil</span>
-      </a>
+      <button type="button" class="dashboard-bnav-item js-open-mobile-menu">
+        <span class="dashboard-bnav-icon">☰</span>
+        <span class="lang-en">More</span><span class="lang-es">Más</span>
+      </button>
     </div>
 
     <!-- Agente Inmomás Bottom Nav -->
-    <div class="dashboard-bnav-group" id="bnav-group-agent_inmomas" style="display:none;">
+    <div class="dashboard-bnav-group" id="bnav-group-agent_inmomas">
       <a href="#agent_inmomas/dashboard" class="dashboard-bnav-item">
         <span class="dashboard-bnav-icon">📊</span>
         <span class="lang-en">Panel</span><span class="lang-es">Panel</span>
@@ -1521,7 +1975,7 @@
     </div>
 
     <!-- Colaborador Bottom Nav -->
-    <div class="dashboard-bnav-group" id="bnav-group-colaborador" style="display:none;">
+    <div class="dashboard-bnav-group" id="bnav-group-colaborador">
       <a href="#colaborador/dashboard" class="dashboard-bnav-item">
         <span class="dashboard-bnav-icon">📊</span>
         <span class="lang-en">Panel</span><span class="lang-es">Panel</span>
@@ -1549,7 +2003,7 @@
     </div>
 
     <!-- Broker Bottom Nav -->
-    <div class="dashboard-bnav-group" id="bnav-group-broker" style="display:none;">
+    <div class="dashboard-bnav-group" id="bnav-group-broker">
       <a href="#broker/dashboard" class="dashboard-bnav-item">
         <span class="dashboard-bnav-icon">📊</span>
         <span class="lang-en">Panel</span><span class="lang-es">Panel</span>
@@ -1577,7 +2031,7 @@
     </div>
 
     <!-- Realtor Bottom Nav -->
-    <div class="dashboard-bnav-group" id="bnav-group-realtor" style="display:none;">
+    <div class="dashboard-bnav-group" id="bnav-group-realtor">
       <a href="#realtor/dashboard" class="dashboard-bnav-item">
         <span class="dashboard-bnav-icon">📊</span>
         <span class="lang-en">Panel</span><span class="lang-es">Panel</span>
@@ -1605,7 +2059,7 @@
     </div>
 
     <!-- Partner Bottom Nav -->
-    <div class="dashboard-bnav-group" id="bnav-group-partner" style="display:none;">
+    <div class="dashboard-bnav-group" id="bnav-group-partner">
       <a href="#partner/dashboard" class="dashboard-bnav-item">
         <span class="dashboard-bnav-icon">📊</span>
         <span class="lang-en">Dashboard</span><span class="lang-es">Panel</span>
@@ -1614,6 +2068,10 @@
         <span class="dashboard-bnav-icon">👤</span>
         <span class="lang-en">My Profile</span><span class="lang-es">Mi Perfil</span>
       </a>
+      <button type="button" class="dashboard-bnav-item js-open-mobile-menu">
+        <span class="dashboard-bnav-icon">☰</span>
+        <span class="lang-en">Menu</span><span class="lang-es">Menú</span>
+      </button>
     </div>
 
   </nav>
@@ -1633,19 +2091,19 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
   <!-- ===================== SCRIPTS ===================== -->
-  <script src="js/notifications.js"></script>
-  <script src="js/firebase-config.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/auth-service.js"></script>
-  <script src="js/router.js"></script>
-  <script src="js/views/auth-views.js"></script>
-  <script src="js/views/admin-views.js"></script>
-  <script src="js/views/broker-views.js"></script>
-  <script src="js/views/realtor-views.js"></script>
-  <script src="js/views/agent-views.js"></script>
-  <script src="js/views/partner-views.js?v=3"></script>
-  <script src="js/referral-agreement.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/notifications.js?v=20261022_v4"></script>
+  <script src="js/firebase-config.js?v=20261022_v4"></script>
+  <script src="js/utils.js?v=20261022_v4"></script>
+  <script src="js/auth-service.js?v=20261022_v4"></script>
+  <script src="js/router.js?v=20261022_v4"></script>
+  <script src="js/views/auth-views.js?v=20261022_v4"></script>
+  <script src="js/views/admin-views.js?v=20261022_v4"></script>
+  <script src="js/views/broker-views.js?v=20261022_v4"></script>
+  <script src="js/views/realtor-views.js?v=20261022_v4"></script>
+  <script src="js/views/agent-views.js?v=20261022_v4"></script>
+  <script src="js/views/partner-views.js?v=20261022_v4"></script>
+  <script src="js/referral-agreement.js?v=20261022_v4"></script>
+  <script src="js/main.js?v=20261022_v4"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       if (App && App.auth) {

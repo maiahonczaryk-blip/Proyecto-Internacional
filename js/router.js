@@ -125,24 +125,54 @@ App.router = (function() {
       }
     });
 
-    // Mobile sidebar toggle
-    const sidebarToggle = document.getElementById('mobile-sidebar-toggle') || document.getElementById('sidebar-toggle-btn');
-    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-    if (sidebarToggle) {
-      sidebarToggle.addEventListener('click', () => {
-        const sidebar = document.getElementById('dashboard-sidebar');
-        const isOpen = sidebar?.classList.contains('active');
-        if (isOpen) {
-          closeMobileSidebar();
-        } else {
-          sidebar?.classList.add('active');
-          sidebarBackdrop?.classList.add('active');
-        }
+    // Mobile sidebar / menu drawer toggles (topbar menu btn, legacy toggle, bottom-nav 'More' btn, close btn)
+    const toggleMobileSidebar = () => {
+      const sidebar = document.getElementById('dashboard-sidebar');
+      const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+      const isOpen = sidebar?.classList.contains('active');
+      if (isOpen) {
+        closeMobileSidebar();
+      } else {
+        sidebar?.classList.add('active');
+        sidebarBackdrop?.classList.add('active');
+      }
+    };
+
+    ['mobile-sidebar-toggle', 'sidebar-toggle-btn', 'mobile-topbar-menu-btn'].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) btn.addEventListener('click', toggleMobileSidebar);
+    });
+
+    document.querySelectorAll('.js-open-mobile-menu').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleMobileSidebar();
       });
+    });
+
+    const sidebarCloseBtn = document.getElementById('sidebar-mobile-close-btn');
+    if (sidebarCloseBtn) {
+      sidebarCloseBtn.addEventListener('click', closeMobileSidebar);
     }
+
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
     if (sidebarBackdrop) {
       sidebarBackdrop.addEventListener('click', () => {
         closeMobileSidebar();
+      });
+    }
+
+    // Re-sync sidebar & mobile nav whenever auth state finishes loading or updates
+    if (App.auth && typeof App.auth.onAuthChange === 'function') {
+      App.auth.onAuthChange(() => {
+        const activeHash = window.location.hash.substring(1) || 'home';
+        const queryIdx = activeHash.indexOf('?');
+        const routeKey = queryIdx >= 0 ? activeHash.substring(0, queryIdx) : activeHash;
+        const route = routes[routeKey];
+        if (route && route.sidebar) {
+          updateSidebar(route.sidebar);
+          updateActiveSidebarLink(routeKey);
+        }
       });
     }
 
@@ -298,19 +328,45 @@ App.router = (function() {
       }
       appMain.classList.add('has-sidebar');
 
-      // Show correct sidebar nav for role
-      document.querySelectorAll('.sidebar-nav').forEach(g => g.style.display = 'none');
-      document.querySelectorAll('.dashboard-bnav-group').forEach(g => g.style.display = 'none');
+      // Show correct sidebar nav, bottom nav group, and mobile top section pills for role
+      document.querySelectorAll('.sidebar-nav').forEach(g => {
+        g.style.display = 'none';
+        g.classList.remove('active');
+      });
+      document.querySelectorAll('.dashboard-bnav-group').forEach(g => {
+        g.style.display = 'none';
+        g.classList.remove('active');
+      });
+      document.querySelectorAll('.mobile-section-group').forEach(g => {
+        g.style.display = 'none';
+        g.classList.remove('active');
+      });
+
       let effectiveRole = sidebarType;
       const user = App.auth.getCurrentUser();
-      if (sidebarType === 'user' && user) {
+      if (sidebarType === 'user' && user && user.role) {
         effectiveRole = user.role;
       }
+
+      document.body.setAttribute('data-role', effectiveRole);
+
       const roleNav = document.getElementById(`sidebar-${effectiveRole}`);
-      if (roleNav) roleNav.style.display = 'block';
+      if (roleNav) {
+        roleNav.style.display = 'block';
+        roleNav.classList.add('active');
+      }
 
       const bnavGroup = document.getElementById(`bnav-group-${effectiveRole}`);
-      if (bnavGroup) bnavGroup.style.display = 'flex';
+      if (bnavGroup) {
+        bnavGroup.style.display = 'flex';
+        bnavGroup.classList.add('active');
+      }
+
+      const msecGroup = document.getElementById(`msec-group-${effectiveRole}`);
+      if (msecGroup) {
+        msecGroup.style.display = 'flex';
+        msecGroup.classList.add('active');
+      }
 
       // Update sidebar & mobile topbar user info
       if (user) {
@@ -321,17 +377,17 @@ App.router = (function() {
         const mobileAvatarEl = document.getElementById('mobile-user-avatar');
         
         const roleLabels = {
-          admin: 'Admin',
+          admin: 'Admin · Broker Inmomás',
           agent_inmomas: 'Agente Inmomás',
           colaborador: 'Colaborador',
-          broker: 'Broker',
-          realtor: 'Realtor',
-          partner: 'Partner'
+          broker: 'Broker Portal',
+          realtor: 'Realtor Portal',
+          partner: 'Partner Portal'
         };
-        const formattedRole = roleLabels[user.role] || (user.role.charAt(0).toUpperCase() + user.role.slice(1));
+        const formattedRole = roleLabels[user.role] || (user.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : '');
         const initials = App.utils.getInitials(user.firstName, user.lastName);
 
-        if (nameEl) nameEl.textContent = `${user.firstName} ${user.lastName}`;
+        if (nameEl) nameEl.textContent = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || '—';
         if (roleEl) {
           roleEl.textContent = formattedRole;
           roleEl.className = `sidebar-user__role sidebar-user__role--${user.role}`;
@@ -346,6 +402,7 @@ App.router = (function() {
     } else {
       sidebar.classList.remove('active');
       appMain.classList.remove('has-sidebar');
+      document.body.removeAttribute('data-role');
     }
   }
 
@@ -385,12 +442,24 @@ App.router = (function() {
     // Sync mobile bottom navigation active tab
     document.querySelectorAll('.dashboard-bnav-item').forEach(item => {
       const href = item.getAttribute('href');
-      if (href) {
+      if (href && href.startsWith('#') && href.length > 1) {
         const linkRoute = href.substring(1);
         const isActive = linkRoute === routeKey;
         item.classList.toggle('active', isActive);
-        if (isActive && item.offsetParent !== null) {
-          item.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    });
+
+    // Sync mobile top section switcher pills
+    document.querySelectorAll('.mobile-section-pill').forEach(pill => {
+      const href = pill.getAttribute('href');
+      if (href && href.startsWith('#') && href.length > 1) {
+        const linkRoute = href.substring(1);
+        const isActive = linkRoute === routeKey;
+        pill.classList.toggle('active', isActive);
+        if (isActive && pill.offsetParent !== null) {
+          try {
+            pill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+          } catch (_) {}
         }
       }
     });

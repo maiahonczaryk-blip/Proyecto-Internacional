@@ -195,15 +195,17 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('hashchange', () => setTimeout(updateBottomNav, 30));
   updateBottomNav();
 
-  // ── Smooth Scroll ──
+  // ── Smooth Scroll (only for in-page section anchors, never SPA routes) ──
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', (e) => {
       const targetId = anchor.getAttribute('href');
-      if (targetId === '#') return;
-      const target = document.querySelector(targetId);
+      if (!targetId || targetId === '#' || targetId.includes('/')) return;
+      const hashKey = targetId.substring(1);
+      if (window.App && App.router && App.router.routes && App.router.routes[hashKey]) return;
+      const target = document.getElementById(hashKey);
       if (target) {
         e.preventDefault();
-        const offset = navbar.offsetHeight + 20;
+        const offset = (navbar ? navbar.offsetHeight : 60) + 20;
         const top = target.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: 'smooth' });
       }
