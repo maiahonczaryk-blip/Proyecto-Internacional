@@ -694,16 +694,9 @@
           <div>
             <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Interest Area in Spain</label>
             <select id="mc-interestArea" class="form-input" style="margin-bottom: 0;">
-              <option value="">Select area</option>
-              <option value="Alicante City">Alicante City</option>
-              <option value="Elche">Elche</option>
-              <option value="Santa Pola">Santa Pola</option>
-              <option value="Gran Alacant">Gran Alacant</option>
-              <option value="Benidorm">Benidorm</option>
-              <option value="Jávea">Jávea</option>
-              <option value="Torrevieja">Torrevieja</option>
-              <option value="Costa Blanca (General)">Costa Blanca (General)</option>
-              <option value="Other">Other</option>
+              <option value="">Select area / Seleccionar zona</option>
+              <option value="Costa Blanca (Alicante, Valencia)">Costa Blanca (Alicante, Valencia)</option>
+              <option value="Resto de España">Resto de España / Rest of Spain</option>
             </select>
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">

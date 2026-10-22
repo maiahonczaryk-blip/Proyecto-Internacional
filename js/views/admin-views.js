@@ -554,6 +554,10 @@
         ? '<span style="color:#10b981; font-weight:bold;">Yes ✓</span>' 
         : '<span style="color:#9ca3af;">No</span>';
 
+      const agencyLogoHtml = user.agencyLogo
+        ? `<img src="${App.utils.escapeHtml(user.agencyLogo)}" alt="Logo" title="Logo de agencia configurado para el Referral Link" style="height: 22px; max-width: 64px; object-fit: contain; border-radius: 4px; border: 1px solid #e5e7eb; background: #fff; padding: 2px; vertical-align: middle; margin-right: 0.4rem;">`
+        : '';
+
       return `
         <tr>
           <td>
@@ -563,7 +567,7 @@
             </div>
           </td>
           <td>${App.utils.escapeHtml(user.email)}</td>
-          <td>${App.utils.escapeHtml(user.agencyName || '—')}</td>
+          <td><div style="display: flex; align-items: center;">${agencyLogoHtml}<span>${App.utils.escapeHtml(user.agencyName || '—')}</span></div></td>
           <td>${roleBadge}</td>
           <td>${statusBadge}</td>
           <td>${webinarStr}</td>
@@ -982,10 +986,157 @@
             <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">Esto asignará el usuario al paraguas del Agente Inmomás seleccionado.</p>
           </div>
           `}
+
+          <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
+            <label style="font-weight: 700; font-size: 0.9rem; color: #111827; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem;">
+              🏢 Agencia Inmobiliaria y Logo (Referral Link Personalizado)
+            </label>
+            <p style="font-size: 0.78rem; color: #6b7280; margin-bottom: 0.75rem;">
+              Configura el nombre de la agencia y sube el logo de la inmobiliaria que aparecerá en el Referral Link personalizado de este usuario (y su oficina).
+            </p>
+            <div style="margin-bottom: 0.75rem;">
+              <label style="font-weight: 600; font-size: 0.8rem; color: #374151; display: block; margin-bottom: 0.25rem;">Nombre de la Agencia / Oficina</label>
+              <input type="text" id="admin-user-agency-name" class="form-control" value="${App.utils.escapeHtml(user.agencyName || '')}" placeholder="Ej. RE/MAX Premier, Keller Williams, Century 21..." style="width: 100%; padding: 0.45rem 0.65rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem;">
+            </div>
+            <div style="margin-bottom: 0.75rem;">
+              <label style="font-weight: 600; font-size: 0.8rem; color: #374151; display: block; margin-bottom: 0.35rem;">Logo de la Inmobiliaria</label>
+              <div style="display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;">
+                <div id="admin-user-agency-logo-preview-wrap" style="width: 150px; height: 64px; border: 1px dashed #cbd5e1; border-radius: 0.5rem; background: #f8fafc; display: flex; align-items: center; justify-content: center; padding: 0.35rem; overflow: hidden;">
+                  ${user.agencyLogo
+                    ? `<img id="admin-user-agency-logo-preview" src="${App.utils.escapeHtml(user.agencyLogo)}" alt="Logo Agencia" style="max-width: 100%; max-height: 100%; object-fit: contain;">`
+                    : `<span id="admin-user-agency-logo-empty" style="font-size: 0.75rem; color: #94a3b8; text-align: center;">Sin logo</span>`
+                  }
+                </div>
+                <div style="flex: 1; min-width: 190px; display: flex; flex-direction: column; gap: 0.4rem;">
+                  <input type="file" id="admin-user-agency-logo-file" accept="image/*" style="font-size: 0.78rem; color: #374151;">
+                  <div style="display: flex; gap: 0.4rem; align-items: center;">
+                    <input type="url" id="admin-user-agency-logo-url" class="form-control" placeholder="O pega URL de imagen (https://...)" value="${user.agencyLogo && !user.agencyLogo.startsWith('data:') ? App.utils.escapeHtml(user.agencyLogo) : ''}" style="flex: 1; padding: 0.35rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.78rem;">
+                    <button type="button" class="btn btn-outline btn-sm" id="admin-remove-agency-logo-btn" style="font-size: 0.75rem; padding: 0.3rem 0.6rem; color: #dc2626; border-color: #fecaca; ${user.agencyLogo ? '' : 'display: none;'}">Quitar Logo</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #374151; margin-bottom: 0.75rem; cursor: pointer;">
+              <input type="checkbox" id="admin-apply-agency-office-chk" checked style="width: 15px; height: 15px; accent-color: #003da5;">
+              <span>Aplicar este logo y agencia al Broker y a todos los agentes de esta misma oficina/agencia</span>
+            </label>
+            <button type="button" class="btn btn-primary btn-sm" id="admin-save-agency-branding-btn" style="width: 100%; justify-content: center;">
+              💾 Guardar Agencia y Logo en Referral Link
+            </button>
+          </div>
         `,
         footer: `<button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Close</button>`,
         onClose: () => {}
       });
+
+      // Agency Logo upload & save handlers
+      let currentAgencyLogoData = user.agencyLogo || null;
+      const logoFileInput = document.getElementById('admin-user-agency-logo-file');
+      const logoUrlInput = document.getElementById('admin-user-agency-logo-url');
+      const logoPreviewWrap = document.getElementById('admin-user-agency-logo-preview-wrap');
+      const removeLogoBtn = document.getElementById('admin-remove-agency-logo-btn');
+      const saveAgencyBrandingBtn = document.getElementById('admin-save-agency-branding-btn');
+
+      const updateLogoPreviewUI = (src) => {
+        currentAgencyLogoData = src || null;
+        if (logoPreviewWrap) {
+          if (currentAgencyLogoData) {
+            logoPreviewWrap.innerHTML = `<img id="admin-user-agency-logo-preview" src="${App.utils.escapeHtml(currentAgencyLogoData)}" alt="Logo Agencia" style="max-width: 100%; max-height: 100%; object-fit: contain;">`;
+          } else {
+            logoPreviewWrap.innerHTML = `<span id="admin-user-agency-logo-empty" style="font-size: 0.75rem; color: #94a3b8; text-align: center;">Sin logo</span>`;
+          }
+        }
+        if (removeLogoBtn) {
+          removeLogoBtn.style.display = currentAgencyLogoData ? 'inline-flex' : 'none';
+        }
+      };
+
+      if (logoFileInput) {
+        logoFileInput.addEventListener('change', (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              const MAX_W = 360;
+              const MAX_H = 140;
+              let w = img.width;
+              let h = img.height;
+              if (w > MAX_W || h > MAX_H) {
+                const ratio = Math.min(MAX_W / w, MAX_H / h);
+                w = Math.round(w * ratio);
+                h = Math.round(h * ratio);
+              }
+              canvas.width = w;
+              canvas.height = h;
+              const ctx = canvas.getContext('2d');
+              ctx.clearRect(0, 0, w, h);
+              ctx.drawImage(img, 0, 0, w, h);
+              const compressedDataUrl = canvas.toDataURL('image/png');
+              if (logoUrlInput) logoUrlInput.value = '';
+              updateLogoPreviewUI(compressedDataUrl);
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      if (logoUrlInput) {
+        logoUrlInput.addEventListener('input', () => {
+          const val = logoUrlInput.value.trim();
+          if (val) {
+            if (logoFileInput) logoFileInput.value = '';
+            updateLogoPreviewUI(val);
+          } else if (!logoFileInput || !logoFileInput.files.length) {
+            updateLogoPreviewUI(null);
+          }
+        });
+      }
+
+      if (removeLogoBtn) {
+        removeLogoBtn.addEventListener('click', () => {
+          if (logoFileInput) logoFileInput.value = '';
+          if (logoUrlInput) logoUrlInput.value = '';
+          updateLogoPreviewUI(null);
+        });
+      }
+
+      if (saveAgencyBrandingBtn) {
+        saveAgencyBrandingBtn.addEventListener('click', async () => {
+          const newAgencyName = (document.getElementById('admin-user-agency-name')?.value || '').trim();
+          const applyToOffice = !!document.getElementById('admin-apply-agency-office-chk')?.checked;
+
+          saveAgencyBrandingBtn.disabled = true;
+          saveAgencyBrandingBtn.textContent = 'Guardando...';
+
+          try {
+            const res = await App.auth.updateUserAgencyBranding(userId, {
+              agencyName: newAgencyName,
+              agencyLogo: currentAgencyLogoData,
+              applyToOffice
+            });
+            App.utils.closeModal();
+            const countMsg = res && res.updatedCount > 1
+              ? ` (${res.updatedCount} miembros de la oficina actualizados)`
+              : '';
+            App.utils.showToast(`Agencia y logo actualizados correctamente${countMsg}.`, 'success');
+            const route = App.router.getCurrentRoute();
+            if (route === 'admin/dashboard') {
+              await initDashboard();
+            } else if (route === 'admin/users') {
+              await initUsers();
+            }
+          } catch (err) {
+            console.error('[Admin] Error updating agency branding:', err);
+            App.utils.showToast('Error al guardar agencia/logo: ' + err.message, 'error');
+            saveAgencyBrandingBtn.disabled = false;
+            saveAgencyBrandingBtn.textContent = '💾 Guardar Agencia y Logo en Referral Link';
+          }
+        });
+      }
 
       const saveRoleBtn = document.getElementById('save-user-role-btn');
       if (saveRoleBtn) {

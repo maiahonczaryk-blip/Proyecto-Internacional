@@ -197,6 +197,7 @@ App.auth = (function() {
         firstName,
         lastName,
         agencyName: agencyName || '',
+        agencyLogo: data.agencyLogo || null,
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
@@ -274,6 +275,7 @@ App.auth = (function() {
         firstName,
         lastName,
         agencyName: agencyName || (isMaiaAccount ? 'RE/MAX Inmomás' : ''),
+        agencyLogo: data.agencyLogo || null,
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
@@ -865,6 +867,80 @@ App.auth = (function() {
         updatedAt: new Date().toISOString()
       });
       return true;
+    }
+  }
+
+  /* ---- Update User / Office Agency Branding & Logo (Admin action) ---- */
+  async function updateUserAgencyBranding(userId, { agencyName, agencyLogo, applyToOffice = true } = {}) {
+    const now = new Date().toISOString();
+    const cleanAgencyName = typeof agencyName === 'string' ? agencyName.trim() : undefined;
+
+    if (App.demoMode) {
+      const targetUser = App.demoData.users.find(u => u.id === userId);
+      if (!targetUser) throw new Error('User not found.');
+
+      const oldAgencyName = (targetUser.agencyName || '').trim().toLowerCase();
+      const officeBrokerId = targetUser.role === 'broker' ? targetUser.id : (targetUser.brokerId || null);
+
+      const usersToUpdate = [targetUser];
+      if (applyToOffice) {
+        App.demoData.users.forEach(u => {
+          if (u.id === targetUser.id) return;
+          const sameBrokerOffice = officeBrokerId && (u.id === officeBrokerId || u.brokerId === officeBrokerId);
+          const uAgency = (u.agencyName || '').trim().toLowerCase();
+          const sameAgencyName = (oldAgencyName && uAgency === oldAgencyName) ||
+            (cleanAgencyName && uAgency === cleanAgencyName.toLowerCase());
+          if (sameBrokerOffice || sameAgencyName) {
+            usersToUpdate.push(u);
+          }
+        });
+      }
+
+      usersToUpdate.forEach(u => {
+        if (cleanAgencyName !== undefined) u.agencyName = cleanAgencyName;
+        if (agencyLogo !== undefined) u.agencyLogo = agencyLogo || null;
+        u.updatedAt = now;
+      });
+
+      saveDemoData();
+      return { updatedCount: usersToUpdate.length };
+    } else {
+      const userRef = App.db.collection('users').doc(userId);
+      const userDoc = await userRef.get();
+      if (!userDoc.exists) throw new Error('User not found.');
+      const targetUser = { id: userDoc.id, ...userDoc.data() };
+
+      const updatePayload = { updatedAt: now };
+      if (cleanAgencyName !== undefined) updatePayload.agencyName = cleanAgencyName;
+      if (agencyLogo !== undefined) updatePayload.agencyLogo = agencyLogo || null;
+
+      await userRef.update(updatePayload);
+      let updatedCount = 1;
+
+      if (applyToOffice) {
+        const oldAgencyName = (targetUser.agencyName || '').trim().toLowerCase();
+        const officeBrokerId = targetUser.role === 'broker' ? targetUser.id : (targetUser.brokerId || null);
+
+        const allSnap = await App.db.collection('users').get();
+        const batchPromises = [];
+        allSnap.docs.forEach(doc => {
+          if (doc.id === userId) return;
+          const u = doc.data();
+          const sameBrokerOffice = officeBrokerId && (doc.id === officeBrokerId || u.brokerId === officeBrokerId);
+          const uAgency = (u.agencyName || '').trim().toLowerCase();
+          const sameAgencyName = (oldAgencyName && uAgency === oldAgencyName) ||
+            (cleanAgencyName && uAgency === cleanAgencyName.toLowerCase());
+          if (sameBrokerOffice || sameAgencyName) {
+            batchPromises.push(App.db.collection('users').doc(doc.id).update(updatePayload));
+            updatedCount++;
+          }
+        });
+        if (batchPromises.length > 0) {
+          await Promise.all(batchPromises);
+        }
+      }
+
+      return { updatedCount };
     }
   }
 
@@ -2366,6 +2442,7 @@ App.auth = (function() {
     updateUserStatus,
     updateUserRole,
     updateUserReferral,
+    updateUserAgencyBranding,
     updateProfile,
     updateAuthEmail,
     getAllUsers,

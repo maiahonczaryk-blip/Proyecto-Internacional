@@ -5,6 +5,56 @@ App.views = App.views || {};
 App.views.public = {
 
   /* ============================================
+     PARTNER BRANDING HELPER (Name, Agency & Logo)
+     ============================================ */
+  renderPartnerBranding: function(ref, prefix) {
+    const card = document.getElementById(`${prefix}-partner-branding`);
+    const logoWrap = document.getElementById(`${prefix}-partner-logo-wrap`);
+    const logoImg = document.getElementById(`${prefix}-partner-logo`);
+    const attrEl = document.getElementById(`${prefix}-partner-attribution`);
+    if (!card || !attrEl) return;
+
+    if (!ref) {
+      card.style.display = 'none';
+      return;
+    }
+
+    const fullName = [ref.firstName, ref.lastName].filter(Boolean).join(' ').trim();
+    const agency = (ref.agencyName || ref.brokerNameManual || '').trim();
+    const logoUrl = ref.agencyLogo || '';
+
+    if (logoWrap && logoImg) {
+      if (logoUrl) {
+        logoImg.src = logoUrl;
+        logoImg.alt = agency || fullName || 'Agency Logo';
+        logoWrap.style.display = 'flex';
+      } else {
+        logoImg.src = '';
+        logoWrap.style.display = 'none';
+      }
+    }
+
+    const showAgency = agency && agency.toLowerCase() !== fullName.toLowerCase();
+    attrEl.innerHTML = `
+      <div style="font-weight: 600; color: var(--text-primary); font-size: 0.96rem;">
+        <span class="lang-en">Personalized link of <strong>${App.utils.escapeHtml(fullName)}</strong></span>
+        <span class="lang-es">Enlace personalizado de <strong>${App.utils.escapeHtml(fullName)}</strong></span>
+        <span class="lang-fr">Lien personnalisé de <strong>${App.utils.escapeHtml(fullName)}</strong></span>
+        <span class="lang-en-ca">Personalized link of <strong>${App.utils.escapeHtml(fullName)}</strong></span>
+      </div>
+      ${showAgency ? `
+      <div style="margin-top: 4px; font-size: 0.88rem; color: var(--text-secondary);">
+        <span class="lang-en">Belongs to agency: <strong style="color: var(--primary);">${App.utils.escapeHtml(agency)}</strong></span>
+        <span class="lang-es">Pertenece a la agencia: <strong style="color: var(--primary);">${App.utils.escapeHtml(agency)}</strong></span>
+        <span class="lang-fr">Appartient à l'agence : <strong style="color: var(--primary);">${App.utils.escapeHtml(agency)}</strong></span>
+        <span class="lang-en-ca">Belongs to agency: <strong style="color: var(--primary);">${App.utils.escapeHtml(agency)}</strong></span>
+      </div>
+      ` : ''}
+    `;
+    card.style.display = 'block';
+  },
+
+  /* ============================================
      INTAKE FORM (Client Portal)
      ============================================ */
   initIntake: function() {
@@ -13,9 +63,12 @@ App.views.public = {
 
     if (refCode && App.demoData && App.demoData.users) {
       const referrer = App.demoData.users.find(u => u.referralCode === refCode);
-      if (referrer && welcomeMsg) {
-        welcomeMsg.innerHTML = `<span class="lang-en">Welcome! You've been referred by <strong>${referrer.firstName} ${referrer.lastName}</strong>.</span>
-                                <span class="lang-es">¡Bienvenido! Has sido referido por <strong>${referrer.firstName} ${referrer.lastName}</strong>.</span>`;
+      if (referrer) {
+        App.views.public.renderPartnerBranding(referrer, 'intake');
+        if (welcomeMsg) {
+          welcomeMsg.innerHTML = `<span class="lang-en">Welcome! You've been referred by <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong>.</span>
+                                  <span class="lang-es">¡Bienvenido! Has sido referido por <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong>.</span>`;
+        }
       }
     }
 
@@ -31,7 +84,8 @@ App.views.public = {
         const lastName = newForm.querySelector('#intake-lastName').value.trim();
         const email = newForm.querySelector('#intake-email').value.trim();
         const phone = newForm.querySelector('#intake-phone').value.trim();
-        const country = newForm.querySelector('#intake-country')?.value.trim() || '';
+        const country = newForm.querySelector('#intake-currentLocation')?.value.trim() || newForm.querySelector('#intake-country')?.value.trim() || '';
+        const targetLoc = newForm.querySelector('#intake-targetLocation')?.value || '';
 
         if (!firstName || !lastName || !email || !phone) {
           if (App.utils && App.utils.showToast) {
@@ -48,7 +102,7 @@ App.views.public = {
           phone,
           currentLocation: country,
           budget: '',
-          interestArea: '',
+          interestArea: targetLoc,
           status: 'contacted',
           notes: '',
           referredBy: refCode || null,
@@ -123,18 +177,16 @@ App.views.public = {
       if (pwGroup) pwGroup.style.display = type === 'client' ? 'none' : '';
 
       // Webinar Spotlight Banners:
-      // When type is 'client' -> Show CLIENT webinar banner, HIDE Realtor banner.
-      // When type is 'realtor' -> Show REALTOR webinar banner, HIDE Client banner.
-      // Otherwise (broker, partner, etc.) -> HIDE both banners.
-      if (banner) banner.style.display = type === 'realtor' ? '' : 'none';
+      // Always hide past Realtor webinar banner. Only show Client webinar banner when type === 'client'.
+      if (banner) banner.style.display = 'none';
       if (clientBanner) clientBanner.style.display = type === 'client' ? '' : 'none';
 
       const profWebinar = document.querySelector('.professional-webinar-group');
       const clientWebinar = document.querySelector('.client-webinar-group');
-      if (profWebinar) profWebinar.style.display = type === 'client' ? 'none' : '';
+      if (profWebinar) profWebinar.style.display = 'none';
       if (clientWebinar) clientWebinar.style.display = type === 'client' ? '' : 'none';
 
-      const refName = referrer ? `${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}` : '';
+      const refName = referrer ? `${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}`.trim() : '';
 
       if (type === 'client') {
         if (formTitle) {
@@ -142,10 +194,10 @@ App.views.public = {
         }
         if (welcomeMsg) {
           welcomeMsg.innerHTML = refName
-            ? `<span class="lang-en">Complimentary invitation from <strong>${refName}</strong> · RE/MAX Inmomás</span>
-               <span class="lang-es">Invitación de cortesía de <strong>${refName}</strong> · RE/MAX Inmomás</span>
-               <span class="lang-fr">Invitation offerte par <strong>${refName}</strong> · RE/MAX Inmomás</span>
-               <span class="lang-en-ca">Complimentary invitation from <strong>${refName}</strong> · RE/MAX Inmomás</span>`
+            ? `<span class="lang-en">Complimentary invitation from <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-es">Invitación de cortesía de <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-fr">Invitation offerte par <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-en-ca">Complimentary invitation from <strong>${refName}</strong> · The Spain Connection</span>`
             : `<span class="lang-en">Personalized advisory with Spain's top real estate advisors</span>
                <span class="lang-es">Asesoría personalizada con los mejores agentes de España</span>
                <span class="lang-fr">Conseil personnalisé avec les meilleurs agents en Espagne</span>
@@ -156,21 +208,21 @@ App.views.public = {
         }
       } else if (type === 'realtor') {
         if (formTitle) {
-          formTitle.innerHTML = `<span class="lang-en">Beyond Borders · Realtor VIP Masterclass</span><span class="lang-es">Beyond Borders · Masterclass VIP</span><span class="lang-fr">Beyond Borders · Webinaire VIP</span><span class="lang-en-ca">Beyond Borders · Realtor VIP Masterclass</span>`;
+          formTitle.innerHTML = `<span class="lang-en">Realtor Partner Registration</span><span class="lang-es">Registro de Agente / Realtor</span><span class="lang-fr">Inscription Agent Partenaire</span><span class="lang-en-ca">Realtor Partner Registration</span>`;
         }
         if (welcomeMsg) {
           welcomeMsg.innerHTML = refName
-            ? `<span class="lang-en">Invited by <strong>${refName}</strong> (25% referral commission in Spain)</span>
-               <span class="lang-es">Invitado/a por <strong>${refName}</strong> (25% de comisión de referido en España)</span>
-               <span class="lang-fr">Invité(e) par <strong>${refName}</strong> (25% de commission en Espagne)</span>
-               <span class="lang-en-ca">Invited by <strong>${refName}</strong> (25% referral commission in Spain)</span>`
-            : `<span class="lang-en">Live Masterclass · September 24, 2026 · 7:00 PM CEST (1:00 PM EDT / 10:00 AM PDT)</span>
-               <span class="lang-es">Masterclass en Vivo · 24 de Septiembre 2026 · 19:00 h España (1:00 PM EDT / Miami · NY · PR)</span>
-               <span class="lang-fr">Masterclass en Direct · 24 Septembre 2026 · 19 h CEST (13 h EDT)</span>
-               <span class="lang-en-ca">Live Masterclass · September 24, 2026 · 7:00 PM CEST (1:00 PM EDT / 10:00 AM PDT)</span>`;
+            ? `<span class="lang-en">Invited by <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-es">Invitado/a por <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-fr">Invité(e) par <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-en-ca">Invited by <strong>${refName}</strong> · The Spain Connection</span>`
+            : `<span class="lang-en">Join our international referral network in Spain</span>
+               <span class="lang-es">Únete a nuestra red internacional de referidos en España</span>
+               <span class="lang-fr">Rejoignez notre réseau international en Espagne</span>
+               <span class="lang-en-ca">Join our international referral network in Spain</span>`;
         }
         if (submitBtn) {
-          submitBtn.innerHTML = `<span class="lang-en">🎟️ Claim Realtor VIP Pass</span><span class="lang-es">🎟️ Reservar Mi Pase VIP de Realtor</span><span class="lang-fr">🎟️ Réserver Mon Pass VIP Conseiller</span><span class="lang-en-ca">🎟️ Claim Realtor VIP Pass</span>`;
+          submitBtn.innerHTML = `<span class="lang-en">Register as Realtor</span><span class="lang-es">Registrarse como Agente</span><span class="lang-fr">S'inscrire comme Agent</span><span class="lang-en-ca">Register as Realtor</span>`;
         }
       } else if (type === 'broker') {
         if (formTitle) {
@@ -178,10 +230,10 @@ App.views.public = {
         }
         if (welcomeMsg) {
           welcomeMsg.innerHTML = refName
-            ? `<span class="lang-en">Strategic Partnership with <strong>${refName}</strong> · RE/MAX Inmomás</span>
-               <span class="lang-es">Alianza Estratégica con <strong>${refName}</strong> · RE/MAX Inmomás</span>
-               <span class="lang-fr">Partenariat Stratégique avec <strong>${refName}</strong> · RE/MAX Inmomás</span>
-               <span class="lang-en-ca">Strategic Partnership with <strong>${refName}</strong> · RE/MAX Inmomás</span>`
+            ? `<span class="lang-en">Strategic Partnership with <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-es">Alianza Estratégica con <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-fr">Partenariat Stratégique avec <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-en-ca">Strategic Partnership with <strong>${refName}</strong> · The Spain Connection</span>`
             : `<span class="lang-en">Register your Brokerage</span>
                <span class="lang-es">Registra tu Brokerage / Agencia</span>
                <span class="lang-fr">Inscrivez votre Agence</span>
@@ -219,17 +271,53 @@ App.views.public = {
       }
     }
 
+    // Helper to enrich a referrer with office/broker agencyName and agencyLogo if missing
+    function enrichReferrerFromPool(ref, usersPool) {
+      if (!ref || !Array.isArray(usersPool)) return ref;
+      const enriched = { ...ref };
+      let agency = (enriched.agencyName || enriched.brokerNameManual || '').trim();
+      let logo = enriched.agencyLogo || '';
+
+      // 1. Check linked broker via brokerId or referredBy
+      if ((!agency || !logo) && (enriched.brokerId || enriched.referredBy)) {
+        const parentBroker = usersPool.find(u =>
+          (enriched.brokerId && u.id === enriched.brokerId) ||
+          (enriched.referredBy && (u.id === enriched.referredBy || u.referralCode === enriched.referredBy))
+        );
+        if (parentBroker) {
+          if (!agency && parentBroker.agencyName) agency = parentBroker.agencyName;
+          if (!logo && parentBroker.agencyLogo) logo = parentBroker.agencyLogo;
+        }
+      }
+
+      // 2. Check any user in the same agency/office who has an agencyLogo
+      if (!logo && agency) {
+        const agencyLower = agency.toLowerCase();
+        const coworkerWithLogo = usersPool.find(u =>
+          u.agencyLogo && (u.agencyName || '').trim().toLowerCase() === agencyLower
+        );
+        if (coworkerWithLogo) {
+          logo = coworkerWithLogo.agencyLogo;
+        }
+      }
+
+      enriched.agencyName = agency;
+      enriched.agencyLogo = logo || null;
+      return enriched;
+    }
+
     // ---- Step 1: Look up referrer (sync from demoData first, then async Firestore) ----
     function lookupReferrerSync() {
       if (!refCode) return null;
       
       // Hardcoded partner fallbacks
-      if (refCode === 'UCI') return { firstName: 'UCI', lastName: '', role: 'partner' };
-      if (refCode === 'Fuster & Associates') return { firstName: 'Fuster', lastName: '& Associates', role: 'partner' };
-      if (refCode === 'Inmomás Holidays') return { firstName: 'Inmomás', lastName: 'Holidays', role: 'partner' };
+      if (refCode === 'UCI') return { firstName: 'UCI', lastName: '', agencyName: 'UCI', role: 'partner' };
+      if (refCode === 'Fuster & Associates') return { firstName: 'Fuster', lastName: '& Associates', agencyName: 'Fuster & Associates', role: 'partner' };
+      if (refCode === 'Inmomás Holidays') return { firstName: 'Inmomás', lastName: 'Holidays', agencyName: 'Inmomás Holidays', role: 'partner' };
 
       if (App.demoData && App.demoData.users) {
-        return App.demoData.users.find(u => u.referralCode === refCode) || null;
+        const found = App.demoData.users.find(u => u.referralCode === refCode) || null;
+        return enrichReferrerFromPool(found, App.demoData.users);
       }
       return null;
     }
@@ -243,7 +331,35 @@ App.views.public = {
           .get();
         if (!snapshot.empty) {
           const doc = snapshot.docs[0];
-          return { id: doc.id, ...doc.data() };
+          let refData = { id: doc.id, ...doc.data() };
+
+          // If agencyLogo or agencyName is missing, try to inherit from broker or office peers
+          if (!refData.agencyLogo || !refData.agencyName) {
+            if (refData.brokerId) {
+              try {
+                const brokerDoc = await App.db.collection('users').doc(refData.brokerId).get();
+                if (brokerDoc.exists) {
+                  const bData = brokerDoc.data();
+                  if (!refData.agencyName && bData.agencyName) refData.agencyName = bData.agencyName;
+                  if (!refData.agencyLogo && bData.agencyLogo) refData.agencyLogo = bData.agencyLogo;
+                }
+              } catch (_) {}
+            }
+            if (!refData.agencyLogo && refData.agencyName) {
+              try {
+                const agencySnap = await App.db.collection('users')
+                  .where('agencyName', '==', refData.agencyName)
+                  .get();
+                agencySnap.forEach(d => {
+                  const dData = d.data();
+                  if (!refData.agencyLogo && dData.agencyLogo) {
+                    refData.agencyLogo = dData.agencyLogo;
+                  }
+                });
+              } catch (_) {}
+            }
+          }
+          return refData;
         }
       } catch (err) {
         console.warn('[Referral] Firestore lookup failed:', err);
@@ -253,20 +369,10 @@ App.views.public = {
 
     function applyReferrer(ref) {
       referrer = ref;
+      App.views.public.renderPartnerBranding(referrer, 'referral');
+
       if (referrer) {
         console.log('[Referral] Referrer found:', referrer.firstName, referrer.lastName, '(' + referrer.role + ')');
-
-        // Update webinar spotlight banner invitee line
-        const bannerInviteeEl = document.getElementById('referral-banner-invitee');
-        if (bannerInviteeEl) {
-          bannerInviteeEl.innerHTML = `
-            <span>✨</span>
-            <span class="lang-en">VIP invitation courtesy of <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
-            <span class="lang-es">Invitación VIP de cortesía de <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
-            <span class="lang-fr">Invitation VIP offerte par <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
-            <span class="lang-en-ca">VIP invitation courtesy of <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
-          `;
-        }
 
         const clientBannerInviteeEl = document.getElementById('referral-client-banner-invitee');
         if (clientBannerInviteeEl) {
@@ -336,7 +442,7 @@ App.views.public = {
         },
         realtor: {
           icon: '🏠',
-          badge: '25%',
+          badge: '',
           labelEn: 'Realtor',
           labelEs: 'Realtor',
           labelFr: 'Conseiller',
@@ -599,6 +705,9 @@ App.views.public = {
             await App.auth.addReferralClient(clientPayload);
           } else {
             agencyName = form.querySelector('#referral-agencyName')?.value.trim() || '';
+            if (!agencyName && referrer && referrer.role === 'broker' && referrer.agencyName) {
+              agencyName = referrer.agencyName;
+            }
             market = form.querySelector('#referral-market')?.value.trim() || '';
             const notes = form.querySelector('#referral-notes')?.value.trim() || '';
             const password = (form.querySelector('#referral-password')?.value || '').trim();
@@ -607,12 +716,18 @@ App.views.public = {
               throw new Error('Password must be at least 6 characters.');
             }
 
+            const sameOffice = referrer && (
+              referrer.role === 'broker' ||
+              (agencyName && referrer.agencyName && agencyName.toLowerCase() === referrer.agencyName.toLowerCase())
+            );
+
             const userPayload = {
               email,
               password,
               firstName,
               lastName,
               agencyName,
+              agencyLogo: (sameOffice && referrer.agencyLogo) ? referrer.agencyLogo : null,
               phone,
               country: market || 'United States',
               role: contactType,
@@ -624,43 +739,45 @@ App.views.public = {
             await App.auth.register(userPayload);
           }
 
-          // ---- Automatic Webinar Registration ----
+          // ---- Automatic Webinar Registration (Client / Buyer only) ----
           const settings = (App.auth && App.auth.getWebinarSettings)
             ? await App.auth.getWebinarSettings()
             : (App.auth && App.auth.getDefaultWebinarSettings ? App.auth.getDefaultWebinarSettings() : null);
 
           const isClientType = contactType === 'client';
-          const typeConfig = isClientType ? (settings?.b2c || {}) : (settings?.b2b || {});
-          const webinarTitle = typeConfig?.title || (isClientType ? 'Spain Unlocked: Living & Investing' : 'Beyond Borders');
-          const webinarDate = typeConfig?.date || (isClientType ? (settings?.b2c?.date || '2026-10-29') : (settings?.b2b?.date || '2026-09-24'));
+          const typeConfig = settings?.b2c || {};
+          const webinarTitle = typeConfig?.title || 'Spain Unlocked: Living & Investing';
+          const webinarDate = typeConfig?.date || settings?.date || '2026-10-29';
 
-          let webinarPayload = {
-            firstName,
-            lastName,
-            email,
-            phone,
-            agency: isClientType ? (form.querySelector('#referral-objective')?.value || 'Client (Interested in Spain)') : (agencyName || 'Referred Partner'),
-            clientInterest: isClientType ? (form.querySelector('#referral-objective')?.value || form.querySelector('#referral-interestArea')?.value || 'Inversión / Mudanza') : null,
-            country: form.querySelector('#referral-country')?.value || (market || 'United States'),
-            state: form.querySelector('#referral-market')?.value || 'N/A',
-            howHeard: 'Referral Link',
-            referrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : '',
-            webinar: webinarTitle,
-            webinarType: (isClientType ? 'B2C' : 'B2B'),
-            webinarDate: webinarDate,
-            gdprConsent: true,
-            referralCode: referrer?.referralCode || refCode || null,
-            referrerId: referrer?.id || null,
-            agentReferrerId: referrer?.id || null,
-            agentReferrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : null,
-            agentReferrerRole: referrer?.role || null,
-            status: 'pending'
-          };
+          if (isClientType) {
+            let webinarPayload = {
+              firstName,
+              lastName,
+              email,
+              phone,
+              agency: form.querySelector('#referral-objective')?.value || 'Client (Interested in Spain)',
+              clientInterest: form.querySelector('#referral-objective')?.value || form.querySelector('#referral-interestArea')?.value || 'Inversión / Mudanza',
+              country: form.querySelector('#referral-country')?.value || (market || 'United States'),
+              state: form.querySelector('#referral-market')?.value || 'N/A',
+              howHeard: 'Referral Link',
+              referrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : '',
+              webinar: webinarTitle,
+              webinarType: 'B2C',
+              webinarDate: webinarDate,
+              gdprConsent: true,
+              referralCode: referrer?.referralCode || refCode || null,
+              referrerId: referrer?.id || null,
+              agentReferrerId: referrer?.id || null,
+              agentReferrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : null,
+              agentReferrerRole: referrer?.role || null,
+              status: 'pending'
+            };
 
-          try {
-            await App.auth.saveWebinarRegistration(webinarPayload);
-          } catch (webinarErr) {
-            console.warn('[Referral] Automatic webinar registration failed:', webinarErr);
+            try {
+              await App.auth.saveWebinarRegistration(webinarPayload);
+            } catch (webinarErr) {
+              console.warn('[Referral] Automatic webinar registration failed:', webinarErr);
+            }
           }
 
           App.utils.showToast(
