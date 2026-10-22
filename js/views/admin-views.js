@@ -1445,7 +1445,7 @@
             <td>${App.utils.escapeHtml(client.phone || '-')}</td>
             <td>${client.budget && !isNaN(Number(client.budget)) ? '€' + Number(client.budget).toLocaleString() : App.utils.escapeHtml(client.budget || '—')}</td>
             <td>${App.utils.escapeHtml(client.interestArea || '—')}</td>
-            <td><span class="badge ${App.utils.getStatusBadgeClass(client.status)}">${App.utils.escapeHtml(App.utils.getStatusLabel(client.status))}</span></td>
+            <td><span class="badge ${App.utils.getStatusBadgeClass(client.status)}">${App.utils.getStatusLabel(client.status)}</span></td>
             <td><span style="color:#b45309;font-weight:600;">🇪🇸 ${App.utils.escapeHtml(client.localAgentName || 'Sin asignar')}</span></td>
             <td>${App.utils.escapeHtml(getRealtorName(client.realtorId || client.referredBy))}</td>
             <td style="text-align: right; white-space: nowrap;" onclick="event.stopPropagation();">

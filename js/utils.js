@@ -249,7 +249,7 @@ App.utils.copyBrokerInviteText = function(customLink) {
 };
 
 /* ---- Status Helpers ---- */
-App.utils.clientStatusLabels = {
+App.utils.clientStatusLabelsEs = {
   'new': 'Seguimiento',
   'contacted': 'Seguimiento',
   'seguimiento': 'Seguimiento',
@@ -266,6 +266,40 @@ App.utils.clientStatusLabels = {
   'completed': 'Cierre'
 };
 
+App.utils.clientStatusLabelsEn = {
+  'new': 'Follow-Up',
+  'contacted': 'Follow-Up',
+  'seguimiento': 'Follow-Up',
+  'service_presentation': 'Service Presentation Meeting',
+  'mandate_signed': 'Signed Representation Mandate',
+  'first_property_meeting': '1st Property Presentation Meeting',
+  'options_sent': '1st Property Presentation Meeting',
+  'second_property_meeting': '2nd Property Presentation Meeting',
+  'properties_visited': 'Property Visits',
+  'negotiation': 'Negotiation',
+  'offer_made': 'Negotiation',
+  'notary_pending': 'Negotiation',
+  'closed': 'Closing',
+  'completed': 'Closing'
+};
+
+App.utils.clientStatusLabels = {
+  'new': '<span class="lang-en">Follow-Up</span><span class="lang-es">Seguimiento</span>',
+  'contacted': '<span class="lang-en">Follow-Up</span><span class="lang-es">Seguimiento</span>',
+  'seguimiento': '<span class="lang-en">Follow-Up</span><span class="lang-es">Seguimiento</span>',
+  'service_presentation': '<span class="lang-en">Service Presentation Meeting</span><span class="lang-es">Reunión de Presentación de Servicios</span>',
+  'mandate_signed': '<span class="lang-en">Signed Representation Mandate</span><span class="lang-es">Mandato de Representación Firmado</span>',
+  'first_property_meeting': '<span class="lang-en">1st Property Presentation Meeting</span><span class="lang-es">Primera Reunión para Presentar Propiedades</span>',
+  'options_sent': '<span class="lang-en">1st Property Presentation Meeting</span><span class="lang-es">Primera Reunión para Presentar Propiedades</span>',
+  'second_property_meeting': '<span class="lang-en">2nd Property Presentation Meeting</span><span class="lang-es">Segunda Reunión para Presentar Propiedades</span>',
+  'properties_visited': '<span class="lang-en">Property Visits</span><span class="lang-es">Visitas a Propiedades</span>',
+  'negotiation': '<span class="lang-en">Negotiation</span><span class="lang-es">Negociación</span>',
+  'offer_made': '<span class="lang-en">Negotiation</span><span class="lang-es">Negociación</span>',
+  'notary_pending': '<span class="lang-en">Negotiation</span><span class="lang-es">Negociación</span>',
+  'closed': '<span class="lang-en">Closing</span><span class="lang-es">Cierre</span>',
+  'completed': '<span class="lang-en">Closing</span><span class="lang-es">Cierre</span>'
+};
+
 App.utils.clientStatusOrder = [
   'contacted',
   'service_presentation',
@@ -278,7 +312,13 @@ App.utils.clientStatusOrder = [
 ];
 
 App.utils.getStatusLabel = function(status) {
-  return App.utils.clientStatusLabels[status] || status;
+  return App.utils.clientStatusLabels[status] || App.utils.escapeHtml(status || '');
+};
+
+App.utils.getStatusLabelText = function(status) {
+  const isEs = App.utils.getCurrentLanguage() === 'es';
+  const map = isEs ? App.utils.clientStatusLabelsEs : App.utils.clientStatusLabelsEn;
+  return map[status] || status;
 };
 
 App.utils.getStatusBadgeClass = function(status) {
@@ -403,14 +443,14 @@ App.utils.toggleLanguage = function() {
 
 /* ---- Kanban Board Rendering ---- */
 App.utils.PIPELINE_COLUMNS = [
-  { key: 'contacted',               label: 'Seguimiento',                                statuses: ['contacted', 'new', 'seguimiento'] },
-  { key: 'service_presentation',    label: 'Reunión de Presentación de Servicios',       statuses: ['service_presentation'] },
-  { key: 'mandate_signed',          label: 'Mandato de Representación Firmado',          statuses: ['mandate_signed'] },
-  { key: 'first_property_meeting',  label: 'Primera Reunión para Presentar Propiedades', statuses: ['first_property_meeting', 'options_sent'] },
-  { key: 'second_property_meeting', label: 'Segunda Reunión para Presentar Propiedades', statuses: ['second_property_meeting'] },
-  { key: 'properties_visited',      label: 'Visitas a Propiedades',                      statuses: ['properties_visited'] },
-  { key: 'negotiation',             label: 'Negociación',                                statuses: ['negotiation', 'offer_made', 'notary_pending'] },
-  { key: 'closed',                  label: 'Cierre',                                     statuses: ['closed', 'completed'] }
+  { key: 'contacted',               labelEn: 'Follow-Up',                         labelEs: 'Seguimiento',                                label: '<span class="lang-en">Follow-Up</span><span class="lang-es">Seguimiento</span>',                                                         statuses: ['contacted', 'new', 'seguimiento'] },
+  { key: 'service_presentation',    labelEn: 'Service Presentation Meeting',      labelEs: 'Reunión de Presentación de Servicios',       label: '<span class="lang-en">Service Presentation Meeting</span><span class="lang-es">Reunión de Presentación de Servicios</span>',             statuses: ['service_presentation'] },
+  { key: 'mandate_signed',          labelEn: 'Signed Representation Mandate',     labelEs: 'Mandato de Representación Firmado',          label: '<span class="lang-en">Signed Representation Mandate</span><span class="lang-es">Mandato de Representación Firmado</span>',               statuses: ['mandate_signed'] },
+  { key: 'first_property_meeting',  labelEn: '1st Property Presentation Meeting', labelEs: 'Primera Reunión para Presentar Propiedades', label: '<span class="lang-en">1st Property Presentation Meeting</span><span class="lang-es">Primera Reunión para Presentar Propiedades</span>', statuses: ['first_property_meeting', 'options_sent'] },
+  { key: 'second_property_meeting', labelEn: '2nd Property Presentation Meeting', labelEs: 'Segunda Reunión para Presentar Propiedades', label: '<span class="lang-en">2nd Property Presentation Meeting</span><span class="lang-es">Segunda Reunión para Presentar Propiedades</span>', statuses: ['second_property_meeting'] },
+  { key: 'properties_visited',      labelEn: 'Property Visits',                   labelEs: 'Visitas a Propiedades',                      label: '<span class="lang-en">Property Visits</span><span class="lang-es">Visitas a Propiedades</span>',                                         statuses: ['properties_visited'] },
+  { key: 'negotiation',             labelEn: 'Negotiation',                       labelEs: 'Negociación',                                label: '<span class="lang-en">Negotiation</span><span class="lang-es">Negociación</span>',                                                       statuses: ['negotiation', 'offer_made', 'notary_pending'] },
+  { key: 'closed',                  labelEn: 'Closing',                           labelEs: 'Cierre',                                     label: '<span class="lang-en">Closing</span><span class="lang-es">Cierre</span>',                                                                 statuses: ['closed', 'completed'] }
 ];
 
 App.utils.columnColors = {
@@ -506,8 +546,10 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
         
       const realtorLabel = getRealtorNameFn ? `<div style="font-size: 0.75rem; color: #4f46e5; margin-bottom: 0.25rem; font-weight: 600;">👤 ${App.utils.escapeHtml(getRealtorNameFn(c.referredBy))}</div>` : '';
       
-      const localAgentName = c.localAgentName || 'Sin asignar / Unassigned';
-      const agentLabel = `<div style="font-size: 0.75rem; color: #b45309; margin-bottom: 0.25rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">🇪🇸 ${App.utils.escapeHtml(localAgentName)}</div>`;
+      const localAgentName = c.localAgentName
+        ? App.utils.escapeHtml(c.localAgentName)
+        : '<span class="lang-en">Unassigned</span><span class="lang-es">Sin asignar</span>';
+      const agentLabel = `<div style="font-size: 0.75rem; color: #b45309; margin-bottom: 0.25rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">🇪🇸 ${localAgentName}</div>`;
 
       const clientTag = c.tag || App.utils.getClientTag(c);
       const tagBadge = App.utils.getClientTagBadge ? App.utils.getClientTagBadge(clientTag) : '';
@@ -532,7 +574,7 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
             💰 ${App.utils.escapeHtml(c.budget || '—')}
           </div>
           <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.5rem;">
-            Updated: ${App.utils.formatDateRelative(lastUpdate)}
+            <span class="lang-en">Updated:</span><span class="lang-es">Actualizado:</span> ${App.utils.formatDateRelative(lastUpdate)}
           </div>
         </div>
       `;
@@ -551,7 +593,7 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
           </span>
         </div>
         <div class="pipeline-column__cards">
-          ${cards || `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 2rem 1rem; border: 2px dashed rgba(0,0,0,0.05); border-radius: 8px; margin: 12px 0;">Arrastra clientes aquí</div>`}
+          ${cards || `<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 2rem 1rem; border: 2px dashed rgba(0,0,0,0.05); border-radius: 8px; margin: 12px 0;"><span class="lang-en">Drag clients here</span><span class="lang-es">Arrastra clientes aquí</span></div>`}
         </div>
       </div>
     `;
