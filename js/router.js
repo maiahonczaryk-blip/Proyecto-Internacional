@@ -300,27 +300,45 @@ App.router = (function() {
 
       // Show correct sidebar nav for role
       document.querySelectorAll('.sidebar-nav').forEach(g => g.style.display = 'none');
-      let targetNavId = `sidebar-${sidebarType}`;
-      if (sidebarType === 'user') {
-        const user = App.auth.getCurrentUser();
-        if (user) targetNavId = `sidebar-${user.role}`;
+      document.querySelectorAll('.dashboard-bnav-group').forEach(g => g.style.display = 'none');
+      let effectiveRole = sidebarType;
+      const user = App.auth.getCurrentUser();
+      if (sidebarType === 'user' && user) {
+        effectiveRole = user.role;
       }
-      const roleNav = document.getElementById(targetNavId);
+      const roleNav = document.getElementById(`sidebar-${effectiveRole}`);
       if (roleNav) roleNav.style.display = 'block';
 
-      // Update sidebar user info
-      const user = App.auth.getCurrentUser();
+      const bnavGroup = document.getElementById(`bnav-group-${effectiveRole}`);
+      if (bnavGroup) bnavGroup.style.display = 'flex';
+
+      // Update sidebar & mobile topbar user info
       if (user) {
         const nameEl = document.getElementById('sidebar-user-name');
         const roleEl = document.getElementById('sidebar-user-role');
         const avatarEl = document.getElementById('sidebar-user-avatar');
+        const mobileRoleEl = document.getElementById('mobile-topbar-role');
+        const mobileAvatarEl = document.getElementById('mobile-user-avatar');
         
+        const roleLabels = {
+          admin: 'Admin',
+          agent_inmomas: 'Agente Inmomás',
+          colaborador: 'Colaborador',
+          broker: 'Broker',
+          realtor: 'Realtor',
+          partner: 'Partner'
+        };
+        const formattedRole = roleLabels[user.role] || (user.role.charAt(0).toUpperCase() + user.role.slice(1));
+        const initials = App.utils.getInitials(user.firstName, user.lastName);
+
         if (nameEl) nameEl.textContent = `${user.firstName} ${user.lastName}`;
         if (roleEl) {
-          roleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+          roleEl.textContent = formattedRole;
           roleEl.className = `sidebar-user__role sidebar-user__role--${user.role}`;
         }
-        if (avatarEl) avatarEl.innerHTML = App.utils.getInitials(user.firstName, user.lastName);
+        if (avatarEl) avatarEl.innerHTML = initials;
+        if (mobileRoleEl) mobileRoleEl.textContent = formattedRole;
+        if (mobileAvatarEl) mobileAvatarEl.innerHTML = initials;
         
         sidebar.classList.remove('sidebar--admin', 'sidebar--broker', 'sidebar--realtor', 'sidebar--agent_inmomas', 'sidebar--colaborador');
         sidebar.classList.add(`sidebar--${user.role}`);
@@ -363,6 +381,25 @@ App.router = (function() {
         link.classList.toggle('active', linkRoute === routeKey);
       }
     });
+
+    // Sync mobile bottom navigation active tab
+    document.querySelectorAll('.dashboard-bnav-item').forEach(item => {
+      const href = item.getAttribute('href');
+      if (href) {
+        const linkRoute = href.substring(1);
+        const isActive = linkRoute === routeKey;
+        item.classList.toggle('active', isActive);
+        if (isActive && item.offsetParent !== null) {
+          item.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+      }
+    });
+
+    // Highlight mobile topbar avatar when on #profile
+    const mobileAvatarEl = document.getElementById('mobile-user-avatar');
+    if (mobileAvatarEl) {
+      mobileAvatarEl.classList.toggle('active', routeKey === 'profile');
+    }
   }
 
   /* ---- Initialize View Logic ---- */

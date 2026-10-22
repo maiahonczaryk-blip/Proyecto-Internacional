@@ -18,6 +18,24 @@
 </head>
 <body class="lang-en dashboard-body">
 
+  <!-- ===================== MOBILE DASHBOARD TOPBAR ===================== -->
+  <header class="mobile-dashboard-topbar" id="mobile-dashboard-topbar">
+    <a href="#profile" class="mobile-topbar-brand" style="text-decoration: none; display: flex; align-items: center; gap: 10px; min-width: 0;">
+      <img src="images/spain-connection-logo.png" alt="The Spain Connection" class="mobile-topbar-logo">
+      <div class="mobile-topbar-meta">
+        <span class="mobile-topbar-title">Partner Portal</span>
+        <span class="mobile-topbar-role" id="mobile-topbar-role">—</span>
+      </div>
+    </a>
+    <div class="mobile-topbar-actions">
+      <button class="mobile-topbar-btn" id="mobile-lang-toggle" aria-label="Switch language" title="Switch Language">
+        <span class="lang-label">ES</span>
+      </button>
+      <a href="#profile" class="mobile-topbar-avatar" id="mobile-user-avatar" title="My Profile" aria-label="My Profile">👤</a>
+      <button class="mobile-topbar-btn mobile-topbar-logout" onclick="App.auth.logout().then(() => window.location.href='index.html#home')" title="Logout" aria-label="Logout">⏻</button>
+    </div>
+  </header>
+
   <!-- ===================== MOBILE SIDEBAR TOGGLE ===================== -->
   <button class="sidebar-toggle" id="mobile-sidebar-toggle" aria-label="Toggle Menu">
     <span></span><span></span><span></span>
@@ -127,6 +145,7 @@
           <h1><span class="lang-en">Admin Dashboard</span><span class="lang-es">Panel de Administración</span></h1>
           <p class="dashboard-subtitle"><span class="lang-en">Manage the RE/MAX Inmomás International Platform</span><span class="lang-es">Gestiona la Plataforma Internacional de RE/MAX Inmomás</span></p>
         </div>
+        <div id="admin-contract-notifications-banner" style="display:none; margin-bottom: 1.5rem;"></div>
         <div class="stat-cards-grid stat-cards-grid--5cols">
           <div class="stat-card stat-card--amber"><div class="stat-card__icon stat-card__icon--amber">⏳</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-pending">0</div><div class="stat-card__label"><span class="lang-en">Pending Approvals</span><span class="lang-es">Pendientes</span></div></div></div>
           <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">🏢</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-brokers">0</div><div class="stat-card__label"><span class="lang-en">Active Brokers</span><span class="lang-es">Brokers Activos</span></div></div></div>
@@ -344,32 +363,32 @@
     <div id="view-admin-agreements" class="app-view">
       <div class="dashboard-content">
         <div class="dashboard-header">
-          <h1>📋 <span class="lang-en">Referral Agreements</span><span class="lang-es">Acuerdos de Referido</span></h1>
-          <p class="dashboard-subtitle"><span class="lang-en">Manage, review, and countersign partnership agreements.</span><span class="lang-es">Gestiona, revisa y co-firma acuerdos de colaboración.</span></p>
+          <h1>📋 <span class="lang-en">Collaboration Agreements &amp; Fiscal Data</span><span class="lang-es">Contratos de Colaboración y Datos Fiscales</span></h1>
+          <p class="dashboard-subtitle"><span class="lang-en">Review submitted company fiscal &amp; bank details to prepare external contracts and manage signed agreements.</span><span class="lang-es">Revisa los datos fiscales y bancarios enviados por Brokers y Agentes para armar el contrato externo y gestionar acuerdos activos.</span></p>
         </div>
 
-        <!-- Agreements Pending Admin Signature -->
+        <!-- Agreements Pending Contract Preparation / Signature -->
         <div class="dashboard-section">
-          <h2>📥 <span class="lang-en">Pending Your Signature</span><span class="lang-es">Pendientes de Tu Firma</span> <span id="admin-agreements-count-tab" style="font-size:0.85rem; font-weight:600; color:#e11b22; margin-left:8px;"></span></h2>
+          <h2>🔔 <span class="lang-en">Fiscal &amp; Bank Details Received — Pending Contract Preparation</span><span class="lang-es">Datos Fiscales y Bancarios Recibidos — Pendientes de Preparar Contrato</span> <span id="admin-agreements-count-tab" style="font-size:0.85rem; font-weight:600; color:#e11b22; margin-left:8px;"></span></h2>
           <div id="admin-agreements-list-tab" class="card-list">
-            <div class="empty-state"><div class="empty-state__icon">📋</div><p class="empty-state__text">No agreements pending signature.</p></div>
+            <div class="empty-state"><div class="empty-state__icon">📋</div><p class="empty-state__text">No hay solicitudes de contrato pendientes.</p></div>
           </div>
         </div>
 
         <!-- Signed / Active Agreements -->
         <div class="dashboard-section">
-          <h2>✅ <span class="lang-en">Active / Signed Agreements</span><span class="lang-es">Acuerdos Firmados / Activos</span></h2>
+          <h2>✅ <span class="lang-en">Active / Signed Agreements</span><span class="lang-es">Contratos Firmados / Activos</span></h2>
           <div class="data-table-container">
             <table class="data-table data-table--medium">
               <thead>
                 <tr>
-                  <th><span class="lang-en">Partner Name</span><span class="lang-es">Nombre</span></th>
+                  <th><span class="lang-en">Partner Name</span><span class="lang-es">Colaborador</span></th>
                   <th>Role</th>
-                  <th>Agency</th>
+                  <th><span class="lang-en">Company &amp; Fiscal Data</span><span class="lang-es">Empresa y Datos Fiscales</span></th>
+                  <th><span class="lang-en">Bank Account</span><span class="lang-es">Cuenta Bancaria</span></th>
                   <th>Email</th>
-                  <th>Realtor Signed Copy</th>
-                  <th>Final Signed Agreement</th>
-                  <th>Actions / Re-upload</th>
+                  <th><span class="lang-en">Signed Contract</span><span class="lang-es">Contrato Firmado</span></th>
+                  <th><span class="lang-en">Actions</span><span class="lang-es">Acciones</span></th>
                 </tr>
               </thead>
               <tbody id="admin-signed-agreements-tbody">
@@ -1176,28 +1195,30 @@
 
     <!-- ==================== VIEW: AGENT PARTNERS ==================== -->
     <div id="view-agent-partners" class="app-view">
-      <div class="page-header">
-        <h1 class="page-title"><span class="lang-en">My Realtors / Partners</span><span class="lang-es">Mis Realtors / Partners</span></h1>
-        <p class="page-subtitle"><span class="lang-en">Brokers and Realtors assigned to you or registered through your link</span><span class="lang-es">Brokers y Realtors bajo tu paraguas o registrados por tu enlace</span></p>
-      </div>
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1>🤝 <span class="lang-en">My Realtors / Partners</span><span class="lang-es">Mis Realtors / Partners</span></h1>
+          <p class="dashboard-subtitle"><span class="lang-en">Brokers and Realtors assigned to you or registered through your link</span><span class="lang-es">Brokers y Realtors bajo tu paraguas o registrados por tu enlace</span></p>
+        </div>
 
-      <div class="card">
-        <div style="overflow-x:auto;">
-          <table class="data-table" style="width:100%; min-width:600px; text-align:left;">
-            <thead>
-              <tr>
-                <th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
-                <th><span class="lang-en">Name</span><span class="lang-es">Nombre</span></th>
-                <th><span class="lang-en">Role</span><span class="lang-es">Rol</span></th>
-                <th>Email</th>
-                <th><span class="lang-en">Agency</span><span class="lang-es">Agencia</span></th>
-                <th><span class="lang-en">Status</span><span class="lang-es">Estado</span></th>
-              </tr>
-            </thead>
-            <tbody id="agent-partners-table-body">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
+        <div class="dashboard-section">
+          <div class="data-table-container">
+            <table class="data-table data-table--narrow">
+              <thead>
+                <tr>
+                  <th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
+                  <th><span class="lang-en">Name</span><span class="lang-es">Nombre</span></th>
+                  <th><span class="lang-en">Role</span><span class="lang-es">Rol</span></th>
+                  <th>Email</th>
+                  <th><span class="lang-en">Agency</span><span class="lang-es">Agencia</span></th>
+                  <th><span class="lang-en">Status</span><span class="lang-es">Estado</span></th>
+                </tr>
+              </thead>
+              <tbody id="agent-partners-table-body">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -1431,6 +1452,171 @@
     </div>
 
   </main>
+
+  <!-- ===================== MOBILE DASHBOARD BOTTOM NAV ===================== -->
+  <nav class="dashboard-bottom-nav" id="dashboard-bottom-nav" aria-label="Dashboard Navigation">
+
+    <!-- Admin Bottom Nav -->
+    <div class="dashboard-bnav-group" id="bnav-group-admin" style="display:none;">
+      <a href="#admin/dashboard" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">📊</span>
+        <span class="lang-en">Panel</span><span class="lang-es">Panel</span>
+      </a>
+      <a href="#admin/users" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">👥</span>
+        <span class="lang-en">Users</span><span class="lang-es">Usuarios</span>
+      </a>
+      <a href="#admin/clients" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">🤝</span>
+        <span class="lang-en">Clients</span><span class="lang-es">Clientes</span>
+      </a>
+      <a href="#admin/agreements" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">📋</span>
+        <span class="lang-en">Agreements</span><span class="lang-es">Acuerdos</span>
+      </a>
+      <a href="#admin/newsletter" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">📧</span>
+        <span class="lang-en">Newsletter</span><span class="lang-es">Newsletter</span>
+      </a>
+      <a href="#admin/webinar" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">🎙️</span>
+        <span class="lang-en">Webinar</span><span class="lang-es">Webinar</span>
+      </a>
+      <a href="#admin/unified" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">🗂️</span>
+        <span class="lang-en">Directory</span><span class="lang-es">Directorio</span>
+      </a>
+      <a href="#profile" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">👤</span>
+        <span class="lang-en">Profile</span><span class="lang-es">Perfil</span>
+      </a>
+    </div>
+
+    <!-- Agente Inmomás Bottom Nav -->
+    <div class="dashboard-bnav-group" id="bnav-group-agent_inmomas" style="display:none;">
+      <a href="#agent_inmomas/dashboard" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">📊</span>
+        <span class="lang-en">Panel</span><span class="lang-es">Panel</span>
+      </a>
+      <a href="#agent_inmomas/clients" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">🤝</span>
+        <span class="lang-en">Clients</span><span class="lang-es">Clientes</span>
+      </a>
+      <a href="#agent_inmomas/finances" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">💰</span>
+        <span class="lang-en">Finances</span><span class="lang-es">Finanzas</span>
+      </a>
+      <a href="#agent_inmomas/webinar" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">🎙️</span>
+        <span class="lang-en">Webinar</span><span class="lang-es">Webinar</span>
+      </a>
+      <a href="#agent_inmomas/partners" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">👥</span>
+        <span class="lang-en">Realtors</span><span class="lang-es">Realtors</span>
+      </a>
+      <a href="#profile" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">👤</span>
+        <span class="lang-en">Profile</span><span class="lang-es">Perfil</span>
+      </a>
+    </div>
+
+    <!-- Colaborador Bottom Nav -->
+    <div class="dashboard-bnav-group" id="bnav-group-colaborador" style="display:none;">
+      <a href="#colaborador/dashboard" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">📊</span>
+        <span class="lang-en">Panel</span><span class="lang-es">Panel</span>
+      </a>
+      <a href="#colaborador/clients" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">🤝</span>
+        <span class="lang-en">Clients</span><span class="lang-es">Clientes</span>
+      </a>
+      <a href="#colaborador/finances" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">💰</span>
+        <span class="lang-en">Finances</span><span class="lang-es">Finanzas</span>
+      </a>
+      <a href="#colaborador/webinar" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">🎙️</span>
+        <span class="lang-en">Webinar</span><span class="lang-es">Webinar</span>
+      </a>
+      <a href="#colaborador/partners" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">👥</span>
+        <span class="lang-en">Partners</span><span class="lang-es">Partners</span>
+      </a>
+      <a href="#profile" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">👤</span>
+        <span class="lang-en">Profile</span><span class="lang-es">Perfil</span>
+      </a>
+    </div>
+
+    <!-- Broker Bottom Nav -->
+    <div class="dashboard-bnav-group" id="bnav-group-broker" style="display:none;">
+      <a href="#broker/dashboard" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">📊</span>
+        <span class="lang-en">Panel</span><span class="lang-es">Panel</span>
+      </a>
+      <a href="#broker/team" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">👥</span>
+        <span class="lang-en">Team</span><span class="lang-es">Equipo</span>
+      </a>
+      <a href="#broker/clients" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">🤝</span>
+        <span class="lang-en">Clients</span><span class="lang-es">Clientes</span>
+      </a>
+      <a href="#broker/documents" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">📄</span>
+        <span class="lang-en">Docs</span><span class="lang-es">Docs</span>
+      </a>
+      <a href="#broker/finances" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">💰</span>
+        <span class="lang-en">Finances</span><span class="lang-es">Finanzas</span>
+      </a>
+      <a href="#profile" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">👤</span>
+        <span class="lang-en">Profile</span><span class="lang-es">Perfil</span>
+      </a>
+    </div>
+
+    <!-- Realtor Bottom Nav -->
+    <div class="dashboard-bnav-group" id="bnav-group-realtor" style="display:none;">
+      <a href="#realtor/dashboard" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">📊</span>
+        <span class="lang-en">Panel</span><span class="lang-es">Panel</span>
+      </a>
+      <a href="#realtor/clients" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">🤝</span>
+        <span class="lang-en">Clients</span><span class="lang-es">Clientes</span>
+      </a>
+      <a href="#realtor/referral" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">🔗</span>
+        <span class="lang-en">Referrals</span><span class="lang-es">Referidos</span>
+      </a>
+      <a href="#realtor/documents" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">📄</span>
+        <span class="lang-en">Docs</span><span class="lang-es">Docs</span>
+      </a>
+      <a href="#realtor/finances" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">💰</span>
+        <span class="lang-en">Finances</span><span class="lang-es">Finanzas</span>
+      </a>
+      <a href="#profile" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">👤</span>
+        <span class="lang-en">Profile</span><span class="lang-es">Perfil</span>
+      </a>
+    </div>
+
+    <!-- Partner Bottom Nav -->
+    <div class="dashboard-bnav-group" id="bnav-group-partner" style="display:none;">
+      <a href="#partner/dashboard" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">📊</span>
+        <span class="lang-en">Dashboard</span><span class="lang-es">Panel</span>
+      </a>
+      <a href="#profile" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">👤</span>
+        <span class="lang-en">My Profile</span><span class="lang-es">Mi Perfil</span>
+      </a>
+    </div>
+
+  </nav>
 
   <!-- ===================== TOAST CONTAINER ===================== -->
   <div id="toast-container" class="toast-container"></div>

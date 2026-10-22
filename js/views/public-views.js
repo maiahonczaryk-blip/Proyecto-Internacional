@@ -857,7 +857,7 @@ App.views.public = {
       const dayDateEs = `${daysEs[dayOfWeek]}, ${dayNum} de ${monthsEs[monthIndex]} de ${yearNum}`;
       const dayDateFr = `${daysFr[dayOfWeek]} ${dayNum} ${monthsFr[monthIndex]} ${yearNum}`;
 
-      // ── Timezone Conversions ──
+      // ── Timezone Conversions (handles Spain CET/CEST vs North America DST) ──
       const [hourRef, minRef] = timeStr.split(':').map(Number);
       function formatTime12(h, min) {
         const period = h >= 12 ? 'PM' : 'AM';
@@ -867,14 +867,27 @@ App.views.public = {
         return `${displayH}${displayM} ${period}`;
       }
 
+      // Check if Spain is in CET (UTC+1) while North America is still in EDT (UTC-4)
+      // In Europe, DST ends on the last Sunday of October; in US/Canada, DST ends on the 1st Sunday of November.
+      const lastDayOct = new Date(Date.UTC(y, 9, 31));
+      const lastSunOct = 31 - lastDayOct.getUTCDay();
+      const firstDayNov = new Date(Date.UTC(y, 10, 1));
+      const firstSunNov = 1 + ((7 - firstDayNov.getUTCDay()) % 7);
+      const isSpainWinterTime = (m > 10) || (m < 3) || (m === 10 && d >= lastSunOct);
+      const isUSWinterTime = (m > 11) || (m < 3) || (m === 11 && d >= firstSunNov);
+      const spainUtcOffset = isSpainWinterTime ? 1 : 2; // CET = +1, CEST = +2
+      const nyUtcOffset = isUSWinterTime ? -5 : -4;    // EST = -5, EDT = -4
+      const diffHours = spainUtcOffset - nyUtcOffset;  // 5 hours during Oct 25–31, 6 hours otherwise
+      const spainTzLabel = isSpainWinterTime ? 'CET' : 'CEST';
+
       const cestTime = formatTime12(hourRef, minRef);
       const cestHour24 = hourRef;
-      const cestTime24 = minRef === 0 ? `${cestHour24} h` : `${cestHour24}:${String(minRef).padStart(2, '0')} h`;
-      const adtTime = formatTime12((hourRef - 5 + 24) % 24, minRef);
-      const edtTime = formatTime12((hourRef - 6 + 24) % 24, minRef);
-      const cdtTime = formatTime12((hourRef - 7 + 24) % 24, minRef);
-      const mdtTime = formatTime12((hourRef - 8 + 24) % 24, minRef);
-      const pdtTime = formatTime12((hourRef - 9 + 24) % 24, minRef);
+      const cestTime24 = minRef === 0 ? `${cestHour24}:00 h` : `${cestHour24}:${String(minRef).padStart(2, '0')} h`;
+      const adtTime = formatTime12((hourRef - (diffHours - 1) + 24) % 24, minRef);
+      const edtTime = formatTime12((hourRef - diffHours + 24) % 24, minRef);
+      const cdtTime = formatTime12((hourRef - (diffHours + 1) + 24) % 24, minRef);
+      const mdtTime = formatTime12((hourRef - (diffHours + 2) + 24) % 24, minRef);
+      const pdtTime = formatTime12((hourRef - (diffHours + 3) + 24) % 24, minRef);
 
       const isB2C = activeType === 'b2c';
 
@@ -932,10 +945,10 @@ App.views.public = {
         const targetDescFr = activeType === 'b2b' ? 'Gratuit pour Agents & Courtiers' : 'Gratuit pour Acheteurs & Investisseurs';
 
         bannerTextEl.innerHTML = `
-          <span class="lang-en">🎙️ <strong>${config.titlePrefix.en} ${config.titleHighlight.en}</strong> &nbsp;&middot;&nbsp; ${monthsEn[monthIndex]} ${dayNum} &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime} Spain &nbsp;&middot;&nbsp; ${targetDescEn}</span>
-          <span class="lang-es">🎙️ <strong>${config.titlePrefix.es} ${config.titleHighlight.es}</strong> &nbsp;&middot;&nbsp; ${dayNum} de ${monthsEs[monthIndex]} &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime24} España &nbsp;&middot;&nbsp; ${targetDescEs}</span>
-          <span class="lang-fr">🎙️ <strong>${config.titlePrefix.fr} ${config.titleHighlight.fr}</strong> &nbsp;&middot;&nbsp; ${dayNum} ${monthsFr[monthIndex]} &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime24} Espagne &nbsp;&middot;&nbsp; ${targetDescFr}</span>
-          <span class="lang-en-ca">🎙️ <strong>${config.titlePrefix['en-ca'] || config.titlePrefix.en} ${config.titleHighlight['en-ca'] || config.titleHighlight.en}</strong> &nbsp;&middot;&nbsp; ${monthsEn[monthIndex]} ${dayNum} &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime} Spain &nbsp;&middot;&nbsp; ${targetDescEn}</span>
+          <span class="lang-en">🎙️ <strong>${config.titlePrefix.en} ${config.titleHighlight.en}</strong> &nbsp;&middot;&nbsp; ${monthsEn[monthIndex]} ${dayNum}<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime} Spain &nbsp;&middot;&nbsp; ${targetDescEn}</span></span>
+          <span class="lang-es">🎙️ <strong>${config.titlePrefix.es} ${config.titleHighlight.es}</strong> &nbsp;&middot;&nbsp; ${dayNum} ${monthsEs[monthIndex]}<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime24} España &nbsp;&middot;&nbsp; ${targetDescEs}</span></span>
+          <span class="lang-fr">🎙️ <strong>${config.titlePrefix.fr} ${config.titleHighlight.fr}</strong> &nbsp;&middot;&nbsp; ${dayNum} ${monthsFr[monthIndex]}<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime24} Espagne &nbsp;&middot;&nbsp; ${targetDescFr}</span></span>
+          <span class="lang-en-ca">🎙️ <strong>${config.titlePrefix['en-ca'] || config.titlePrefix.en} ${config.titleHighlight['en-ca'] || config.titleHighlight.en}</strong> &nbsp;&middot;&nbsp; ${monthsEn[monthIndex]} ${dayNum}<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime} Spain &nbsp;&middot;&nbsp; ${targetDescEn}</span></span>
         `;
       }
 
@@ -954,10 +967,10 @@ App.views.public = {
       const topBandEl = document.getElementById('webinar-top-announcement-band');
       if (topBandEl && config.badge) {
         topBandEl.innerHTML = `
-          <span class="lang-en">🔴 LIVE WEBINAR &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Exclusive Masterclass for US, Canadian & PR Realtors' : 'Living, Moving & Investing in Spain'} &nbsp;&middot;&nbsp; ${formattedDateEn} &nbsp;&middot;&nbsp; FREE Registration</span>
-          <span class="lang-es">🔴 WEBINAR EN VIVO &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Masterclass Exclusiva para Agentes y Brokers de EE.UU., Canadá y PR' : 'Vivir, Mudarse e Invertir en España'} &nbsp;&middot;&nbsp; ${formattedDateEs} &nbsp;&middot;&nbsp; Registro GRATUITO</span>
-          <span class="lang-fr">🔴 WEBINAIRE EN DIRECT &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Masterclass Exclusive pour Courtiers et Agents' : 'Vivre et Investir en Espagne'} &nbsp;&middot;&nbsp; ${formattedDateFr} &nbsp;&middot;&nbsp; Inscription GRATUITE</span>
-          <span class="lang-en-ca">🔴 LIVE WEBINAR &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Exclusive Masterclass for North American Realtors' : 'Living, Moving & Investing in Spain'} &nbsp;&middot;&nbsp; ${formattedDateEn} &nbsp;&middot;&nbsp; FREE Registration</span>
+          <span class="lang-en">🔴 LIVE WEBINAR<span class="webinar-band-extra"> &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Exclusive Masterclass for US, Canadian & PR Realtors' : 'Living, Moving & Investing in Spain'}</span> &nbsp;&middot;&nbsp; ${formattedDateEn} &nbsp;&middot;&nbsp; FREE Registration</span>
+          <span class="lang-es">🔴 WEBINAR EN VIVO<span class="webinar-band-extra"> &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Masterclass Exclusiva para Agentes y Brokers de EE.UU., Canadá y PR' : 'Vivir, Mudarse e Invertir en España'}</span> &nbsp;&middot;&nbsp; ${formattedDateEs} &nbsp;&middot;&nbsp; Registro GRATUITO</span>
+          <span class="lang-fr">🔴 WEBINAIRE EN DIRECT<span class="webinar-band-extra"> &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Masterclass Exclusive pour Courtiers et Agents' : 'Vivre et Investir en Espagne'}</span> &nbsp;&middot;&nbsp; ${formattedDateFr} &nbsp;&middot;&nbsp; Inscription GRATUITE</span>
+          <span class="lang-en-ca">🔴 LIVE WEBINAR<span class="webinar-band-extra"> &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Exclusive Masterclass for North American Realtors' : 'Living, Moving & Investing in Spain'}</span> &nbsp;&middot;&nbsp; ${formattedDateEn} &nbsp;&middot;&nbsp; FREE Registration</span>
         `;
       }
 
@@ -1092,8 +1105,8 @@ App.views.public = {
       const benefitsContainer = document.getElementById('webinar-benefits-container');
       if (benefitsContainer && Array.isArray(config.benefits)) {
         benefitsContainer.innerHTML = config.benefits.map(b => `
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;display:flex;gap:14px;align-items:flex-start;transition:transform .2s,border-color .2s,box-shadow .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='${hoverBorderColor}';this.style.boxShadow='0 8px 24px rgba(0,0,0,.25)';" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.08)';this.style.boxShadow='none';">
-            <div style="font-size:1.8rem;flex-shrink:0;">${b.icon || '✨'}</div>
+          <div class="webinar-benefit-card" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;display:flex;gap:14px;align-items:flex-start;transition:transform .2s,border-color .2s,box-shadow .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='${hoverBorderColor}';this.style.boxShadow='0 8px 24px rgba(0,0,0,.25)';" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.08)';this.style.boxShadow='none';">
+            <div class="webinar-benefit-icon" style="font-size:1.8rem;flex-shrink:0;">${b.icon || '✨'}</div>
             <div>
               <div style="font-weight:700;color:#fff;font-size:.92rem;margin-bottom:5px;">
                 <span class="lang-en">${b.title?.en || ''}</span>
@@ -1145,7 +1158,7 @@ App.views.public = {
 
       const cardHeaderSubtitle = document.getElementById('webinar-card-header-subtitle');
       if (cardHeaderSubtitle) {
-        cardHeaderSubtitle.textContent = `${cestTime} CEST (Spain) | ${edtTime} EDT (Miami/NY/PR) | ${pdtTime} PDT`;
+        cardHeaderSubtitle.textContent = `${cestTime} ${spainTzLabel} (Spain) | ${edtTime} EDT (Miami/NY/Toronto) | ${edtTime} AST (PR) | ${pdtTime} PDT`;
       }
 
       const submitBtn = document.getElementById('webinar-submit-btn');
@@ -1190,7 +1203,7 @@ App.views.public = {
 
       const countdownEl = document.getElementById('webinar-countdown');
       if (countdownEl) {
-        const targetDate = new Date(`${dateStr}T${timeStr}:00+02:00`);
+        const targetDate = new Date(`${dateStr}T${timeStr}:00+0${spainUtcOffset}:00`);
         function tick() {
           const now = new Date();
           const diff = targetDate - now;
@@ -1204,24 +1217,24 @@ App.views.public = {
           const s = Math.floor((diff % 60000) / 1000);
           const pad = n => String(n).padStart(2, '0');
           countdownEl.innerHTML = `
-            <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;align-items:center;">
-              <div style="text-align:center;min-width:52px;">
-                <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${d}</div>
+            <div class="webinar-countdown-row" style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;align-items:center;">
+              <div class="webinar-countdown-unit" style="text-align:center;min-width:52px;">
+                <div class="webinar-countdown-num" style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${d}</div>
                 <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Days</span><span class="lang-es">Días</span><span class="lang-fr">Jours</span><span class="lang-en-ca">Days</span></div>
               </div>
-              <div style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
-              <div style="text-align:center;min-width:52px;">
-                <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(h)}</div>
+              <div class="webinar-countdown-sep" style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
+              <div class="webinar-countdown-unit" style="text-align:center;min-width:52px;">
+                <div class="webinar-countdown-num" style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(h)}</div>
                 <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Hours</span><span class="lang-es">Horas</span><span class="lang-fr">Heures</span><span class="lang-en-ca">Hours</span></div>
               </div>
-              <div style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
-              <div style="text-align:center;min-width:52px;">
-                <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(m)}</div>
+              <div class="webinar-countdown-sep" style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
+              <div class="webinar-countdown-unit" style="text-align:center;min-width:52px;">
+                <div class="webinar-countdown-num" style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(m)}</div>
                 <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Min</span><span class="lang-es">Min</span><span class="lang-fr">Min</span><span class="lang-en-ca">Min</span></div>
               </div>
-              <div style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
-              <div style="text-align:center;min-width:52px;">
-                <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(s)}</div>
+              <div class="webinar-countdown-sep" style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
+              <div class="webinar-countdown-unit" style="text-align:center;min-width:52px;">
+                <div class="webinar-countdown-num" style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(s)}</div>
                 <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Sec</span><span class="lang-es">Seg</span><span class="lang-fr">Sec</span><span class="lang-en-ca">Sec</span></div>
               </div>
             </div>`;

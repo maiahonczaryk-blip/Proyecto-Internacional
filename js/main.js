@@ -47,12 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
       item.classList.toggle('active', item.dataset.lang === lang);
     });
 
-    // Update sidebar dashboard lang toggle label (app.html)
+    // Update sidebar & mobile topbar dashboard lang toggle labels (app.html)
+    const nextLangText = (lang === 'es') ? 'EN' : 'ES';
     const sidebarLangLabel = document.querySelector('#sidebar-lang-toggle .lang-label');
-    if (sidebarLangLabel) {
-      // Dashboard supports EN and ES; show the opposite so clicking switches to it
-      sidebarLangLabel.textContent = (lang === 'es') ? 'EN' : 'ES';
-    }
+    if (sidebarLangLabel) sidebarLangLabel.textContent = nextLangText;
+    const mobileLangLabel = document.querySelector('#mobile-lang-toggle .lang-label');
+    if (mobileLangLabel) mobileLangLabel.textContent = nextLangText;
 
     // Update form placeholders
     updateFormPlaceholders(lang);
@@ -109,14 +109,15 @@ document.addEventListener('DOMContentLoaded', () => {
     setLang(lang);
   })();
 
-  // ── Dashboard sidebar lang toggle (app.html: cycles EN ↔ ES) ──
-  const sidebarLangToggleBtn = document.getElementById('sidebar-lang-toggle');
-  if (sidebarLangToggleBtn) {
-    sidebarLangToggleBtn.addEventListener('click', () => {
-      const next = body.classList.contains('lang-es') ? 'en' : 'es';
-      setLang(next);
-    });
-  }
+  // ── Dashboard sidebar & mobile topbar lang toggle (app.html: cycles EN ↔ ES) ──
+  [document.getElementById('sidebar-lang-toggle'), document.getElementById('mobile-lang-toggle')].forEach(btn => {
+    if (btn) {
+      btn.addEventListener('click', () => {
+        const next = body.classList.contains('lang-es') ? 'en' : 'es';
+        setLang(next);
+      });
+    }
+  });
 
   function updateFormPlaceholders(lang) {
     const placeholders = {
@@ -161,26 +162,29 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll();
 
-  // ── Bottom Nav — active tab on scroll ──
+  // ── Bottom Nav — active tab on scroll & hash change ──
   const bnavItems = document.querySelectorAll('.bnav-item[data-section]');
 
   function updateBottomNav() {
     if (!bnavItems.length) return;
-    const navH = navbar ? navbar.offsetHeight : 60;
-    let currentSection = 'home'; // default to home
+    const rawHash = (window.location.hash || '#home').substring(1).split('?')[0] || 'home';
+    let currentSection = rawHash === 'register' ? 'login' : rawHash;
 
-    bnavItems.forEach(item => {
-      const sectionId = item.dataset.section;
-      const section = document.getElementById('view-' + sectionId) ||
-                      document.getElementById(sectionId);
-      if (section) {
-        const rect = section.getBoundingClientRect();
-        // Skip hidden sections (display:none returns height 0)
-        if (rect.height > 0 && rect.top <= navH + 80) {
-          currentSection = sectionId;
+    // Only check scroll offset when on home view
+    if (currentSection === 'home') {
+      const navH = navbar ? navbar.offsetHeight : 60;
+      bnavItems.forEach(item => {
+        const sectionId = item.dataset.section;
+        const section = document.getElementById('view-' + sectionId) ||
+                        document.getElementById(sectionId);
+        if (section) {
+          const rect = section.getBoundingClientRect();
+          if (rect.height > 0 && rect.top <= navH + 80) {
+            currentSection = sectionId;
+          }
         }
-      }
-    });
+      });
+    }
 
     bnavItems.forEach(item => {
       item.classList.toggle('active', item.dataset.section === currentSection);
@@ -188,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   window.addEventListener('scroll', updateBottomNav, { passive: true });
+  window.addEventListener('hashchange', () => setTimeout(updateBottomNav, 30));
   updateBottomNav();
 
   // ── Smooth Scroll ──

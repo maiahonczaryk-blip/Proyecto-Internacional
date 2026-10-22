@@ -83,10 +83,10 @@
 
   <!-- ── WEBINAR ANNOUNCEMENT BANNER ── -->
   <div id="webinar-top-banner" style="background:linear-gradient(90deg,#180309 0%,#881337 35%,#e11d48 65%,#f97316 90%,#180309 100%);padding:10px 16px;text-align:center;position:fixed;top:0;left:0;right:0;z-index:1001;height:40px;display:flex;align-items:center;justify-content:center;">
-    <div style="display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;">
-      <div style="display:flex;align-items:center;gap:7px;">
+    <div id="webinar-top-banner-inner" style="display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;width:100%;">
+      <div id="webinar-top-banner-live" style="display:flex;align-items:center;gap:7px;">
         <span style="width:8px;height:8px;border-radius:50%;background:#ff4444;box-shadow:0 0 7px #ff4444;animation:webinar-pulse 1.5s ease-in-out infinite;flex-shrink:0;"></span>
-        <span style="color:rgba(255,255,255,.65);font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;">
+        <span class="webinar-banner-live-label" style="color:rgba(255,255,255,.65);font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;">
           <span class="lang-en">Live Webinar</span>
           <span class="lang-es">Webinar en Vivo</span>
           <span class="lang-fr">Webinaire en Direct</span>
@@ -94,10 +94,10 @@
         </span>
       </div>
       <span id="webinar-top-banner-text" style="color:#fff;font-size:.85rem;font-weight:600;">
-        <span class="lang-en">🏡 <strong>Spain Unlocked</strong> &nbsp;&middot;&nbsp; October 29 &nbsp;&middot;&nbsp; 2:00 PM EDT / 7:00 PM Spain &nbsp;&middot;&nbsp; Free for Buyers &amp; Investors</span>
-        <span class="lang-es">🏡 <strong>Descubre España</strong> &nbsp;&middot;&nbsp; 29 de octubre &nbsp;&middot;&nbsp; 19:00 h España (2:00 PM EDT) &nbsp;&middot;&nbsp; Gratuito para Compradores e Inversores</span>
-        <span class="lang-fr">🏡 <strong>Découvrez l'Espagne</strong> &nbsp;&middot;&nbsp; 29 octobre &nbsp;&middot;&nbsp; 19 h CET (14 h EDT) &nbsp;&middot;&nbsp; Gratuit pour Acheteurs &amp; Investisseurs</span>
-        <span class="lang-en-ca">🏡 <strong>Spain Unlocked</strong> &nbsp;&middot;&nbsp; October 29 &nbsp;&middot;&nbsp; 2:00 PM EDT / 7:00 PM Spain &nbsp;&middot;&nbsp; Free for Buyers &amp; Investors</span>
+        <span class="lang-en">🏡 <strong>Spain Unlocked</strong> &nbsp;&middot;&nbsp; Oct 29<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; 2:00 PM EDT / 7:00 PM Spain &nbsp;&middot;&nbsp; Free for Buyers &amp; Investors</span></span>
+        <span class="lang-es">🏡 <strong>Descubre España</strong> &nbsp;&middot;&nbsp; 29 oct<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; 19:00 h España (2:00 PM EDT) &nbsp;&middot;&nbsp; Gratuito para Compradores e Inversores</span></span>
+        <span class="lang-fr">🏡 <strong>Découvrez l'Espagne</strong> &nbsp;&middot;&nbsp; 29 oct<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; 19 h CET (14 h EDT) &nbsp;&middot;&nbsp; Gratuit pour Acheteurs &amp; Investisseurs</span></span>
+        <span class="lang-en-ca">🏡 <strong>Spain Unlocked</strong> &nbsp;&middot;&nbsp; Oct 29<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; 2:00 PM EDT / 7:00 PM Spain &nbsp;&middot;&nbsp; Free for Buyers &amp; Investors</span></span>
       </span>
       <span id="webinar-top-banner-spots" style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,200,0,.18);border:1px solid rgba(255,200,0,.45);border-radius:50px;padding:2px 10px;font-size:.72rem;font-weight:800;color:#ffe066;white-space:nowrap;letter-spacing:.04em;">
         &#x1F525;
@@ -110,10 +110,10 @@
          style="display:inline-flex;align-items:center;gap:5px;background:#fff1f2;color:#881337;padding:5px 16px;border-radius:50px;font-weight:800;font-size:.78rem;text-decoration:none;white-space:nowrap;transition:transform .15s,opacity .15s,box-shadow .15s;box-shadow:0 2px 14px rgba(225,29,72,.4);"
          onmouseover="this.style.opacity='.88';this.style.transform='scale(1.04)'"
          onmouseout="this.style.opacity='1';this.style.transform=''">
-        <span class="lang-en">Reserve My Spot &rarr;</span>
-        <span class="lang-es">Reservar mi Plaza &rarr;</span>
-        <span class="lang-fr">R&eacute;server ma place &rarr;</span>
-        <span class="lang-en-ca">Reserve My Spot &rarr;</span>
+        <span class="lang-en">Reserve<span class="webinar-banner-extra"> My Spot</span> &rarr;</span>
+        <span class="lang-es">Reservar<span class="webinar-banner-extra"> mi Plaza</span> &rarr;</span>
+        <span class="lang-fr">R&eacute;server<span class="webinar-banner-extra"> ma place</span> &rarr;</span>
+        <span class="lang-en-ca">Reserve<span class="webinar-banner-extra"> My Spot</span> &rarr;</span>
       </a>
     </div>
   </div>
@@ -2068,12 +2068,12 @@
     </div>
     <div id="view-pending" class="app-view">
       <section class="auth-section">
-        <div class="auth-card text-center">
+        <div class="auth-card auth-card--wide text-center" style="max-width: 780px;">
           <div class="pending-icon">⏳</div>
           <h2><span class="lang-en">Application Under Review</span><span class="lang-es">Solicitud en Revisión</span></h2>
           <p style="color:var(--text-secondary);margin-top:12px;line-height:1.7;">
-            <span class="lang-en">Thank you for registering with the The Spain Connection Referral Network.<br>Your application is being reviewed by our team. You'll be able to access your dashboard once it's approved.</span>
-            <span class="lang-es">Gracias por registrarte en la Red Internacional de Referidos de RE/MAX Inmomás.<br>Tu solicitud está siendo revisada por nuestro equipo. Podrás acceder a tu panel una vez sea aprobada.</span>
+            <span class="lang-en">Thank you for registering with the The Spain Connection Referral Network.<br>Your application is being reviewed by our team. While we review your profile, please complete the company fiscal and bank details below so we can prepare your Collaboration Agreement.</span>
+            <span class="lang-es">Gracias por registrarte en la Red Internacional de Referidos de RE/MAX Inmomás.<br>Mientras revisamos tu solicitud, completa a continuación los datos fiscales y bancarios de la empresa para que podamos redactar y presentarte el Contrato de Colaboración Conjunta.</span>
           </p>
           <div id="pending-agreement-container" style="margin-top: 24px; text-align: left; width: 100%;"></div>
           <div style="margin-top:28px; display:flex; flex-direction:column; align-items:center; gap:12px;">
@@ -2104,21 +2104,21 @@
         <div id="webinar-orb-3" class="webinar-ambient-orb webinar-orb-3" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(245,158,11,.28) 0%,transparent 70%);pointer-events:none;"></div>
 
         <!-- Top announcement band -->
-        <div id="webinar-top-announcement-band-wrap" style="width:100%;background:linear-gradient(90deg,#881337 0%,#be123c 25%,#e11d48 50%,#f97316 75%,#881337 100%);padding:10px 0;text-align:center;position:relative;z-index:1;">
+        <div id="webinar-top-announcement-band-wrap" style="width:100%;background:linear-gradient(90deg,#881337 0%,#be123c 25%,#e11d48 50%,#f97316 75%,#881337 100%);padding:10px 14px;text-align:center;position:relative;z-index:1;box-sizing:border-box;">
           <span id="webinar-top-announcement-band" style="color:#fff;font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;">
-            <span class="lang-en">&#x1F534; LIVE WEBINAR &nbsp;&#xB7;&nbsp; &#x1F1FA;&#x1F1F8; Beyond Borders: How US &amp; Canadian Realtors Earn 25% Commissions &nbsp;&#xB7;&nbsp; September 24, 2026 &nbsp;&#xB7;&nbsp; FREE Registration</span>
-            <span class="lang-es">&#x1F534; WEBINAR EN VIVO &nbsp;&#xB7;&nbsp; &#x1F1FA;&#x1F1F8; Beyond Borders: Cómo Ganar 25% de Comisión en España como Realtor &nbsp;&#xB7;&nbsp; 24 de septiembre, 2026 &nbsp;&#xB7;&nbsp; Registro GRATUITO</span>
-            <span class="lang-fr">&#x1F534; WEBINAIRE EN DIRECT &nbsp;&#xB7;&nbsp; &#x1F1FA;&#x1F1F8; Beyond Borders: 25% de Commission pour Agents en Espagne &nbsp;&#xB7;&nbsp; 24 septembre 2026 &nbsp;&#xB7;&nbsp; Inscription GRATUITE</span>
-            <span class="lang-en-ca">&#x1F534; LIVE WEBINAR &nbsp;&#xB7;&nbsp; &#x1F1FA;&#x1F1F8; Beyond Borders: How Realtors Earn 25% Commissions in Spain &nbsp;&#xB7;&nbsp; September 24, 2026 &nbsp;&#xB7;&nbsp; FREE Registration</span>
+            <span class="lang-en">&#x1F534; LIVE WEBINAR<span class="webinar-band-extra"> &nbsp;&#xB7;&nbsp; &#x1F1FA;&#x1F1F8; Beyond Borders: How US &amp; Canadian Realtors Earn 25% Commissions</span> &nbsp;&#xB7;&nbsp; September 24, 2026 &nbsp;&#xB7;&nbsp; FREE Registration</span>
+            <span class="lang-es">&#x1F534; WEBINAR EN VIVO<span class="webinar-band-extra"> &nbsp;&#xB7;&nbsp; &#x1F1FA;&#x1F1F8; Beyond Borders: Cómo Ganar 25% de Comisión en España como Realtor</span> &nbsp;&#xB7;&nbsp; 24 de septiembre, 2026 &nbsp;&#xB7;&nbsp; Registro GRATUITO</span>
+            <span class="lang-fr">&#x1F534; WEBINAIRE EN DIRECT<span class="webinar-band-extra"> &nbsp;&#xB7;&nbsp; &#x1F1FA;&#x1F1F8; Beyond Borders: 25% de Commission pour Agents en Espagne</span> &nbsp;&#xB7;&nbsp; 24 septembre 2026 &nbsp;&#xB7;&nbsp; Inscription GRATUITE</span>
+            <span class="lang-en-ca">&#x1F534; LIVE WEBINAR<span class="webinar-band-extra"> &nbsp;&#xB7;&nbsp; &#x1F1FA;&#x1F1F8; Beyond Borders: How Realtors Earn 25% Commissions in Spain</span> &nbsp;&#xB7;&nbsp; September 24, 2026 &nbsp;&#xB7;&nbsp; FREE Registration</span>
           </span>
         </div>
 
         <!-- HERO -->
-        <div style="max-width:880px;width:100%;padding:40px 24px 0;text-align:center;position:relative;z-index:1;">
+        <div id="webinar-hero-container" class="webinar-hero-container" style="max-width:880px;width:100%;padding:40px 24px 0;text-align:center;position:relative;z-index:1;box-sizing:border-box;">
 
           <!-- Label pill -->
-          <div id="webinar-hero-pill-wrap" style="display:inline-flex;align-items:center;gap:10px;background:rgba(225,29,72,.16);border:1.5px solid rgba(244,63,94,.6);border-radius:50px;padding:9px 22px;margin-bottom:32px;backdrop-filter:blur(8px);box-shadow:0 0 24px rgba(225,29,72,.28);">
-            <span style="width:8px;height:8px;border-radius:50%;background:#ff4444;display:inline-block;box-shadow:0 0 8px #ff4444;animation:webinar-pulse 1.5s ease-in-out infinite;"></span>
+          <div id="webinar-hero-pill-wrap" style="display:inline-flex;align-items:center;gap:10px;background:rgba(225,29,72,.16);border:1.5px solid rgba(244,63,94,.6);border-radius:50px;padding:9px 22px;margin-bottom:32px;backdrop-filter:blur(8px);box-shadow:0 0 24px rgba(225,29,72,.28);max-width:100%;box-sizing:border-box;">
+            <span style="width:8px;height:8px;border-radius:50%;background:#ff4444;display:inline-block;box-shadow:0 0 8px #ff4444;animation:webinar-pulse 1.5s ease-in-out infinite;flex-shrink:0;"></span>
             <span id="webinar-hero-pill" style="color:#ffe4e6;font-size:.8rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;">
               <span class="lang-en">RE/MAX Inmom&aacute;s International &mdash; Realtor VIP Masterclass</span>
               <span class="lang-es">RE/MAX Inmom&aacute;s International &mdash; Masterclass VIP para Realtors</span>
@@ -2142,7 +2142,7 @@
           </p>
 
           <!-- Social proof bar -->
-          <div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:44px;">
+          <div class="webinar-social-proof" style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:44px;">
             <div style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.55);font-size:.82rem;">
               <span style="color:#fbbf24;">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</span>
               <span class="lang-en">Rated 4.9/5 by attendees</span>
@@ -2150,13 +2150,13 @@
               <span class="lang-fr">Not&eacute; 4,9/5 par les participants</span>
               <span class="lang-en-ca">Rated 4.9/5 by attendees</span>
             </div>
-            <div style="width:1px;height:16px;background:rgba(255,255,255,.15);"></div>
+            <div class="webinar-social-divider" style="width:1px;height:16px;background:rgba(255,255,255,.15);"></div>
             <span style="color:rgba(255,255,255,.55);font-size:.82rem;">&#x1F3C6; RE/MAX Certified Program</span>
-            <div style="width:1px;height:16px;background:rgba(255,255,255,.15);"></div>
+            <div class="webinar-social-divider" style="width:1px;height:16px;background:rgba(255,255,255,.15);"></div>
             <span style="color:rgba(255,255,255,.55);font-size:.82rem;">
               &#x1F7E2; <span class="lang-en">100% Free to Attend</span><span class="lang-es">100% Gratuito</span><span class="lang-fr">100% Gratuit</span><span class="lang-en-ca">100% Free to Attend</span>
             </span>
-            <div style="width:1px;height:16px;background:rgba(255,255,255,.15);"></div>
+            <div class="webinar-social-divider" style="width:1px;height:16px;background:rgba(255,255,255,.15);"></div>
             <span id="webinar-hero-spots-pill" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,180,0,.18);border:1px solid rgba(255,180,0,.5);border-radius:50px;padding:4px 14px;font-size:.8rem;font-weight:800;color:#fef08a;letter-spacing:.04em;box-shadow:0 0 16px rgba(245,158,11,.25);">
               &#x1F525;
               <span class="lang-en">Only 25 spots available</span>
@@ -2167,74 +2167,74 @@
           </div>
 
           <!-- Timezone Grid -->
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:24px 28px;margin-bottom:20px;backdrop-filter:blur(12px);">
+          <div id="webinar-tz-box" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:24px 28px;margin-bottom:20px;backdrop-filter:blur(12px);">
             <div id="webinar-tz-date-label" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,.38);margin-bottom:18px;">
               &#x1F4C5;
-              <span class="lang-en">Thursday, September 24, 2026 &mdash; Your Local Time</span>
-              <span class="lang-es">Jueves, 24 de septiembre de 2026 &mdash; Tu hora local</span>
-              <span class="lang-fr">Jeudi 24 septembre 2026 &mdash; Votre heure locale</span>
-              <span class="lang-en-ca">Thursday, September 24, 2026 &mdash; Your Local Time</span>
+              <span class="lang-en">Thursday, October 29, 2026 &mdash; Your Local Time</span>
+              <span class="lang-es">Jueves, 29 de octubre de 2026 &mdash; Tu hora local</span>
+              <span class="lang-fr">Jeudi 29 octobre 2026 &mdash; Votre heure locale</span>
+              <span class="lang-en-ca">Thursday, October 29, 2026 &mdash; Your Local Time</span>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:10px;">
+            <div id="webinar-tz-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:10px;">
 
-              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 8px;text-align:center;">
-                <div style="font-size:1.4rem;margin-bottom:6px;">&#x1F301;</div>
-                <div id="webinar-time-pdt" style="font-size:1.2rem;font-weight:800;color:#fff;line-height:1;">10:00 AM</div>
-                <div style="font-size:.68rem;font-weight:700;color:#5badff;margin:4px 0 3px;text-transform:uppercase;letter-spacing:.08em;">PDT</div>
-                <div style="font-size:.65rem;color:rgba(255,255,255,.38);line-height:1.35;">Los Angeles<br>Vancouver</div>
+              <div class="webinar-tz-card" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 8px;text-align:center;">
+                <div class="webinar-tz-icon" style="font-size:1.4rem;margin-bottom:6px;">&#x1F301;</div>
+                <div id="webinar-time-pdt" class="webinar-tz-time" style="font-size:1.2rem;font-weight:800;color:#fff;line-height:1;">11:00 AM</div>
+                <div class="webinar-tz-code" style="font-size:.68rem;font-weight:700;color:#5badff;margin:4px 0 3px;text-transform:uppercase;letter-spacing:.08em;">PDT</div>
+                <div class="webinar-tz-cities" style="font-size:.65rem;color:rgba(255,255,255,.38);line-height:1.35;">Los Angeles<br>Vancouver</div>
               </div>
 
-              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 8px;text-align:center;">
-                <div style="font-size:1.4rem;margin-bottom:6px;">&#x26F0;&#xFE0F;</div>
-                <div id="webinar-time-mdt" style="font-size:1.2rem;font-weight:800;color:#fff;line-height:1;">11:00 AM</div>
-                <div style="font-size:.68rem;font-weight:700;color:#5badff;margin:4px 0 3px;text-transform:uppercase;letter-spacing:.08em;">MDT</div>
-                <div style="font-size:.65rem;color:rgba(255,255,255,.38);line-height:1.35;">Denver<br>Calgary</div>
+              <div class="webinar-tz-card" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 8px;text-align:center;">
+                <div class="webinar-tz-icon" style="font-size:1.4rem;margin-bottom:6px;">&#x26F0;&#xFE0F;</div>
+                <div id="webinar-time-mdt" class="webinar-tz-time" style="font-size:1.2rem;font-weight:800;color:#fff;line-height:1;">12:00 PM</div>
+                <div class="webinar-tz-code" style="font-size:.68rem;font-weight:700;color:#5badff;margin:4px 0 3px;text-transform:uppercase;letter-spacing:.08em;">MDT</div>
+                <div class="webinar-tz-cities" style="font-size:.65rem;color:rgba(255,255,255,.38);line-height:1.35;">Denver<br>Calgary</div>
               </div>
 
-              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 8px;text-align:center;">
-                <div style="font-size:1.4rem;margin-bottom:6px;">&#x1F306;</div>
-                <div id="webinar-time-cdt" style="font-size:1.2rem;font-weight:800;color:#fff;line-height:1;">12:00 PM</div>
-                <div style="font-size:.68rem;font-weight:700;color:#5badff;margin:4px 0 3px;text-transform:uppercase;letter-spacing:.08em;">CDT</div>
-                <div style="font-size:.65rem;color:rgba(255,255,255,.38);line-height:1.35;">Chicago<br>Winnipeg</div>
+              <div class="webinar-tz-card" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 8px;text-align:center;">
+                <div class="webinar-tz-icon" style="font-size:1.4rem;margin-bottom:6px;">&#x1F306;</div>
+                <div id="webinar-time-cdt" class="webinar-tz-time" style="font-size:1.2rem;font-weight:800;color:#fff;line-height:1;">1:00 PM</div>
+                <div class="webinar-tz-code" style="font-size:.68rem;font-weight:700;color:#5badff;margin:4px 0 3px;text-transform:uppercase;letter-spacing:.08em;">CDT</div>
+                <div class="webinar-tz-cities" style="font-size:.65rem;color:rgba(255,255,255,.38);line-height:1.35;">Chicago<br>Winnipeg</div>
               </div>
 
               <!-- EDT / Reference highlighted -->
-              <div id="webinar-reference-card" style="background:linear-gradient(135deg,rgba(136,19,55,.55),rgba(225,29,72,.3));border:2px solid rgba(244,63,94,.75);border-radius:14px;padding:14px 8px;text-align:center;position:relative;box-shadow:0 0 35px rgba(225,29,72,.38);">
+              <div id="webinar-reference-card" class="webinar-tz-card" style="background:linear-gradient(135deg,rgba(136,19,55,.55),rgba(225,29,72,.3));border:2px solid rgba(244,63,94,.75);border-radius:14px;padding:14px 8px;text-align:center;position:relative;box-shadow:0 0 35px rgba(225,29,72,.38);">
                 <div id="webinar-reference-badge" style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#be123c,#e11d48);color:#fff;font-size:.58rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:2px 10px;border-radius:50px;white-space:nowrap;box-shadow:0 2px 12px rgba(225,29,72,.45);">
                   <span class="lang-en">Reference</span><span class="lang-es">Referencia</span><span class="lang-fr">R&eacute;f&eacute;rence</span><span class="lang-en-ca">Reference</span>
                 </div>
-                <div style="font-size:1.4rem;margin-bottom:6px;">&#x1F5FD;</div>
-                <div id="webinar-time-edt" style="font-size:1.2rem;font-weight:800;color:#fff;line-height:1;">1:00 PM</div>
-                <div style="font-size:.68rem;font-weight:700;color:#fecdd3;margin:4px 0 3px;text-transform:uppercase;letter-spacing:.08em;">EDT / AST</div>
-                <div style="font-size:.65rem;color:rgba(255,255,255,.55);line-height:1.35;">New York &middot; Miami &middot; PR<br>Toronto &middot; Ottawa</div>
+                <div class="webinar-tz-icon" style="font-size:1.4rem;margin-bottom:6px;">&#x1F5FD;</div>
+                <div id="webinar-time-edt" class="webinar-tz-time" style="font-size:1.2rem;font-weight:800;color:#fff;line-height:1;">2:00 PM</div>
+                <div class="webinar-tz-code" style="font-size:.68rem;font-weight:700;color:#fecdd3;margin:4px 0 3px;text-transform:uppercase;letter-spacing:.08em;">EDT / AST</div>
+                <div class="webinar-tz-cities" style="font-size:.65rem;color:rgba(255,255,255,.55);line-height:1.35;">New York &middot; Miami &middot; PR<br>Toronto &middot; Ottawa</div>
               </div>
 
-              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 8px;text-align:center;">
-                <div style="font-size:1.4rem;margin-bottom:6px;">&#x1F41F;</div>
-                <div id="webinar-time-adt" style="font-size:1.2rem;font-weight:800;color:#fff;line-height:1;">2:00 PM</div>
-                <div style="font-size:.68rem;font-weight:700;color:#5badff;margin:4px 0 3px;text-transform:uppercase;letter-spacing:.08em;">ADT</div>
-                <div style="font-size:.65rem;color:rgba(255,255,255,.38);line-height:1.35;">Halifax<br>Moncton</div>
+              <div class="webinar-tz-card" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 8px;text-align:center;">
+                <div class="webinar-tz-icon" style="font-size:1.4rem;margin-bottom:6px;">&#x1F41F;</div>
+                <div id="webinar-time-adt" class="webinar-tz-time" style="font-size:1.2rem;font-weight:800;color:#fff;line-height:1;">3:00 PM</div>
+                <div class="webinar-tz-code" style="font-size:.68rem;font-weight:700;color:#5badff;margin:4px 0 3px;text-transform:uppercase;letter-spacing:.08em;">ADT</div>
+                <div class="webinar-tz-cities" style="font-size:.65rem;color:rgba(255,255,255,.38);line-height:1.35;">Halifax<br>Moncton</div>
               </div>
 
-              <div style="background:linear-gradient(135deg,rgba(204,0,0,.25),rgba(200,50,0,.15));border:1px solid rgba(255,100,50,.28);border-radius:14px;padding:14px 8px;text-align:center;">
-                <div style="font-size:1.4rem;margin-bottom:6px;">&#x1F1EA;&#x1F1F8;</div>
-                <div id="webinar-time-cest" style="font-size:1.2rem;font-weight:800;color:#fff;line-height:1;">7:00 PM</div>
-                <div style="font-size:.68rem;font-weight:700;color:#ff8c42;margin:4px 0 3px;text-transform:uppercase;letter-spacing:.08em;">CEST</div>
-                <div style="font-size:.65rem;color:rgba(255,255,255,.38);line-height:1.35;">Madrid<br>Barcelona</div>
+              <div class="webinar-tz-card" style="background:linear-gradient(135deg,rgba(204,0,0,.25),rgba(200,50,0,.15));border:1px solid rgba(255,100,50,.28);border-radius:14px;padding:14px 8px;text-align:center;">
+                <div class="webinar-tz-icon" style="font-size:1.4rem;margin-bottom:6px;">&#x1F1EA;&#x1F1F8;</div>
+                <div id="webinar-time-cest" class="webinar-tz-time" style="font-size:1.2rem;font-weight:800;color:#fff;line-height:1;">7:00 PM</div>
+                <div class="webinar-tz-code" style="font-size:.68rem;font-weight:700;color:#ff8c42;margin:4px 0 3px;text-transform:uppercase;letter-spacing:.08em;">CET</div>
+                <div class="webinar-tz-cities" style="font-size:.65rem;color:rgba(255,255,255,.38);line-height:1.35;">Madrid<br>Barcelona</div>
               </div>
 
             </div>
-            <p style="font-size:.62rem;color:rgba(255,255,255,.28);margin-top:12px;margin-bottom:0;">
-              <span class="lang-en">* All times during Daylight Saving. Live Q&amp;A directly with Spanish property and legal experts.</span>
-              <span class="lang-es">* Todos los horarios en horario de verano. Sesión de preguntas y respuestas en vivo con expertos en España.</span>
-              <span class="lang-fr">* Horaires en heure d'&eacute;t&eacute;. Questions-réponses en direct avec nos experts espagnols.</span>
-              <span class="lang-en-ca">* All times during Daylight Saving. Live Q&amp;A directly with Spanish experts.</span>
+            <p class="webinar-tz-note" style="font-size:.62rem;color:rgba(255,255,255,.28);margin-top:12px;margin-bottom:0;">
+              <span class="lang-en">* Note: Spain switches to CET (winter time) on Oct 25 while North America remains on Daylight Saving Time until Nov 1 (5-hour difference with EDT).</span>
+              <span class="lang-es">* Nota: España pasa a horario de invierno (CET) el 25 de octubre mientras Norteamérica mantiene horario de verano hasta el 1 de noviembre (5 h de diferencia con EDT/PR).</span>
+              <span class="lang-fr">* Note : l'Espagne passe à l'heure d'hiver (CET) le 25 octobre (5 h de décalage avec EDT).</span>
+              <span class="lang-en-ca">* Note: Spain switches to CET on Oct 25 while North America remains on Daylight Saving Time until Nov 1 (5-hour difference with EDT).</span>
             </p>
           </div>
 
           <!-- Countdown -->
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px 32px;margin-bottom:52px;backdrop-filter:blur(12px);">
-            <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,.38);margin-bottom:18px;">
+          <div id="webinar-countdown-box" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px 32px;margin-bottom:52px;backdrop-filter:blur(12px);">
+            <div class="webinar-countdown-label" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,.38);margin-bottom:18px;">
               &#x23F1;
               <span class="lang-en">Starts in</span>
               <span class="lang-es">Empieza en</span>
@@ -2248,7 +2248,7 @@
         </div>
 
         <!-- WHAT YOU'LL LEARN + CTA -->
-        <div style="max-width:880px;width:100%;padding:0 24px;margin-bottom:52px;position:relative;z-index:1;">
+        <div id="webinar-learn-section" style="max-width:880px;width:100%;padding:0 24px;margin-bottom:52px;position:relative;z-index:1;box-sizing:border-box;">
           <div style="text-align:center;margin-bottom:32px;">
             <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,.35);margin-bottom:10px;">
               <span class="lang-en">What's Inside</span><span class="lang-es">Contenido</span><span class="lang-fr">Au Programme</span><span class="lang-en-ca">What's Inside</span>
@@ -2269,40 +2269,40 @@
 
           <div id="webinar-benefits-container" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:28px;">
 
-            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;display:flex;gap:14px;align-items:flex-start;transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(91,173,255,.3)';" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.08)';">
-              <div style="font-size:1.8rem;flex-shrink:0;">&#x1F6E1;&#xFE0F;</div>
+            <div class="webinar-benefit-card" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;display:flex;gap:14px;align-items:flex-start;transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(91,173,255,.3)';" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.08)';">
+              <div class="webinar-benefit-icon" style="font-size:1.8rem;flex-shrink:0;">&#x1F6E1;&#xFE0F;</div>
               <div>
                 <div style="font-weight:700;color:#fff;font-size:.92rem;margin-bottom:5px;"><span class="lang-en">Safe Buying Process &amp; Legal Security</span><span class="lang-es">Compra 100% Segura y Garantías</span><span class="lang-fr">Achat Sécurisé &amp; Garanties</span><span class="lang-en-ca">Safe Buying Process</span></div>
                 <div style="color:rgba(255,255,255,.42);font-size:.8rem;line-height:1.55;"><span class="lang-en">NIE number, bank accounts, contracts (Arras), registry checks, and notary closing without surprises.</span><span class="lang-es">Obtención de NIE, apertura de cuenta bancaria, contratos de arras, verificación registral y firma notarial sin sorpresas.</span><span class="lang-fr">Numéro NIE, comptes bancaires, contrats et notaire sans surprises.</span><span class="lang-en-ca">NIE number, bank accounts, contracts and notary closing.</span></div>
               </div>
             </div>
 
-            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;display:flex;gap:14px;align-items:flex-start;transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(91,173,255,.3)';" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.08)';">
-              <div style="font-size:1.8rem;flex-shrink:0;">&#x1F6C2;</div>
+            <div class="webinar-benefit-card" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;display:flex;gap:14px;align-items:flex-start;transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(91,173,255,.3)';" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.08)';">
+              <div class="webinar-benefit-icon" style="font-size:1.8rem;flex-shrink:0;">&#x1F6C2;</div>
               <div>
                 <div style="font-weight:700;color:#fff;font-size:.92rem;margin-bottom:5px;"><span class="lang-en">Visas &amp; Residency Pathways</span><span class="lang-es">Visados y Vías de Residencia</span><span class="lang-fr">Visas &amp; Chemins de Résidence</span><span class="lang-en-ca">Visas &amp; Residency Pathways</span></div>
                 <div style="color:rgba(255,255,255,.42);font-size:.8rem;line-height:1.55;"><span class="lang-en">Digital Nomad Visa, Non-Lucrative Visa, and Real Estate Investment residency requirements explained simply.</span><span class="lang-es">Visado de Nómada Digital, Visado No Lucrativo y requisitos de residencia explicados con total claridad.</span><span class="lang-fr">Visa Nomade Digital, Visa Non Lucratif et options de résidence.</span><span class="lang-en-ca">Digital Nomad Visa, Non-Lucrative Visa, and residency requirements.</span></div>
               </div>
             </div>
 
-            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;display:flex;gap:14px;align-items:flex-start;transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(91,173,255,.3)';" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.08)';">
-              <div style="font-size:1.8rem;flex-shrink:0;">&#x1F3D6;&#xFE0F;</div>
+            <div class="webinar-benefit-card" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;display:flex;gap:14px;align-items:flex-start;transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(91,173,255,.3)';" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.08)';">
+              <div class="webinar-benefit-icon" style="font-size:1.8rem;flex-shrink:0;">&#x1F3D6;&#xFE0F;</div>
               <div>
                 <div style="font-weight:700;color:#fff;font-size:.92rem;margin-bottom:5px;"><span class="lang-en">Best Areas: Coast, Sun &amp; Cities</span><span class="lang-es">Mejores Zonas: Costa, Sol y Ciudades</span><span class="lang-fr">Meilleures Régions: Côte &amp; Villes</span><span class="lang-en-ca">Best Areas: Coast, Sun &amp; Cities</span></div>
                 <div style="color:rgba(255,255,255,.42);font-size:.8rem;line-height:1.55;"><span class="lang-en">Compare Costa Blanca (Alicante/Jávea), Costa del Sol (Málaga/Marbella), Madrid and Valencia for lifestyle &amp; ROI.</span><span class="lang-es">Compara Costa Blanca (Alicante/Jávea), Costa del Sol (Málaga/Marbella), Madrid y Valencia según estilo de vida y rentabilidad.</span><span class="lang-fr">Comparez Costa Blanca, Costa del Sol, Madrid et Valence.</span><span class="lang-en-ca">Compare Costa Blanca, Costa del Sol, Madrid and Valencia.</span></div>
               </div>
             </div>
 
-            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;display:flex;gap:14px;align-items:flex-start;transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(91,173,255,.3)';" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.08)';">
-              <div style="font-size:1.8rem;flex-shrink:0;">&#x1F4B6;</div>
+            <div class="webinar-benefit-card" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;display:flex;gap:14px;align-items:flex-start;transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(91,173,255,.3)';" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.08)';">
+              <div class="webinar-benefit-icon" style="font-size:1.8rem;flex-shrink:0;">&#x1F4B6;</div>
               <div>
                 <div style="font-weight:700;color:#fff;font-size:.92rem;margin-bottom:5px;"><span class="lang-en">Taxes, Mortgages &amp; Financing</span><span class="lang-es">Impuestos, Hipotecas y Financiación</span><span class="lang-fr">Fiscalité, Prêts &amp; Financement</span><span class="lang-en-ca">Taxes, Mortgages &amp; Financing</span></div>
                 <div style="color:rgba(255,255,255,.42);font-size:.8rem;line-height:1.55;"><span class="lang-en">How non-resident mortgages work (up to 70%), transfer taxes (ITP/IVA), tax exemptions, and running costs.</span><span class="lang-es">Cómo funcionan las hipotecas para no residentes (hasta el 70%), ITP/IVA, exenciones fiscales y costes de mantenimiento.</span><span class="lang-fr">Prêts non-résidents jusqu'à 70%, taxes de transfert et coûts d'entretien.</span><span class="lang-en-ca">How non-resident mortgages work (up to 70%) and taxes.</span></div>
               </div>
             </div>
 
-            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;display:flex;gap:14px;align-items:flex-start;transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(91,173,255,.3)';" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.08)';">
-              <div style="font-size:1.8rem;flex-shrink:0;">&#x1F399;&#xFE0F;</div>
+            <div class="webinar-benefit-card" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;display:flex;gap:14px;align-items:flex-start;transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(91,173,255,.3)';" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.08)';">
+              <div class="webinar-benefit-icon" style="font-size:1.8rem;flex-shrink:0;">&#x1F399;&#xFE0F;</div>
               <div>
                 <div style="font-weight:700;color:#fff;font-size:.92rem;margin-bottom:5px;"><span class="lang-en">Live Q&amp;A with Relocation Advisors</span><span class="lang-es">Preguntas y Respuestas con Expertos</span><span class="lang-fr">Q&amp;R en Direct avec nos Conseillers</span><span class="lang-en-ca">Live Q&amp;A with Relocation Advisors</span></div>
                 <div style="color:rgba(255,255,255,.42);font-size:.8rem;line-height:1.55;"><span class="lang-en">Direct access to our Spanish property consultants, bilingual lawyers, and relocation specialists.</span><span class="lang-es">Acceso directo y en tiempo real a nuestros consultores inmobiliarios, abogados bilingües y equipo de relocalización.</span><span class="lang-fr">Accès direct à nos consultants inmobiliers et avocats bilingues.</span><span class="lang-en-ca">Direct access to our property consultants and lawyers.</span></div>
@@ -2339,26 +2339,26 @@
         </div>
 
         <!-- REGISTRATION CARD -->
-        <div style="max-width:660px;width:100%;padding:0 24px;position:relative;z-index:1;">
+        <div id="webinar-form-outer" style="max-width:660px;width:100%;padding:0 24px;position:relative;z-index:1;box-sizing:border-box;">
           <div style="background:rgba(255,255,255,.985);border-radius:24px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.6);">
 
             <!-- Card Header -->
             <div id="webinar-card-header" style="background:linear-gradient(135deg,#881337 0%,#be123c 40%,#e11d48 75%,#f97316 110%);padding:28px 36px;position:relative;overflow:hidden;">
               <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:rgba(255,255,255,.05);border-radius:50%;"></div>
-              <div style="display:flex;align-items:center;gap:14px;position:relative;">
-                <img src="images/spain-connection-logo.png" alt="The Spain Connection" style="height:55px; opacity:1; object-fit: contain; background: white; padding: 4px; border-radius: 4px;">
-                <div>
+              <div id="webinar-card-header-flex" style="display:flex;align-items:center;gap:14px;position:relative;">
+                <img id="webinar-card-header-logo" src="images/spain-connection-logo.png" alt="The Spain Connection" style="height:55px; opacity:1; object-fit: contain; background: white; padding: 4px; border-radius: 4px; flex-shrink:0;">
+                <div style="min-width:0;">
                   <div style="color:rgba(255,255,255,.62);font-size:.7rem;text-transform:uppercase;letter-spacing:.14em;">
                     <span class="lang-en">Secure Your Free Spot</span><span class="lang-es">Asegura Tu Plaza Gratuita</span><span class="lang-fr">R&eacute;servez Votre Place Gratuite</span><span class="lang-en-ca">Secure Your Free Spot</span>
                   </div>
-                  <div id="webinar-card-header-title" style="color:#fff;font-weight:800;font-size:1.05rem;">Beyond Borders &middot; September 24, 2026</div>
-                  <div id="webinar-card-header-subtitle" style="color:rgba(255,255,255,.6);font-size:.78rem;margin-top:2px;">7:00 PM CEST (Spain) &nbsp;|&nbsp; 1:00 PM EDT (Miami / NY / Toronto) &nbsp;|&nbsp; 1:00 PM AST (PR) &nbsp;|&nbsp; 10:00 AM PDT</div>
+                  <div id="webinar-card-header-title" style="color:#fff;font-weight:800;font-size:1.05rem;">Spain Unlocked &middot; October 29, 2026</div>
+                  <div id="webinar-card-header-subtitle" style="color:rgba(255,255,255,.6);font-size:.78rem;margin-top:2px;">7:00 PM CET (Spain) &nbsp;|&nbsp; 2:00 PM EDT (Miami / NY / Toronto) &nbsp;|&nbsp; 2:00 PM AST (PR) &nbsp;|&nbsp; 11:00 AM PDT</div>
                 </div>
               </div>
             </div>
 
             <!-- Form Body -->
-            <div style="padding:32px 36px;">
+            <div id="webinar-form-body" style="padding:32px 36px;">
               <form id="webinar-register-form" novalidate>
 
                 <div class="form-row">
@@ -2544,13 +2544,13 @@
                 <span class="lang-en">You're In!</span><span class="lang-es">&iexcl;Ya est&aacute;s inscrito!</span><span class="lang-fr">C'est confirm&eacute; !</span><span class="lang-en-ca">You're In!</span>
               </h2>
               <p style="color:#6b7280;font-size:1rem;line-height:1.7;max-width:380px;margin:0 auto 24px;">
-                <span class="lang-en">Thank you for registering for <strong>Beyond Borders</strong>.<br>We'll send you the access link and a calendar invite before September 24th.</span>
-                <span class="lang-es">Gracias por registrarte en <strong>Beyond Borders</strong>.<br>Te enviaremos el enlace de acceso y una invitaci&oacute;n de calendario antes del 24 de septiembre.</span>
-                <span class="lang-fr">Merci de vous &ecirc;tre inscrit &agrave; <strong>Beyond Borders</strong>.<br>Nous vous enverrons le lien d'acc&egrave;s et une invitation agenda avant le 24 septembre.</span>
-                <span class="lang-en-ca">Thank you for registering for <strong>Beyond Borders</strong>.<br>We'll send you the access link and a calendar invite before September 24th.</span>
+                <span class="lang-en">Thank you for registering for <strong>Spain Unlocked</strong>.<br>We'll send you the access link and a calendar invite before October 29th.</span>
+                <span class="lang-es">Gracias por registrarte en <strong>Descubre España (Spain Unlocked)</strong>.<br>Te enviaremos el enlace de acceso y una invitaci&oacute;n de calendario antes del 29 de octubre.</span>
+                <span class="lang-fr">Merci de vous &ecirc;tre inscrit &agrave; <strong>D&eacute;couvrez l'Espagne (Spain Unlocked)</strong>.<br>Nous vous enverrons le lien d'acc&egrave;s et une invitation agenda avant le 29 octobre.</span>
+                <span class="lang-en-ca">Thank you for registering for <strong>Spain Unlocked</strong>.<br>We'll send you the access link and a calendar invite before October 29th.</span>
               </p>
               <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px 24px;margin-bottom:24px;font-size:.85rem;color:#065f46;">
-                &#x1F4C5; <strong>Thursday, September 24 &nbsp;&middot;&nbsp; 7:00 PM CEST (Spain) &nbsp;&middot;&nbsp; 1:00 PM EDT (Miami / NY / Toronto) &nbsp;&middot;&nbsp; 1:00 PM AST (PR)</strong>
+                &#x1F4C5; <strong>Thursday, October 29 &nbsp;&middot;&nbsp; 7:00 PM CET (Spain) &nbsp;&middot;&nbsp; 2:00 PM EDT (Miami / NY / Toronto) &nbsp;&middot;&nbsp; 2:00 PM AST (PR) &nbsp;&middot;&nbsp; 11:00 AM PDT</strong>
               </div>
               <a href="#home" style="display:inline-block;padding:12px 32px;background:#003f99;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;font-size:.9rem;"
                  onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">

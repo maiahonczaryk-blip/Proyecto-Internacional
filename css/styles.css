@@ -5981,37 +5981,35 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   }
 }
 
-/* Medium: <= 991px — Sidebar becomes overlay */
+/* Medium: <= 991px — Mobile Topbar + Bottom Nav replaces Sidebar */
 @media (max-width: 991px) {
-  /* Hamburger always visible */
+  /* Hide floating hamburger — replaced by bottom nav & mobile topbar */
   .sidebar-toggle {
-    display: flex !important;
+    display: none !important;
   }
 
-  /* Sidebar hidden behind left edge; .active slides it in */
+  /* Sidebar hidden behind left edge on mobile */
   .dashboard-sidebar {
     z-index: 1000;
+    transform: translateX(-100%);
   }
 
-  /* Backdrop visible when sidebar open */
-  .sidebar-backdrop {
-    display: block;
+  /* No left margin on mobile */
+  .dashboard-main,
+  .app-main.has-sidebar {
+    margin-left: 0 !important;
   }
 
-  /* No left margin on mobile — sidebar is overlay */
-  .dashboard-main {
-    margin-left: 0;
-  }
-
-  /* Give content top padding for the hamburger button */
+  /* Give content top padding for mobile topbar and bottom padding for bottom nav */
   .dashboard-content {
-    padding-top: 72px;
+    padding: 76px 16px calc(88px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
-  /* Shift header right to avoid hamburger overlap */
+  /* Clean balanced header without hamburger left offset */
   .dashboard-header {
-    padding: 16px 20px;
-    padding-left: 68px;
+    padding: 12px 4px 16px 4px;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
   .referral-stats {
@@ -6027,11 +6025,11 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   .dashboard-filters {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
+    gap: 10px;
   }
   .dashboard-filters .form-group {
     width: 100%;
-    min-width: 0;
+    min-width: 0 !important;
   }
   .dashboard-grid-2col {
     grid-template-columns: 1fr;
@@ -6041,24 +6039,40 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
 
 /* Small: <= 768px */
 @media (max-width: 768px) {
-  .stat-cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+  .stat-cards-grid,
+  .stat-cards-grid--5cols {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px;
   }
 
   .stat-card {
-    padding: 16px;
-    flex-direction: column;
-    gap: 12px;
+    padding: 14px;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .stat-card__icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+    flex-shrink: 0;
   }
 
   .stat-card__value {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
+    line-height: 1.15;
+  }
+
+  .stat-card__label {
+    font-size: 0.72rem;
   }
 
   .data-table-container {
     border-radius: var(--radius-sm);
-    margin: 0 -12px;
+    margin: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .pipeline-board {
@@ -6071,26 +6085,23 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
     max-height: none;
   }
 
-  .dashboard-content {
-    padding: 16px;
-  }
-
   .dashboard-header__welcome {
     font-size: 1rem;
   }
 
   .modal {
     max-width: 100%;
-    border-radius: var(--radius-sm);
+    border-radius: 14px;
+    margin: 12px;
   }
 
   .modal__body {
-    max-height: 50vh;
+    max-height: 60vh;
   }
 
   .toast-container {
     top: auto;
-    bottom: 16px;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px));
     left: 16px;
     right: 16px;
   }
@@ -6135,10 +6146,17 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
 
 /* Extra Small: <= 480px */
 @media (max-width: 480px) {
-  /* Force single column even with inline styles */
+  /* Keep 2 columns for stat cards so mobile dashboards stay compact and scannable */
   .stat-cards-grid,
+  .stat-cards-grid--5cols,
   .stat-cards-grid[style*="grid-template-columns"] {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* If odd number of stat cards (like 5 in Admin), span the last one full width */
+  .stat-cards-grid--5cols > .stat-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 
   .role-selector {
@@ -6148,13 +6166,19 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   .dashboard-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
-    padding-left: 60px;
+    gap: 10px;
+    padding: 8px 0 14px 0;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.35rem !important;
+    line-height: 1.2;
   }
 
   .dashboard-header__actions {
     width: 100%;
-    justify-content: flex-end;
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
   .user-card {
@@ -8173,3 +8197,751 @@ textarea:focus-visible {
   border: 1px solid rgba(244, 63, 94, 0.6) !important;
   color: #ffe4e6 !important;
 }
+
+/* ============================================
+   MOBILE DASHBOARD TOPBAR & BOTTOM NAVIGATION
+   (app.html — Personal Space & Admin Panels)
+   ============================================ */
+
+/* Hidden on Desktop (> 991px) */
+.mobile-dashboard-topbar,
+.dashboard-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 991px) {
+  /* 1. Mobile Top Bar */
+  .mobile-dashboard-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    padding: 0 14px;
+    background: rgba(11, 20, 38, 0.96);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+    z-index: 1005;
+    box-sizing: border-box;
+  }
+
+  .mobile-topbar-logo {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  .mobile-topbar-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.15;
+  }
+
+  .mobile-topbar-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.92);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobile-topbar-role {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #60a5fa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  .mobile-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .mobile-topbar-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    min-width: 34px;
+    padding: 0 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-topbar-btn:active {
+    background: rgba(255, 255, 255, 0.16);
+    transform: scale(0.96);
+  }
+
+  .mobile-topbar-logout {
+    color: #fca5a5;
+    border-color: rgba(248, 113, 113, 0.28);
+    background: rgba(239, 68, 68, 0.12);
+    font-size: 0.95rem;
+  }
+
+  .mobile-topbar-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0043ff, #2563eb);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-decoration: none;
+    border: 2px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 0 2px 8px rgba(0, 67, 255, 0.35);
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-topbar-avatar.active {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.35);
+  }
+
+  /* 2. Mobile Bottom Navigation Bar (Dashboard) */
+  .dashboard-bottom-nav {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1005;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(0, 20, 60, 0.08);
+    box-shadow: 0 -6px 24px rgba(0, 15, 50, 0.09);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
+  }
+
+  .dashboard-bnav-group {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-around;
+    width: 100%;
+    height: 64px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    padding: 0 4px;
+    box-sizing: border-box;
+  }
+
+  .dashboard-bnav-group::-webkit-scrollbar {
+    display: none; /* Safari/Chrome */
+  }
+
+  /* When a role has > 6 items (e.g. Admin has 8), allow clean horizontal scroll */
+  #bnav-group-admin {
+    justify-content: flex-start;
+  }
+
+  #bnav-group-admin .dashboard-bnav-item {
+    flex: 0 0 auto;
+    min-width: 66px;
+    padding: 6px 8px;
+  }
+
+  .dashboard-bnav-item {
+    flex: 1 1 0;
+    min-width: 54px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 4px;
+    text-decoration: none;
+    color: #64748b;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    position: relative;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    border-radius: 10px;
+    margin: 4px 1px;
+    white-space: nowrap;
+  }
+
+  .dashboard-bnav-icon {
+    font-size: 1.15rem;
+    line-height: 1;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .dashboard-bnav-item.active {
+    color: #0043ff;
+    background: rgba(0, 67, 255, 0.07);
+    font-weight: 700;
+  }
+
+  .dashboard-bnav-item.active .dashboard-bnav-icon {
+    transform: translateY(-1px) scale(1.08);
+  }
+
+  /* Top indicator pill on active tab */
+  .dashboard-bnav-item.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 25%;
+    right: 25%;
+    height: 3px;
+    background: #0043ff;
+    border-radius: 0 0 4px 4px;
+  }
+
+  .dashboard-bnav-item:active {
+    transform: scale(0.95);
+  }
+
+  /* 3. Dashboard Sections & Cards Mobile Polish */
+  .dashboard-section {
+    padding: 16px !important;
+    border-radius: 14px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .dashboard-section h2 {
+    font-size: 1.05rem !important;
+    line-height: 1.3;
+  }
+
+  /* Profile View Mobile Responsiveness */
+  .profile-layout-flex {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center;
+    gap: 20px !important;
+  }
+
+  .profile-header-bar {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 12px !important;
+    text-align: center;
+  }
+
+  .profile-info-grid,
+  .profile-form-grid {
+    grid-template-columns: 1fr !important;
+    text-align: left;
+    gap: 14px !important;
+  }
+
+  .profile-actions-bar {
+    flex-direction: column !important;
+    width: 100%;
+    gap: 10px !important;
+  }
+
+  .profile-actions-bar .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ============================================
+   4. MOBILE CLEANUP & WEBINAR BANNER REFINEMENTS
+   (De-clutter mobile views, compact webinar banners,
+   fix multi-column inline grids, balance vertical rhythm)
+   ============================================ */
+@media (max-width: 768px) {
+
+  /* ── A. Top Announcement Banner (#webinar-top-banner) ── */
+  /* Hide top banner when already on the Webinar view to avoid double stacked banners */
+  body[data-route="webinar"] #webinar-top-banner {
+    display: none !important;
+  }
+
+  #webinar-top-banner {
+    position: relative !important;
+    height: auto !important;
+    min-height: 38px !important;
+    padding: 6px 12px !important;
+  }
+
+  #webinar-top-banner-inner {
+    flex-wrap: nowrap !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    max-width: 100% !important;
+  }
+
+  /* Hide verbose secondary text & spots badge on mobile so the banner stays 1 clean line */
+  .webinar-banner-live-label,
+  .webinar-banner-extra,
+  #webinar-top-banner-spots {
+    display: none !important;
+  }
+
+  #webinar-top-banner-live {
+    flex-shrink: 0;
+    gap: 0 !important;
+  }
+
+  #webinar-top-banner-text {
+    font-size: 0.76rem !important;
+    line-height: 1.25 !important;
+    text-align: left !important;
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #webinar-top-banner-btn {
+    padding: 4px 11px !important;
+    font-size: 0.7rem !important;
+    flex-shrink: 0;
+  }
+
+  /* ── B. Webinar Registration Page (#view-webinar-register) ── */
+  #webinar-section {
+    padding-top: 0 !important;
+    padding-bottom: 84px !important;
+  }
+
+  #webinar-top-announcement-band-wrap {
+    padding: 7px 12px !important;
+  }
+
+  #webinar-top-announcement-band {
+    font-size: 0.65rem !important;
+    letter-spacing: 0.04em !important;
+    line-height: 1.35 !important;
+    display: block;
+  }
+
+  /* Hide verbose middle sentence in the webinar page's top band on mobile */
+  .webinar-band-extra {
+    display: none !important;
+  }
+
+  .webinar-hero-container {
+    padding: 20px 16px 0 !important;
+  }
+
+  #webinar-hero-pill-wrap {
+    padding: 6px 14px !important;
+    margin-bottom: 14px !important;
+    gap: 7px !important;
+    max-width: 100% !important;
+  }
+
+  #webinar-hero-pill {
+    font-size: 0.64rem !important;
+    letter-spacing: 0.04em !important;
+    line-height: 1.3 !important;
+  }
+
+  #webinar-hero-title {
+    font-size: clamp(1.85rem, 7.5vw, 2.35rem) !important;
+    line-height: 1.08 !important;
+    margin-bottom: 10px !important;
+  }
+
+  #webinar-hero-subtitle {
+    font-size: 0.88rem !important;
+    line-height: 1.5 !important;
+    margin-bottom: 16px !important;
+  }
+
+  .webinar-social-proof {
+    gap: 8px 12px !important;
+    margin-bottom: 20px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .webinar-social-divider {
+    display: none !important;
+  }
+
+  #webinar-hero-spots-pill {
+    font-size: 0.72rem !important;
+    padding: 3px 10px !important;
+  }
+
+  /* Compact 3x2 Timezone Grid on Mobile */
+  #webinar-tz-box {
+    padding: 14px 10px !important;
+    border-radius: 16px !important;
+    margin-bottom: 14px !important;
+  }
+
+  #webinar-tz-date-label {
+    font-size: 0.62rem !important;
+    letter-spacing: 0.08em !important;
+    margin-bottom: 12px !important;
+  }
+
+  #webinar-tz-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  .webinar-tz-card {
+    padding: 10px 4px !important;
+    border-radius: 10px !important;
+  }
+
+  .webinar-tz-icon {
+    font-size: 1rem !important;
+    margin-bottom: 3px !important;
+  }
+
+  .webinar-tz-time {
+    font-size: 0.88rem !important;
+  }
+
+  .webinar-tz-code {
+    font-size: 0.6rem !important;
+    margin: 2px 0 1px !important;
+  }
+
+  .webinar-tz-cities {
+    font-size: 0.55rem !important;
+    line-height: 1.2 !important;
+  }
+
+  #webinar-reference-badge {
+    font-size: 0.48rem !important;
+    padding: 1px 6px !important;
+    top: -7px !important;
+  }
+
+  .webinar-tz-note {
+    font-size: 0.56rem !important;
+    margin-top: 8px !important;
+    line-height: 1.35 !important;
+  }
+
+  /* Sleek Single-Row Countdown on Mobile */
+  #webinar-countdown-box {
+    padding: 14px 12px !important;
+    border-radius: 16px !important;
+    margin-bottom: 26px !important;
+  }
+
+  .webinar-countdown-label {
+    font-size: 0.62rem !important;
+    margin-bottom: 10px !important;
+  }
+
+  .webinar-countdown-row {
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .webinar-countdown-unit {
+    min-width: 38px !important;
+  }
+
+  .webinar-countdown-num {
+    font-size: 1.45rem !important;
+  }
+
+  .webinar-countdown-sep {
+    font-size: 1.2rem !important;
+    padding-bottom: 14px !important;
+  }
+
+  /* Compact Benefits & Urgency Bar on Mobile */
+  #webinar-learn-section {
+    padding: 0 16px !important;
+    margin-bottom: 26px !important;
+  }
+
+  #webinar-learn-section > div:first-child {
+    margin-bottom: 18px !important;
+  }
+
+  #webinar-section-headline {
+    font-size: 1.3rem !important;
+    line-height: 1.25 !important;
+  }
+
+  #webinar-section-subheadline {
+    font-size: 0.82rem !important;
+    line-height: 1.45 !important;
+  }
+
+  #webinar-benefits-container {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    margin-bottom: 18px !important;
+  }
+
+  .webinar-benefit-card {
+    padding: 14px 14px !important;
+    gap: 12px !important;
+    border-radius: 14px !important;
+  }
+
+  .webinar-benefit-icon {
+    font-size: 1.35rem !important;
+  }
+
+  #webinar-urgency-bar {
+    flex-direction: column !important;
+    text-align: center !important;
+    padding: 16px !important;
+    gap: 12px !important;
+    border-radius: 14px !important;
+  }
+
+  #webinar-urgency-bar > div {
+    flex-direction: column !important;
+    gap: 4px !important;
+  }
+
+  #webinar-urgency-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    padding: 11px 16px !important;
+  }
+
+  /* Registration Form Card on Mobile */
+  #webinar-form-outer {
+    padding: 0 14px !important;
+  }
+
+  #webinar-form-outer > div {
+    border-radius: 18px !important;
+  }
+
+  #webinar-card-header {
+    padding: 16px 16px !important;
+  }
+
+  #webinar-card-header-flex {
+    gap: 10px !important;
+  }
+
+  #webinar-card-header-logo {
+    height: 40px !important;
+  }
+
+  #webinar-card-header-title {
+    font-size: 0.92rem !important;
+    line-height: 1.25 !important;
+  }
+
+  #webinar-card-header-subtitle {
+    font-size: 0.68rem !important;
+    line-height: 1.35 !important;
+  }
+
+  #webinar-form-body {
+    padding: 18px 16px !important;
+  }
+
+  /* ── C. Referral Form Luxury Webinar Pass (#referral-client-webinar-banner) ── */
+  .luxury-webinar-pass,
+  .luxury-webinar-pass--client {
+    padding: 14px 12px !important;
+    border-radius: 14px !important;
+    margin-bottom: 16px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .luxury-webinar-pass .pass-badge-row {
+    gap: 6px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .luxury-webinar-pass .live-pill,
+  .luxury-webinar-pass .vip-pill,
+  .luxury-webinar-pass--client .client-live-pill,
+  .luxury-webinar-pass--client .client-vip-pill {
+    font-size: 0.64rem !important;
+    padding: 3px 8px !important;
+    letter-spacing: 0.03em !important;
+    white-space: normal !important;
+    line-height: 1.25 !important;
+  }
+
+  .luxury-webinar-pass .pass-title {
+    font-size: 0.95rem !important;
+    line-height: 1.3 !important;
+    margin-bottom: 8px !important;
+  }
+
+  .luxury-webinar-pass .pass-meta-strip {
+    padding: 6px 8px !important;
+    font-size: 0.7rem !important;
+    gap: 4px 8px !important;
+    flex-direction: column !important;
+    line-height: 1.35 !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* Hide duplicate date in meta strip on mobile since date is already in the top live pill */
+  #client-webinar-meta-strip > span:first-child {
+    display: none !important;
+  }
+
+  .luxury-webinar-pass .pass-invitee-chip {
+    font-size: 0.7rem !important;
+    padding: 3px 10px !important;
+  }
+
+  /* Proportionate logo in Referral & Intake cards on mobile */
+  .auth-logo.referral-hero-logo {
+    height: 76px !important;
+    max-height: 76px !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* ── D. Landing Page & Public Views De-Cluttering ── */
+  /* Since .navbar is sticky on mobile, remove huge fixed-navbar top offsets */
+  .auth-section {
+    padding: 20px 14px calc(84px + env(safe-area-inset-bottom, 0px)) !important;
+    min-height: auto !important;
+  }
+
+  #about-us {
+    padding-top: 40px !important;
+    padding-bottom: 48px !important;
+  }
+
+  #about-us img[alt="The Spain Connection"] {
+    max-width: 185px !important;
+    margin-bottom: 18px !important;
+  }
+
+  #about-us p {
+    font-size: 0.94rem !important;
+    line-height: 1.6 !important;
+    margin-bottom: 20px !important;
+  }
+
+  /* 2x2 compact partner cards in #about-us instead of 4 huge stacked cards */
+  #about-us .container > div:last-child {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    margin-top: 24px !important;
+  }
+
+  #about-us .container > div:last-child .card {
+    padding: 16px 10px !important;
+    border-radius: 12px !important;
+  }
+
+  #about-us .container > div:last-child .card img {
+    height: 32px !important;
+    margin-bottom: 10px !important;
+    object-fit: contain;
+  }
+
+  #about-us .container > div:last-child .card h3 {
+    font-size: 0.9rem !important;
+    margin-bottom: 4px !important;
+  }
+
+  #about-us .container > div:last-child .card p {
+    font-size: 0.75rem !important;
+    line-height: 1.35 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Testimonials: clean card layout, compact video width & balanced spacing */
+  #testimonials .testimonial-row {
+    margin-top: 24px !important;
+    gap: 14px !important;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 18px 14px;
+  }
+
+  #testimonials .testimonial-row .testimonial-video {
+    margin-bottom: 4px !important;
+  }
+
+  #testimonials .testimonial-video > div {
+    max-width: 220px !important;
+  }
+
+  #testimonials .testimonial-text h3 {
+    font-size: 1.15rem !important;
+    line-height: 1.3 !important;
+    margin-bottom: 8px !important;
+  }
+
+  #testimonials .testimonial-text p {
+    font-size: 0.88rem !important;
+    line-height: 1.55 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* About Spain & For Realtors top padding & timeline fix */
+  #view-about-spain .why-spain,
+  #view-about-spain section:first-child {
+    padding-top: 32px !important;
+  }
+
+  #view-for-realtors .hero-split {
+    padding-top: 36px !important;
+    min-height: auto !important;
+  }
+
+  /* Fix 3 squished columns in "How It Works" on mobile */
+  .process-timeline,
+  .process-timeline[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  /* ── E. Admin Webinar Management Panel (#view-admin-webinar) ── */
+  #admin-webinar-type-switch {
+    width: 100% !important;
+    display: flex !important;
+  }
+
+  #admin-webinar-type-switch button {
+    flex: 1 1 50% !important;
+    justify-content: center !important;
+    font-size: 0.75rem !important;
+    padding: 8px 8px !important;
+    white-space: normal !important;
+    text-align: center !important;
+  }
+
+  #admin-webinar-config-form [style*="minmax(300px"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
