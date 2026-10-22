@@ -42,8 +42,8 @@
       allUsers = await App.auth.getAllUsers();
 
       // Calculate metrics
-      const activeCount = agentClients.filter(c => c.status !== 'closed').length;
-      const closedCount = agentClients.filter(c => c.status === 'closed').length;
+      const activeCount = agentClients.filter(c => !['completed', 'closed'].includes(c.status)).length;
+      const closedCount = agentClients.filter(c => ['completed', 'closed'].includes(c.status)).length;
       const totalEarned = agentCommissions.reduce((sum, c) => sum + (c.agentAmount || 0), 0);
 
       // Update stat cards

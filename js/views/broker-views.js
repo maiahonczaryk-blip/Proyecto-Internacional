@@ -32,30 +32,51 @@
       const agreementStatus = currentUser.agreementStatus || 'none';
       const warningEl = document.getElementById('broker-agreement-warning');
       const hasSigned = (agreementStatus === 'signed');
+      const hasSubmittedData = (agreementStatus === 'data_submitted' || agreementStatus === 'uploaded');
       
       if (warningEl) {
-        if (!hasSigned) {
+        if (hasSigned) {
+          warningEl.style.display = 'none';
+        } else if (hasSubmittedData) {
+          warningEl.style.display = 'block';
+          warningEl.innerHTML = `
+            <div class="glass-card" style="display:flex; align-items:center; gap:1rem; padding:1.25rem; background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; text-align:left;">
+              <span style="font-size:2rem;">📋</span>
+              <div>
+                <div style="font-weight:700; color:#1e40af; font-size:1.05rem;">
+                  <span class="lang-en">Fiscal &amp; Bank Details Received — Preparing Contract</span>
+                  <span class="lang-es">Datos Fiscales y Bancarios Recibidos — Preparando Contrato</span>
+                  <span class="lang-fr">Données Fiscales et Bancaires Reçues — Préparation du Contrat</span>
+                  <span class="lang-en-ca">Fiscal &amp; Bank Details Received — Preparing Contract</span>
+                </div>
+                <div style="font-size:0.85rem; color:#1d4ed8; margin-top:4px;">
+                  <span class="lang-en">Our administration team is preparing your joint Collaboration Agreement externally and will present it to you for signature shortly. You can review or update your details in <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a>.</span>
+                  <span class="lang-es">Nuestro equipo de administración está redactando tu Contrato de Colaboración Conjunta de forma externa y te lo presentará en breve para la firma. Puedes revisar o actualizar tus datos en <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documentos</a>.</span>
+                  <span class="lang-fr">Notre équipe prépare votre Contrat de Collaboration et vous le présentera sous peu. Vous pouvez vérifier vos données dans <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a>.</span>
+                  <span class="lang-en-ca">Our administration team is preparing your joint Collaboration Agreement externally and will present it to you for signature shortly. You can review or update your details in <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a>.</span>
+                </div>
+              </div>
+            </div>`;
+        } else {
           warningEl.style.display = 'block';
           warningEl.innerHTML = `
             <div class="glass-card" style="display:flex; align-items:center; gap:1rem; padding:1.25rem; background:#fef3c7; border:1px solid #fde68a; border-radius:12px; text-align:left;">
               <span style="font-size:2rem;">⚠️</span>
               <div>
                 <div style="font-weight:700; color:#92400e; font-size:1.05rem;">
-                  <span class="lang-en">Master Referral Agreement Required</span>
-                  <span class="lang-es">Acuerdo de Referido Requerido</span>
-                  <span class="lang-fr">Accord de Référencement Requis</span>
-                  <span class="lang-en-ca">Master Referral Agreement Required</span>
+                  <span class="lang-en">Company Fiscal &amp; Bank Details Required for Contract</span>
+                  <span class="lang-es">Datos Fiscales y Bancarios Requeridos para el Contrato</span>
+                  <span class="lang-fr">Données Fiscales et Bancaires Requises pour le Contrat</span>
+                  <span class="lang-en-ca">Company Fiscal &amp; Bank Details Required for Contract</span>
                 </div>
                 <div style="font-size:0.85rem; color:#78350f; margin-top:4px;">
-                  <span class="lang-en">Your partnership is pending execution of the Master Referral Agreement. Please go to <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> to sign and upload it to complete your partnership setup.</span>
-                  <span class="lang-es">Tu colaboración está pendiente de la firma del Acuerdo de Referido. Ve a <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documentos</a> para firmarlo y subirlo para completar tu perfil de colaborador.</span>
-                  <span class="lang-fr">Votre partenariat est en attente de signature de l'accord. Veuillez vous rendre dans <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> pour le signer afin de compléter votre inscription.</span>
-                  <span class="lang-en-ca">Your partnership is pending execution of the Master Referral Agreement. Please go to <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> to sign and upload it to complete your partnership setup.</span>
+                  <span class="lang-en">To prepare and present your joint Collaboration Agreement, please go to <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> and fill out your company's fiscal and corporate bank account details.</span>
+                  <span class="lang-es">Para que podamos redactar y presentarte el Contrato de Colaboración Conjunta, ve a <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documentos</a> y completa el formulario con los datos fiscales de tu empresa y cuenta bancaria.</span>
+                  <span class="lang-fr">Pour que nous puissions préparer votre Contrat de Collaboration, rendez-vous dans <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> et complétez les données fiscales et bancaires de votre entreprise.</span>
+                  <span class="lang-en-ca">To prepare and present your joint Collaboration Agreement, please go to <a href="#broker/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> and fill out your company's fiscal and corporate bank account details.</span>
                 </div>
               </div>
             </div>`;
-        } else {
-          warningEl.style.display = 'none';
         }
       }
 
@@ -555,100 +576,21 @@
 
       teamRealtors = await App.auth.getAllUsers({ brokerId: currentUser.id, role: 'realtor' });
 
-      const status = currentUser.agreementStatus || 'none';
-
-      if (status === 'signed') {
-        agreementStatusHtml = `
-          <div style="display:flex; align-items:center; gap:0.75rem; padding:1rem; background:#d1fae5; border-radius:0.5rem; margin-bottom:1rem;">
-            <span style="font-size:1.5rem;">✅</span>
-            <div>
-              <div style="font-weight:600; color:#065f46;">Referral Agreement — Signed by both parties</div>
-              <div style="font-size:0.85rem; color:#047857; margin-bottom: 8px;">Signed on ${App.utils.formatDate(currentUser.agreementSignedAt)}</div>
-              <div style="display:flex; gap:10px; margin-top:8px;">
-                ${currentUser.agreementFileUrl ? `<a href="${currentUser.agreementFileUrl}" target="_blank" class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:0.78rem;">📥 Your Signed Copy</a>` : ''}
-                ${currentUser.agreementFinalUrl ? `<a href="${currentUser.agreementFinalUrl}" target="_blank" class="btn btn-primary btn-sm" style="padding:4px 10px;font-size:0.78rem;color:white;">📥 Final Countersigned Agreement</a>` : ''}
-              </div>
-            </div>
-          </div>`;
-      } else if (status === 'uploaded') {
-        agreementStatusHtml = `
-          <div style="display:flex; align-items:center; gap:0.75rem; padding:1rem; background:#fef9c3; border-radius:0.5rem; margin-bottom:1rem;">
-            <span style="font-size:1.5rem;">⏳</span>
-            <div>
-              <div style="font-weight:600; color:#854d0e;">Agreement uploaded — Pending RE/MAX Inmom&aacute;s countersignature</div>
-              <div style="font-size:0.85rem; color:#a16207; margin-bottom: 8px;">We will countersign shortly and confirm your partnership.</div>
-              ${currentUser.agreementFileUrl ? `<a href="${currentUser.agreementFileUrl}" target="_blank" class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:0.78rem;">📥 View Uploaded Copy</a>` : ''}
-            </div>
-          </div>`;
-      } else {
-        agreementStatusHtml = `
-          <div style="padding:1rem; background:#fef3c7; border-radius:0.5rem; margin-bottom:1rem;">
-            <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.6rem;">
-              <span style="font-size:1.25rem;">⚠️</span>
-              <div style="font-weight:600; color:#92400e;">Referral Agreement Required</div>
-            </div>
-            <p style="font-size:0.85rem; color:#78350f; margin:0;">Please download, sign, and upload your Referral Agreement to activate your broker partnership.</p>
-          </div>
-          <!-- Download -->
-          <div style="background:#f8f9ff; border:1.5px solid #c7d2fe; border-radius:0.75rem; padding:1rem; margin-bottom:0.75rem;">
-            <div style="font-weight:600; color:#1e40af; margin-bottom:0.5rem;">
-              <span class="lang-en">1️⃣ Download &amp; Complete</span>
-              <span class="lang-es">1️⃣ Descargar y Completar</span>
-              <span class="lang-fr">1️⃣ Télécharger et Compléter</span>
-              <span class="lang-en-ca">1️⃣ Download &amp; Complete</span>
-            </div>
-            <p style="font-size:0.82rem; color:#374151; margin:0 0 0.75rem;">
-              <span class="lang-en">Download the Master Referral Agreement. Please complete it with your details and sign it.</span>
-              <span class="lang-es">Descarga el Acuerdo Marco de Referidos. Por favor, complétalo con tus datos y fírmalo.</span>
-              <span class="lang-fr">Téléchargez l'accord de référencement. Veuillez le compléter avec vos coordonnées et le signer.</span>
-              <span class="lang-en-ca">Download the Master Referral Agreement. Please complete it with your details and sign it.</span>
-            </p>
-            <button class="btn btn-primary" id="broker-download-agreement-btn">
-              📄 
-              <span class="lang-en">Download Referral Agreement (.doc)</span>
-              <span class="lang-es">Descargar Acuerdo (.doc)</span>
-              <span class="lang-fr">Télécharger l'Accord (.doc)</span>
-              <span class="lang-en-ca">Download Referral Agreement (.doc)</span>
-            </button>
-          </div>
-          <!-- Send by Email -->
-          <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:0.75rem; padding:1rem;">
-            <div style="font-weight:600; color:#166534; margin-bottom:0.5rem;">
-              <span class="lang-en">2️⃣ Send via Email</span>
-              <span class="lang-es">2️⃣ Enviar por Correo</span>
-              <span class="lang-fr">2️⃣ Envoyer par Email</span>
-              <span class="lang-en-ca">2️⃣ Send via Email</span>
-            </div>
-            <p style="font-size:0.82rem; color:#374151; margin:0 0 0.75rem;">
-              <span class="lang-en">Send the completed and signed agreement to <strong>spainconnection0@gmail.com</strong>.</span>
-              <span class="lang-es">Envía el acuerdo completado y firmado a <strong>spainconnection0@gmail.com</strong>.</span>
-              <span class="lang-fr">Envoyez l'accord complété et signé à <strong>spainconnection0@gmail.com</strong>.</span>
-              <span class="lang-en-ca">Send the completed and signed agreement to <strong>spainconnection0@gmail.com</strong>.</span>
-            </p>
-            <p style="font-size:0.82rem; color:#374151; margin:0;">
-              <span class="lang-en">We will return a countersigned copy to you to confirm your partnership.</span>
-              <span class="lang-es">Te devolveremos una copia co-firmada para confirmar tu colaboración.</span>
-              <span class="lang-fr">Nous vous retournerons une copie contresignée pour confirmer votre partenariat.</span>
-              <span class="lang-en-ca">We will return a countersigned copy to you to confirm your partnership.</span>
-            </p>
-          </div>`;
-      }
-
       const teamDocsHtml = teamRealtors.length === 0
         ? `<div class="empty-state"><div class="empty-state__icon">👥</div><p class="empty-state__text">No team members yet.</p></div>`
         : `<div class="team-cards-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:1rem;">
              ${teamRealtors.map(r => {
                const rStatus = r.agreementStatus || 'none';
                const badge = rStatus === 'signed'
-                 ? '<span class="badge badge--approved">Signed</span>'
-                 : rStatus === 'uploaded'
-                   ? '<span class="badge badge--pending" style="background:#fef9c3; color:#854d0e;">Uploaded ⏳</span>'
-                   : '<span class="badge badge--pending">Pending</span>';
+                 ? '<span class="badge badge--approved">Firmado / Signed ✅</span>'
+                 : (rStatus === 'data_submitted' || rStatus === 'uploaded')
+                   ? '<span class="badge badge--pending" style="background:#dbeafe; color:#1e40af;">Datos Enviados 📋</span>'
+                   : '<span class="badge badge--pending">Pendiente ⚠️</span>';
                const detail = rStatus === 'signed'
-                 ? `<p style="margin:0; color:#10b981;">Signed on: ${App.utils.formatDate(r.agreementSignedAt)}</p>`
-                 : rStatus === 'uploaded'
-                   ? `<p style="margin:0; color:#a16207;">Agreement uploaded — awaiting admin countersignature</p>`
-                   : `<p style="margin:0; color:#f59e0b;">Waiting for realtor to upload signed agreement</p>`;
+                 ? `<p style="margin:0; color:#10b981;">Firmado el / Signed on: ${App.utils.formatDate(r.agreementSignedAt)}</p>`
+                 : (rStatus === 'data_submitted' || rStatus === 'uploaded')
+                   ? `<p style="margin:0; color:#1d4ed8;">Datos fiscales y bancarios enviados — preparando contrato externo</p>`
+                   : `<p style="margin:0; color:#f59e0b;">Pendiente de completar datos fiscales/bancarios o firma conjunta</p>`;
                return `
                <div class="glass-card" style="padding:1.25rem;">
                  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
@@ -659,7 +601,7 @@
                    ${badge}
                  </div>
                  <div style="font-size:0.85rem; color:#374151;">
-                   <p style="margin:0 0 0.5rem;"><strong>Agreement:</strong> Master Referral Agreement (25%)</p>
+                   <p style="margin:0 0 0.5rem;"><strong>Contrato:</strong> Acuerdo de Colaboración Conjunta (25%)</p>
                    ${detail}
                  </div>
                </div>`;
@@ -668,98 +610,35 @@
 
       container.innerHTML = `
         <div class="dashboard-section">
-          <h2>My Referral Agreement</h2>
-          ${agreementStatusHtml}
+          <h2>
+            <span class="lang-en">Collaboration Agreement &amp; Company Fiscal Details</span>
+            <span class="lang-es">Contrato de Colaboración y Datos Fiscales de la Empresa</span>
+            <span class="lang-fr">Contrat de Collaboration et Données Fiscales</span>
+            <span class="lang-en-ca">Collaboration Agreement &amp; Company Fiscal Details</span>
+          </h2>
+          <div id="broker-contract-data-section"></div>
         </div>
         <div class="dashboard-section">
-          <h2>Team Realtors — Agreement Status</h2>
+          <h2>
+            <span class="lang-en">Team Realtors — Collaboration Agreement Status</span>
+            <span class="lang-es">Agentes del Equipo — Estado del Contrato de Colaboración</span>
+            <span class="lang-fr">Agents de l'Équipe — Statut du Contrat</span>
+            <span class="lang-en-ca">Team Realtors — Collaboration Agreement Status</span>
+          </h2>
           ${teamDocsHtml}
         </div>
       `;
 
-      // Bind broker download button
-      const dlBtn = document.getElementById('broker-download-agreement-btn');
-      if (dlBtn) {
-        dlBtn.addEventListener('click', () => {
-          if (typeof App.generateReferralAgreementDoc === 'function') {
-            App.generateReferralAgreementDoc(currentUser);
-            App.utils.showToast('Agreement downloading... Sign it and upload below.', 'info');
-          } else {
-            App.utils.showToast('Generator not loaded. Please refresh.', 'error');
-          }
-        });
-      }
-
-      // Bind broker upload zone
-      const uploadZone = document.getElementById('broker-agreement-upload-zone');
-      const fileInput  = document.getElementById('broker-agreement-file-input');
-      if (uploadZone) {
-        uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.borderColor = '#22c55e'; });
-        uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = '#86efac'; });
-        uploadZone.addEventListener('drop', e => {
-          e.preventDefault();
-          uploadZone.style.borderColor = '#86efac';
-          if (e.dataTransfer.files[0]) handleBrokerAgreementUpload(e.dataTransfer.files[0]);
-        });
-      }
-      if (fileInput) {
-        fileInput.addEventListener('change', () => {
-          if (fileInput.files[0]) handleBrokerAgreementUpload(fileInput.files[0]);
+      const contractContainer = document.getElementById('broker-contract-data-section');
+      if (contractContainer && App.utils && typeof App.utils.renderContractDataSection === 'function') {
+        App.utils.renderContractDataSection(contractContainer, currentUser, 'broker-contract', () => {
+          initDocuments();
         });
       }
 
     } catch (err) {
       console.error('[Broker] initDocuments error:', err);
       App.utils.showToast('Error loading documents.', 'error');
-    }
-  }
-
-  /* ── Handle broker signed agreement upload ── */
-  async function handleBrokerAgreementUpload(file) {
-    const statusEl = document.getElementById('broker-agreement-upload-status');
-    if (statusEl) statusEl.innerHTML = '<span style="color:#6b7280;">⏳ Uploading...</span>';
-    try {
-      let fileUrl = null;
-      if (!App.demoMode && App.storage) {
-        const ref = App.storage.ref(`agreements/${currentUser.id}/signed_${Date.now()}_${file.name}`);
-        await ref.put(file);
-        fileUrl = await ref.getDownloadURL();
-      } else {
-        fileUrl = `demo://agreements/${currentUser.id}/${file.name}`;
-      }
-
-      if (!App.demoMode && App.db) {
-        await App.db.collection('users').doc(currentUser.id).update({
-          agreementStatus: 'uploaded',
-          agreementUploadedAt: new Date().toISOString(),
-          agreementFileUrl: fileUrl
-        });
-        await App.db.collection('agreement_notifications').add({
-          userId: currentUser.id,
-          userName: `${currentUser.firstName} ${currentUser.lastName}`,
-          userRole: currentUser.role,
-          agencyName: currentUser.agencyName || '—',
-          email: currentUser.email,
-          fileUrl: fileUrl,
-          fileName: file.name,
-          uploadedAt: new Date().toISOString(),
-          status: 'pending_admin'
-        });
-      } else {
-        const demoUser = App.demoData.users.find(u => u.id === currentUser.id);
-        if (demoUser) { demoUser.agreementStatus = 'uploaded'; demoUser.agreementUploadedAt = new Date().toISOString(); demoUser.agreementFileUrl = fileUrl; }
-        currentUser.agreementStatus = 'uploaded';
-        App.demoData.agreementNotifications = App.demoData.agreementNotifications || [];
-        App.demoData.agreementNotifications.push({ id: 'notif_' + Date.now(), userId: currentUser.id, userName: `${currentUser.firstName} ${currentUser.lastName}`, userRole: currentUser.role, agencyName: currentUser.agencyName || '—', email: currentUser.email, fileUrl, fileName: file.name, uploadedAt: new Date().toISOString(), status: 'pending_admin' });
-        if (App.auth && typeof App.auth.saveDemoData === 'function') App.auth.saveDemoData();
-      }
-
-      App.utils.showToast('✅ Agreement uploaded! RE/MAX Inmomás will countersign shortly.', 'success');
-      initDocuments();
-    } catch (err) {
-      console.error('[Broker] Agreement upload error:', err);
-      if (statusEl) statusEl.innerHTML = '<span style="color:#e11b22;">❌ Upload failed. Please try again.</span>';
-      App.utils.showToast('Upload failed. Please try again.', 'error');
     }
   }
 

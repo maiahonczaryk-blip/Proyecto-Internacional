@@ -180,7 +180,41 @@
         }
       }
 
-      // 8. Role Notification Banner (ONLY for José Martínez, NEVER for Maia / Super Admin)
+      // 8. Check pending Contract / Fiscal Data notifications for Admin Dashboard alert & sidebar badge
+      try {
+        let pendingNotifs = [];
+        if (!App.demoMode && App.db) {
+          const snap = await App.db.collection('agreement_notifications')
+            .where('status', '==', 'pending_admin')
+            .get();
+          snap.forEach(doc => pendingNotifs.push({ id: doc.id, ...doc.data() }));
+        } else {
+          pendingNotifs = (App.demoData.agreementNotifications || [])
+            .filter(n => n.status === 'pending_admin');
+        }
+        // Also include any user who has agreementStatus === 'data_submitted' or 'uploaded' not yet in pendingNotifs
+        allUsers.forEach(u => {
+          if ((u.agreementStatus === 'data_submitted' || u.agreementStatus === 'uploaded') && !pendingNotifs.some(n => n.userId === u.id)) {
+            pendingNotifs.push({
+              id: 'user_notif_' + u.id,
+              userId: u.id,
+              userName: `${u.firstName || ''} ${u.lastName || ''}`.trim(),
+              userRole: u.role,
+              agencyName: u.agencyName || (u.contractCompanyData && u.contractCompanyData.companyLegalName) || '—',
+              email: u.email,
+              type: 'contract_data_submitted',
+              contractCompanyData: u.contractCompanyData || null,
+              uploadedAt: u.contractDataSubmittedAt || u.agreementUploadedAt || u.createdAt,
+              status: 'pending_admin'
+            });
+          }
+        });
+        renderAgreementNotifications(pendingNotifs);
+      } catch (notifErr) {
+        console.warn('[Admin] Could not load agreement notifications on dashboard:', notifErr);
+      }
+
+      // 9. Role Notification Banner (ONLY for José Martínez, NEVER for Maia / Super Admin)
       const header = document.querySelector('#view-admin-dashboard .dashboard-header');
       if (header) {
         let banner = document.getElementById('admin-maia-approval-banner');
@@ -208,8 +242,57 @@
     }
   }
 
-  /* ── Agreement Notifications List (Obsolete on main dashboard, kept as fallback/stub) ── */
+  /* ── Agreement / Fiscal Data Notifications Banner on Main Admin Dashboard ── */
   function renderAgreementNotifications(notifications) {
+    const badge = document.getElementById('admin-agreements-badge');
+    if (badge) {
+      if (notifications && notifications.length > 0) {
+        badge.textContent = notifications.length;
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    const bannerEl = document.getElementById('admin-contract-notifications-banner');
+    if (!bannerEl) return;
+
+    if (!notifications || notifications.length === 0) {
+      bannerEl.style.display = 'none';
+      bannerEl.innerHTML = '';
+      return;
+    }
+
+    bannerEl.style.display = 'block';
+    const itemsPreview = notifications.slice(0, 3).map(n => {
+      const roleLabel = n.userRole === 'broker' ? '🏢 Broker' : '👤 Realtor';
+      const companyName = (n.contractCompanyData && n.contractCompanyData.companyLegalName) || n.agencyName || '—';
+      return `<li style="margin-bottom:4px;"><strong>${App.utils.escapeHtml(n.userName)}</strong> (${roleLabel} — ${App.utils.escapeHtml(companyName)}) · <span style="color:#4b5563;">${App.utils.escapeHtml(n.email)}</span></li>`;
+    }).join('');
+
+    bannerEl.innerHTML = `
+      <div class="glass-card" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; padding:1.25rem 1.5rem; background:linear-gradient(135deg, #eff6ff 0%, #fef3c7 100%); border:1.5px solid #93c5fd; border-left:5px solid #003f99; border-radius:12px;">
+        <div style="display:flex; align-items:flex-start; gap:1rem; flex:1; min-width:260px;">
+          <span style="font-size:2rem; line-height:1;">🔔</span>
+          <div>
+            <div style="font-weight:800; color:#1e3a8a; font-size:1.02rem; margin-bottom:4px;">
+              ${notifications.length} ${notifications.length === 1 ? 'Colaborador ha enviado Datos Fiscales y Bancarios para Contrato' : 'Colaboradores han enviado Datos Fiscales y Bancarios para Contrato'}
+            </div>
+            <p style="font-size:0.84rem; color:#374151; margin:0 0 8px;">
+              Se han registrado nuevos datos fiscales de empresa y cuenta bancaria. Revisa los datos para armar el Contrato de Colaboración Conjunta de forma externa y presentárselo al Broker/Agente:
+            </p>
+            <ul style="margin:0; padding-left:1.2rem; font-size:0.83rem; color:#1f2937;">
+              ${itemsPreview}
+            </ul>
+          </div>
+        </div>
+        <div>
+          <a href="#admin/agreements" class="btn btn-primary" style="white-space:nowrap; font-weight:700; padding:0.65rem 1.25rem; border-radius:8px;">
+            📋 Ver Datos y Preparar Contrato &rarr;
+          </a>
+        </div>
+      </div>
+    `;
   }
 
   /* ── Dossier Leads List ── */
@@ -936,9 +1019,30 @@
             </div>
             <div>
               <div style="font-weight: 600; color: #374151; margin-bottom: 0.25rem;">Agreement</div>
-              <div style="color: #6b7280;">${user.agreementSigned ? '✅ Signed' : '❌ Not signed'}</div>
+              <div style="color: #6b7280;">${(user.agreementSigned || user.agreementStatus === 'signed') ? '✅ Firmado / Signed' : (user.agreementStatus === 'data_submitted' || user.agreementStatus === 'uploaded') ? '📋 Datos Fiscales Recibidos' : '❌ Pendiente'}</div>
             </div>
           </div>
+
+          ${user.contractCompanyData ? `
+          <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:0.5rem; padding:0.9rem; margin-top:1rem; font-size:0.82rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <strong style="color:#1e3a8a;">🏢 Datos Fiscales y Bancarios (Para Contrato Externo)</strong>
+              <button type="button" class="btn btn-outline btn-xs" style="padding:2px 8px; font-size:0.75rem;" onclick="App.views.admin.copyContractData('${user.id}')">📋 Copiar Datos</button>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem; color:#334155;">
+              <div><strong>Razón Social:</strong> ${App.utils.escapeHtml(user.contractCompanyData.companyLegalName || '—')}</div>
+              <div><strong>NIF / Tax ID:</strong> ${App.utils.escapeHtml(user.contractCompanyData.taxId || '—')}</div>
+              <div><strong>Licencia:</strong> ${App.utils.escapeHtml(user.contractCompanyData.licenseNumber || '—')}</div>
+              <div><strong>País:</strong> ${App.utils.escapeHtml(user.contractCompanyData.fiscalCountry || '—')}</div>
+              <div style="grid-column:span 2;"><strong>Domicilio Fiscal:</strong> ${App.utils.escapeHtml(user.contractCompanyData.fiscalAddress || '—')}</div>
+              <div><strong>Broker Resp.:</strong> ${App.utils.escapeHtml(user.contractCompanyData.brokerSignerName || '—')}</div>
+              <div><strong>Email Broker:</strong> ${App.utils.escapeHtml(user.contractCompanyData.brokerSignerEmail || '—')}</div>
+              <div><strong>Banco / Titular:</strong> ${App.utils.escapeHtml(user.contractCompanyData.bankName || '—')} (${App.utils.escapeHtml(user.contractCompanyData.bankAccountHolder || '—')})</div>
+              <div><strong>IBAN / Cuenta:</strong> <code style="background:#fff; padding:1px 4px; border-radius:3px;">${App.utils.escapeHtml(user.contractCompanyData.bankAccountNumber || '—')}</code></div>
+              <div style="grid-column:span 2;"><strong>SWIFT / Routing:</strong> <code style="background:#fff; padding:1px 4px; border-radius:3px;">${App.utils.escapeHtml(user.contractCompanyData.bankSwiftRouting || '—')}</code></div>
+            </div>
+          </div>
+          ` : ''}
           
           ${user.role !== 'admin' ? `
           <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1.5rem;">
@@ -1341,7 +1445,7 @@
             <td>${App.utils.escapeHtml(client.phone || '-')}</td>
             <td>${client.budget && !isNaN(Number(client.budget)) ? '€' + Number(client.budget).toLocaleString() : App.utils.escapeHtml(client.budget || '—')}</td>
             <td>${App.utils.escapeHtml(client.interestArea || '—')}</td>
-            <td><span class="status-badge status-${(client.status || 'new').toLowerCase().replace(/\s+/g, '-')}">${App.utils.escapeHtml(client.status || 'New')}</span></td>
+            <td><span class="badge ${App.utils.getStatusBadgeClass(client.status)}">${App.utils.escapeHtml(App.utils.getStatusLabel(client.status))}</span></td>
             <td><span style="color:#b45309;font-weight:600;">🇪🇸 ${App.utils.escapeHtml(client.localAgentName || 'Sin asignar')}</span></td>
             <td>${App.utils.escapeHtml(getRealtorName(client.realtorId || client.referredBy))}</td>
             <td style="text-align: right; white-space: nowrap;" onclick="event.stopPropagation();">
@@ -2734,33 +2838,54 @@
   /* ── Dedicated Agreements View ── */
   async function initAgreementsView() {
     try {
+      // Load all users so we can enrich notifications with contractCompanyData
+      const usersList = await App.auth.getAllUsers();
+      allUsers = usersList;
+
       // 1. Fetch pending agreement notifications
       let pendingNotifs = [];
       if (!App.demoMode && App.db) {
         const snap = await App.db.collection('agreement_notifications')
           .where('status', '==', 'pending_admin')
-          .orderBy('uploadedAt', 'desc')
           .get();
         snap.forEach(doc => pendingNotifs.push({ id: doc.id, ...doc.data() }));
+        pendingNotifs.sort((a, b) => new Date(b.uploadedAt || 0) - new Date(a.uploadedAt || 0));
       } else {
         pendingNotifs = (App.demoData.agreementNotifications || [])
           .filter(n => n.status === 'pending_admin');
       }
 
+      // Enrich notifications with user's latest contractCompanyData & include any user with agreementStatus === 'data_submitted' / 'uploaded'
+      pendingNotifs = pendingNotifs.map(n => {
+        const u = usersList.find(usr => usr.id === n.userId);
+        return {
+          ...n,
+          contractCompanyData: n.contractCompanyData || (u && u.contractCompanyData) || null
+        };
+      });
+
+      usersList.forEach(u => {
+        if ((u.agreementStatus === 'data_submitted' || u.agreementStatus === 'uploaded') && !pendingNotifs.some(n => n.userId === u.id)) {
+          pendingNotifs.push({
+            id: 'user_notif_' + u.id,
+            userId: u.id,
+            userName: `${u.firstName || ''} ${u.lastName || ''}`.trim(),
+            userRole: u.role,
+            agencyName: u.agencyName || (u.contractCompanyData && u.contractCompanyData.companyLegalName) || '—',
+            email: u.email,
+            type: 'contract_data_submitted',
+            contractCompanyData: u.contractCompanyData || null,
+            uploadedAt: u.contractDataSubmittedAt || u.agreementUploadedAt || u.createdAt,
+            status: 'pending_admin'
+          });
+        }
+      });
+
       // Render pending agreements in tab
       renderPendingAgreementsTab(pendingNotifs);
 
       // 2. Fetch signed agreements
-      let signedUsers = [];
-      if (!App.demoMode && App.db) {
-        const snap = await App.db.collection('users')
-          .where('agreementStatus', '==', 'signed')
-          .get();
-        snap.forEach(doc => signedUsers.push({ id: doc.id, ...doc.data() }));
-      } else {
-        signedUsers = (App.demoData.users || [])
-          .filter(u => u.agreementStatus === 'signed');
-      }
+      const signedUsers = usersList.filter(u => u.agreementStatus === 'signed' || u.agreementSigned === true);
 
       // Render signed agreements list
       renderSignedAgreementsTab(signedUsers);
@@ -2786,48 +2911,87 @@
       }
     }
     if (count) {
-      count.textContent = notifications.length > 0 ? `(${notifications.length} pending)` : '';
+      count.textContent = notifications.length > 0 ? `(${notifications.length} pendientes)` : '';
     }
 
     if (!list) return;
 
     if (notifications.length === 0) {
-      list.innerHTML = '<div class="empty-state"><div class="empty-state__icon">📋</div><p class="empty-state__text">No agreements pending signature.</p></div>';
+      list.innerHTML = '<div class="empty-state"><div class="empty-state__icon">📋</div><p class="empty-state__text">No hay datos fiscales o acuerdos pendientes de revisión.</p></div>';
       return;
     }
 
-    list.innerHTML = notifications.map(n => `
-      <div class="pending-card glass-card" id="agreement-card-${n.id}" style="padding:1.25rem; margin-bottom:0.75rem; text-align:left;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.75rem;">
+    list.innerHTML = notifications.map(n => {
+      const cd = n.contractCompanyData || {};
+      const hasFiscalData = Boolean(cd.companyLegalName || cd.taxId || cd.bankAccountNumber);
+      const isVirtualNotif = String(n.id || '').startsWith('user_notif_');
+      const realNotifId = isVirtualNotif ? '' : n.id;
+
+      return `
+      <div class="pending-card glass-card" id="agreement-card-${n.id}" style="padding:1.35rem; margin-bottom:1rem; text-align:left; border-left:4px solid #003f99;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.75rem; margin-bottom:1rem;">
           <div>
-            <div style="font-weight:700; font-size:1rem;">${App.utils.escapeHtml(n.userName)}</div>
-            <div style="font-size:0.82rem; color:#6b7280; margin-top:2px;">
-              ${n.userRole === 'broker' ? '🏢 Broker' : '👤 Realtor'} &nbsp;·&nbsp; ${App.utils.escapeHtml(n.agencyName)} &nbsp;·&nbsp; ${App.utils.escapeHtml(n.email)}
+            <div style="font-weight:800; font-size:1.05rem; color:#111827;">${App.utils.escapeHtml(n.userName)}</div>
+            <div style="font-size:0.84rem; color:#4b5563; margin-top:2px;">
+              ${n.userRole === 'broker' ? '🏢 Broker' : '👤 Realtor'} &nbsp;·&nbsp; <strong>${App.utils.escapeHtml(cd.companyLegalName || n.agencyName || '—')}</strong> &nbsp;·&nbsp; ${App.utils.escapeHtml(n.email)}
             </div>
-            <div style="font-size:0.8rem; color:#9ca3af; margin-top:3px;">
-              📎 ${App.utils.escapeHtml(n.fileName || 'agreement')} &nbsp;·&nbsp; Uploaded: ${App.utils.formatDate(n.uploadedAt)}
+            <div style="font-size:0.78rem; color:#6b7280; margin-top:4px;">
+              🕒 Enviado el: ${App.utils.formatDate(n.uploadedAt)}
             </div>
           </div>
-          <span class="badge badge--pending" style="background:#fef9c3; color:#854d0e; white-space:nowrap;">⏳ Pending your signature</span>
+          <span class="badge badge--pending" style="background:#dbeafe; color:#1e40af; font-weight:700; white-space:nowrap;">
+            🔔 Datos Recibidos — Preparar Contrato Externo
+          </span>
         </div>
-        <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:1rem;">
-          <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+
+        ${hasFiscalData ? `
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1rem; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:1rem; margin-bottom:1rem; font-size:0.83rem;">
+          <div>
+            <div style="font-weight:700; color:#1e3a8a; margin-bottom:6px; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">🏢 Datos Fiscales de la Empresa</div>
+            <div style="margin-bottom:3px;"><strong>Razón Social:</strong> ${App.utils.escapeHtml(cd.companyLegalName || '—')}</div>
+            <div style="margin-bottom:3px;"><strong>Tax ID / EIN / CIF:</strong> ${App.utils.escapeHtml(cd.taxId || '—')}</div>
+            <div style="margin-bottom:3px;"><strong>Nº Licencia:</strong> ${App.utils.escapeHtml(cd.licenseNumber || '—')}</div>
+            <div style="margin-bottom:3px;"><strong>Domicilio Fiscal:</strong> ${App.utils.escapeHtml(cd.fiscalAddress || '—')} (${App.utils.escapeHtml(cd.fiscalCountry || '—')})</div>
+            <div style="margin-bottom:3px;"><strong>Broker Firmante:</strong> ${App.utils.escapeHtml(cd.brokerSignerName || '—')}</div>
+            <div><strong>Contacto Broker:</strong> ${App.utils.escapeHtml(cd.brokerSignerEmail || '—')} · ${App.utils.escapeHtml(cd.brokerSignerPhone || '—')}</div>
+          </div>
+          <div>
+            <div style="font-weight:700; color:#166534; margin-bottom:6px; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">🏦 Datos Bancarios Corporativos</div>
+            <div style="margin-bottom:3px;"><strong>Titular de la Cuenta:</strong> ${App.utils.escapeHtml(cd.bankAccountHolder || '—')}</div>
+            <div style="margin-bottom:3px;"><strong>Banco:</strong> ${App.utils.escapeHtml(cd.bankName || '—')}</div>
+            <div style="margin-bottom:3px;"><strong>IBAN / Nº Cuenta:</strong> <code style="background:#fff; padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; font-weight:700;">${App.utils.escapeHtml(cd.bankAccountNumber || '—')}</code></div>
+            <div style="margin-bottom:3px;"><strong>SWIFT / BIC / Routing:</strong> <code style="background:#fff; padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; font-weight:700;">${App.utils.escapeHtml(cd.bankSwiftRouting || '—')}</code></div>
+            <div style="margin-bottom:3px;"><strong>Dirección Banco:</strong> ${App.utils.escapeHtml(cd.bankAddress || '—')}</div>
+            ${cd.notes ? `<div style="margin-top:4px; color:#475569;"><strong>Notas:</strong> ${App.utils.escapeHtml(cd.notes)}</div>` : ''}
+          </div>
+        </div>
+        ` : ''}
+
+        <div style="display:flex; flex-direction:column; gap:0.75rem;">
+          <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
+            ${hasFiscalData ? `
+              <button type="button" class="btn btn-outline btn-sm" onclick="App.views.admin.copyContractData('${n.userId}')">
+                📋 Copiar Datos para Contrato
+              </button>
+            ` : ''}
             ${n.fileUrl && !n.fileUrl.startsWith('demo://') ? `
               <a href="${App.utils.escapeHtml(n.fileUrl)}" target="_blank" class="btn btn-outline btn-sm">
-                📥 Download Realtor-Signed Copy
+                📥 Descargar Documento Subido
               </a>
-            ` : `
-              <span class="btn btn-outline btn-sm" style="opacity:0.5; cursor:not-allowed;" title="Demo mode — no real file">📥 Download Signed Copy (demo)</span>
-            `}
-            <button class="btn btn-primary btn-sm" onclick="document.getElementById('admin-file-input-${n.id}').click()">
-              ✍️ Upload Final Countersigned Copy
+            ` : ''}
+            <button type="button" class="btn btn-primary btn-sm" style="background:#16a34a; border-color:#16a34a;" onclick="App.views.admin.markAgreementSigned('${realNotifId}', '${n.userId}')">
+              ✅ Marcar Contrato como Presentado y Firmado
             </button>
-            <input type="file" id="admin-file-input-${n.id}" accept=".pdf,.doc,.docx" style="display:none;" onchange="App.views.admin.handleAdminAgreementUpload(this, '${n.id}', '${n.userId}')">
+            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('admin-file-input-${n.id}').click()">
+              📎 Subir PDF Firmado (Opcional)
+            </button>
+            <input type="file" id="admin-file-input-${n.id}" accept=".pdf,.doc,.docx" style="display:none;" onchange="App.views.admin.handleAdminAgreementUpload(this, '${realNotifId}', '${n.userId}')">
           </div>
           <div id="admin-upload-status-${n.id}" style="font-size:0.8rem; color:#4b5563;"></div>
         </div>
       </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   function renderSignedAgreementsTab(users) {
@@ -2835,31 +2999,134 @@
     if (!tbody) return;
 
     if (users.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:#6b7280;">No active agreements yet.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:#6b7280;">No hay contratos activos todavía.</td></tr>`;
       return;
     }
 
-    tbody.innerHTML = users.map(u => `
+    tbody.innerHTML = users.map(u => {
+      const cd = u.contractCompanyData || {};
+      const companySummary = cd.companyLegalName
+        ? `<div><strong>${App.utils.escapeHtml(cd.companyLegalName)}</strong></div><div style="font-size:0.75rem;color:#6b7280;">ID: ${App.utils.escapeHtml(cd.taxId || '—')} · ${App.utils.escapeHtml(cd.fiscalCountry || '')}</div>`
+        : App.utils.escapeHtml(u.agencyName || u.brokerNameManual || '—');
+      const bankSummary = cd.bankAccountNumber
+        ? `<div><strong>${App.utils.escapeHtml(cd.bankName || '—')}</strong></div><div style="font-size:0.75rem;color:#6b7280;"><code>${App.utils.escapeHtml(cd.bankAccountNumber)}</code></div>`
+        : '—';
+
+      return `
       <tr>
         <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.85rem;font-weight:600;">${App.utils.escapeHtml(u.firstName)} ${App.utils.escapeHtml(u.lastName)}</td>
         <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${u.role === 'broker' ? '🏢 Broker' : '👤 Realtor'}</td>
-        <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${App.utils.escapeHtml(u.agencyName || u.brokerNameManual || '—')}</td>
+        <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${companySummary}</td>
+        <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${bankSummary}</td>
         <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${App.utils.escapeHtml(u.email)}</td>
         <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">
-          ${u.agreementFileUrl ? `<a href="${App.utils.escapeHtml(u.agreementFileUrl)}" target="_blank" style="color:var(--primary);text-decoration:underline;">📥 Realtor Signed Copy</a>` : '—'}
-        </td>
-        <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">
-          ${u.agreementFinalUrl ? `<a href="${App.utils.escapeHtml(u.agreementFinalUrl)}" target="_blank" style="color:#16a34a;font-weight:600;text-decoration:underline;">📥 Final Agreement</a>` : '—'}
+          <span class="badge badge--approved">✅ Firmado</span>
+          ${u.agreementFinalUrl && !u.agreementFinalUrl.startsWith('demo://') ? `<div style="margin-top:4px;"><a href="${App.utils.escapeHtml(u.agreementFinalUrl)}" target="_blank" style="color:#16a34a;font-weight:600;text-decoration:underline;font-size:0.76rem;">📥 Ver PDF</a></div>` : ''}
         </td>
         <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">
-          <button class="btn btn-outline btn-xs" onclick="document.getElementById('admin-reupload-file-input-${u.id}').click()" style="padding:2px 8px;font-size:0.75rem;">
-            🔄 Re-upload Final
-          </button>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            ${cd.companyLegalName ? `<button class="btn btn-outline btn-xs" onclick="App.views.admin.copyContractData('${u.id}')" style="padding:2px 8px;font-size:0.75rem;">📋 Copiar Datos</button>` : ''}
+            <button class="btn btn-outline btn-xs" onclick="document.getElementById('admin-reupload-file-input-${u.id}').click()" style="padding:2px 8px;font-size:0.75rem;">
+              📎 Adjuntar PDF
+            </button>
+          </div>
           <input type="file" id="admin-reupload-file-input-${u.id}" accept=".pdf,.doc,.docx" style="display:none;" onchange="App.views.admin.handleAdminAgreementUpload(this, '', '${u.id}')">
           <div id="admin-reupload-status-${u.id}" style="font-size:0.75rem;color:#4b5563;margin-top:2px;"></div>
         </td>
       </tr>
-    `).join('');
+      `;
+    }).join('');
+  }
+
+  function copyContractData(userId) {
+    const user = (allUsers || []).find(u => u.id === userId) || (App.demoData && App.demoData.users ? App.demoData.users.find(u => u.id === userId) : null);
+    if (!user || !user.contractCompanyData) {
+      App.utils.showToast('No hay datos fiscales registrados para este usuario.', 'error');
+      return;
+    }
+    const cd = user.contractCompanyData;
+    const text = [
+      `=== DATOS PARA CONTRATO DE COLABORACIÓN ===`,
+      `Colaborador: ${user.firstName || ''} ${user.lastName || ''} (${user.role === 'broker' ? 'Broker' : 'Realtor'})`,
+      `Email usuario: ${user.email || '—'}`,
+      ``,
+      `-- DATOS FISCALES DE LA EMPRESA --`,
+      `Razón Social / Empresa: ${cd.companyLegalName || '—'}`,
+      `NIF / Tax ID / EIN / CIF: ${cd.taxId || '—'}`,
+      `Nº Licencia Inmobiliaria: ${cd.licenseNumber || '—'}`,
+      `Domicilio Fiscal: ${cd.fiscalAddress || '—'}`,
+      `País Fiscal: ${cd.fiscalCountry || '—'}`,
+      `Broker Responsable (Firmante): ${cd.brokerSignerName || '—'}`,
+      `Email del Broker: ${cd.brokerSignerEmail || '—'}`,
+      `Teléfono del Broker: ${cd.brokerSignerPhone || '—'}`,
+      ``,
+      `-- DATOS BANCARIOS CORPORATIVOS --`,
+      `Titular de la Cuenta: ${cd.bankAccountHolder || '—'}`,
+      `Nombre del Banco: ${cd.bankName || '—'}`,
+      `IBAN / Número de Cuenta: ${cd.bankAccountNumber || '—'}`,
+      `SWIFT / BIC / Routing ABA: ${cd.bankSwiftRouting || '—'}`,
+      `Dirección del Banco: ${cd.bankAddress || '—'}`,
+      `Notas Adicionales: ${cd.notes || '—'}`
+    ].join('\n');
+
+    App.utils.copyToClipboard(text);
+    App.utils.showToast('📋 Datos fiscales y bancarios copiados al portapapeles.', 'success');
+  }
+
+  async function markAgreementSigned(notifId, userId) {
+    if (!isMaiaOrSuperAdmin()) {
+      await requestChangeApproval(
+        'Confirmación de Contrato de Colaboración Firmado',
+        `Marcar el Contrato de Colaboración como presentado y firmado para el usuario ${userId}.`
+      );
+      return;
+    }
+
+    try {
+      const now = new Date().toISOString();
+      if (!App.demoMode && App.db) {
+        await App.db.collection('users').doc(userId).update({
+          agreementStatus: 'signed',
+          agreementSigned: true,
+          agreementSignedAt: now
+        });
+        if (notifId) {
+          await App.db.collection('agreement_notifications').doc(notifId).update({
+            status: 'signed',
+            adminSignedAt: now
+          });
+        } else {
+          // Also close any pending_admin notifications for this userId
+          const snap = await App.db.collection('agreement_notifications')
+            .where('userId', '==', userId)
+            .where('status', '==', 'pending_admin')
+            .get();
+          const batch = App.db.batch();
+          snap.forEach(doc => batch.update(doc.ref, { status: 'signed', adminSignedAt: now }));
+          await batch.commit();
+        }
+      } else {
+        const user = App.demoData.users.find(u => u.id === userId);
+        if (user) {
+          user.agreementStatus = 'signed';
+          user.agreementSigned = true;
+          user.agreementSignedAt = now;
+        }
+        (App.demoData.agreementNotifications || []).forEach(n => {
+          if (n.id === notifId || (n.userId === userId && n.status === 'pending_admin')) {
+            n.status = 'signed';
+            n.adminSignedAt = now;
+          }
+        });
+        if (App.auth && typeof App.auth.saveDemoData === 'function') App.auth.saveDemoData();
+      }
+
+      App.utils.showToast('✅ Contrato marcado como presentado y firmado.', 'success');
+      initAgreementsView();
+    } catch (err) {
+      console.error('[Admin] markAgreementSigned error:', err);
+      App.utils.showToast('Error al actualizar el estado del contrato.', 'error');
+    }
   }
 
   async function handleAdminAgreementUpload(input, notifId, userId) {
@@ -2878,7 +3145,7 @@
     const statusEl = notifId 
       ? document.getElementById(`admin-upload-status-${notifId}`) 
       : document.getElementById(`admin-reupload-status-${userId}`);
-    if (statusEl) statusEl.innerHTML = '<span style="color:#6b7280;">⏳ Uploading final agreement...</span>';
+    if (statusEl) statusEl.innerHTML = '<span style="color:#6b7280;">⏳ Subiendo acuerdo firmado...</span>';
 
     try {
       let fileUrl = null;
@@ -2895,6 +3162,7 @@
         // Update user record
         await App.db.collection('users').doc(userId).update({
           agreementStatus: 'signed',
+          agreementSigned: true,
           agreementSignedAt: now,
           agreementFinalUrl: fileUrl
         });
@@ -2912,6 +3180,7 @@
         const user = App.demoData.users.find(u => u.id === userId);
         if (user) {
           user.agreementStatus = 'signed';
+          user.agreementSigned = true;
           user.agreementSignedAt = now;
           user.agreementFinalUrl = fileUrl;
         }
@@ -2926,14 +3195,14 @@
         if (App.auth && typeof App.auth.saveDemoData === 'function') App.auth.saveDemoData();
       }
 
-      App.utils.showToast('✅ Final signed agreement uploaded. Partner active!', 'success');
+      App.utils.showToast('✅ Contrato final subido y colaborador activado.', 'success');
       
       // Reload the view
       initAgreementsView();
     } catch (err) {
       console.error('[Admin] Final agreement upload error:', err);
-      if (statusEl) statusEl.innerHTML = '<span style="color:#e11b22;">❌ Upload failed.</span>';
-      App.utils.showToast('Upload failed.', 'error');
+      if (statusEl) statusEl.innerHTML = '<span style="color:#e11b22;">❌ Error al subir archivo.</span>';
+      App.utils.showToast('Error al subir el contrato.', 'error');
     }
   }
 
@@ -3366,6 +3635,8 @@
     confirmDeleteLead,
     initAgreementsView,
     handleAdminAgreementUpload,
+    copyContractData,
+    markAgreementSigned,
     handleDeleteUser,
     handleDeleteWebinarRegistration,
     setWebinarType,

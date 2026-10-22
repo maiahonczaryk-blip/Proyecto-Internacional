@@ -296,6 +296,27 @@
     }
   }
 
+  async function onContractDataSubmitted(user, contractData) {
+    const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
+    const summarySource = `Tax ID: ${contractData.taxId || '—'} | Banco: ${contractData.bankName || '—'} | Cuenta/IBAN: ${contractData.bankAccountNumber || '—'} | SWIFT/ABA: ${contractData.bankSwiftRouting || '—'} | Dir: ${contractData.fiscalAddress || '—'}`;
+    const emailData = {
+      user_type:     `📋 Datos Fiscales/Bancarios para Contrato (${roleLabel(user.role)})`,
+      user_name:     name,
+      user_email:    user.email || contractData.brokerEmail || '—',
+      user_country:  contractData.country || user.country || '—',
+      user_agency:   `${contractData.companyLegalName || user.agencyName || '—'} (Broker: ${contractData.brokerFullName || name})`,
+      user_phone:    contractData.brokerPhone || user.phone || '—',
+      registered_at: fmtDate(contractData.submittedAt || new Date().toISOString()),
+      source:        summarySource,
+      admin_url:     'https://thespainconnection.com/app.html#admin/agreements'
+    };
+
+    const targetList = Array.isArray(ADMIN_EMAILS) && ADMIN_EMAILS.length ? ADMIN_EMAILS : [ADMIN_EMAIL];
+    for (const target of targetList) {
+      await sendEmail(EMAILJS_TEMPLATE_NEW_REG, emailData, target);
+    }
+  }
+
   // ── Expose on App namespace ────────────────────────────────────────────────
   window.App = window.App || {};
   window.App.notifications = {
@@ -305,6 +326,8 @@
     onNewWebinarRegistration,
     onUserStatusChange,
     onAdminChangeRequested,
-    onNewSurveyFeedback
+    onNewSurveyFeedback,
+    onContractDataSubmitted
   };
 })();
+

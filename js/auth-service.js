@@ -1035,7 +1035,7 @@ App.auth = (function() {
         if (newStatus === 'closed') {
           comm.status = 'paid';
           comm.closingDate = new Date().toISOString();
-        } else if (newStatus === 'notary_pending' || newStatus === 'offer_made') {
+        } else if (newStatus === 'negotiation' || newStatus === 'notary_pending' || newStatus === 'offer_made') {
           comm.status = 'pending_payment';
           comm.closingDate = null;
         } else {
@@ -1062,7 +1062,7 @@ App.auth = (function() {
       if (!commQuery.empty) {
         let commStatus = 'projected';
         if (newStatus === 'closed') commStatus = 'paid';
-        else if (newStatus === 'notary_pending' || newStatus === 'offer_made') commStatus = 'pending_payment';
+        else if (newStatus === 'negotiation' || newStatus === 'notary_pending' || newStatus === 'offer_made') commStatus = 'pending_payment';
         
         await commQuery.docs[0].ref.update({
           status: commStatus,
@@ -1118,7 +1118,7 @@ App.auth = (function() {
       if (client.status === 'closed') {
         comm.status = 'paid';
         comm.closingDate = new Date().toISOString();
-      } else if (client.status === 'notary_pending' || client.status === 'offer_made') {
+      } else if (client.status === 'negotiation' || client.status === 'notary_pending' || client.status === 'offer_made') {
         comm.status = 'pending_payment';
         comm.closingDate = null;
       } else {
@@ -1149,7 +1149,7 @@ App.auth = (function() {
 
       let commStatus = 'projected';
       if (client.status === 'closed') commStatus = 'paid';
-      else if (client.status === 'notary_pending' || client.status === 'offer_made') commStatus = 'pending_payment';
+      else if (client.status === 'negotiation' || client.status === 'notary_pending' || client.status === 'offer_made') commStatus = 'pending_payment';
 
       await commRef.set({
         clientId: clientId,
