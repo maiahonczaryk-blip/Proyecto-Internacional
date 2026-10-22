@@ -476,6 +476,9 @@ App.views.public = {
 
       if (availableTypes.length > 1 && typeSelector && typeOptions) {
         typeSelector.style.display = 'block';
+        const isMultiRow = availableTypes.length > 3;
+        typeSelector.classList.toggle('referral-segmented-wrapper--multi', isMultiRow);
+        typeOptions.classList.toggle('referral-segmented-bar--multi', isMultiRow);
         typeOptions.innerHTML = availableTypes.map((type) => {
           const cfg = typeConfig[type] || typeConfig.client;
           const isSelected = type === selectedType;
