@@ -1620,14 +1620,77 @@
               </label>
               <input type="text" id="register-agency-manual" class="form-input" placeholder="e.g. RE/MAX Gold">
             </div>
-            <div class="form-group">
+            <!-- Optional RE/MAX Inmomás Agent selection -->
+            <div class="form-group" id="register-inmomas-agent-group">
+              <label for="register-inmomas-agent">
+                <span class="lang-en">RE/MAX Inmomás Agent (Optional)</span>
+                <span class="lang-es">Agente de RE/MAX Inmomás (Opcional)</span>
+                <span class="lang-fr">Agent RE/MAX Inmomás (Optionnel)</span>
+                <span class="lang-en-ca">RE/MAX Inmomás Agent (Optional)</span>
+              </label>
+              <select id="register-inmomas-agent">
+                <option value="">
+                  <span class="lang-en">— None / Select an agent (Optional) —</span>
+                  <span class="lang-es">— Ninguno / Seleccionar agente (Opcional) —</span>
+                  <span class="lang-fr">— Aucun / Sélectionner un agent (Optionnel) —</span>
+                  <span class="lang-en-ca">— None / Select an agent (Optional) —</span>
+                </option>
+                <option value="Jamisa Home Lifestyle">Jamisa Home Lifestyle</option>
+                <option value="Angel Luis Rodriguez / Debra Nadal">Angel Luis Rodriguez / Debra Nadal</option>
+                <option value="Sepehr Hosseini">Sepehr Hosseini</option>
+                <option value="José Martínez">José Martínez</option>
+                <option value="Maia Honczaryk">Maia Honczaryk</option>
+                <option value="Denise McNeal">Denise McNeal</option>
+                <option value="Giancarlo Agudelo">Giancarlo Agudelo</option>
+                <option value="Ana Martínez">Ana Martínez</option>
+              </select>
+              <small style="color:var(--text-muted); display:block; margin-top:4px;">
+                <span class="lang-en">Optional: Select if you were referred by or are collaborating with a specific RE/MAX Inmomás agent</span>
+                <span class="lang-es">Opcional: Selecciona si vienes de parte de o colaboras con un agente específico de RE/MAX Inmomás</span>
+                <span class="lang-fr">Optionnel : Sélectionnez si vous êtes référé par un agent spécifique de RE/MAX Inmomás</span>
+                <span class="lang-en-ca">Optional: Select if you were referred by or are collaborating with a specific RE/MAX Inmomás agent</span>
+              </small>
+            </div>
+            <!-- Detailed Terms & Conditions Quadrant -->
+            <div class="form-group" style="margin-top: 14px;">
+              <div class="terms-quadrant" style="background: rgba(0, 63, 153, 0.03); border: 1px solid rgba(0, 63, 153, 0.16); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; max-height: 165px; overflow-y: auto; font-size: 0.78rem; line-height: 1.5; color: var(--text-secondary);">
+                <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 6px; font-size: 0.82rem; display: flex; align-items: center; gap: 6px;">
+                  <span>🔒</span>
+                  <span class="lang-en">Terms &amp; Conditions, Data Privacy &amp; Business Management Authorization</span>
+                  <span class="lang-es">Términos y Condiciones, Privacidad de Datos y Autorización de Gestión Comercial</span>
+                  <span class="lang-fr">Conditions Générales, Confidentialité des Données et Autorisation de Gestion</span>
+                  <span class="lang-en-ca">Terms &amp; Conditions, Data Privacy &amp; Business Management Authorization</span>
+                </div>
+                <div class="lang-es">
+                  <p style="margin: 0 0 6px;"><strong>1. Protección de Datos y Privacidad (RGPD / LOPDGDD):</strong> De conformidad con el Reglamento General de Protección de Datos (UE 2016/679) y la Ley Orgánica 3/2018 (LOPDGDD), los datos personales y profesionales facilitados serán tratados con estricta confidencialidad por <strong>RE/MAX Inmomás (The Spain Connection)</strong> como responsable del tratamiento.</p>
+                  <p style="margin: 0 0 6px;"><strong>2. Uso de la Información para Gestión de Negocios y Clientes:</strong> El usuario autoriza expresamente el tratamiento y uso de su información para gestionar su registro, coordinar operaciones de compraventa e inversión inmobiliaria en España, administrar acuerdos de colaboración y referidos, realizar el seguimiento comercial de clientes y facilitar servicios integrales vinculados a la operación (asesoría inmobiliaria, legal, fiscal, financiera/hipotecaria y de reubicación) junto a nuestros agentes y colaboradores autorizados.</p>
+                  <p style="margin: 0 0 6px;"><strong>3. Confidencialidad y No Cesión Comercial a Terceros Ajenos:</strong> La información suministrada se utilizará exclusivamente para la correcta ejecución y trazabilidad de los negocios, clientes y comisiones dentro del ecosistema de RE/MAX Inmomás / The Spain Connection. No se venderán ni cederán datos a terceros ajenos a la prestación de los servicios solicitados.</p>
+                  <p style="margin: 0;"><strong>4. Derechos del Titular:</strong> Podrá ejercer en cualquier momento sus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad enviando una solicitud a los canales oficiales de contacto de RE/MAX Inmomás.</p>
+                </div>
+                <div class="lang-en">
+                  <p style="margin: 0 0 6px;"><strong>1. Data Privacy &amp; Protection (GDPR):</strong> In compliance with the EU General Data Protection Regulation (GDPR 2016/679) and applicable Spanish data protection laws (LOPDGDD), all personal and professional information provided will be treated with strict confidentiality by <strong>RE/MAX Inmomás (The Spain Connection)</strong> as Data Controller.</p>
+                  <p style="margin: 0 0 6px;"><strong>2. Use of Information for Business &amp; Client Management:</strong> By registering, you expressly authorize the collection and use of your information to manage your account, coordinate real estate purchase and investment transactions in Spain, administer referral and partner agreements, track client operations, and coordinate comprehensive advisory services (real estate, legal, tax, mortgage/financial, and relocation) with our authorized agents and partners.</p>
+                  <p style="margin: 0 0 6px;"><strong>3. Commercial Confidentiality:</strong> Your data will be used strictly for managing client operations, commercial partnerships, and referral attribution within the RE/MAX Inmomás / The Spain Connection ecosystem, and will never be sold to unrelated third parties.</p>
+                  <p style="margin: 0;"><strong>4. Your Rights:</strong> You may exercise your rights of access, rectification, erasure, restriction, and portability at any time by contacting RE/MAX Inmomás through our official channels.</p>
+                </div>
+                <div class="lang-fr">
+                  <p style="margin: 0 0 6px;"><strong>1. Protection des Données et Confidentialité (RGPD) :</strong> Conformément au Règlement Général sur la Protection des Données (UE 2016/679), les informations fournies seront traitées en toute confidentialité par <strong>RE/MAX Inmomás (The Spain Connection)</strong>.</p>
+                  <p style="margin: 0 0 6px;"><strong>2. Utilisation des Informations et Gestion des Affaires :</strong> Vous autorisez expressément l'utilisation de vos données pour gérer votre inscription, coordonner les opérations immobilières et le suivi des clients en Espagne, gérer les partenariats et commissions de recommandation, et assurer l'accompagnement complet (immobilier, juridique, fiscal et financier) avec nos agents et partenaires autorisés.</p>
+                  <p style="margin: 0;"><strong>3. Droits de l'Utilisateur :</strong> Vous pouvez exercer vos droits d'accès, de rectification et de suppression à tout moment auprès de RE/MAX Inmomás.</p>
+                </div>
+                <div class="lang-en-ca">
+                  <p style="margin: 0 0 6px;"><strong>1. Data Privacy &amp; Protection (GDPR):</strong> In compliance with the EU General Data Protection Regulation (GDPR 2016/679), all personal and professional information provided will be treated with strict confidentiality by <strong>RE/MAX Inmomás (The Spain Connection)</strong>.</p>
+                  <p style="margin: 0 0 6px;"><strong>2. Use of Information for Business &amp; Client Management:</strong> By registering, you expressly authorize the use of your information to manage your registration, coordinate real estate transactions in Spain, administer partner and referral agreements, track client operations, and coordinate advisory services (real estate, legal, tax, mortgage, and relocation) with our authorized agents and partners.</p>
+                  <p style="margin: 0;"><strong>3. Your Rights:</strong> You may exercise your rights of access, rectification, and erasure at any time by contacting RE/MAX Inmomás.</p>
+                </div>
+              </div>
               <label class="checkbox-label">
                 <input type="checkbox" id="register-terms" required>
                 <span>
-                  <span class="lang-en">I agree to the terms and conditions of the The Spain Connection International Referral Program</span>
-                  <span class="lang-es">Acepto los términos y condiciones del Programa Internacional de Referidos de RE/MAX Inmomás</span>
-                  <span class="lang-fr">J'accepte les conditions générales du programme de référencement international de RE/MAX Inmomás</span>
-                  <span class="lang-en-ca">I agree to the terms and conditions of the The Spain Connection International Referral Program</span>
+                  <span class="lang-en">I have read and accept the Terms &amp; Conditions, Privacy Policy, and authorize the use of my information for client and business management *</span>
+                  <span class="lang-es">He leído y acepto los Términos y Condiciones, la Política de Privacidad y autorizo el uso de la información para la gestión comercial y de clientes *</span>
+                  <span class="lang-fr">J'ai lu et j'accepte les Conditions Générales, la Politique de Confidentialité et j'autorise l'utilisation de mes informations pour la gestion des affaires et des clients *</span>
+                  <span class="lang-en-ca">I have read and accept the Terms &amp; Conditions, Privacy Policy, and authorize the use of my information for client and business management *</span>
                 </span>
               </label>
             </div>
@@ -1962,6 +2025,37 @@
               </label>
               <input type="password" id="referral-password" placeholder="Min. 6 characters">
             </div>
+            <!-- Optional RE/MAX Inmomás Agent (shown for all user types: Client, Realtor, Broker, Colaborador) -->
+            <div class="form-group" id="referral-inmomas-agent-group">
+              <label for="referral-inmomas-agent">
+                <span class="lang-en">RE/MAX Inmomás Agent (Optional)</span>
+                <span class="lang-es">Agente de RE/MAX Inmomás (Opcional)</span>
+                <span class="lang-fr">Agent RE/MAX Inmomás (Optionnel)</span>
+                <span class="lang-en-ca">RE/MAX Inmomás Agent (Optional)</span>
+              </label>
+              <select id="referral-inmomas-agent">
+                <option value="">
+                  <span class="lang-en">— None / Select an agent (Optional) —</span>
+                  <span class="lang-es">— Ninguno / Seleccionar agente (Opcional) —</span>
+                  <span class="lang-fr">— Aucun / Sélectionner un agent (Optionnel) —</span>
+                  <span class="lang-en-ca">— None / Select an agent (Optional) —</span>
+                </option>
+                <option value="Jamisa Home Lifestyle">Jamisa Home Lifestyle</option>
+                <option value="Angel Luis Rodriguez / Debra Nadal">Angel Luis Rodriguez / Debra Nadal</option>
+                <option value="Sepehr Hosseini">Sepehr Hosseini</option>
+                <option value="José Martínez">José Martínez</option>
+                <option value="Maia Honczaryk">Maia Honczaryk</option>
+                <option value="Denise McNeal">Denise McNeal</option>
+                <option value="Giancarlo Agudelo">Giancarlo Agudelo</option>
+                <option value="Ana Martínez">Ana Martínez</option>
+              </select>
+              <small style="color:var(--text-muted); display:block; margin-top:4px;">
+                <span class="lang-en">Optional: Select if you are in contact with or referred by a specific RE/MAX Inmomás agent</span>
+                <span class="lang-es">Opcional: Selecciona si estás en contacto o vienes referido por un agente específico de RE/MAX Inmomás</span>
+                <span class="lang-fr">Optionnel : Sélectionnez si vous êtes en contact ou référé par un agent spécifique de RE/MAX Inmomás</span>
+                <span class="lang-en-ca">Optional: Select if you are in contact with or referred by a specific RE/MAX Inmomás agent</span>
+              </small>
+            </div>
             <!-- Notes -->
             <div class="form-group">
               <label>
@@ -1971,6 +2065,49 @@
                 <span class="lang-en-ca">Notes / Questions</span>
               </label>
               <textarea id="referral-notes" rows="3" placeholder="" style="resize: vertical; width: 100%; padding: 12px 16px; border: 1px solid rgba(0,0,0,0.12); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.95rem; background: var(--bg-card); color: var(--text-primary); transition: border-color 0.2s;"></textarea>
+            </div>
+            <!-- Detailed Terms & Conditions Quadrant + Acceptance -->
+            <div class="form-group" style="margin-top: 16px;">
+              <div class="terms-quadrant" style="background: rgba(0, 63, 153, 0.03); border: 1px solid rgba(0, 63, 153, 0.16); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; max-height: 170px; overflow-y: auto; font-size: 0.78rem; line-height: 1.5; color: var(--text-secondary);">
+                <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 6px; font-size: 0.82rem; display: flex; align-items: center; gap: 6px;">
+                  <span>🔒</span>
+                  <span class="lang-en">Terms &amp; Conditions, Data Privacy &amp; Business Management Authorization</span>
+                  <span class="lang-es">Términos y Condiciones, Privacidad de Datos y Autorización de Gestión Comercial</span>
+                  <span class="lang-fr">Conditions Générales, Confidentialité des Données et Autorisation de Gestion</span>
+                  <span class="lang-en-ca">Terms &amp; Conditions, Data Privacy &amp; Business Management Authorization</span>
+                </div>
+                <div class="lang-es">
+                  <p style="margin: 0 0 6px;"><strong>1. Protección de Datos y Privacidad (RGPD / LOPDGDD):</strong> De conformidad con el Reglamento General de Protección de Datos (UE 2016/679) y la Ley Orgánica 3/2018 (LOPDGDD), los datos personales y profesionales facilitados serán tratados con estricta confidencialidad por <strong>RE/MAX Inmomás (The Spain Connection)</strong> como responsable del tratamiento.</p>
+                  <p style="margin: 0 0 6px;"><strong>2. Uso de la Información para Gestión de Negocios y Clientes:</strong> El usuario (sea Cliente, Realtor, Broker o Colaborador) autoriza expresamente el tratamiento y uso de su información para gestionar su solicitud o registro, coordinar operaciones de compraventa e inversión inmobiliaria en España, administrar acuerdos de colaboración y referidos, realizar el seguimiento comercial de clientes y facilitar servicios integrales vinculados a la operación (asesoría inmobiliaria, legal, fiscal, financiera/hipotecaria y de reubicación) junto a nuestros agentes y colaboradores autorizados.</p>
+                  <p style="margin: 0 0 6px;"><strong>3. Confidencialidad y Trazabilidad Comercial:</strong> La información suministrada se utilizará exclusivamente para la correcta gestión, asignación y seguimiento de los negocios, clientes y comisiones dentro del ecosistema de RE/MAX Inmomás / The Spain Connection. En ningún caso se venderán ni cederán datos a terceros ajenos a la gestión de los servicios solicitados.</p>
+                  <p style="margin: 0;"><strong>4. Derechos del Titular:</strong> Podrá ejercer en cualquier momento sus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad enviando una solicitud a los canales oficiales de contacto de RE/MAX Inmomás.</p>
+                </div>
+                <div class="lang-en">
+                  <p style="margin: 0 0 6px;"><strong>1. Data Privacy &amp; Protection (GDPR):</strong> In compliance with the EU General Data Protection Regulation (GDPR 2016/679) and applicable Spanish data protection laws (LOPDGDD), all personal and professional information provided will be treated with strict confidentiality by <strong>RE/MAX Inmomás (The Spain Connection)</strong> as Data Controller.</p>
+                  <p style="margin: 0 0 6px;"><strong>2. Use of Information for Business &amp; Client Management:</strong> By submitting this form (whether as a Client, Realtor, Broker, or Collaborator), you expressly authorize the collection and use of your information to manage your request or account, coordinate real estate purchase and investment transactions in Spain, administer referral and partner agreements, track client operations, and coordinate comprehensive advisory services (real estate, legal, tax, mortgage/financial, and relocation) with our authorized agents and partners.</p>
+                  <p style="margin: 0 0 6px;"><strong>3. Commercial Confidentiality:</strong> Your data will be used strictly for managing client operations, commercial partnerships, and referral attribution within the RE/MAX Inmomás / The Spain Connection ecosystem, and will never be sold to unrelated third parties.</p>
+                  <p style="margin: 0;"><strong>4. Your Rights:</strong> You may exercise your rights of access, rectification, erasure, restriction, and portability at any time by contacting RE/MAX Inmomás through our official channels.</p>
+                </div>
+                <div class="lang-fr">
+                  <p style="margin: 0 0 6px;"><strong>1. Protection des Données et Confidentialité (RGPD) :</strong> Conformément au Règlement Général sur la Protection des Données (UE 2016/679), les informations fournies seront traitées en toute confidentialité par <strong>RE/MAX Inmomás (The Spain Connection)</strong>.</p>
+                  <p style="margin: 0 0 6px;"><strong>2. Utilisation des Informations et Gestion des Affaires :</strong> En soumettant ce formulaire, vous autorisez expressément l'utilisation de vos données pour gérer votre demande, coordonner les opérations immobilières et le suivi des clients en Espagne, gérer les partenariats et commissions de recommandation, et assurer l'accompagnement complet (immobilier, juridique, fiscal et financier) avec nos agents et partenaires autorisés.</p>
+                  <p style="margin: 0;"><strong>3. Droits de l'Utilisateur :</strong> Vous pouvez exercer vos droits d'accès, de rectification et de suppression à tout moment auprès de RE/MAX Inmomás.</p>
+                </div>
+                <div class="lang-en-ca">
+                  <p style="margin: 0 0 6px;"><strong>1. Data Privacy &amp; Protection (GDPR):</strong> In compliance with the EU General Data Protection Regulation (GDPR 2016/679), all personal and professional information provided will be treated with strict confidentiality by <strong>RE/MAX Inmomás (The Spain Connection)</strong>.</p>
+                  <p style="margin: 0 0 6px;"><strong>2. Use of Information for Business &amp; Client Management:</strong> By submitting this form (whether as a Client, Realtor, Broker, or Collaborator), you expressly authorize the use of your information to manage your request, coordinate real estate transactions in Spain, administer partner and referral agreements, track client operations, and coordinate advisory services (real estate, legal, tax, mortgage, and relocation) with our authorized agents and partners.</p>
+                  <p style="margin: 0;"><strong>3. Your Rights:</strong> You may exercise your rights of access, rectification, and erasure at any time by contacting RE/MAX Inmomás.</p>
+                </div>
+              </div>
+              <label class="checkbox-label" style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 0.86rem; line-height: 1.4;">
+                <input type="checkbox" id="referral-terms" required style="margin-top: 3px;">
+                <span>
+                  <span class="lang-en">I have read and accept the Terms &amp; Conditions, Privacy Policy, and authorize the use of my information for client and business management *</span>
+                  <span class="lang-es">He leído y acepto los Términos y Condiciones, la Política de Privacidad y autorizo el uso de la información para la gestión comercial y de clientes *</span>
+                  <span class="lang-fr">J'ai lu et j'accepte les Conditions Générales, la Politique de Confidentialité et j'autorise l'utilisation de mes informations pour la gestion des affaires et des clients *</span>
+                  <span class="lang-en-ca">I have read and accept the Terms &amp; Conditions, Privacy Policy, and authorize the use of my information for client and business management *</span>
+                </span>
+              </label>
             </div>
             <!-- Submit -->
             <div class="form-group" style="margin-top: 24px;">
@@ -2476,11 +2613,13 @@
                     <option class="lang-es" value="">&mdash; Selecciona un agente &mdash;</option>
                     <option class="lang-fr" value="">&mdash; Sélectionner un agent &mdash;</option>
                     <option class="lang-en-ca" value="">&mdash; Select an agent &mdash;</option>
+                    <option value="Jamisa Home Lifestyle">Jamisa Home Lifestyle</option>
                     <option value="Angel Luis Rodriguez / Debra Nadal">Angel Luis Rodriguez / Debra Nadal</option>
-                    <option value="James Lavoie / Isabelle">James Lavoie / Isabelle</option>
                     <option value="Sepehr Hosseini">Sepehr Hosseini</option>
-                    <option value="Giancarlo Agudelo">Giancarlo Agudelo</option>
+                    <option value="José Martínez">José Martínez</option>
+                    <option value="Maia Honczaryk">Maia Honczaryk</option>
                     <option value="Denise McNeal">Denise McNeal</option>
+                    <option value="Giancarlo Agudelo">Giancarlo Agudelo</option>
                     <option value="Ana Martínez">Ana Martínez</option>
                   </select>
                 </div>
@@ -2831,19 +2970,19 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-  <script src="js/notifications.js?v=20261022_v4"></script>
-  <script src="js/firebase-config.js?v=20261022_v4"></script>
-  <script src="js/utils.js?v=20261022_v4"></script>
-  <script src="js/auth-service.js?v=20261022_v4"></script>
-  <script src="js/router.js?v=20261022_v4"></script>
-  <script src="js/views/public-views.js?v=20261022_v4"></script>
-  <script src="js/views/auth-views.js?v=20261022_v4"></script>
-  <script src="js/views/admin-views.js?v=20261022_v4"></script>
-  <script src="js/views/broker-views.js?v=20261022_v4"></script>
-  <script src="js/views/realtor-views.js?v=20261022_v4"></script>
-  <script src="js/views/agent-views.js?v=20261022_v4"></script>
-  <script src="js/referral-agreement.js?v=20261022_v4"></script>
-  <script src="js/main.js?v=20261022_v4"></script>
+  <script src="js/notifications.js?v=20261026_v1"></script>
+  <script src="js/firebase-config.js?v=20261026_v1"></script>
+  <script src="js/utils.js?v=20261026_v1"></script>
+  <script src="js/auth-service.js?v=20261026_v1"></script>
+  <script src="js/router.js?v=20261026_v1"></script>
+  <script src="js/views/public-views.js?v=20261026_v1"></script>
+  <script src="js/views/auth-views.js?v=20261026_v1"></script>
+  <script src="js/views/admin-views.js?v=20261026_v1"></script>
+  <script src="js/views/broker-views.js?v=20261026_v1"></script>
+  <script src="js/views/realtor-views.js?v=20261026_v1"></script>
+  <script src="js/views/agent-views.js?v=20261026_v1"></script>
+  <script src="js/referral-agreement.js?v=20261026_v1"></script>
+  <script src="js/main.js?v=20261026_v1"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       if (App && App.auth) {

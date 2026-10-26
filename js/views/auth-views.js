@@ -622,11 +622,12 @@ App.views.auth = {
         e.preventDefault();
         
         const termsChecked = newForm.querySelector('#register-terms').checked;
-        if (!termsChecked) return alert('Please agree to the terms.');
+        if (!termsChecked) return alert('Debes aceptar los Términos y Condiciones para continuar. / Please agree to the Terms & Conditions.');
 
         const brokerId = brokerSelect ? brokerSelect.value : '';
         const isManualBroker = brokerId === 'other';
         const refCode = sessionStorage.getItem('referralCode') || null;
+        const inmomasAgent = (newForm.querySelector('#register-inmomas-agent')?.value || '').trim();
         const data = {
           role: newForm.querySelector('input[name="register-role"]:checked').value,
           firstName: newForm.querySelector('#register-firstName').value,
@@ -640,9 +641,12 @@ App.views.auth = {
             : (agencyNameInput ? agencyNameInput.value : ''),
           brokerId: isManualBroker ? '' : brokerId,
           brokerNameManual: isManualBroker ? (newForm.querySelector('#register-broker-manual')?.value || '') : '',
+          inmomasAgentName: inmomasAgent || null,
+          termsAccepted: true,
+          termsAcceptedAt: new Date().toISOString(),
           newsletterConsent: newForm.querySelector('#register-newsletter')?.checked || false,
-          referredBy: refCode,
-          source: refCode ? 'referral' : 'direct',
+          referredBy: refCode || inmomasAgent || null,
+          source: (refCode || inmomasAgent) ? 'referral' : 'direct',
         };
         
         try {
@@ -662,7 +666,7 @@ App.views.auth = {
         googleRegBtn.onclick = async () => {
           const termsChecked = newForm.querySelector('#register-terms').checked;
           if (!termsChecked) {
-            App.utils.showToast('Please agree to the terms.', 'error');
+            App.utils.showToast('Debes aceptar los Términos y Condiciones para continuar. / Please agree to the Terms & Conditions.', 'error');
             return;
           }
 
@@ -675,6 +679,7 @@ App.views.auth = {
           const firstName = newForm.querySelector('#register-firstName').value;
           const lastName = newForm.querySelector('#register-lastName').value;
           const refCode = sessionStorage.getItem('referralCode') || null;
+          const inmomasAgent = (newForm.querySelector('#register-inmomas-agent')?.value || '').trim();
 
           const data = {
             role: roleRadio.value,
@@ -684,9 +689,12 @@ App.views.auth = {
             country: newForm.querySelector('#register-country').value,
             agencyName: agencyNameInput ? agencyNameInput.value : '',
             brokerId: brokerSelect ? brokerSelect.value : '',
+            inmomasAgentName: inmomasAgent || null,
+            termsAccepted: true,
+            termsAcceptedAt: new Date().toISOString(),
             newsletterConsent: newForm.querySelector('#register-newsletter')?.checked || false,
-            referredBy: refCode,
-            source: refCode ? 'referral' : 'direct',
+            referredBy: refCode || inmomasAgent || null,
+            source: (refCode || inmomasAgent) ? 'referral' : 'direct',
           };
 
           try {

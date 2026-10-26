@@ -176,7 +176,7 @@ App.auth = (function() {
       throw new Error('Password must be at least 6 characters.');
     }
 
-    if (!['broker', 'realtor', 'client'].includes(role)) {
+    if (!['broker', 'realtor', 'client', 'colaborador', 'agent_inmomas'].includes(role)) {
       throw new Error('Invalid role selected.');
     }
 
@@ -205,9 +205,13 @@ App.auth = (function() {
         profileImage: null,
         agreementSigned: false,
         agreementSignedAt: null,
+        termsAccepted: data.termsAccepted !== undefined ? data.termsAccepted : true,
+        termsAcceptedAt: data.termsAcceptedAt || new Date().toISOString(),
         newsletterConsent: data.newsletterConsent || false,
         newsletterConsentAt: data.newsletterConsent ? new Date().toISOString() : null,
-        referredBy: referredBy || null,
+        inmomasAgentName: data.inmomasAgentName || null,
+        notes: data.notes || '',
+        referredBy: referredBy || data.inmomasAgentName || null,
         source: source || null,
         createdAt: new Date().toISOString()
       };
@@ -283,9 +287,13 @@ App.auth = (function() {
         profileImage: null,
         agreementSigned: isMaiaAccount ? true : false,
         agreementSignedAt: isMaiaAccount ? new Date().toISOString() : null,
+        termsAccepted: data.termsAccepted !== undefined ? data.termsAccepted : true,
+        termsAcceptedAt: data.termsAcceptedAt || new Date().toISOString(),
         newsletterConsent: data.newsletterConsent || false,
         newsletterConsentAt: data.newsletterConsent ? new Date().toISOString() : null,
-        referredBy: referredBy || null,
+        inmomasAgentName: data.inmomasAgentName || null,
+        notes: data.notes || '',
+        referredBy: referredBy || data.inmomasAgentName || null,
         source: source || null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -520,7 +528,7 @@ App.auth = (function() {
       throw new Error('Please select a role (Broker or Realtor).');
     }
 
-    if (!['broker', 'realtor', 'client'].includes(role)) {
+    if (!['broker', 'realtor', 'client', 'colaborador', 'agent_inmomas'].includes(role)) {
       throw new Error('Invalid role selected.');
     }
 
@@ -544,9 +552,12 @@ App.auth = (function() {
         profileImage: null,
         agreementSigned: false,
         agreementSignedAt: null,
+        termsAccepted: data.termsAccepted !== undefined ? data.termsAccepted : true,
+        termsAcceptedAt: data.termsAcceptedAt || new Date().toISOString(),
         newsletterConsent: data.newsletterConsent || false,
         newsletterConsentAt: data.newsletterConsent ? new Date().toISOString() : null,
-        referredBy: referredBy || null,
+        inmomasAgentName: data.inmomasAgentName || null,
+        referredBy: referredBy || data.inmomasAgentName || null,
         source: source || null,
         createdAt: new Date().toISOString()
       };
@@ -619,9 +630,12 @@ App.auth = (function() {
         profileImage: firebaseUser.photoURL || null,
         agreementSigned: false,
         agreementSignedAt: null,
+        termsAccepted: data.termsAccepted !== undefined ? data.termsAccepted : true,
+        termsAcceptedAt: data.termsAcceptedAt || new Date().toISOString(),
         newsletterConsent: data.newsletterConsent || false,
         newsletterConsentAt: data.newsletterConsent ? new Date().toISOString() : null,
-        referredBy: referredBy || null,
+        inmomasAgentName: data.inmomasAgentName || null,
+        referredBy: referredBy || data.inmomasAgentName || null,
         source: source || null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -2081,12 +2095,15 @@ App.auth = (function() {
       needsHolidays: clientData.needsHolidays || false,
       tag: clientData.tag || 'spain_buyer',
       status: 'contacted',
-      referredBy: clientData.referredBy || null,
+      referredBy: clientData.referredBy || clientData.inmomasAgentName || null,
       realtorId: clientData.realtorId || null,
       realtorName: clientData.realtorName || null,
       brokerId: clientData.brokerId || null,
       localAgentId: clientData.localAgentId || null,
-      localAgentName: clientData.localAgentName || null,
+      localAgentName: clientData.localAgentName || clientData.inmomasAgentName || null,
+      inmomasAgentName: clientData.inmomasAgentName || null,
+      termsAccepted: clientData.termsAccepted !== undefined ? clientData.termsAccepted : true,
+      termsAcceptedAt: clientData.termsAcceptedAt || new Date().toISOString(),
       source: 'referral',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -2110,7 +2127,7 @@ App.auth = (function() {
       howHeard: 'Referral Link',
       referrerId: clientData.referredBy || null,
       agentReferrerId: clientData.localAgentId || clientData.realtorId || null,
-      agentReferrerName: clientData.localAgentName || clientData.realtorName || null
+      agentReferrerName: clientData.localAgentName || clientData.realtorName || clientData.inmomasAgentName || null
     });
 
     return newClient;
@@ -2131,7 +2148,10 @@ App.auth = (function() {
       notes: userData.notes || '',
       referralCode: `${userData.role === 'broker' ? 'BRK' : 'REA'}-${(userData.lastName || 'USER').toUpperCase()}`,
       source: 'referral',
-      referredBy: userData.referredBy || null,
+      referredBy: userData.referredBy || userData.inmomasAgentName || null,
+      inmomasAgentName: userData.inmomasAgentName || null,
+      termsAccepted: userData.termsAccepted !== undefined ? userData.termsAccepted : true,
+      termsAcceptedAt: userData.termsAcceptedAt || new Date().toISOString(),
       brokerId: userData.brokerId || null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()

@@ -623,14 +623,17 @@
         </button>
       `;
 
-      let sourceStr = user.source ? App.utils.escapeHtml(user.source) : (user.referredBy ? 'Referral' : 'Direct');
+      let sourceStr = user.source ? App.utils.escapeHtml(user.source) : ((user.referredBy || user.inmomasAgentName) ? 'Referral' : 'Direct');
       if (user.referredBy) {
         const agent = window.App && window.App.auth && allUsers ? allUsers.find(u => u.referralCode === user.referredBy || u.id === user.referredBy || (u.referralCode && u.referralCode.toUpperCase() === user.referredBy.toUpperCase())) : null;
         if (agent) {
           sourceStr = `<span style="font-weight:600; color:#047857;">Paraguas: ${App.utils.escapeHtml(agent.firstName)} ${App.utils.escapeHtml(agent.lastName)}</span>`;
         } else {
-          sourceStr += ` <span style="font-size:0.8em; color:#6b7280;">(Ref: ${App.utils.escapeHtml(user.referredBy)})</span>`;
+          sourceStr = `<span style="font-weight:600; color:#047857;">Paraguas: ${App.utils.escapeHtml(user.referredBy)}</span>`;
         }
+      }
+      if (user.inmomasAgentName && (!user.referredBy || !sourceStr.includes(user.inmomasAgentName))) {
+        sourceStr += `<div style="font-size:0.78em; color:#0369a1; font-weight:600; margin-top:2px;">🇪🇸 Agente Inmomás: ${App.utils.escapeHtml(user.inmomasAgentName)}</div>`;
       }
 
       const webinarStr = user.isWebinarRegistered 
@@ -3216,9 +3219,11 @@
   let currentUnifiedData = [];
 
   const KNOWN_AGENT_MAP = {
-    'HmfMyuSCbyOIQqi29DiP4v5CKop2': 'James Lavoie / Isabelle',
-    'LOC-LAVOIE MONTERO-HmfM': 'James Lavoie / Isabelle',
-    'James Lavoie Montero': 'James Lavoie / Isabelle',
+    'HmfMyuSCbyOIQqi29DiP4v5CKop2': 'Jamisa Home Lifestyle',
+    'LOC-LAVOIE MONTERO-HmfM': 'Jamisa Home Lifestyle',
+    'James Lavoie Montero': 'Jamisa Home Lifestyle',
+    'James Lavoie / Isabelle': 'Jamisa Home Lifestyle',
+    'Jamisa Home Lifestyle': 'Jamisa Home Lifestyle',
     'LOC-LUÍS RODRIGUEZ-zHUD': 'Ángel Luís Rodriguez',
     'zHUDljXCeEaNgFxq45PTLw4SCq82': 'Ángel Luís Rodriguez',
     'LOC-MARTINEZ -GBPi': 'José Martínez',
@@ -3232,12 +3237,16 @@
     'LOC-MCNEAL-opTD': 'Denise McNeal',
     'opTDoczG6ZVKwnNYp2sDVYbCOVz1': 'Denise McNeal',
     'Denise McNeal ': 'Denise McNeal',
+    'Maia Honczaryk': 'Maia Honczaryk',
+    'ADM-INMOMAS': 'Maia Honczaryk',
+    'Giancarlo Agudelo': 'Giancarlo Agudelo',
+    'Ana Martínez': 'Ana Martínez',
     'LOC-ESCARABAJAL-XAyK': 'Dionisio Escarabajal Asensio',
     'XAyKZzGVmdZB8KOWIPqGDHhyRHm1': 'Dionisio Escarabajal Asensio',
     'LOC-LLERAS-inTN': 'Ozzie Lleras',
     'inTN2iHJIrc3zouiDS4mJfkkaV02': 'Ozzie Lleras',
     'Ozzie Llleras': 'Ozzie Lleras',
-    'admin-001': 'Admin Inmomás'
+    'admin-001': 'Maia Honczaryk'
   };
 
   async function initUnified() {
@@ -3270,7 +3279,7 @@
         if (!email) return;
         
         let userName = (u.name || (u.firstName ? (u.firstName + ' ' + (u.lastName || '')) : 'Sin Nombre')).trim();
-        let refKey = u.referredBy || u.registeredBy || '';
+        let refKey = u.referredBy || u.inmomasAgentName || u.registeredBy || '';
         let referrerName = refKey ? (userLookup[refKey] || userLookup[refKey.toUpperCase()] || refKey) : 'N/A';
         if (referrerName === 'admin-001') referrerName = 'Admin Inmomás';
         if (referrerName === 'N/A' && u.partnerCode) referrerName = u.partnerCode;
@@ -3301,7 +3310,7 @@
         if (!email) return;
 
         let userName = ((c.firstName || '') + ' ' + (c.lastName || '')).trim() || 'Sin Nombre';
-        let refKey = c.realtorId || c.referredBy || c.localAgentId || '';
+        let refKey = c.realtorId || c.referredBy || c.localAgentId || c.inmomasAgentName || c.localAgentName || '';
         let referrerName = refKey ? (userLookup[refKey] || userLookup[refKey.toUpperCase()] || refKey) : 'N/A';
 
         let existing = unifiedMap.get(email);

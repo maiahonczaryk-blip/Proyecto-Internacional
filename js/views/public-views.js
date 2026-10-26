@@ -384,6 +384,29 @@ App.views.public = {
             <span class="lang-en-ca">VIP invitation courtesy of <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
           `;
         }
+
+        // Pre-select RE/MAX Inmomás Agent dropdown if the referrer is one of our Inmomás agents
+        const inmomasSelect = document.getElementById('referral-inmomas-agent');
+        if (inmomasSelect && !inmomasSelect.value) {
+          const refFull = `${referrer.firstName || ''} ${referrer.lastName || ''}`.toLowerCase();
+          if (refFull.includes('jamisa') || refFull.includes('james') || refFull.includes('lavoie') || refFull.includes('isabelle') || refFull.includes('isabel')) {
+            inmomasSelect.value = 'Jamisa Home Lifestyle';
+          } else if (refFull.includes('angel') || refFull.includes('ángel') || refFull.includes('debra') || refFull.includes('débora') || refFull.includes('nadal')) {
+            inmomasSelect.value = 'Angel Luis Rodriguez / Debra Nadal';
+          } else if (refFull.includes('sepehr') || refFull.includes('hosseini')) {
+            inmomasSelect.value = 'Sepehr Hosseini';
+          } else if (refFull.includes('josé') || refFull.includes('jose martinez') || refFull.includes('josé martínez')) {
+            inmomasSelect.value = 'José Martínez';
+          } else if (refFull.includes('maia') || refFull.includes('honczaryk')) {
+            inmomasSelect.value = 'Maia Honczaryk';
+          } else if (refFull.includes('denise') || refFull.includes('mcneal')) {
+            inmomasSelect.value = 'Denise McNeal';
+          } else if (refFull.includes('giancarlo') || refFull.includes('agudelo')) {
+            inmomasSelect.value = 'Giancarlo Agudelo';
+          } else if (refFull.includes('ana martínez') || refFull.includes('ana martinez')) {
+            inmomasSelect.value = 'Ana Martínez';
+          }
+        }
       }
 
       // Pre-check webinar consents
@@ -395,7 +418,7 @@ App.views.public = {
       // Build type options based on referrer's role
       let availableTypes = ['realtor', 'client'];
       if (!referrer) {
-        availableTypes = ['realtor', 'broker', 'client'];
+        availableTypes = ['realtor', 'broker', 'colaborador', 'client'];
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
         } else {
@@ -418,14 +441,14 @@ App.views.public = {
       } else if (referrer.role === 'agent_inmomas' || referrer.role === 'colaborador' || referrer.role === 'admin' || referrer.role === 'partner') {
         availableTypes = referrer.role === 'admin' 
           ? ['realtor', 'broker', 'client', 'agent_inmomas', 'colaborador']
-          : ['realtor', 'broker', 'client'];
+          : ['realtor', 'broker', 'colaborador', 'client'];
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
         } else if (!availableTypes.includes(selectedType)) {
           selectedType = 'realtor';
         }
       } else {
-        availableTypes = ['realtor', 'broker', 'client'];
+        availableTypes = ['realtor', 'broker', 'colaborador', 'client'];
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
         }
@@ -660,12 +683,19 @@ App.views.public = {
           const lastName = (form.querySelector('#referral-lastName')?.value || '').trim();
           const email = (form.querySelector('#referral-email')?.value || '').trim();
           const phone = (form.querySelector('#referral-phone')?.value || '').trim();
+          const inmomasAgent = (form.querySelector('#referral-inmomas-agent')?.value || '').trim();
+          const termsChecked = form.querySelector('#referral-terms')?.checked;
 
           const typeRadio = document.querySelector('input[name="referral-contact-type"]:checked');
           const contactType = typeRadio ? typeRadio.value : selectedType;
 
           if (!firstName || !lastName || !email || !phone) {
             App.utils.showToast('Please fill in all required fields.', 'error');
+            return;
+          }
+
+          if (!termsChecked) {
+            App.utils.showToast('Debes aceptar los Términos y Condiciones para continuar. / Please accept the Terms & Conditions.', 'error');
             return;
           }
 
@@ -685,6 +715,9 @@ App.views.public = {
               currentLocation: country,
               budget, interestArea, timeline, objective,
               notes: notes || `Objective: ${objective} | Timeline: ${timeline}`,
+              inmomasAgentName: inmomasAgent || null,
+              termsAccepted: true,
+              termsAcceptedAt: new Date().toISOString()
             };
 
             if (referrer) {
@@ -702,6 +735,15 @@ App.views.public = {
                 clientPayload.realtorId = referrer.id;
                 clientPayload.realtorName = `${referrer.firstName} ${referrer.lastName}`;
                 clientPayload.brokerId = referrer.brokerId || null;
+              }
+            }
+
+            if (inmomasAgent) {
+              if (!clientPayload.localAgentName) {
+                clientPayload.localAgentName = inmomasAgent;
+              }
+              if (!clientPayload.referredBy) {
+                clientPayload.referredBy = inmomasAgent;
               }
             }
 
@@ -735,7 +777,11 @@ App.views.public = {
               country: market || 'United States',
               role: contactType,
               brokerId: (referrer && referrer.role === 'broker') ? referrer.id : null,
-              referredBy: referrer ? referrer.id : null,
+              referredBy: referrer ? referrer.id : (inmomasAgent || null),
+              inmomasAgentName: inmomasAgent || null,
+              notes: notes || '',
+              termsAccepted: true,
+              termsAcceptedAt: new Date().toISOString(),
               source: 'referral'
             };
 
@@ -763,7 +809,7 @@ App.views.public = {
               country: form.querySelector('#referral-country')?.value || (market || 'United States'),
               state: form.querySelector('#referral-market')?.value || 'N/A',
               howHeard: 'Referral Link',
-              referrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : '',
+              referrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : (inmomasAgent || ''),
               webinar: webinarTitle,
               webinarType: 'B2C',
               webinarDate: webinarDate,
@@ -771,8 +817,9 @@ App.views.public = {
               referralCode: referrer?.referralCode || refCode || null,
               referrerId: referrer?.id || null,
               agentReferrerId: referrer?.id || null,
-              agentReferrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : null,
-              agentReferrerRole: referrer?.role || null,
+              agentReferrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : (inmomasAgent || null),
+              agentReferrerRole: referrer?.role || (inmomasAgent ? 'agent_inmomas' : null),
+              inmomasAgentName: inmomasAgent || null,
               status: 'pending'
             };
 
