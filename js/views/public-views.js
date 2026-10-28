@@ -390,7 +390,7 @@ App.views.public = {
         if (inmomasSelect && !inmomasSelect.value) {
           const refFull = `${referrer.firstName || ''} ${referrer.lastName || ''}`.toLowerCase();
           if (refFull.includes('jamisa') || refFull.includes('james') || refFull.includes('lavoie') || refFull.includes('isabelle') || refFull.includes('isabel')) {
-            inmomasSelect.value = 'Jamisa Home Lifestyle';
+            inmomasSelect.value = 'James Lavoie Montero';
           } else if (refFull.includes('angel') || refFull.includes('ángel') || refFull.includes('debra') || refFull.includes('débora') || refFull.includes('nadal')) {
             inmomasSelect.value = 'Angel Luis Rodriguez / Debra Nadal';
           } else if (refFull.includes('sepehr') || refFull.includes('hosseini')) {

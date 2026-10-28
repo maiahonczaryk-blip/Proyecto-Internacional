@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spain Unlocked · Daily Client Email Sequence Hub (Oct 22 – Oct 30)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --crimson: #e11d48;
+      --crimson-dark: #881337;
+      --remax-blue: #0033A0;
+      --dark-navy: #180309;
+      --bg-light: #f8fafc;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f1f5f9;
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(135deg, #180309 0%, #881337 45%, #e11d48 85%, #f97316 100%);
+      color: white;
+      padding: 20px 32px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+      border-bottom: 3px solid #fda4af;
+    }
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .brand-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      background-color: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 24px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 390px 1fr;
+      gap: 28px;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .card-title {
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .email-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .email-btn {
+      text-align: left;
+      background: #f8fafc;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 10px 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .email-btn:hover {
+      background: #fff1f2;
+      border-color: #fecdd3;
+    }
+    .email-btn.active {
+      background: #fff1f2;
+      border-color: var(--crimson);
+      box-shadow: 0 4px 12px rgba(225, 29, 72, 0.14);
+    }
+    .email-btn .btn-tag {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: var(--crimson);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .email-btn .btn-title {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text);
+    }
+    .email-btn .btn-schedule {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* QUICK CREDENTIALS */
+    .input-group {
+      margin-bottom: 12px;
+    }
+    .input-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .input-group input {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      background: #ffffff;
+      color: #0f172a;
+      font-weight: 600;
+    }
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--crimson);
+      box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.15);
+    }
+    .btn-apply-link {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--dark-navy);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-apply-link:hover {
+      background: var(--crimson-dark);
+    }
+
+    /* PREVIEW AREA */
+    .preview-area {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .preview-toolbar {
+      background: white;
+      border-radius: 14px;
+      padding: 16px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      border: 1px solid var(--border);
+    }
+    .subject-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      max-width: 56%;
+    }
+    .subject-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--crimson);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .subject-text {
+      font-weight: 700;
+      font-size: 14px;
+      color: #0f172a;
+    }
+
+    .action-buttons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn-copy {
+      background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 20px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(225, 29, 72, 0.3);
+      transition: all 0.2s;
+    }
+    .btn-copy:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(225, 29, 72, 0.4);
+    }
+    .btn-copy-sub {
+      background: #fff1f2;
+      color: #881337;
+      border: 1px solid #fecdd3;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-device {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+    .btn-device.active {
+      background: #e2e8f0;
+      color: var(--text);
+    }
+
+    .frame-wrapper {
+      background: #e2e8f0;
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+    }
+    .preview-frame {
+      width: 660px;
+      min-height: 920px;
+      background: white;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: width 0.3s ease;
+    }
+    .preview-frame.mobile {
+      width: 380px;
+    }
+
+    /* GMAIL SCHEDULING GUIDE */
+    .gmail-guide {
+      background: #fff;
+      border-radius: 16px;
+      padding: 22px;
+      border: 1px solid var(--border);
+      margin-top: 6px;
+    }
+    .gmail-guide h3 {
+      font-size: 15.5px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: #0f172a;
+    }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 12px;
+    }
+    .step-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .step-num {
+      width: 24px;
+      height: 24px;
+      background: var(--crimson);
+      color: white;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .step-box h4 {
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .step-box p {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* TOAST */
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #180309;
+      color: white;
+      padding: 14px 24px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 9999;
+      pointer-events: none;
+      border-left: 4px solid #10b981;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 980px) {
+      .container { grid-template-columns: 1fr; }
+      .subject-info { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-content">
+      <div class="brand-title">
+        <span>🏡 Spain Unlocked (B2C Clients)</span>
+        <span style="opacity: 0.6;">×</span>
+        <span>The Spain Connection · RE/MAX Inmomás</span>
+        <span class="badge">9-Email Daily Sequence (Oct 22 – Oct 30)</span>
+      </div>
+      <div style="font-size: 13px; color: #ffe4e6; font-weight: 600;">
+        Oct 29 · 6:00 PM CET (Spain) = 1:00 PM EDT / 1:00 PM AST (PR) / 12:00 PM CDT / 10:00 AM PDT
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <div class="container">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <!-- LIVE LINK CONFIGURATOR -->
+      <div class="card" style="border: 2px solid #fda4af; background: #fff1f2;">
+        <div class="card-title" style="color: #881337;">
+          <span>🔗 Enlace del Webinario (Auto-Update)</span>
+        </div>
+        
+        <div class="input-group">
+          <label>Direct Zoom Link (Spain Unlocked):</label>
+          <input type="text" id="custom-zoom-url" value="https://zoom.us/j/98266586103" oninput="updateLiveZoomLinks()">
+        </div>
+
+        <div class="input-group">
+          <label>Meeting ID:</label>
+          <input type="text" id="custom-meeting-id" value="982 6658 6103" oninput="updateLiveZoomLinks()">
+        </div>
+
+        <div class="input-group" style="margin-bottom: 8px;">
+          <label>One-Tap Mobile (EE.UU.):</label>
+          <input type="text" value="+13052241968,,98266586103# | +13092053325,,98266586103#" readonly style="font-size: 11.5px; background: #f8fafc; color: #475569;">
+        </div>
+
+        <button class="btn-apply-link" onclick="updateLiveZoomLinks(true)">
+          ✅ Link Oficial 982 6658 6103 Conectado
+        </button>
+
+        <p style="font-size: 11px; color: #166534; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 8px 10px; border-radius: 6px; margin-top: 8px; line-height: 1.4;">
+          ✅ <strong>Conectado en los 9 correos:</strong> Todos los botones de Zoom, enlaces directos, invitación de Google Calendar y marcación móvil de EE.UU. apuntan a la sala <strong>982 6658 6103</strong>.
+        </p>
+      </div>
+
+      <!-- SEQUENCE NAVIGATOR -->
+      <div class="card">
+        <div class="card-title">
+          <span>Calendario Diario (Jue 22 → Vie 30)</span>
+          <span style="font-size: 11px; color: var(--crimson); font-weight: 800;">9 Emails</span>
+        </div>
+        
+        <div class="email-nav">
+          <button class="email-btn active" onclick="loadEmail(1)">
+            <span class="btn-tag">Día 1 · Jueves 22 Oct (Hoy)</span>
+            <span class="btn-title">Your Confirmed Spot + Access Link</span>
+            <span class="btn-schedule">📅 Hoy Jueves 22 Oct · Confirmación Inicial</span>
+          </button>
+
+          <button class="email-btn" onclick="loadEmail(2)">
+            <span class="btn-tag" style="color: #0284c7;">Día 2 · Viernes 23 Oct (6 Días Antes)</span>
+            <span class="btn-title">Regions: Costa Blanca vs. Costa del Sol vs. Madrid</span>
+            <span class="btn-schedule">⏰ Programar: Viernes 23 Oct · 10:00 AM EDT (16:00 ES)</span>
+          </button>
+
+          <button class="email-btn" onclick="loadEmail(3)">
+            <span class="btn-tag" style="color: #d97706;">Día 3 · Sábado 24 Oct (5 Días Antes)</span>
+            <span class="btn-title">What €250k–€600k Buys on the Spanish Coast</span>
+            <span class="btn-schedule">⏰ Programar: Sábado 24 Oct · 10:30 AM EDT (16:30 ES)</span>
+          </button>
+
+          <button class="email-btn" onclick="loadEmail(4)">
+            <span class="btn-tag" style="color: #4f46e5;">Día 4 · Domingo 25 Oct (4 Días Antes)</span>
+            <span class="btn-title">The 5-Step 100% Safe Legal Buying Process</span>
+            <span class="btn-schedule">⏰ Programar: Domingo 25 Oct · 11:00 AM EDT (16:00 ES)</span>
+          </button>
+
+          <button class="email-btn" onclick="loadEmail(5)">
+            <span class="btn-tag" style="color: #059669;">Día 5 · Lunes 26 Oct (3 Días Antes)</span>
+            <span class="btn-title">Visas &amp; Residency: Digital Nomad &amp; Retirees</span>
+            <span class="btn-schedule">⏰ Programar: Lunes 26 Oct · 10:00 AM EDT (15:00 ES)</span>
+          </button>
+
+          <button class="email-btn" onclick="loadEmail(6)">
+            <span class="btn-tag" style="color: #0d9488;">Día 6 · Martes 27 Oct (2 Días Antes)</span>
+            <span class="btn-title">70% Non-Resident Mortgages &amp; Closing Costs</span>
+            <span class="btn-schedule">⏰ Programar: Martes 27 Oct · 10:00 AM EDT (15:00 ES)</span>
+          </button>
+
+          <button class="email-btn" onclick="loadEmail(7)">
+            <span class="btn-tag" style="color: #dc2626;">Día 7 · Miércoles 28 Oct (Mañana · 24h)</span>
+            <span class="btn-title">⏰ Tomorrow We Go Live: Direct Link &amp; Times</span>
+            <span class="btn-schedule">⏰ Programar: Miércoles 28 Oct · 11:00 AM EDT (16:00 ES)</span>
+          </button>
+
+          <button class="email-btn" onclick="loadEmail(8)">
+            <span class="btn-tag" style="color: #ea580c;">Día 8 · Jueves 29 Oct (HOY EN VIVO)</span>
+            <span class="btn-title">🔥 TODAY at 1:00 PM EDT (Normal US) / 6:00 PM ES!</span>
+            <span class="btn-schedule">⏰ Programar: Jueves 29 Oct · 9:00 AM EDT (14:00 ES)</span>
+          </button>
+
+          <button class="email-btn" onclick="loadEmail(9)">
+            <span class="btn-tag" style="color: #7c3aed;">Día 9 · Viernes 30 Oct (Post-Webinario)</span>
+            <span class="btn-title">⭐ Thank You + 1-Min Survey &amp; Buyer's Guide PDF</span>
+            <span class="btn-schedule">📊 Programar: Viernes 30 Oct · 10:00 AM EDT (15:00 ES)</span>
+          </button>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- PREVIEW AREA -->
+    <main class="preview-area">
+      
+      <!-- TOOLBAR -->
+      <div class="preview-toolbar">
+        <div class="subject-info">
+          <span class="subject-label" id="current-email-label">Día 1 (Jueves 22 Oct) · Asunto recomendado para Gmail:</span>
+          <span class="subject-text" id="current-email-subject">🏡 Your Confirmed Spot + Access Link · Spain Unlocked Masterclass (Oct 29)</span>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn-copy-sub" onclick="copySubject()">📝 Copiar Asunto</button>
+          <button class="btn-device active" id="btn-desktop" onclick="setDevice('desktop')">💻 Desktop</button>
+          <button class="btn-device" id="btn-mobile" onclick="setDevice('mobile')">📱 Mobile</button>
+          
+          <button class="btn-copy" onclick="copyForGmail()">
+            <span>📋 Copiar Diseño para Gmail</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- VISOR -->
+      <div class="frame-wrapper">
+        <iframe id="preview-frame" class="preview-frame" src="email-1-thu-oct22.html" onload="syncIframeZoomLinks()"></iframe>
+      </div>
+
+      <!-- TIMEZONE VERIFICATION NOTE WITH EXPLICIT UPDATE -->
+      <div class="gmail-guide">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;">
+          <span style="background: #e11d48; color: #fff; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase;">
+            📢 UPDATE DE HORARIOS Y SINCRONIZACIÓN
+          </span>
+          <h3 style="margin: 0; font-size: 16px;">Jueves 29 de Octubre de 2026</h3>
+        </div>
+        <p style="font-size: 13.5px; color: #1e293b; margin-bottom: 8px; font-weight: 600;">
+          🇺🇸🇨🇦 Para clientes en Estados Unidos, Canadá y Puerto Rico: <strong>La hora sigue 100% normal y sin cambios.</strong>
+        </p>
+        <p style="font-size: 13px; color: #475569; margin-bottom: 14px; line-height: 1.55;">
+          <strong>¿Por qué en España es a las 18:00 h (6:00 PM)?</strong> El domingo <strong>25 de octubre</strong> España cambió al horario de invierno (<strong>CET, UTC+1</strong>), pero Estados Unidos y Canadá no cambian hasta el 1 de noviembre (5 horas de diferencia con Miami/NY en vez de 6). Para que los clientes norteamericanos se conecten a la <strong>hora habitual ya planificada</strong> (1:00 PM EDT Miami / 12:00 PM CDT / 10:00 AM PDT), en España el evento se emite a las <strong>18:00 h</strong>:
+        </p>
+        <div class="steps-grid">
+          <div class="step-box" style="border: 2px solid #059669; background: #f0fdf4;">
+            <div class="step-num">🇺🇸🇨🇦</div>
+            <h4 style="color: #065f46;">1:00 PM EDT / AST</h4>
+            <p style="color: #047857; font-weight: 700; margin-bottom: 3px;">✓ Sigue Normal (Sin cambios)</p>
+            <p style="font-size: 11.5px; color: #334155;">Miami · Nueva York · Toronto · Montreal · Puerto Rico</p>
+          </div>
+          <div class="step-box" style="border: 2px solid #059669; background: #f0fdf4;">
+            <div class="step-num">🇺🇸</div>
+            <h4 style="color: #065f46;">12:00 PM CDT / 11:00 AM MDT</h4>
+            <p style="color: #047857; font-weight: 700; margin-bottom: 3px;">✓ Sigue Normal (Sin cambios)</p>
+            <p style="font-size: 11.5px; color: #334155;">12:00 PM Chicago, Houston, Dallas · 11:00 AM Denver, Calgary</p>
+          </div>
+          <div class="step-box" style="border: 2px solid #059669; background: #f0fdf4;">
+            <div class="step-num">🇺🇸🇨🇦</div>
+            <h4 style="color: #065f46;">10:00 AM PDT / 2:00 PM ADT</h4>
+            <p style="color: #047857; font-weight: 700; margin-bottom: 3px;">✓ Sigue Normal (Sin cambios)</p>
+            <p style="font-size: 11.5px; color: #334155;">10:00 AM Los Ángeles, Vancouver · 2:00 PM Halifax</p>
+          </div>
+          <div class="step-box" style="border: 1.5px solid #fda4af; background: #fff1f2;">
+            <div class="step-num">🇪🇸</div>
+            <h4 style="color: #881337;">6:00 PM (18:00 h) CET</h4>
+            <p style="color: #b91c1c; font-weight: 700; margin-bottom: 3px;">Ajustado por Horario Invierno</p>
+            <p style="font-size: 11.5px; color: #475569;">España Peninsular (Madrid, Alicante, Barcelona, Costa Blanca)</p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast">
+    <span>✅</span>
+    <span id="toast-msg">¡Copiado! Abre Gmail, pulsa Redactar y pega con Cmd+V (o Ctrl+V).</span>
+  </div>
+
+  <script>
+    const emailsData = {
+      1: {
+        file: 'email-1-thu-oct22.html',
+        subject: '🏡 Your Confirmed Spot + Access Link · Spain Unlocked Masterclass (Oct 29)',
+        label: 'Día 1 (Jueves 22 Oct · Hoy) · Asunto recomendado:'
+      },
+      2: {
+        file: 'email-2-fri-oct23.html',
+        subject: '[6 Days Out] ☀️ Costa Blanca vs. Costa del Sol vs. Madrid: Where Should You Buy in Spain?',
+        label: 'Día 2 (Viernes 23 Oct) · Asunto recomendado:'
+      },
+      3: {
+        file: 'email-3-sat-oct24.html',
+        subject: '[Weekend Read] 🏡 What Does €250k–€600k Really Buy on the Spanish Coast?',
+        label: 'Día 3 (Sábado 24 Oct) · Asunto recomendado:'
+      },
+      4: {
+        file: 'email-4-sun-oct25.html',
+        subject: '[4 Days Out] 🛡️ How to Buy Property in Spain with 100% Legal Security',
+        label: 'Día 4 (Domingo 25 Oct) · Asunto recomendado:'
+      },
+      5: {
+        file: 'email-5-mon-oct26.html',
+        subject: '[3 Days Out] 🛂 Visas & Residency in Spain: Digital Nomad, Retirement & Buyers',
+        label: 'Día 5 (Lunes 26 Oct) · Asunto recomendado:'
+      },
+      6: {
+        file: 'email-6-tue-oct27.html',
+        subject: '[2 Days Out] 🏦 70% Mortgages for US & Canadian Buyers + Closing Costs in Spain',
+        label: 'Día 6 (Martes 27 Oct) · Asunto recomendado:'
+      },
+      7: {
+        file: 'email-7-wed-oct28.html',
+        subject: '⏰ [Tomorrow] Your Direct Access Link · Spain Unlocked Live Masterclass',
+        label: 'Día 7 (Miércoles 28 Oct · 24h Antes) · Asunto recomendado:'
+      },
+      8: {
+        file: 'email-8-thu-oct29-today.html',
+        subject: '🔥 [TODAY] We Go Live at 1:00 PM EDT (Normal US Time) / 6:00 PM Spain · Your Spain Unlocked Zoom Room',
+        label: 'Día 8 (Jueves 29 Oct · Mañana del Evento) · Asunto recomendado:'
+      },
+      9: {
+        file: 'email-9-fri-oct30-followup.html',
+        subject: '⭐ Thank you for joining Spain Unlocked! (+ Your Buyer\'s Guide PDF & 1-Min Survey)',
+        label: 'Día 9 (Viernes 30 Oct · Post-Webinario) · Asunto recomendado:'
+      }
+    };
+
+    let currentEmailId = 1;
+    const frame = document.getElementById('preview-frame');
+
+    // Load saved Zoom URL if present
+    (function initSavedZoom() {
+      try {
+        const savedUrl = localStorage.getItem('spain_unlocked_zoom_url_v2');
+        const savedId = localStorage.getItem('spain_unlocked_meeting_id_v2');
+        if (savedUrl) document.getElementById('custom-zoom-url').value = savedUrl;
+        if (savedId) document.getElementById('custom-meeting-id').value = savedId;
+      } catch (e) {}
+    })();
+
+    function updateLiveZoomLinks(showConfirmation) {
+      const url = document.getElementById('custom-zoom-url').value.trim();
+      const id = document.getElementById('custom-meeting-id').value.trim();
+      try {
+        localStorage.setItem('spain_unlocked_zoom_url_v2', url);
+        localStorage.setItem('spain_unlocked_meeting_id_v2', id);
+      } catch (e) {}
+      syncIframeZoomLinks();
+      if (showConfirmation) {
+        showToast('🔗 ¡Enlace actualizado en los 9 correos!');
+      }
+    }
+
+    function syncIframeZoomLinks() {
+      try {
+        const url = document.getElementById('custom-zoom-url').value.trim();
+        const id = document.getElementById('custom-meeting-id').value.trim();
+        const doc = frame.contentDocument || frame.contentWindow.document;
+        if (!doc) return;
+        if (url) {
+          doc.querySelectorAll('.dynamic-zoom-link').forEach(el => { el.href = url; });
+          doc.querySelectorAll('.dynamic-zoom-text').forEach(el => { el.textContent = url; });
+        }
+        if (id) {
+          doc.querySelectorAll('.dynamic-meeting-id').forEach(el => { el.textContent = id; });
+        }
+      } catch (e) {}
+    }
+
+    function loadEmail(id) {
+      currentEmailId = id;
+      const data = emailsData[id];
+      document.getElementById('current-email-label').innerText = data.label;
+      document.getElementById('current-email-subject').innerText = data.subject;
+      
+      document.querySelectorAll('.email-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', (idx + 1) === id);
+      });
+
+      frame.src = data.file;
+    }
+
+    function setDevice(device) {
+      if (device === 'mobile') {
+        frame.classList.add('mobile');
+        document.getElementById('btn-mobile').classList.add('active');
+        document.getElementById('btn-desktop').classList.remove('active');
+      } else {
+        frame.classList.remove('mobile');
+        document.getElementById('btn-desktop').classList.add('active');
+        document.getElementById('btn-mobile').classList.remove('active');
+      }
+    }
+
+    async function copySubject() {
+      const text = document.getElementById('current-email-subject').innerText;
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('📝 ¡Asunto copiado al portapapeles!');
+      } catch (e) {}
+    }
+
+    async function copyForGmail() {
+      syncIframeZoomLinks();
+      try {
+        const doc = frame.contentDocument || frame.contentWindow.document;
+        const content = doc.getElementById('email-content') || doc.body;
+        const htmlContent = content.innerHTML;
+
+        const blobHtml = new Blob([htmlContent], { type: 'text/html' });
+        const blobText = new Blob([content.innerText], { type: 'text/plain' });
+
+        const clipboardItem = new ClipboardItem({
+          'text/html': blobHtml,
+          'text/plain': blobText
+        });
+
+        await navigator.clipboard.write([clipboardItem]);
+        showToast('✅ ¡Diseño copiado! Abre Gmail, pulsa Redactar y pega con Cmd+V.');
+      } catch (err) {
+        try {
+          const doc = frame.contentDocument || frame.contentWindow.document;
+          const content = doc.getElementById('email-content') || doc.body;
+          const range = doc.createRange();
+          range.selectNode(content);
+          frame.contentWindow.getSelection().removeAllRanges();
+          frame.contentWindow.getSelection().addRange(range);
+          doc.execCommand('copy');
+          showToast('✅ ¡Diseño copiado! Abre Gmail, pulsa Redactar y pega con Cmd+V.');
+        } catch (e) {
+          alert('Abre el correo y pulsa el botón "COPIAR PARA GMAIL" en la barra superior.');
+        }
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      if (msg) document.getElementById('toast-msg').innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4500);
+    }
+  </script>
+</body>
+</html>

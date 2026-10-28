@@ -3219,11 +3219,11 @@
   let currentUnifiedData = [];
 
   const KNOWN_AGENT_MAP = {
-    'HmfMyuSCbyOIQqi29DiP4v5CKop2': 'Jamisa Home Lifestyle',
-    'LOC-LAVOIE MONTERO-HmfM': 'Jamisa Home Lifestyle',
-    'James Lavoie Montero': 'Jamisa Home Lifestyle',
-    'James Lavoie / Isabelle': 'Jamisa Home Lifestyle',
-    'Jamisa Home Lifestyle': 'Jamisa Home Lifestyle',
+    'HmfMyuSCbyOIQqi29DiP4v5CKop2': 'James Lavoie Montero',
+    'LOC-LAVOIE MONTERO-HmfM': 'James Lavoie Montero',
+    'James Lavoie Montero': 'James Lavoie Montero',
+    'James Lavoie / Isabelle': 'James Lavoie Montero',
+    'Jamisa Home Lifestyle': 'James Lavoie Montero',
     'LOC-LUÍS RODRIGUEZ-zHUD': 'Ángel Luís Rodriguez',
     'zHUDljXCeEaNgFxq45PTLw4SCq82': 'Ángel Luís Rodriguez',
     'LOC-MARTINEZ -GBPi': 'José Martínez',

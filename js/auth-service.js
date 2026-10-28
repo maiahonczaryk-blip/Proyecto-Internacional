@@ -1616,10 +1616,10 @@ App.auth = (function() {
 
   /* ---- Webinar Settings (B2B vs B2C Switch & Date Config) ---- */
   const DEFAULT_WEBINAR_SETTINGS = {
-    configVersion: 3, // Bump this whenever activeType or date changes to force-override stale Firestore/localStorage data
-    activeType: 'b2c', // Default next upcoming webinar: B2C for Buyers & Investors (Oct 29, 2026 at 7:00 PM CET / 2:00 PM EDT / 11:00 AM PDT)
+    configVersion: 4, // Bump this whenever activeType or date changes to force-override stale Firestore/localStorage data
+    activeType: 'b2c', // Default next upcoming webinar: B2C for Buyers & Investors (Oct 29, 2026 at 6:00 PM CET / 1:00 PM EDT / 10:00 AM PDT)
     date: '2026-10-29',
-    time: '19:00', // 7:00 PM CET (19:00 h Spain / 2:00 PM EDT / 11:00 AM PDT)
+    time: '18:00', // 6:00 PM CET (18:00 h Spain / 1:00 PM EDT / 10:00 AM PDT)
     timeZone: 'CET',
     spotsAvailable: 25,
     updatedAt: new Date().toISOString(),
@@ -1725,7 +1725,7 @@ App.auth = (function() {
       targetAudience: 'International Buyers, Expats & Investors',
       spots: 25,
       date: '2026-10-29',
-      time: '19:00',
+      time: '18:00',
       badge: {
         en: '🔴 LIVE WEBINAR · 🇪🇸 Living, Moving & Investing in Spain · 🏡 FREE Masterclass',
         es: '🔴 WEBINAR EN VIVO · 🇪🇸 Vivir, Mudarse e Invertir en España · 🏡 Masterclass GRATUITA',
@@ -1769,10 +1769,10 @@ App.auth = (function() {
         'en-ca': 'Avoid costly mistakes. Learn the legal, tax, financial, and lifestyle secrets from RE/MAX Inmomás.'
       },
       bannerText: {
-        en: 'Spain Unlocked · October 29 · 2:00 PM EDT / 7:00 PM Spain · Free Masterclass for Buyers & Investors',
-        es: 'Descubre España · 29 de Octubre · 19:00 h España (2:00 PM EDT) · Masterclass Gratuita para Compradores e Inversores',
-        fr: 'Découvrez l\'Espagne · 29 Octobre · 19 h CET (14 h EDT) · Masterclass Gratuite pour Acheteurs & Investisseurs',
-        'en-ca': 'Spain Unlocked · October 29 · 2:00 PM EDT / 7:00 PM Spain · Free Masterclass for Buyers & Investors'
+        en: 'Spain Unlocked · October 29 · 1:00 PM EDT / 6:00 PM Spain · Free Masterclass for Buyers & Investors',
+        es: 'Descubre España · 29 de Octubre · 18:00 h España (1:00 PM EDT) · Masterclass Gratuita para Compradores e Inversores',
+        fr: 'Découvrez l\'Espagne · 29 Octobre · 18 h CET (13 h EDT) · Masterclass Gratuite pour Acheteurs & Investisseurs',
+        'en-ca': 'Spain Unlocked · October 29 · 1:00 PM EDT / 6:00 PM Spain · Free Masterclass for Buyers & Investors'
       },
       formCardTitle: {
         en: 'Spain Unlocked · Free Masterclass Registration',
