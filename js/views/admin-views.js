@@ -2317,16 +2317,98 @@
     App.utils.showToast('Valores recomendados cargados. Haz clic en "Guardar y Publicar" para confirmar.', 'info');
   }
 
+  /* ---- Robust categorization helper for Webinar Registrations (B2B vs B2C) ---- */
+  function isWebinarB2B(r) {
+    if (!r) return false;
+    const type = (r.webinarType || '').toLowerCase().trim();
+    const role = (r.role || r.contactType || '').toLowerCase().trim();
+    const title = (r.webinar || '').toLowerCase().trim();
+    const agency = (r.agency || '').toLowerCase().trim();
+    const interest = (r.clientInterest || '').toLowerCase().trim();
+
+    // 1. Explicit webinarType
+    if (type === 'b2c') return false;
+    if (type === 'b2b') return true;
+
+    // 2. Explicit role/contactType
+    if (role === 'client' || role === 'cliente') return false;
+    if (['realtor', 'broker', 'agent', 'agent_inmomas', 'colaborador'].includes(role)) return true;
+
+    // 3. Client interest field present -> B2C
+    if (interest && interest.length > 0) return false;
+
+    // 4. Typical buyer/client objective text in agency field -> B2C
+    if (
+      agency.includes('client') ||
+      agency.includes('interes') ||
+      agency.includes('invers') ||
+      agency.includes('comprador') ||
+      agency.includes('buyer') ||
+      agency.includes('investor') ||
+      agency.includes('holiday') ||
+      agency.includes('golden visa') ||
+      agency.includes('relocat') ||
+      agency.includes('mudanza') ||
+      agency.includes('vivir') ||
+      agency.includes('jubila') ||
+      agency.includes('segunda residencia')
+    ) {
+      return false;
+    }
+
+    // 5. Title keywords
+    if (title.includes('spain unlocked') || title.includes('living') || title.includes('investing') || title.includes('vivir') || title.includes('clientes')) {
+      return false;
+    }
+    if (title.includes('beyond borders') || title.includes('partner') || title.includes('b2b') || title.includes('masterclass para realtors')) {
+      return true;
+    }
+
+    // 6. Professional brokerage keywords in agency field -> B2B
+    if (
+      agency.includes('remax') ||
+      agency.includes('re/max') ||
+      agency.includes('realty') ||
+      agency.includes('broker') ||
+      agency.includes('real estate') ||
+      agency.includes('inmobiliaria') ||
+      agency.includes('century 21') ||
+      agency.includes('c21') ||
+      agency.includes('keller') ||
+      agency.includes('coldwell') ||
+      agency.includes('exp') ||
+      agency.includes('compass') ||
+      agency.includes('sothebys') ||
+      agency.includes('sotheby') ||
+      agency.includes('lifestyle') ||
+      agency.includes('homes') ||
+      agency.includes('properties') ||
+      agency.includes('inmotools') ||
+      agency.includes('independent') ||
+      agency.includes('independiente')
+    ) {
+      return true;
+    }
+
+    // 7. Referral code prefixes (REA, BRO, LOC, COL)
+    if (r.referralCode) {
+      const code = String(r.referralCode).toUpperCase().trim();
+      if (code.startsWith('REA-') || code.startsWith('BRO-') || code.startsWith('LOC-') || code.startsWith('COL-')) {
+        return true;
+      }
+    }
+
+    // Default to B2C (client/investor) if no B2B indicator found
+    return false;
+  }
+
   function updateWebinarStats(registrations) {
     const total = registrations.length;
     let b2bCount = 0;
     let b2cCount = 0;
 
     registrations.forEach(r => {
-      const type = (r.webinarType || '').toLowerCase();
-      const webTitle = (r.webinar || '').toLowerCase();
-      const isB2B = type === 'b2b' || webTitle.includes('beyond borders') || (!type && r.agency && r.agency.trim().length > 0);
-      if (isB2B) {
+      if (isWebinarB2B(r)) {
         b2bCount++;
       } else {
         b2cCount++;
@@ -2382,21 +2464,20 @@
       social: 'Redes Sociales',
       remax: 'Red RE/MAX',
       agent: 'Referido de Agente',
+      collaborator: 'Colaborador / Broker',
       email: 'Email / Newsletter',
       event: 'Evento / Conferencia',
       other: 'Otro'
     };
 
     let filtered = allWebinarRegistrations.filter(r => {
-      const type = (r.webinarType || '').toLowerCase();
-      const webTitle = (r.webinar || '').toLowerCase();
-      const isB2B = type === 'b2b' || webTitle.includes('beyond borders') || (r.agency && r.agency.trim().length > 0 && !type);
+      const isB2B = isWebinarB2B(r);
 
       if (currentWebinarFilter === 'b2b' && !isB2B) return false;
       if (currentWebinarFilter === 'b2c' && isB2B) return false;
 
       if (currentWebinarSearch) {
-        const searchPool = `${r.firstName} ${r.lastName} ${r.email} ${r.phone} ${r.agency} ${r.country} ${r.state} ${r.referrerName} ${r.agentReferrerName}`.toLowerCase();
+        const searchPool = `${r.firstName || ''} ${r.lastName || ''} ${r.email || ''} ${r.phone || ''} ${r.agency || ''} ${r.clientInterest || ''} ${r.country || ''} ${r.state || ''} ${r.referrerName || ''} ${r.agentReferrerName || ''}`.toLowerCase();
         if (!searchPool.includes(currentWebinarSearch)) return false;
       }
 
@@ -2412,7 +2493,7 @@
       const date = App.utils.formatDate(r.createdAt);
       const how  = HOW_LABELS[r.howHeard] || r.howHeard || '—';
       const ref  = r.referrerName ? App.utils.escapeHtml(r.referrerName) : '—';
-      const isB2B = (r.webinarType || '').toLowerCase() === 'b2b' || (r.webinar || '').toLowerCase().includes('beyond borders') || (r.agency && !r.webinarType);
+      const isB2B = isWebinarB2B(r);
 
       const typeBadge = isB2B
         ? `<span style="background:rgba(0,63,153,0.1);color:#003f99;border:1px solid rgba(0,63,153,0.2);padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏢 B2B Realtor</span>`
@@ -2453,7 +2534,7 @@
           </div>`;
       }
 
-      const agencyGoal = r.agency || r.clientInterest || (isB2B ? '—' : 'Inversión / Mudanza');
+      const agencyGoal = isB2B ? (r.agency || '—') : (r.clientInterest || r.agency || 'Inversión / Mudanza');
 
       return `
         <tr>
@@ -2668,22 +2749,23 @@
         social: 'Social Media',
         remax: 'RE/MAX Network',
         agent: 'Agent Referral',
+        collaborator: 'Realtor / Broker Collaborator',
         email: 'Email / Newsletter',
         event: 'Event / Conference',
         other: 'Other'
       };
 
-      const headersB2B = [
+      const headersB2C = [
         'Date', 'Event Type', 'Webinar Theme', 'Target Date', 'First Name', 'Last Name', 'Email', 'Phone',
-        'Agency / Brokerage', 'Country', 'State / Province',
+        'Client Goal / Interest', 'Country', 'State / Province',
         'How They Heard', 'Referring Agent (self-reported)',
         'Agent Via Link', 'Referral Code', 'Agent Role',
         'Tagged Agent', 'Source', 'GDPR Consent'
       ];
 
-      const headersB2C = [
+      const headersB2B = [
         'Date', 'Event Type', 'Webinar Theme', 'Target Date', 'First Name', 'Last Name', 'Email', 'Phone',
-        'Client Goal / Interest', 'Country', 'State / Province',
+        'Agency / Brokerage', 'Country', 'State / Province',
         'How They Heard', 'Referring Agent (self-reported)',
         'Agent Via Link', 'Referral Code', 'Agent Role',
         'Tagged Agent', 'Source', 'GDPR Consent'
@@ -2697,8 +2779,8 @@
         'Tagged Agent', 'Source', 'GDPR Consent'
       ];
 
-      const rowsB2B = [];
       const rowsB2C = [];
+      const rowsB2B = [];
       const rowsAll = [];
 
       registrations.forEach(r => {
@@ -2717,21 +2799,19 @@
           ? mappedAgentName 
           : (r.howHeard === 'agent' && r.referrerName ? r.referrerName : '');
 
-        const type = (r.webinarType || '').toLowerCase();
-        const webTitle = (r.webinar || '').toLowerCase();
-        const isB2B = type === 'b2b' || webTitle.includes('beyond borders') || (r.agency && !r.webinarType);
+        const isB2B = isWebinarB2B(r);
         const eventType = isB2B ? 'B2B (Realtors & Brokers)' : 'B2C (Clientes Finales & Inversores)';
 
-        const baseRow = [
+        const baseRowB2C = [
           r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-US') : '',
           eventType,
-          r.webinar || '',
+          r.webinar || 'Spain Unlocked: Living & Investing',
           r.webinarDate || '',
           r.firstName || '',
           r.lastName || '',
           r.email || '',
           r.phone || '',
-          r.agency || r.clientInterest || '',
+          r.clientInterest || r.agency || '',
           r.country || '',
           r.state || '',
           HOW_LABELS[r.howHeard] || r.howHeard || '',
@@ -2744,15 +2824,59 @@
           r.gdprConsent ? 'Yes' : 'No'
         ];
 
-        rowsAll.push(baseRow);
+        const baseRowB2B = [
+          r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-US') : '',
+          eventType,
+          r.webinar || 'Beyond Borders',
+          r.webinarDate || '',
+          r.firstName || '',
+          r.lastName || '',
+          r.email || '',
+          r.phone || '',
+          r.agency || '',
+          r.country || '',
+          r.state || '',
+          HOW_LABELS[r.howHeard] || r.howHeard || '',
+          r.referrerName || '',
+          mappedAgentName || '',
+          r.referralCode || '',
+          mappedAgentRole || '',
+          taggedAgent,
+          r.source || 'direct',
+          r.gdprConsent ? 'Yes' : 'No'
+        ];
+
+        const baseRowAll = [
+          r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-US') : '',
+          eventType,
+          r.webinar || '',
+          r.webinarDate || '',
+          r.firstName || '',
+          r.lastName || '',
+          r.email || '',
+          r.phone || '',
+          isB2B ? (r.agency || '') : (r.clientInterest || r.agency || ''),
+          r.country || '',
+          r.state || '',
+          HOW_LABELS[r.howHeard] || r.howHeard || '',
+          r.referrerName || '',
+          mappedAgentName || '',
+          r.referralCode || '',
+          mappedAgentRole || '',
+          taggedAgent,
+          r.source || 'direct',
+          r.gdprConsent ? 'Yes' : 'No'
+        ];
+
+        rowsAll.push(baseRowAll);
         if (isB2B) {
-          rowsB2B.push(baseRow);
+          rowsB2B.push(baseRowB2B);
         } else {
-          rowsB2C.push(baseRow);
+          rowsB2C.push(baseRowB2C);
         }
       });
 
-      // Export using SheetJS (.xlsx) with separated sheets:
+      // Export using SheetJS (.xlsx) with separated sheets (Hoja 1: B2C, Hoja 2: B2B, Hoja 3: Todos):
       if (typeof XLSX !== 'undefined') {
         const wb = XLSX.utils.book_new();
 
@@ -2767,17 +2891,17 @@
           return colWidths.map(wch => ({ wch }));
         };
 
-        // Hoja 1: B2B Registrados
-        const wsB2BData = [headersB2B, ...rowsB2B];
-        const wsB2B = XLSX.utils.aoa_to_sheet(wsB2BData);
-        wsB2B['!cols'] = autoFit(wsB2BData);
-        XLSX.utils.book_append_sheet(wb, wsB2B, 'B2B Registrados');
-
-        // Hoja 2: B2C Registrados
+        // Hoja 1: B2C Registrados (Clientes Finales & Inversores)
         const wsB2CData = [headersB2C, ...rowsB2C];
         const wsB2C = XLSX.utils.aoa_to_sheet(wsB2CData);
         wsB2C['!cols'] = autoFit(wsB2CData);
         XLSX.utils.book_append_sheet(wb, wsB2C, 'B2C Registrados');
+
+        // Hoja 2: B2B Registrados (Realtors & Brokers)
+        const wsB2BData = [headersB2B, ...rowsB2B];
+        const wsB2B = XLSX.utils.aoa_to_sheet(wsB2BData);
+        wsB2B['!cols'] = autoFit(wsB2BData);
+        XLSX.utils.book_append_sheet(wb, wsB2B, 'B2B Registrados');
 
         // Hoja 3: Todos los Registrados (Consolidado)
         const wsAllData = [headersAll, ...rowsAll];
@@ -2785,7 +2909,7 @@
         wsAll['!cols'] = autoFit(wsAllData);
         XLSX.utils.book_append_sheet(wb, wsAll, 'Todos los Registrados');
 
-        const fileName = `Spain-Connection-Registrados-${new Date().toISOString().slice(0, 10)}.xlsx`;
+        const fileName = `Spain-Connection-Webinar-Registrados-${new Date().toISOString().slice(0, 10)}.xlsx`;
         try {
           XLSX.writeFile(wb, fileName);
         } catch (writeErr) {
@@ -2801,7 +2925,7 @@
           URL.revokeObjectURL(url);
         }
 
-        App.utils.showToast(`✅ Exportados a Excel: ${rowsB2B.length} en hoja B2B y ${rowsB2C.length} en hoja B2C (${registrations.length} en total).`, 'success');
+        App.utils.showToast(`✅ Exportados a Excel: ${rowsB2C.length} en hoja B2C y ${rowsB2B.length} en hoja B2B (${registrations.length} en total).`, 'success');
         return;
       }
 
@@ -2835,8 +2959,8 @@
    <Interior ss:Color="#003F99" ss:Pattern="Solid"/>
   </Style>
  </Styles>
-` + makeXmlSheet('B2B Registrados', headersB2B, rowsB2B)
-  + makeXmlSheet('B2C Registrados', headersB2C, rowsB2C)
+` + makeXmlSheet('B2C Registrados', headersB2C, rowsB2C)
+  + makeXmlSheet('B2B Registrados', headersB2B, rowsB2B)
   + makeXmlSheet('Todos los Registrados', headersAll, rowsAll)
   + `</Workbook>`;
 
@@ -2844,13 +2968,13 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Spain-Connection-Registrados-${new Date().toISOString().slice(0, 10)}.xls`;
+      a.download = `Spain-Connection-Webinar-Registrados-${new Date().toISOString().slice(0, 10)}.xls`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      App.utils.showToast(`✅ Exportados a Excel: ${rowsB2B.length} en hoja B2B y ${rowsB2C.length} en hoja B2C.`, 'success');
+      App.utils.showToast(`✅ Exportados a Excel: ${rowsB2C.length} en hoja B2C y ${rowsB2B.length} en hoja B2B.`, 'success');
     } catch (err) {
       console.error('[Admin] exportWebinar error:', err);
       App.utils.showToast('Error exporting registrations.', 'error');
@@ -3551,7 +3675,7 @@
         }
         if (!referrer || referrer.toLowerCase() === 'n/a' || referrer === '') referrer = 'N/A';
 
-        const isB2B = (w.webinarType || '').toLowerCase() === 'b2b' || (w.webinar || '').toLowerCase().includes('beyond borders') || (w.agency && (w.agency.toLowerCase().includes('remax') || w.agency.toLowerCase().includes('broker')));
+        const isB2B = isWebinarB2B(w);
         const webinarRole = isB2B ? 'Realtor / Broker (B2B)' : 'Invitado Webinar';
 
         if (existing) {
@@ -3866,7 +3990,8 @@
     handleConvertClient,
     loadWebinarFeedbacks,
     deleteFeedbackSurvey,
-    exportSurveyToExcel
+    exportSurveyToExcel,
+    isWebinarB2B
   };
 
 })();
