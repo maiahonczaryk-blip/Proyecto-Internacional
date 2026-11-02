@@ -2502,6 +2502,24 @@
       u.isWebinarRegistered ? 'Yes' : 'No'
     ]);
 
+    if (typeof XLSX !== 'undefined') {
+      const wb = XLSX.utils.book_new();
+      const wsData = [headers, ...rows];
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      ws['!cols'] = headers.map((h, i) => {
+        let maxLen = h.length;
+        rows.forEach(r => {
+          const val = r[i] ? String(r[i]) : '';
+          if (val.length > maxLen) maxLen = Math.min(val.length, 45);
+        });
+        return { wch: maxLen + 3 };
+      });
+      XLSX.utils.book_append_sheet(wb, ws, 'Usuarios Registrados');
+      XLSX.writeFile(wb, `Users-Export-${new Date().toISOString().slice(0,10)}.xlsx`);
+      App.utils.showToast(`✅ Exported ${allUsers.length} users to Excel (.xlsx).`, 'success');
+      return;
+    }
+
     const escape = v => '"' + String(v).replace(/"/g, '""') + '"';
     const csvContent = '\uFEFF' + [headers, ...rows].map(row => row.map(escape).join(',')).join('\r\n');
 
@@ -2580,6 +2598,24 @@
       getRealtorName(c.realtorId || c.referredBy)
     ]);
 
+    if (typeof XLSX !== 'undefined') {
+      const wb = XLSX.utils.book_new();
+      const wsData = [headers, ...rows];
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      ws['!cols'] = headers.map((h, i) => {
+        let maxLen = h.length;
+        rows.forEach(r => {
+          const val = r[i] ? String(r[i]) : '';
+          if (val.length > maxLen) maxLen = Math.min(val.length, 45);
+        });
+        return { wch: maxLen + 3 };
+      });
+      XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
+      XLSX.writeFile(wb, `Clients-Export-${new Date().toISOString().slice(0,10)}.xlsx`);
+      App.utils.showToast(`✅ Exported ${allClients.length} clients to Excel (.xlsx).`, 'success');
+      return;
+    }
+
     const escape = v => '"' + String(v).replace(/"/g, '""') + '"';
     const csvContent = '\uFEFF' + [headers, ...rows].map(row => row.map(escape).join(',')).join('\r\n');
 
@@ -2602,9 +2638,30 @@
         allUsers = await App.auth.getAllUsers();
       }
       const registrations = await App.auth.getWebinarRegistrations();
-      if (registrations.length === 0) {
+      if (!registrations || registrations.length === 0) {
         App.utils.showToast('No registrations to export.', 'error');
         return;
+      }
+
+      // Ensure SheetJS is loaded
+      if (typeof XLSX === 'undefined') {
+        try {
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'js/xlsx.full.min.js';
+            script.onload = resolve;
+            script.onerror = () => {
+              const cdn = document.createElement('script');
+              cdn.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+              cdn.onload = resolve;
+              cdn.onerror = reject;
+              document.head.appendChild(cdn);
+            };
+            document.head.appendChild(script);
+          });
+        } catch (loadErr) {
+          console.warn('[Admin] Could not load SheetJS dynamically:', loadErr);
+        }
       }
 
       const HOW_LABELS = {
@@ -2616,34 +2673,56 @@
         other: 'Other'
       };
 
-      const headers = [
-        'Date','Event Type','Webinar Theme','Target Date','First Name','Last Name','Email','Phone',
-        'Agency / Goal','Country','State / Province',
-        'How They Heard','Referring Agent (self-reported)',
-        'Agent Via Link','Referral Code','Agent Role',
-        'Tagged Agent','Source','GDPR Consent'
+      const headersB2B = [
+        'Date', 'Event Type', 'Webinar Theme', 'Target Date', 'First Name', 'Last Name', 'Email', 'Phone',
+        'Agency / Brokerage', 'Country', 'State / Province',
+        'How They Heard', 'Referring Agent (self-reported)',
+        'Agent Via Link', 'Referral Code', 'Agent Role',
+        'Tagged Agent', 'Source', 'GDPR Consent'
       ];
 
-      const rows = registrations.map(r => {
+      const headersB2C = [
+        'Date', 'Event Type', 'Webinar Theme', 'Target Date', 'First Name', 'Last Name', 'Email', 'Phone',
+        'Client Goal / Interest', 'Country', 'State / Province',
+        'How They Heard', 'Referring Agent (self-reported)',
+        'Agent Via Link', 'Referral Code', 'Agent Role',
+        'Tagged Agent', 'Source', 'GDPR Consent'
+      ];
+
+      const headersAll = [
+        'Date', 'Event Type', 'Webinar Theme', 'Target Date', 'First Name', 'Last Name', 'Email', 'Phone',
+        'Agency / Goal', 'Country', 'State / Province',
+        'How They Heard', 'Referring Agent (self-reported)',
+        'Agent Via Link', 'Referral Code', 'Agent Role',
+        'Tagged Agent', 'Source', 'GDPR Consent'
+      ];
+
+      const rowsB2B = [];
+      const rowsB2C = [];
+      const rowsAll = [];
+
+      registrations.forEach(r => {
         let mappedAgentName = r.agentReferrerName || '';
         let mappedAgentRole = r.agentReferrerRole || '';
 
-        if (r.referralCode && !mappedAgentName) {
-           const foundAgent = allUsers.find(u => u.referralCode && u.referralCode.toUpperCase() === r.referralCode.toUpperCase());
-           if (foundAgent) {
-             mappedAgentName = `${foundAgent.firstName} ${foundAgent.lastName}`.trim();
-             mappedAgentRole = foundAgent.role;
-           }
+        if (r.referralCode && !mappedAgentName && allUsers) {
+          const foundAgent = allUsers.find(u => u.referralCode && u.referralCode.toUpperCase() === r.referralCode.toUpperCase());
+          if (foundAgent) {
+            mappedAgentName = `${foundAgent.firstName || ''} ${foundAgent.lastName || ''}`.trim();
+            mappedAgentRole = foundAgent.role || '';
+          }
         }
 
         const taggedAgent = mappedAgentName 
           ? mappedAgentName 
           : (r.howHeard === 'agent' && r.referrerName ? r.referrerName : '');
 
-        const isB2B = (r.webinarType || '').toLowerCase() === 'b2b' || (r.webinar || '').toLowerCase().includes('beyond borders') || (r.agency && !r.webinarType);
+        const type = (r.webinarType || '').toLowerCase();
+        const webTitle = (r.webinar || '').toLowerCase();
+        const isB2B = type === 'b2b' || webTitle.includes('beyond borders') || (r.agency && !r.webinarType);
         const eventType = isB2B ? 'B2B (Realtors & Brokers)' : 'B2C (Clientes Finales & Inversores)';
 
-        return [
+        const baseRow = [
           r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-US') : '',
           eventType,
           r.webinar || '',
@@ -2664,23 +2743,114 @@
           r.source || 'direct',
           r.gdprConsent ? 'Yes' : 'No'
         ];
+
+        rowsAll.push(baseRow);
+        if (isB2B) {
+          rowsB2B.push(baseRow);
+        } else {
+          rowsB2C.push(baseRow);
+        }
       });
 
-      const escape = v => '"' + String(v).replace(/"/g, '""') + '"';
-      const csvContent = '\uFEFF' + // BOM for Excel UTF-8
-        [headers, ...rows].map(row => row.map(escape).join(',')).join('\r\n');
+      // Export using SheetJS (.xlsx) with separated sheets:
+      if (typeof XLSX !== 'undefined') {
+        const wb = XLSX.utils.book_new();
 
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
+        const autoFit = (aoa) => {
+          const colWidths = [];
+          aoa.forEach(row => {
+            row.forEach((cell, i) => {
+              const len = cell ? String(cell).length : 0;
+              colWidths[i] = Math.max(colWidths[i] || 10, Math.min(len + 3, 50));
+            });
+          });
+          return colWidths.map(wch => ({ wch }));
+        };
+
+        // Hoja 1: B2B Registrados
+        const wsB2BData = [headersB2B, ...rowsB2B];
+        const wsB2B = XLSX.utils.aoa_to_sheet(wsB2BData);
+        wsB2B['!cols'] = autoFit(wsB2BData);
+        XLSX.utils.book_append_sheet(wb, wsB2B, 'B2B Registrados');
+
+        // Hoja 2: B2C Registrados
+        const wsB2CData = [headersB2C, ...rowsB2C];
+        const wsB2C = XLSX.utils.aoa_to_sheet(wsB2CData);
+        wsB2C['!cols'] = autoFit(wsB2CData);
+        XLSX.utils.book_append_sheet(wb, wsB2C, 'B2C Registrados');
+
+        // Hoja 3: Todos los Registrados (Consolidado)
+        const wsAllData = [headersAll, ...rowsAll];
+        const wsAll = XLSX.utils.aoa_to_sheet(wsAllData);
+        wsAll['!cols'] = autoFit(wsAllData);
+        XLSX.utils.book_append_sheet(wb, wsAll, 'Todos los Registrados');
+
+        const fileName = `Spain-Connection-Registrados-${new Date().toISOString().slice(0, 10)}.xlsx`;
+        try {
+          XLSX.writeFile(wb, fileName);
+        } catch (writeErr) {
+          const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+          const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+
+        App.utils.showToast(`✅ Exportados a Excel: ${rowsB2B.length} en hoja B2B y ${rowsB2C.length} en hoja B2C (${registrations.length} en total).`, 'success');
+        return;
+      }
+
+      // Fallback: Multi-sheet XML Spreadsheet (.xls)
+      const escapeXml = v => String(v ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+
+      const makeXmlSheet = (name, headers, rows) => {
+        let xml = `  <Worksheet ss:Name="${escapeXml(name)}">\n    <Table>\n`;
+        xml += `      <Row>\n` + headers.map(h => `        <Cell ss:StyleID="Header"><Data ss:Type="String">${escapeXml(h)}</Data></Cell>\n`).join('') + `      </Row>\n`;
+        rows.forEach(r => {
+          xml += `      <Row>\n` + r.map(c => `        <Cell><Data ss:Type="String">${escapeXml(c)}</Data></Cell>\n`).join('') + `      </Row>\n`;
+        });
+        xml += `    </Table>\n  </Worksheet>\n`;
+        return xml;
+      };
+
+      const xmlSpreadsheet = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+ <Styles>
+  <Style ss:ID="Header">
+   <Font ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#003F99" ss:Pattern="Solid"/>
+  </Style>
+ </Styles>
+` + makeXmlSheet('B2B Registrados', headersB2B, rowsB2B)
+  + makeXmlSheet('B2C Registrados', headersB2C, rowsB2C)
+  + makeXmlSheet('Todos los Registrados', headersAll, rowsAll)
+  + `</Workbook>`;
+
+      const blob = new Blob([xmlSpreadsheet], { type: 'application/vnd.ms-excel;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
       a.href = url;
-      a.download = `REMAX-Webinar-Registrations-${new Date().toISOString().slice(0,10)}.csv`;
+      a.download = `Spain-Connection-Registrados-${new Date().toISOString().slice(0, 10)}.xls`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      App.utils.showToast(`✅ Exported ${registrations.length} registrations to Excel.`, 'success');
+      App.utils.showToast(`✅ Exportados a Excel: ${rowsB2B.length} en hoja B2B y ${rowsB2C.length} en hoja B2C.`, 'success');
     } catch (err) {
       console.error('[Admin] exportWebinar error:', err);
       App.utils.showToast('Error exporting registrations.', 'error');
@@ -2815,6 +2985,24 @@
         item.usefulness || '',
         item.comments || ''
       ]);
+
+      if (typeof XLSX !== 'undefined') {
+        const wb = XLSX.utils.book_new();
+        const wsData = [headers, ...rows];
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        ws['!cols'] = headers.map((h, i) => {
+          let maxLen = h.length;
+          rows.forEach(r => {
+            const val = r[i] ? String(r[i]) : '';
+            if (val.length > maxLen) maxLen = Math.min(val.length, 45);
+          });
+          return { wch: maxLen + 3 };
+        });
+        XLSX.utils.book_append_sheet(wb, ws, 'Encuestas Feedback');
+        XLSX.writeFile(wb, `Encuestas_Feedback_Webinar_${new Date().toISOString().slice(0,10)}.xlsx`);
+        App.utils.showToast(`✅ Exportadas ${list.length} encuestas a Excel (.xlsx).`, 'success');
+        return;
+      }
 
       const csvContent = [
         headers.join(','),
@@ -3572,7 +3760,7 @@
     tbody.innerHTML = html;
   }
 
-  /* ── Export Unified Directory to CSV ── */
+  /* ── Export Unified Directory to Excel ── */
   function exportUnifiedToExcel() {
     try {
       if (!currentUnifiedData || currentUnifiedData.length === 0) {
@@ -3594,6 +3782,24 @@
         item.origin || '',
         item.createdAt || ''
       ]);
+
+      if (typeof XLSX !== 'undefined') {
+        const wb = XLSX.utils.book_new();
+        const wsData = [headers, ...rows];
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        ws['!cols'] = headers.map((h, i) => {
+          let maxLen = h.length;
+          rows.forEach(r => {
+            const val = r[i] ? String(r[i]) : '';
+            if (val.length > maxLen) maxLen = Math.min(val.length, 45);
+          });
+          return { wch: maxLen + 3 };
+        });
+        XLSX.utils.book_append_sheet(wb, ws, 'Directorio Unificado');
+        XLSX.writeFile(wb, `Directorio-Unificado-${new Date().toISOString().slice(0, 10)}.xlsx`);
+        App.utils.showToast(`✅ Exportados ${currentUnifiedData.length} contactos a Excel (.xlsx).`, 'success');
+        return;
+      }
 
       const csvContent = '\uFEFF' + [headers, ...rows]
         .map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))
