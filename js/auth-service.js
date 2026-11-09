@@ -228,7 +228,7 @@ App.auth = (function() {
 
       // Notify admin of new registration
       if (window.App && window.App.notifications) {
-        window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
+        await window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
 
         // If referred, notify the referring agent
         if (newUser.referredBy) {
@@ -236,7 +236,7 @@ App.auth = (function() {
             const allUsers = App.demoData.users;
             const referrerAgent = allUsers.find(u => u.id === newUser.referredBy || (u.referralCode && u.referralCode.toUpperCase() === (newUser.referredBy || "").toUpperCase()));
             if (referrerAgent) {
-              window.App.notifications.onNewReferredCollaborator(newUser, referrerAgent).catch(() => {});
+              await window.App.notifications.onNewReferredCollaborator(newUser, referrerAgent).catch(() => {});
             }
           } catch(e) {
             console.warn('[Notifications] Error finding referrer agent:', e);
@@ -244,11 +244,11 @@ App.auth = (function() {
         }
       }
 
-      // Auto-enroll user/client in upcoming webinar
+      // Auto-enroll user/client in upcoming webinar (silent since onNewUserRegistration already notified)
       if (newUser.role === 'client') {
-        await autoEnrollClientWebinar(newUser);
+        await autoEnrollClientWebinar(newUser, { silent: true });
       } else if (['realtor', 'broker'].includes(newUser.role)) {
-        await autoEnrollRealtorWebinar(newUser);
+        await autoEnrollRealtorWebinar(newUser, { silent: true });
       }
 
       return { success: true, user: newUser };
@@ -304,7 +304,7 @@ App.auth = (function() {
       // Notify admin of new registration
       if (window.App && window.App.notifications) {
         const fullUser = { id: uid, ...userData };
-        window.App.notifications.onNewUserRegistration(fullUser).catch(() => {});
+        await window.App.notifications.onNewUserRegistration(fullUser).catch(() => {});
 
         // If referred, notify the referring agent
         if (userData.referredBy) {
@@ -312,7 +312,7 @@ App.auth = (function() {
             const allUsers = await getAllUsers();
             const referrerAgent = allUsers.find(u => u.id === userData.referredBy || (u.referralCode && u.referralCode.toUpperCase() === (userData.referredBy || "").toUpperCase()));
             if (referrerAgent) {
-              window.App.notifications.onNewReferredCollaborator(fullUser, referrerAgent).catch(() => {});
+              await window.App.notifications.onNewReferredCollaborator(fullUser, referrerAgent).catch(() => {});
             }
           } catch(e) {
             console.warn('[Notifications] Error finding referrer agent:', e);
@@ -320,12 +320,12 @@ App.auth = (function() {
         }
       }
 
-      // Auto-enroll user/client in upcoming webinar
+      // Auto-enroll user/client in upcoming webinar (silent since onNewUserRegistration already notified)
       const fullUser = { id: uid, ...userData };
       if (finalRole === 'client') {
-        await autoEnrollClientWebinar(fullUser);
+        await autoEnrollClientWebinar(fullUser, { silent: true });
       } else if (['realtor', 'broker'].includes(finalRole)) {
-        await autoEnrollRealtorWebinar(fullUser);
+        await autoEnrollRealtorWebinar(fullUser, { silent: true });
       }
 
       currentUser = { id: uid, ...userData };
@@ -571,7 +571,7 @@ App.auth = (function() {
 
       // Notify admin of new registration via Google
       if (window.App && window.App.notifications) {
-        window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
+        await window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
 
         // If referred, notify the referring agent
         if (newUser.referredBy) {
@@ -579,7 +579,7 @@ App.auth = (function() {
             const allUsers = App.demoData.users;
             const referrerAgent = allUsers.find(u => u.id === newUser.referredBy || (u.referralCode && u.referralCode.toUpperCase() === (newUser.referredBy || "").toUpperCase()));
             if (referrerAgent) {
-              window.App.notifications.onNewReferredCollaborator(newUser, referrerAgent).catch(() => {});
+              await window.App.notifications.onNewReferredCollaborator(newUser, referrerAgent).catch(() => {});
             }
           } catch(e) {
             console.warn('[Notifications] Error finding referrer agent:', e);
@@ -589,9 +589,9 @@ App.auth = (function() {
 
       // Auto-enroll in webinar
       if (newUser.role === 'client') {
-        await autoEnrollClientWebinar(newUser);
+        await autoEnrollClientWebinar(newUser, { silent: true });
       } else if (['realtor', 'broker'].includes(newUser.role)) {
-        await autoEnrollRealtorWebinar(newUser);
+        await autoEnrollRealtorWebinar(newUser, { silent: true });
       }
 
       return { success: true, user: newUser };
@@ -646,7 +646,7 @@ App.auth = (function() {
       // Notify admin of new registration via Google
       if (window.App && window.App.notifications) {
         const fullUser = { id: uid, ...userData };
-        window.App.notifications.onNewUserRegistration(fullUser).catch(() => {});
+        await window.App.notifications.onNewUserRegistration(fullUser).catch(() => {});
 
         // If referred, notify the referring agent
         if (userData.referredBy) {
@@ -654,7 +654,7 @@ App.auth = (function() {
             const allUsers = await getAllUsers();
             const referrerAgent = allUsers.find(u => u.id === userData.referredBy || (u.referralCode && u.referralCode.toUpperCase() === (userData.referredBy || "").toUpperCase()));
             if (referrerAgent) {
-              window.App.notifications.onNewReferredCollaborator(fullUser, referrerAgent).catch(() => {});
+              await window.App.notifications.onNewReferredCollaborator(fullUser, referrerAgent).catch(() => {});
             }
           } catch(e) {
             console.warn('[Notifications] Error finding referrer agent:', e);
@@ -665,9 +665,9 @@ App.auth = (function() {
       // Auto-enroll in webinar
       const fullUser = { id: uid, ...userData };
       if (role === 'client') {
-        await autoEnrollClientWebinar(fullUser);
+        await autoEnrollClientWebinar(fullUser, { silent: true });
       } else if (['realtor', 'broker'].includes(role)) {
-        await autoEnrollRealtorWebinar(fullUser);
+        await autoEnrollRealtorWebinar(fullUser, { silent: true });
       }
 
       currentUser = { id: uid, ...userData };
@@ -1300,7 +1300,7 @@ App.auth = (function() {
       saveDemoData();
       // Notify admin of new Buyer's Guide lead
       if (window.App && window.App.notifications) {
-        window.App.notifications.onNewDossierLead(newLead).catch(() => {});
+        await window.App.notifications.onNewDossierLead(newLead).catch(() => {});
       }
       return newLead;
     } else {
@@ -1308,7 +1308,7 @@ App.auth = (function() {
       const saved = { id: docRef.id, ...newLead };
       // Notify admin of new Buyer's Guide lead
       if (window.App && window.App.notifications) {
-        window.App.notifications.onNewDossierLead(saved).catch(() => {});
+        await window.App.notifications.onNewDossierLead(saved).catch(() => {});
       }
       return saved;
     }
@@ -1324,7 +1324,7 @@ App.auth = (function() {
   }
 
   /* ---- Webinar Registrations ---- */
-  async function saveWebinarRegistration(data) {
+  async function saveWebinarRegistration(data, options = {}) {
     const payload = {
       ...data,
       createdAt: data.createdAt || new Date().toISOString()
@@ -1358,8 +1358,8 @@ App.auth = (function() {
       App.demoData.webinar_registrations.push(payload);
       saveDemoData();
       // Notify admin of new webinar registration
-      if (window.App && window.App.notifications) {
-        window.App.notifications.onNewWebinarRegistration(payload, agentEmail).catch(() => {});
+      if (!options.silent && window.App && window.App.notifications) {
+        await window.App.notifications.onNewWebinarRegistration(payload, agentEmail).catch(() => {});
       }
       return payload.id;
     } else {
@@ -1382,8 +1382,8 @@ App.auth = (function() {
 
       const docRef = await App.db.collection('webinar_registrations').add(payload);
       // Notify admin of new webinar registration
-      if (window.App && window.App.notifications) {
-        window.App.notifications.onNewWebinarRegistration({ id: docRef.id, ...payload }, agentEmail).catch(() => {});
+      if (!options.silent && window.App && window.App.notifications) {
+        await window.App.notifications.onNewWebinarRegistration({ id: docRef.id, ...payload }, agentEmail).catch(() => {});
       }
       return docRef.id;
     }
@@ -1472,7 +1472,7 @@ App.auth = (function() {
         createdAt: client.createdAt || new Date().toISOString()
       };
 
-      await saveWebinarRegistration(webinarPayload);
+      await saveWebinarRegistration(webinarPayload, { silent: Boolean(extraOptions.silent) });
     } catch (err) {
       console.warn('[Auth] Error auto-enrolling client in webinar:', err);
     }
@@ -1533,7 +1533,7 @@ App.auth = (function() {
         createdAt: user.createdAt || new Date().toISOString()
       };
 
-      await saveWebinarRegistration(webinarPayload);
+      await saveWebinarRegistration(webinarPayload, { silent: Boolean(extraOptions.silent) });
     } catch (err) {
       console.warn('[Auth] Error auto-enrolling realtor in webinar:', err);
     }
@@ -1555,7 +1555,7 @@ App.auth = (function() {
       for (const c of clients) {
         const em = (c.email || '').toLowerCase().trim();
         if (em && !existingMap.has(`${em}::B2C`)) {
-          await autoEnrollClientWebinar(c);
+          await autoEnrollClientWebinar(c, { silent: true });
           existingMap.add(`${em}::B2C`);
         }
       }
@@ -1566,7 +1566,7 @@ App.auth = (function() {
         if (!['realtor', 'broker'].includes(u.role)) continue;
         const em = (u.email || '').toLowerCase().trim();
         if (em && !existingMap.has(`${em}::B2B`)) {
-          await autoEnrollRealtorWebinar(u);
+          await autoEnrollRealtorWebinar(u, { silent: true });
           existingMap.add(`${em}::B2B`);
         }
       }
@@ -2122,12 +2122,40 @@ App.auth = (function() {
       await App.db.collection('clients').doc(newClient.id).set(newClient);
     }
 
-    // Auto-enroll client in B2C client webinar
+    // Notify admin and referring agent of new client registration
+    if (window.App && window.App.notifications) {
+      const clientForNotif = {
+        ...newClient,
+        role: 'client',
+        country: newClient.currentLocation || '—',
+        agencyName: newClient.objective || newClient.interestArea || 'Cliente / Comprador'
+      };
+      await window.App.notifications.onNewUserRegistration(clientForNotif).catch(() => {});
+
+      if (newClient.referredBy || newClient.realtorId || newClient.localAgentId || newClient.brokerId) {
+        try {
+          const allUsers = await getAllUsers();
+          const refKey = (newClient.referredBy || newClient.realtorId || newClient.localAgentId || newClient.brokerId || '').toString();
+          const referrerAgent = allUsers.find(u =>
+            u.id === refKey ||
+            (u.referralCode && u.referralCode.toUpperCase() === refKey.toUpperCase())
+          );
+          if (referrerAgent) {
+            await window.App.notifications.onNewReferredCollaborator(clientForNotif, referrerAgent).catch(() => {});
+          }
+        } catch (e) {
+          console.warn('[Notifications] Error finding referrer agent for client:', e);
+        }
+      }
+    }
+
+    // Auto-enroll client in B2C client webinar (silent since onNewUserRegistration already notified)
     await autoEnrollClientWebinar(newClient, {
       howHeard: 'Referral Link',
       referrerId: clientData.referredBy || null,
       agentReferrerId: clientData.localAgentId || clientData.realtorId || null,
-      agentReferrerName: clientData.localAgentName || clientData.realtorName || clientData.inmomasAgentName || null
+      agentReferrerName: clientData.localAgentName || clientData.realtorName || clientData.inmomasAgentName || null,
+      silent: true
     });
 
     return newClient;
@@ -2166,14 +2194,14 @@ App.auth = (function() {
     }
 
     if (window.App && window.App.notifications) {
-      window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
+      await window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
       
       if (newUser.referredBy) {
         try {
           const allUsers = await getAllUsers();
           const referrerAgent = allUsers.find(u => u.id === newUser.referredBy || (u.referralCode && u.referralCode.toUpperCase() === (newUser.referredBy || "").toUpperCase()));
           if (referrerAgent) {
-            window.App.notifications.onNewReferredCollaborator(newUser, referrerAgent).catch(() => {});
+            await window.App.notifications.onNewReferredCollaborator(newUser, referrerAgent).catch(() => {});
           }
         } catch(e) {
           console.warn('[Notifications] Error finding referrer agent:', e);
@@ -2183,9 +2211,9 @@ App.auth = (function() {
 
     // Auto-enroll referred user in webinar
     if (newUser.role === 'client') {
-      await autoEnrollClientWebinar(newUser);
+      await autoEnrollClientWebinar(newUser, { silent: true });
     } else if (['realtor', 'broker'].includes(newUser.role)) {
-      await autoEnrollRealtorWebinar(newUser);
+      await autoEnrollRealtorWebinar(newUser, { silent: true });
     }
 
     return newUser;

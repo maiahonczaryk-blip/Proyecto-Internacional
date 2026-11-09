@@ -116,7 +116,7 @@
     const map = {
       broker: 'Broker', realtor: 'Realtor',
       agent_inmomas: 'Agente Inmomás', admin: 'Administrador',
-      colaborador: 'Colaborador'
+      colaborador: 'Colaborador', client: 'Cliente / Comprador'
     };
     return map[role] || role || '—';
   }
@@ -152,42 +152,49 @@
 
   async function onNewUserRegistration(user) {
     const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
-    await sendEmail(EMAILJS_TEMPLATE_NEW_REG, {
+    const emailData = {
       user_type:     roleLabel(user.role),
       user_name:     name,
       user_email:    user.email || '—',
-      user_country:  user.country || '—',
-      user_agency:   user.agencyName || '—',
+      user_country:  user.country || user.currentLocation || '—',
+      user_agency:   user.agencyName || user.objective || '—',
       user_phone:    user.phone || '—',
       registered_at: fmtDate(user.createdAt),
       source:        user.source || '—',
       admin_url:     ADMIN_URL
-    });
+    };
+    const targetList = Array.isArray(ADMIN_EMAILS) && ADMIN_EMAILS.length ? ADMIN_EMAILS : [ADMIN_EMAIL];
+    for (const target of targetList) {
+      await sendEmail(EMAILJS_TEMPLATE_NEW_REG, emailData, target);
+    }
   }
 
   async function onNewReferredCollaborator(newUser, referrerAgent) {
     const newUserName = `${newUser.firstName || ''} ${newUser.lastName || ''}`.trim() || newUser.email;
     
     // Si el agente no tiene correo (improbable), no enviamos
-    if (!referrerAgent.email) return;
+    if (!referrerAgent || !referrerAgent.email) return;
+
+    // Evitar duplicar si el referente ya está en ADMIN_EMAILS
+    if (ADMIN_EMAILS.includes(referrerAgent.email.toLowerCase().trim())) return;
 
     // Reutilizamos la plantilla de administrador para la alerta del agente
     await sendEmail(EMAILJS_TEMPLATE_NEW_REG, {
       user_type:     roleLabel(newUser.role),
       user_name:     newUserName,
       user_email:    newUser.email || '—',
-      user_country:  newUser.country || '—',
-      user_agency:   newUser.agencyName || '—',
+      user_country:  newUser.country || newUser.currentLocation || '—',
+      user_agency:   newUser.agencyName || newUser.objective || '—',
       user_phone:    newUser.phone || '—',
       registered_at: fmtDate(newUser.createdAt),
       source:        newUser.source || '—',
-      admin_url:     'https://proyecto-internacional.vercel.app/app.html#agent/clients'
+      admin_url:     'https://thespainconnection.com/app.html#agent/clients'
     }, referrerAgent.email);
   }
 
   async function onNewDossierLead(lead) {
     const name = `${lead.firstName || ''} ${lead.lastName || ''}`.trim() || lead.email;
-    await sendEmail(EMAILJS_TEMPLATE_NEW_REG, {
+    const emailData = {
       user_type:     "Lead — Buyer's Guide",
       user_name:     name,
       user_email:    lead.email || '—',
@@ -197,28 +204,35 @@
       registered_at: fmtDate(lead.createdAt),
       source:        lead.source || 'Dossier Download',
       admin_url:     ADMIN_URL
-    });
+    };
+    const targetList = Array.isArray(ADMIN_EMAILS) && ADMIN_EMAILS.length ? ADMIN_EMAILS : [ADMIN_EMAIL];
+    for (const target of targetList) {
+      await sendEmail(EMAILJS_TEMPLATE_NEW_REG, emailData, target);
+    }
   }
 
   async function onNewWebinarRegistration(reg, agentEmail = null) {
     const name = `${reg.firstName || ''} ${reg.lastName || ''}`.trim() || reg.email;
     const emailData = {
-      user_type:     'Registro Webinar',
+      user_type:     `Registro Webinar (${reg.webinarType || 'VIP'})`,
       user_name:     name,
       user_email:    reg.email || '—',
       user_country:  reg.country || '—',
-      user_agency:   reg.agencyName || reg.company || '—',
+      user_agency:   reg.agency || reg.agencyName || reg.company || '—',
       user_phone:    reg.phone || '—',
       registered_at: fmtDate(reg.createdAt),
-      source:        reg.howHeard || 'Webinar B2B',
-      admin_url:     ADMIN_URL
+      source:        reg.howHeard || reg.source || 'Webinar',
+      admin_url:     'https://thespainconnection.com/app.html#admin/webinar'
     };
 
-    // 1. Send to Admin
-    await sendEmail(EMAILJS_TEMPLATE_NEW_REG, emailData);
+    // 1. Send to all Admin emails
+    const targetList = Array.isArray(ADMIN_EMAILS) && ADMIN_EMAILS.length ? ADMIN_EMAILS : [ADMIN_EMAIL];
+    for (const target of targetList) {
+      await sendEmail(EMAILJS_TEMPLATE_NEW_REG, emailData, target);
+    }
 
-    // 2. If referred, send a copy to the agent
-    if (agentEmail) {
+    // 2. If referred, send a copy to the agent (unless already sent as admin)
+    if (agentEmail && !targetList.includes(agentEmail.toLowerCase().trim())) {
       await sendEmail(EMAILJS_TEMPLATE_NEW_REG, emailData, agentEmail);
     }
   }
