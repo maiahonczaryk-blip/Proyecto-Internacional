@@ -192,7 +192,9 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
    ======================================================== */
 .page {
   width: var(--page-width);
+  height: var(--page-height);
   min-height: var(--page-height);
+  max-height: var(--page-height);
   max-width: var(--page-width);
   background: var(--cream);
   margin: 24px auto;
@@ -200,13 +202,21 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
   overflow: hidden;
   box-shadow: 0 4px 30px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.08);
   page-break-after: always;
+  break-after: page;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 .page-inner {
-  padding: var(--page-padding-top) var(--page-padding) var(--page-padding-bottom);
-  min-height: calc(var(--page-height) - 0mm);
+  padding: 13mm 16mm 11mm;
+  height: var(--page-height);
+  min-height: var(--page-height);
+  max-height: var(--page-height);
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  transform-origin: top left;
 }
 
 /* Page header & footer */
@@ -214,9 +224,10 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 10px;
-  margin-bottom: 14px;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
   border-bottom: 1.5px solid var(--light-gray);
+  flex-shrink: 0;
 }
 
 .page-header-title {
@@ -236,13 +247,14 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
 
 .page-footer {
   margin-top: auto;
-  padding-top: 10px;
+  padding-top: 8px;
   border-top: 1px solid var(--light-gray);
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 7pt;
   color: var(--medium-gray);
+  flex-shrink: 0;
 }
 
 .page-footer .page-number {
@@ -448,8 +460,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
    TYPOGRAPHY UTILITIES
    ======================================================== */
 .text-body {
-  font-size: 9.5pt;
-  line-height: 1.65;
+  font-size: 9pt;
+  line-height: 1.55;
   color: var(--charcoal);
 }
 
@@ -864,7 +876,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
 }
 
 .comparison-table tbody td {
-  padding: 9px 10px;
+  padding: 7px 10px;
   border-bottom: 1px solid var(--light-gray);
   vertical-align: middle;
 }
@@ -947,7 +959,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
 
 .timeline-step {
   position: relative;
-  margin-bottom: 9px;
+  margin-bottom: 6px;
   page-break-inside: avoid;
 }
 
@@ -982,7 +994,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
 .timeline-content {
   background: var(--white);
   border-radius: 5px;
-  padding: 9px 12px;
+  padding: 7px 12px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
@@ -1330,17 +1342,17 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
 .personal-letter {
   background: var(--white);
   border-radius: 6px;
-  padding: 18px 20px;
+  padding: 13px 16px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   border-top: 3px solid var(--remax-red);
-  font-size: 9pt;
-  line-height: 1.65;
+  font-size: 8.5pt;
+  line-height: 1.5;
   color: var(--charcoal);
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .letter-signature {
-  margin-top: 12px;
+  margin-top: 8px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 700;
   font-size: 10pt;
@@ -1400,7 +1412,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
 
 .final-footer {
   text-align: center;
-  padding: 16px 0 8px;
+  padding: 10px 0 4px;
   border-top: 2px solid var(--remax-red);
   margin-top: auto;
 }
@@ -1518,13 +1530,13 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
       <button class="btn-lang" id="btn-en" onclick="setLang('en')" title="English (US)">🇺🇸</button>
       <button class="btn-lang" id="btn-en-ca" onclick="setLang('en-ca')" title="English (Canada)">🇨🇦</button>
       <button class="btn-lang" id="btn-fr" onclick="setLang('fr')" title="Français">🇫🇷</button>
-      <button class="btn-action secondary" onclick="window.print()">
+      <button class="btn-action" id="btn-download-pdf" onclick="downloadDossierPDF()">
         <span class="lang-es">📥 Descargar PDF</span>
         <span class="lang-en">📥 Download PDF</span>
         <span class="lang-fr">📥 Télécharger PDF</span>
         <span class="lang-en-ca">📥 Download PDF</span>
       </button>
-      <button class="btn-action" onclick="window.print()">
+      <button class="btn-action secondary" onclick="window.fitDossierPages && window.fitDossierPages(); window.print()">
         <span class="lang-es">🖨️ Imprimir</span>
         <span class="lang-en">🖨️ Print</span>
         <span class="lang-fr">🖨️ Imprimer</span>
@@ -1533,10 +1545,10 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
     </div>
   </div>
   <div class="help-banner">
-    <span class="lang-es">💡 Para mejor calidad, use <strong>Guardar como PDF</strong> en el diálogo de impresión · Formato <strong>A4</strong> · Márgenes <strong>Ninguno</strong></span>
-    <span class="lang-en">💡 For best quality, use <strong>Save as PDF</strong> in the print dialog · Format <strong>A4</strong> · Margins <strong>None</strong></span>
-    <span class="lang-fr">💡 Pour une meilleure qualité, utilisez <strong>Enregistrer en PDF</strong> dans la boîte de dialogue d'impression · Format <strong>A4</strong> · Marges <strong>Aucune</strong></span>
-    <span class="lang-en-ca">💡 For best quality, use <strong>Save as PDF</strong> in the print dialog · Format <strong>A4</strong> · Margins <strong>None</strong></span>
+    <span class="lang-es">💡 Haz clic en <strong>📥 Descargar PDF</strong> para bajar la guía cuadrada en hojas A4, o selecciona el idioma arriba (🇪🇸 🇺🇸 🇨🇦 🇫🇷)</span>
+    <span class="lang-en">💡 Click <strong>📥 Download PDF</strong> to download the guide formatted for A4 pages, or switch language above (🇪🇸 🇺🇸 🇨🇦 🇫🇷)</span>
+    <span class="lang-fr">💡 Cliquez sur <strong>📥 Télécharger PDF</strong> pour télécharger le guide au format A4, ou changez de langue ci-dessus (🇪🇸 🇺🇸 🇨🇦 🇫🇷)</span>
+    <span class="lang-en-ca">💡 Click <strong>📥 Download PDF</strong> to download the guide formatted for A4 pages, or switch language above (🇪🇸 🇺🇸 🇨🇦 🇫🇷)</span>
   </div>
 </div>
 
@@ -1840,6 +1852,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <span class="lang-en-ca">Golf &amp; Sports</span>
         </div>
         <div class="advantage-text">
+          <span class="lang-es">Más de 7 campos de golf de campeonato a menos de 30 min. Vela, buceo y senderismo en la Sierra de Aitana.</span>
           <span class="lang-fr">Plus de 7 terrains de golf de championnat à moins de 30 min. Voile, plongée, randonnée dans la Sierra de Aitana.</span>
           <span class="lang-en">7+ championship golf courses within 30 min. Sailing, diving, hiking in Sierra de Aitana.</span>
         <span class="lang-en-ca">7+ championship golf courses within 30 min. Sailing, diving, hiking in Sierra de Aitana.</span>
@@ -1871,7 +1884,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <span class="lang-en-ca">International Connectivity</span>
         </div>
         <div class="advantage-text">
-          <span class="lang-fr">Aéroport d\'Alicante-Elche (ALC) avec plus de 150 vols directs. TGV (AVE) vers Madrid en 2h.</span>
+          <span class="lang-es">Aeropuerto de Alicante-Elche (ALC) con más de 150 vuelos directos. Tren de alta velocidad (AVE) a Madrid en 2h.</span>
+          <span class="lang-fr">Aéroport d'Alicante-Elche (ALC) avec plus de 150 vols directs. TGV (AVE) vers Madrid en 2h.</span>
           <span class="lang-en">Alicante-Elche Airport (ALC) with 150+ direct routes. AVE high-speed rail to Madrid in 2h.</span>
         <span class="lang-en-ca">Alicante-Elche Airport (ALC) with 150+ direct routes. AVE high-speed rail to Madrid in 2h.</span>
         </div>
@@ -2093,27 +2107,27 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <span class="lang-en-ca">"With the same retirement or remote work budget, on the Costa Blanca you live with a significantly superior standard of living."</span>
         </div>
       </div>
-      <div class="img-rounded" style="height:200px;">
+      <div class="img-rounded" style="height:175px;">
         <img src="images/alicante_castle.png" alt="Castle of Santa Bárbara, Alicante" style="width:100%;height:100%;object-fit:cover;">
       </div>
     </div>
 
     <!-- Purchase Cost Breakdown (from Fuster & Associates 2026 Guide) -->
-    <h3 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:10pt;color:var(--dark-blue);margin-bottom:8px;">
+    <h3 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:10pt;color:var(--dark-blue);margin-bottom:6px;">
       <span class="lang-es">💶 Desglose de Costes de Compra — Costa Blanca (Valencia)</span>
         <span class="lang-fr">💶 Décomposition des Frais d'Achat — Costa Blanca (Valence)</span>
       <span class="lang-en">💶 Purchase Cost Breakdown — Costa Blanca (Valencia)</span>
         <span class="lang-en-ca">💶 Purchase Cost Breakdown — Costa Blanca (Valencia)</span>
     </h3>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;">
-      <div style="background:var(--white);border:1.5px solid var(--light-gray);border-radius:8px;padding:10px;">
-        <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:8.5pt;color:var(--remax-blue);margin-bottom:6px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;">
+      <div style="background:var(--white);border:1.5px solid var(--light-gray);border-radius:8px;padding:9px 10px;">
+        <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:8.5pt;color:var(--remax-blue);margin-bottom:5px;">
           <span class="lang-es">🏠 Propiedad de Segunda Mano</span>
         <span class="lang-fr">🏠 Bien Immobilier de Revente</span>
           <span class="lang-en">🏠 Resale Property</span>
         <span class="lang-en-ca">🏠 Resale Property</span>
         </div>
-        <div style="font-size:8pt;color:var(--charcoal);line-height:1.7;">
+        <div style="font-size:8pt;color:var(--charcoal);line-height:1.55;">
           <div style="display:flex;justify-content:space-between;"><span><span class="lang-es">Precio de compra</span>
         <span class="lang-fr">Prix d'achat</span><span class="lang-en">Purchase price</span>
         <span class="lang-en-ca">Purchase price</span></span><span style="font-weight:600;">€150,000</span></div>
@@ -2137,14 +2151,14 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <span class="lang-en-ca">ESTIMATED TOTAL</span></span><span style="font-weight:800;color:var(--dark-blue);">€168,009</span></div>
         </div>
       </div>
-      <div style="background:var(--white);border:1.5px solid var(--light-gray);border-radius:8px;padding:10px;">
-        <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:8.5pt;color:var(--remax-red);margin-bottom:6px;">
+      <div style="background:var(--white);border:1.5px solid var(--light-gray);border-radius:8px;padding:9px 10px;">
+        <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:8.5pt;color:var(--remax-red);margin-bottom:5px;">
           <span class="lang-es">🏗️ Obra Nueva</span>
         <span class="lang-fr">🏗️ Construction Neuve</span>
           <span class="lang-en">🏗️ New-Build Property</span>
         <span class="lang-en-ca">🏗️ New-Build Property</span>
         </div>
-        <div style="font-size:8pt;color:var(--charcoal);line-height:1.7;">
+        <div style="font-size:8pt;color:var(--charcoal);line-height:1.55;">
           <div style="display:flex;justify-content:space-between;"><span><span class="lang-es">Precio de compra</span>
         <span class="lang-fr">Prix d'achat</span><span class="lang-en">Purchase price</span>
         <span class="lang-en-ca">Purchase price</span></span><span style="font-weight:600;">€150,000</span></div>
@@ -2323,9 +2337,10 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <span class="lang-en-ca">Legal Due Diligence</span>
           </div>
           <div class="timeline-desc">
-            <span class="lang-fr">Verificación de cargas, deudas, permisos y titularidad por Fuster & Associates.</span>
-            <span class="lang-en">Verification of liens, debts, permits and ownership by Fuster & Associates.</span>
-        <span class="lang-en-ca">Verification of liens, debts, permits and ownership by Fuster & Associates.</span>
+            <span class="lang-es">Verificación de cargas, deudas, permisos y titularidad por Fuster &amp; Associates.</span>
+            <span class="lang-fr">Vérification des charges, dettes, permis et propriété par Fuster &amp; Associates.</span>
+            <span class="lang-en">Verification of liens, debts, permits and ownership by Fuster &amp; Associates.</span>
+        <span class="lang-en-ca">Verification of liens, debts, permits and ownership by Fuster &amp; Associates.</span>
           </div>
           <span class="timeline-time">1
             <span class="lang-es">semana</span>
@@ -2517,7 +2532,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <div class="visa-detail">
           <span class="visa-detail-label">
             <span class="lang-es">Dirigido a</span>
-        <span class="lang-fr">S\'adresse à</span>
+            <span class="lang-fr">S'adresse à</span>
             <span class="lang-en">Target</span>
         <span class="lang-en-ca">Target</span>
           </span>
@@ -2618,7 +2633,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         </div>
         <div class="visa-detail">
           <span class="visa-detail-label">
-            <span class="lang-fr">S\'adresse à</span>
+            <span class="lang-es">Dirigido a</span>
+            <span class="lang-fr">S'adresse à</span>
             <span class="lang-en">Target</span>
         <span class="lang-en-ca">Target</span>
           </span>
@@ -2684,11 +2700,13 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         </div>
         <div class="visa-detail">
           <span class="visa-detail-label">
+            <span class="lang-es">Familia</span>
             <span class="lang-fr">Famille</span>
             <span class="lang-en">Family</span>
         <span class="lang-en-ca">Family</span>
           </span>
           <span class="visa-detail-value">
+            <span class="lang-es">Incluye cónyuge e hijos</span>
             <span class="lang-fr">Inclut conjoint et enfants</span>
             <span class="lang-en">Includes spouse &amp; children</span>
         <span class="lang-en-ca">Includes spouse &amp; children</span>
@@ -2708,9 +2726,26 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <span class="lang-en-ca">🏛️ Other Residency Pathways</span>
       </h4>
       <div class="text-body" style="font-size:8pt;">
-        <span class="lang-fr"><strong>Visa Entrepreneur :</strong> pour lancer une entreprise en Espagne. <strong>Regroupement Familial :</strong> si vous avez de la famille citoyenne de l\'UE. <strong>Accord de double nationalité :</strong> les citoyens des pays hispano-américains peuvent demander la nationalité après 2 ans de résidence légale.</span>
+        <span class="lang-es"><strong>Visa de Emprendedor:</strong> para lanzar un negocio en España. <strong>Reagrupación Familiar:</strong> si tienes familia ciudadana de la UE. <strong>Convenio de doble nacionalidad:</strong> los ciudadanos de países iberoamericanos pueden solicitar la nacionalidad tras 2 años de residencia legal.</span>
+        <span class="lang-fr"><strong>Visa Entrepreneur :</strong> pour lancer une entreprise en Espagne. <strong>Regroupement Familial :</strong> si vous avez de la famille citoyenne de l'UE. <strong>Accord de double nationalité :</strong> les citoyens des pays hispano-américains peuvent demander la nationalité après 2 ans de résidence légale.</span>
         <span class="lang-en"><strong>Entrepreneur Visa:</strong> to launch a business in Spain. <strong>Family Reunification:</strong> if you have EU citizen family. <strong>Dual nationality agreement:</strong> citizens from Hispanic American countries can apply for citizenship after 2 years of legal residency.</span>
         <span class="lang-en-ca"><strong>Entrepreneur Visa:</strong> to launch a business in Spain. <strong>Family Reunification:</strong> if you have EU citizen family. <strong>Dual nationality agreement:</strong> citizens from Hispanic American countries can apply for citizenship after 2 years of legal residency.</span>
+      </div>
+    </div>
+
+    <!-- Key Visa Application Requirements -->
+    <div class="card card-bordered mb-12" style="padding:12px 14px;">
+      <h4 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:9pt;color:var(--dark-blue);margin-bottom:8px;">
+        <span class="lang-es">📋 Requisitos Generales para Solicitar tu Visado</span>
+        <span class="lang-fr">📋 Conditions Générales pour Votre Demande de Visa</span>
+        <span class="lang-en">📋 Key Requirements for Your Visa Application</span>
+        <span class="lang-en-ca">📋 Key Requirements for Your Visa Application</span>
+      </h4>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;font-size:7.8pt;color:var(--charcoal);line-height:1.45;">
+        <div><strong>1. <span class="lang-es">Seguro médico privado:</span><span class="lang-fr">Assurance santé privée :</span><span class="lang-en">Private health insurance:</span><span class="lang-en-ca">Private health insurance:</span></strong> <span class="lang-es">Cobertura completa en España sin copagos ni carencias.</span><span class="lang-fr">Couverture complète en Espagne sans franchise ni délai de carence.</span><span class="lang-en">Full coverage in Spain with zero co-pays or waiting periods.</span><span class="lang-en-ca">Full coverage in Spain with zero co-pays or waiting periods.</span></div>
+        <div><strong>2. <span class="lang-es">Antecedentes penales:</span><span class="lang-fr">Casier judiciaire :</span><span class="lang-en">Background check:</span><span class="lang-en-ca">Background check:</span></strong> <span class="lang-es">Certificado apostillado (La Haya) y traducido por traductor jurado.</span><span class="lang-fr">Certificat apostillé (La Haye) et traduit par un traducteur assermenté.</span><span class="lang-en">Apostilled certificate (Hague) with sworn Spanish translation.</span><span class="lang-en-ca">Apostilled certificate (Hague) with sworn Spanish translation.</span></div>
+        <div><strong>3. <span class="lang-es">Solvencia económica:</span><span class="lang-fr">Solvabilité financière :</span><span class="lang-en">Proof of income/funds:</span><span class="lang-en-ca">Proof of income/funds:</span></strong> <span class="lang-es">Extractos bancarios, contratos remotos o pensión según el visado.</span><span class="lang-fr">Relevés bancaires, contrats à distance ou pension selon le visa.</span><span class="lang-en">Bank statements, remote contracts or pension records per visa type.</span><span class="lang-en-ca">Bank statements, remote contracts or pension records per visa type.</span></div>
+        <div><strong>4. <span class="lang-es">NIE y empadronamiento:</span><span class="lang-fr">NIE et enregistrement :</span><span class="lang-en">NIE &amp; registration:</span><span class="lang-en-ca">NIE &amp; registration:</span></strong> <span class="lang-es">Coordinación integral de citas y expediente con Fuster &amp; Associates.</span><span class="lang-fr">Coordination complète des rendez-vous et du dossier avec Fuster &amp; Associates.</span><span class="lang-en">Full appointment and file coordination with Fuster &amp; Associates.</span><span class="lang-en-ca">Full appointment and file coordination with Fuster &amp; Associates.</span></div>
       </div>
     </div>
 
@@ -2745,7 +2780,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
     <div class="page-header">
       <span class="page-header-title">
         <span class="lang-es">Fiscalidad</span>
-        <span class="lang-fr">Fiscalidad</span>
+        <span class="lang-fr">Fiscalité</span>
         <span class="lang-en">Taxation</span>
         <span class="lang-en-ca">Taxation</span>
       </span>
@@ -2755,13 +2790,13 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
     <div class="section-num">06</div>
     <div class="section-label">
       <span class="lang-es">Costes de Adquisición</span>
-        <span class="lang-fr">Frais d\'Acquisition</span>
+        <span class="lang-fr">Frais d'Acquisition</span>
       <span class="lang-en">Acquisition Costs</span>
         <span class="lang-en-ca">Acquisition Costs</span>
     </div>
     <h2 class="section-title">
       <span class="lang-es">Fiscalidad y Costes<br>de Adquisición</span>
-        <span class="lang-fr">Fiscalité et Frais<br>d\'Acquisition</span>
+        <span class="lang-fr">Fiscalité et Frais<br>d'Acquisition</span>
       <span class="lang-en">Taxation &amp;<br>Acquisition Costs</span>
         <span class="lang-en-ca">Taxation &amp;<br>Acquisition Costs</span>
     </h2>
@@ -2777,7 +2812,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
     <div class="card card-bordered mb-12">
       <h4 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:10pt;color:var(--dark-blue);margin-bottom:8px;">
         <span class="lang-es">📊 Desglose de Costes de Compra (Propiedad de Reventa)</span>
-        <span class="lang-fr">📊 Détail des Frais d\'Achat (Propriété de Revente)</span>
+        <span class="lang-fr">📊 Détail des Frais d'Achat (Propriété de Revente)</span>
         <span class="lang-en">📊 Purchase Cost Breakdown (Resale Property)</span>
         <span class="lang-en-ca">📊 Purchase Cost Breakdown (Resale Property)</span>
       </h4>
@@ -2815,7 +2850,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
           <div class="tax-legend-dot" style="background:var(--bridge-blue);"></div>
           <span>
             <span class="lang-es"><strong>Notaría</strong> — Honorarios notariales y registro (~1.5%)</span>
-        <span class="lang-fr"><strong>Notaire</strong> — Frais de notaire et d\'enregistrement (~1,5%)</span>
+        <span class="lang-fr"><strong>Notaire</strong> — Frais de notaire et d'enregistrement (~1,5%)</span>
             <span class="lang-en"><strong>Notary</strong> — Notary and registry fees (~1.5%)</span>
         <span class="lang-en-ca"><strong>Notary</strong> — Notary and registry fees (~1.5%)</span>
           </span>
@@ -2824,7 +2859,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
           <div class="tax-legend-dot" style="background:var(--accent-gold);"></div>
           <span>
             <span class="lang-es"><strong>Legal</strong> — Honorarios abogado (~1%)</span>
-        <span class="lang-fr"><strong>Légal</strong> — Honoraires d\'avocat (~1%)</span>
+        <span class="lang-fr"><strong>Légal</strong> — Honoraires d'avocat (~1%)</span>
             <span class="lang-en"><strong>Legal</strong> — Attorney fees (~1%)</span>
         <span class="lang-en-ca"><strong>Legal</strong> — Attorney fees (~1%)</span>
           </span>
@@ -2834,7 +2869,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <span style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:12pt;">~14%</span>
         <span style="font-size:8pt;margin-left:6px;">
           <span class="lang-es">del precio de compra en costes totales</span>
-        <span class="lang-fr">du prix d\'achat en frais totaux</span>
+        <span class="lang-fr">du prix d'achat en frais totaux</span>
           <span class="lang-en">of purchase price in total costs</span>
         <span class="lang-en-ca">of purchase price in total costs</span>
         </span>
@@ -2850,7 +2885,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <span class="lang-en-ca">🏗️ New Build Properties</span>
       </h4>
       <p class="text-body" style="font-size:8pt;">
-        <span class="lang-fr">Pour les propriétés neuves, l\'ITP est remplacé par la TVA (10%) + AJD (1,5%). Le coût total est similaire (~12,5-14%).</span>
+        <span class="lang-es">Para propiedades de obra nueva, el ITP se sustituye por el IVA (10%) + AJD (1.5%). El coste total es similar (~12.5-14%).</span>
+        <span class="lang-fr">Pour les propriétés neuves, l'ITP est remplacé par la TVA (10%) + AJD (1,5%). Le coût total est similaire (~12,5-14%).</span>
         <span class="lang-en">For new build properties, ITP is replaced by VAT (10%) + AJD (1.5%). Total cost is similar (~12.5-14%).</span>
         <span class="lang-en-ca">For new build properties, ITP is replaced by VAT (10%) + AJD (1.5%). Total cost is similar (~12.5-14%).</span>
       </p>
@@ -2873,6 +2909,7 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <span class="lang-en-ca">IBI — Property Tax (Municipal)</span>
         </h4>
         <p class="text-body" style="font-size:8pt;">
+          <span class="lang-es">Equivalente al impuesto municipal sobre la propiedad. Se calcula sobre el valor catastral (muy inferior al valor de mercado). Rango habitual en la Costa Blanca:</span>
           <span class="lang-fr">Équivalent à la taxe foncière municipale. Calculé sur la valeur cadastrale (très inférieure à la valeur marchande). Fourchette typique sur la Costa Blanca :</span>
           <span class="lang-en">Equivalent to municipal property tax. Calculated on cadastral value (much lower than market value). Typical range on Costa Blanca:</span>
         <span class="lang-en-ca">Equivalent to municipal property tax. Calculated on cadastral value (much lower than market value). Typical range on Costa Blanca:</span>
@@ -2893,7 +2930,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
         <span class="lang-en-ca">IRNR — Non-Resident Income Tax</span>
         </h4>
         <p class="text-body" style="font-size:8pt;">
-          <span class="lang-fr">Impôt imputé sur le revenu présumé (si la propriété n\'est pas louée). Calculé comme 1,1% de la valeur cadastrale × 24% de taux d\'imposition. Résultat typique :</span>
+          <span class="lang-es">Impuesto sobre la renta imputada (si la propiedad no se alquila). Calculado como el 1.1% del valor catastral × 24% de tipo impositivo. Resultado habitual:</span>
+          <span class="lang-fr">Impôt imputé sur le revenu présumé (si la propriété n'est pas louée). Calculé comme 1,1% de la valeur cadastrale × 24% de taux d'imposition. Résultat typique :</span>
           <span class="lang-en">Imputed income tax (if property is not rented). Calculated as 1.1% of cadastral value × 24% tax rate. Typical result:</span>
         <span class="lang-en-ca">Imputed income tax (if property is not rented). Calculated as 1.1% of cadastral value × 24% tax rate. Typical result:</span>
         </p>
@@ -3013,9 +3051,76 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
       </div>
 
     </div>
+
+    <!-- 360° Support Pillars -->
+    <div style="margin-top:14px;">
+      <h3 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:10pt;color:var(--dark-blue);margin-bottom:8px;">
+        <span class="lang-es">🌟 ¿Qué incluye nuestro acompañamiento 360°?</span>
+        <span class="lang-fr">🌟 Que comprend notre accompagnement 360° ?</span>
+        <span class="lang-en">🌟 What Does Our 360° Support Include?</span>
+        <span class="lang-en-ca">🌟 What Does Our 360° Support Include?</span>
+      </h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="card card-accent-left" style="padding:11px 14px;">
+          <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:8.5pt;color:var(--dark-blue);margin-bottom:3px;">
+            <span class="lang-es">1. Selección y Negociación Inmobiliaria</span>
+            <span class="lang-fr">1. Sélection et Négociation Immobilière</span>
+            <span class="lang-en">1. Property Curation &amp; Negotiation</span>
+            <span class="lang-en-ca">1. Property Curation &amp; Negotiation</span>
+          </div>
+          <div style="font-size:7.6pt;color:#555;line-height:1.45;">
+            <span class="lang-es">Filtrado experto de todo el mercado en Costa Blanca (obra nueva y reventa), tours virtuales en directo o presenciales y defensa de tus intereses como comprador.</span>
+            <span class="lang-fr">Filtrage expert de tout le marché sur la Costa Blanca (neuf et revente), visites virtuelles en direct ou sur place et défense de vos intérêts d'acheteur.</span>
+            <span class="lang-en">Expert filtering of the entire Costa Blanca market (new build and resale), live virtual or in-person tours, and dedicated buyer representation.</span>
+            <span class="lang-en-ca">Expert filtering of the entire Costa Blanca market (new build and resale), live virtual or in-person tours, and dedicated buyer representation.</span>
+          </div>
+        </div>
+        <div class="card card-accent-blue" style="padding:11px 14px;">
+          <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:8.5pt;color:var(--dark-blue);margin-bottom:3px;">
+            <span class="lang-es">2. Blindaje Legal y Fiscal Completo</span>
+            <span class="lang-fr">2. Sécurité Juridique et Fiscale Complète</span>
+            <span class="lang-en">2. Full Legal &amp; Tax Protection</span>
+            <span class="lang-en-ca">2. Full Legal &amp; Tax Protection</span>
+          </div>
+          <div style="font-size:7.6pt;color:#555;line-height:1.45;">
+            <span class="lang-es">Auditoría registral y urbanística de la vivienda, obtención de NIE, poder notarial para compra remota, revisión de contratos y representación ante notario.</span>
+            <span class="lang-fr">Audit cadastral et urbanistique du bien, obtention du NIE, procuration notariée pour achat à distance, révision des contrats et représentation chez le notaire.</span>
+            <span class="lang-en">Registry and urban planning audit, NIE acquisition, Power of Attorney for remote closing, contract review, and notary representation.</span>
+            <span class="lang-en-ca">Registry and urban planning audit, NIE acquisition, Power of Attorney for remote closing, contract review, and notary representation.</span>
+          </div>
+        </div>
+        <div class="card card-accent-blue" style="padding:11px 14px;">
+          <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:8.5pt;color:var(--dark-blue);margin-bottom:3px;">
+            <span class="lang-es">3. Estructuración Financiera Internacional</span>
+            <span class="lang-fr">3. Structuration Financière Internationale</span>
+            <span class="lang-en">3. International Financial Structuring</span>
+            <span class="lang-en-ca">3. International Financial Structuring</span>
+          </div>
+          <div style="font-size:7.6pt;color:#555;line-height:1.45;">
+            <span class="lang-es">Estudio de viabilidad hipotecaria sin coste en 48h con Banco UCI, apertura de cuenta bancaria española y optimización en cambio de divisas.</span>
+            <span class="lang-fr">Étude de faisabilité hypothécaire gratuite en 48h avec Banco UCI, ouverture de compte bancaire espagnol et optimisation du change de devises.</span>
+            <span class="lang-en">Complimentary 48-hour mortgage feasibility study with Banco UCI, Spanish bank account setup, and currency exchange optimization.</span>
+            <span class="lang-en-ca">Complimentary 48-hour mortgage feasibility study with Banco UCI, Spanish bank account setup, and currency exchange optimization.</span>
+          </div>
+        </div>
+        <div class="card card-accent-left" style="padding:11px 14px;">
+          <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:8.5pt;color:var(--dark-blue);margin-bottom:3px;">
+            <span class="lang-es">4. Servicio Post-Venta y Concierge</span>
+            <span class="lang-fr">4. Service Après-Vente et Conciergerie</span>
+            <span class="lang-en">4. After-Sales &amp; Concierge Service</span>
+            <span class="lang-en-ca">4. After-Sales &amp; Concierge Service</span>
+          </div>
+          <div style="font-size:7.6pt;color:#555;line-height:1.45;">
+            <span class="lang-es">Cambio de titularidad de suministros (agua, luz, fibra), seguros de hogar y salud, mobiliario, reformas y declaraciones fiscales anuales.</span>
+            <span class="lang-fr">Changement de titulaire des contrats (eau, électricité, fibre), assurances habitation et santé, mobilier, rénovations et déclarations fiscales annuelles.</span>
+            <span class="lang-en">Utility transfers (water, electricity, fiber internet), home and health insurance, furnishing, renovations, and annual tax filings.</span>
+            <span class="lang-en-ca">Utility transfers (water, electricity, fiber internet), home and health insurance, furnishing, renovations, and annual tax filings.</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="card card-dark mt-16" style="text-align:center;padding:14px;">
+    <div class="card card-dark mt-12" style="text-align:center;padding:14px;">
       <p style="font-size:9pt;">
         <span class="lang-es">🤝 Un solo punto de contacto para todo. <strong style="color:var(--accent-gold);">Tú te enfocas en elegir tu hogar. Nosotros nos encargamos del resto.</strong></span>
         <span class="lang-fr">🤝 Un seul point de contact pour tout. <strong style="color:var(--accent-gold);">Vous vous concentrez sur le choix de votre bien. Nous nous occupons du reste.</strong></span>
@@ -3091,14 +3196,14 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
     </div>
 
     <!-- Offices Grid -->
-    <h3 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:11pt;color:var(--dark-blue);margin-bottom:10px;">
+    <h3 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:10.5pt;color:var(--dark-blue);margin-bottom:8px;">
       <span class="lang-es">🏢 Nuestras Oficinas</span>
         <span class="lang-fr">🏢 Nos Bureaux</span>
       <span class="lang-en">🏢 Our Offices</span>
         <span class="lang-en-ca">🏢 Our Offices</span>
     </h3>
 
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;">
       <div class="office-card">
         <div class="office-city">Alicante</div>
         <div class="office-address">Carrer Doctor José Luis de la Vega, 2</div>
@@ -3122,55 +3227,55 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
     </div>
 
     <!-- What to Expect Steps -->
-    <div style="background:rgba(0,14,53,0.03);border:1.5px solid rgba(0,14,53,0.1);border-radius:8px;padding:12px;margin-bottom:12px;">
-      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:9pt;color:var(--dark-blue);margin-bottom:9px;">
+    <div style="background:rgba(0,14,53,0.03);border:1.5px solid rgba(0,14,53,0.1);border-radius:8px;padding:10px 12px;margin-bottom:10px;">
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:9pt;color:var(--dark-blue);margin-bottom:7px;">
         <span class="lang-es">🗓️ ¿Qué ocurre después de contactarnos?</span>
         <span class="lang-fr">🗓️ Que se passe-t-il après nous avoir contactés ?</span>
         <span class="lang-en">🗓️ What happens after you contact us?</span>
         <span class="lang-en-ca">🗓️ What happens after you contact us?</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;font-size:7.5pt;">
-        <div style="padding:8px;background:white;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
-          <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:13pt;color:var(--remax-red);">1</div>
-          <div style="font-weight:700;color:var(--dark-blue);margin:3px 0;font-size:8pt;"><span class="lang-es">Videollamada</span><span class="lang-fr">Appel vidéo</span><span class="lang-en">Video Call</span><span class="lang-en-ca">Video Call</span></div>
-          <div style="color:var(--medium-gray);line-height:1.4;"><span class="lang-es">Sin compromiso para entender tus necesidades y presupuesto.</span><span class="lang-fr">Sans engagement pour comprendre vos besoins et budget.</span><span class="lang-en">No obligation call to understand your needs and budget.</span><span class="lang-en-ca">No obligation call to understand your needs and budget.</span></div>
+        <div style="padding:7px;background:white;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+          <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:12pt;color:var(--remax-red);">1</div>
+          <div style="font-weight:700;color:var(--dark-blue);margin:2px 0;font-size:8pt;"><span class="lang-es">Videollamada</span><span class="lang-fr">Appel vidéo</span><span class="lang-en">Video Call</span><span class="lang-en-ca">Video Call</span></div>
+          <div style="color:var(--medium-gray);line-height:1.35;"><span class="lang-es">Sin compromiso para entender tus necesidades y presupuesto.</span><span class="lang-fr">Sans engagement pour comprendre vos besoins et budget.</span><span class="lang-en">No obligation call to understand your needs and budget.</span><span class="lang-en-ca">No obligation call to understand your needs and budget.</span></div>
         </div>
-        <div style="padding:8px;background:white;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
-          <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:13pt;color:var(--remax-red);">2</div>
-          <div style="font-weight:700;color:var(--dark-blue);margin:3px 0;font-size:8pt;"><span class="lang-es">Propiedades</span><span class="lang-fr">Sélection</span><span class="lang-en">Properties</span><span class="lang-en-ca">Properties</span></div>
-          <div style="color:var(--medium-gray);line-height:1.4;"><span class="lang-es">Selección personalizada que se ajusta a tu perfil y criterios.</span><span class="lang-fr">Sélection personnalisée correspondant à votre profil.</span><span class="lang-en">Curated shortlist matching your profile and criteria.</span><span class="lang-en-ca">Curated shortlist matching your profile and criteria.</span></div>
+        <div style="padding:7px;background:white;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+          <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:12pt;color:var(--remax-red);">2</div>
+          <div style="font-weight:700;color:var(--dark-blue);margin:2px 0;font-size:8pt;"><span class="lang-es">Propiedades</span><span class="lang-fr">Sélection</span><span class="lang-en">Properties</span><span class="lang-en-ca">Properties</span></div>
+          <div style="color:var(--medium-gray);line-height:1.35;"><span class="lang-es">Selección personalizada que se ajusta a tu perfil y criterios.</span><span class="lang-fr">Sélection personnalisée correspondant à votre profil.</span><span class="lang-en">Curated shortlist matching your profile and criteria.</span><span class="lang-en-ca">Curated shortlist matching your profile and criteria.</span></div>
         </div>
-        <div style="padding:8px;background:white;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
-          <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:13pt;color:var(--remax-red);">3</div>
-          <div style="font-weight:700;color:var(--dark-blue);margin:3px 0;font-size:8pt;"><span class="lang-es">Visita</span><span class="lang-fr">Visite</span><span class="lang-en">Visit</span><span class="lang-en-ca">Visit</span></div>
-          <div style="color:var(--medium-gray);line-height:1.4;"><span class="lang-es">Tour presencial o virtual de propiedades en Costa Blanca.</span><span class="lang-fr">Visite en personne ou virtuelle de biens sur la Costa Blanca.</span><span class="lang-en">In-person or virtual property tours on the Costa Blanca.</span><span class="lang-en-ca">In-person or virtual property tours on the Costa Blanca.</span></div>
+        <div style="padding:7px;background:white;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+          <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:12pt;color:var(--remax-red);">3</div>
+          <div style="font-weight:700;color:var(--dark-blue);margin:2px 0;font-size:8pt;"><span class="lang-es">Visita</span><span class="lang-fr">Visite</span><span class="lang-en">Visit</span><span class="lang-en-ca">Visit</span></div>
+          <div style="color:var(--medium-gray);line-height:1.35;"><span class="lang-es">Tour presencial o virtual de propiedades en Costa Blanca.</span><span class="lang-fr">Visite en personne ou virtuelle de biens sur la Costa Blanca.</span><span class="lang-en">In-person or virtual property tours on the Costa Blanca.</span><span class="lang-en-ca">In-person or virtual property tours on the Costa Blanca.</span></div>
         </div>
-        <div style="padding:8px;background:white;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
-          <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:13pt;color:var(--remax-red);">4</div>
-          <div style="font-weight:700;color:var(--dark-blue);margin:3px 0;font-size:8pt;"><span class="lang-es">Cierre</span><span class="lang-fr">Clôture</span><span class="lang-en">Closing</span><span class="lang-en-ca">Closing</span></div>
-          <div style="color:var(--medium-gray);line-height:1.4;"><span class="lang-es">Toda la documentación gestionada hasta la entrega de llaves.</span><span class="lang-fr">Toute la documentation gérée jusqu'à la remise des clés.</span><span class="lang-en">All documentation managed right through to key handover.</span><span class="lang-en-ca">All documentation managed right through to key handover.</span></div>
+        <div style="padding:7px;background:white;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+          <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:12pt;color:var(--remax-red);">4</div>
+          <div style="font-weight:700;color:var(--dark-blue);margin:2px 0;font-size:8pt;"><span class="lang-es">Cierre</span><span class="lang-fr">Clôture</span><span class="lang-en">Closing</span><span class="lang-en-ca">Closing</span></div>
+          <div style="color:var(--medium-gray);line-height:1.35;"><span class="lang-es">Toda la documentación gestionada hasta la entrega de llaves.</span><span class="lang-fr">Toute la documentation gérée jusqu'à la remise des clés.</span><span class="lang-en">All documentation managed right through to key handover.</span><span class="lang-en-ca">All documentation managed right through to key handover.</span></div>
         </div>
       </div>
     </div>
 
     <!-- Fuster Contact Info -->
-    <div style="background:rgba(0,61,165,0.05);border:1.5px solid rgba(0,61,165,0.15);border-radius:8px;padding:10px;margin-bottom:12px;">
-      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:9pt;color:var(--remax-blue);margin-bottom:6px;">Fuster &amp; Associates — Legal &amp; Tax</div>
-      <div style="font-size:8pt;color:var(--charcoal);line-height:1.6;">
+    <div style="background:rgba(0,61,165,0.05);border:1.5px solid rgba(0,61,165,0.15);border-radius:8px;padding:8px 10px;margin-bottom:10px;">
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:9pt;color:var(--remax-blue);margin-bottom:3px;">Fuster &amp; Associates — Legal &amp; Tax</div>
+      <div style="font-size:8pt;color:var(--charcoal);line-height:1.5;">
         🌐 <a href="https://www.fuster-associates.com" target="_blank" style="color:var(--remax-blue);">www.fuster-associates.com</a> &nbsp;·&nbsp;
         ✉️ <a href="mailto:hola@fuster-associates.com" style="color:var(--remax-blue);">hola@fuster-associates.com</a>
       </div>
     </div>
 
     <!-- Schedule CTA -->
-    <div class="card card-dark" style="text-align:center;padding:18px 20px;">
-      <p style="font-size:10pt;margin-bottom:6px;">
+    <div class="card card-dark" style="text-align:center;padding:12px 18px;">
+      <p style="font-size:9.5pt;margin-bottom:4px;">
         <span class="lang-es">¿Listo para dar el primer paso?</span>
         <span class="lang-fr">Prêt à franchir le premier pas ?</span>
         <span class="lang-en">Ready to take the first step?</span>
         <span class="lang-en-ca">Ready to take the first step?</span>
       </p>
-      <p style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:14pt;color:var(--accent-gold);margin-bottom:8px;">
+      <p style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:13pt;color:var(--accent-gold);margin-bottom:4px;">
         <span class="lang-es">Agenda tu Videollamada Gratuita</span>
         <span class="lang-fr">Planifiez Votre Appel Vidéo Gratuit</span>
         <span class="lang-en">Schedule Your Free Video Call</span>
@@ -3205,13 +3310,58 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
 </div>
 
 <!-- ============================================================
-     LANGUAGE TOGGLE SCRIPT
+     LANGUAGE TOGGLE & AUTO-FIT A4 PAGE ENGINE
      ============================================================ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 (function() {
   'use strict';
 
   const VALID_LANGS = ['es', 'en', 'fr', 'en-ca'];
+
+  function fitDossierPages() {
+    var isMobile = window.innerWidth <= 800 && !window.matchMedia('print').matches;
+    var pages = document.querySelectorAll('.page');
+
+    pages.forEach(function (page) {
+      var inner = page.querySelector('.page-inner');
+      if (!inner) return;
+
+      // Reset inline styles before measuring natural content height
+      inner.style.transform = '';
+      inner.style.width = '';
+      inner.style.height = '';
+      inner.style.minHeight = '';
+      inner.style.maxHeight = '';
+
+      if (isMobile) return;
+
+      var targetH = page.clientHeight || 1122;
+      // Measure natural height without fixed height constraints
+      inner.style.height = 'auto';
+      inner.style.minHeight = '0px';
+      inner.style.maxHeight = 'none';
+      var naturalH = inner.scrollHeight;
+
+      if (naturalH > targetH + 2) {
+        var scale = targetH / naturalH;
+        inner.style.transformOrigin = 'top left';
+        inner.style.transform = 'scale(' + scale.toFixed(5) + ')';
+        inner.style.width = (100 / scale).toFixed(4) + '%';
+        inner.style.height = Math.ceil(targetH / scale) + 'px';
+        inner.style.minHeight = Math.ceil(targetH / scale) + 'px';
+      } else {
+        inner.style.transform = 'none';
+        inner.style.width = '100%';
+        inner.style.height = targetH + 'px';
+        inner.style.minHeight = targetH + 'px';
+        inner.style.maxHeight = targetH + 'px';
+      }
+    });
+  }
+
+  window.fitDossierPages = fitDossierPages;
 
   function getPreferredLang() {
     var hash = window.location.hash.replace('#', '').toLowerCase();
@@ -3237,6 +3387,8 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
       var btn = document.getElementById('btn-' + l);
       if (btn) btn.classList.toggle('active', lang === l);
     });
+
+    requestAnimationFrame(fitDossierPages);
   }
 
   window.setLang = function(lang) {
@@ -3246,51 +3398,119 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
 
   applyLang(getPreferredLang());
 
-  window.addEventListener('hashchange', function() {
-    var hash = window.location.hash.replace('#', '').toLowerCase();
-    if (VALID_LANGS.includes(hash)) applyLang(hash);
-  });
-})();
-</script>
-
-
-<!-- ============================================================
-     AUTO-FIT PAGES FOR PRINT
-     Detects pages whose content overflows 297mm and applies
-     CSS zoom (which — unlike transform — affects real layout)
-     so Chrome's print engine never spills content to the next page.
-     ============================================================ -->
-<script>
-(function () {
-  'use strict';
-
-  function fitForPrint() {
-    var pages = document.querySelectorAll('.page');
-    pages.forEach(function (page) {
-      var inner = page.querySelector('.page-inner');
-      if (!inner) return;
-
-      // Reset previous zoom before measuring
-      inner.style.zoom = '';
-
-      var pageH  = page.getBoundingClientRect().height;  // ~1122 px for 297 mm
-      var innerH = inner.scrollHeight;                  // real content height
-
-      if (innerH > pageH + 1) {
-        // Scale content down so it fits exactly inside the page box
-        inner.style.zoom = (pageH / innerH).toFixed(6);
+  function prepareCoverWhiteLogos() {
+    var imgs = document.querySelectorAll('.cover-partners img');
+    imgs.forEach(function(img) {
+      if (img.dataset.whiteProcessed) return;
+      var inlineFilter = (img.style && img.style.filter) || '';
+      var computedFilter = window.getComputedStyle ? window.getComputedStyle(img).filter : '';
+      if (inlineFilter === 'none') return;
+      if (inlineFilter.indexOf('invert') === -1 && computedFilter.indexOf('invert') === -1) return;
+      if (!img.complete || !img.naturalWidth) return;
+      try {
+        var c = document.createElement('canvas');
+        c.width = img.naturalWidth;
+        c.height = img.naturalHeight;
+        var ctx = c.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        var imageData = ctx.getImageData(0, 0, c.width, c.height);
+        var d = imageData.data;
+        for (var p = 0; p < d.length; p += 4) {
+          if (d[p + 3] > 0) {
+            d[p] = 255;
+            d[p + 1] = 255;
+            d[p + 2] = 255;
+          }
+        }
+        ctx.putImageData(imageData, 0, 0);
+        img.src = c.toDataURL('image/png');
+        img.style.filter = 'none';
+        img.dataset.whiteProcessed = 'true';
+      } catch (e) {
+        // Ignore CORS canvas errors if any
       }
     });
   }
 
-  function resetAfterPrint() {
-    document.querySelectorAll('.page .page-inner').forEach(function (el) {
-      el.style.zoom = '';
-    });
-  }
+  window.addEventListener('load', function() {
+    prepareCoverWhiteLogos();
+    fitDossierPages();
+    setTimeout(fitDossierPages, 300);
+  });
+  window.addEventListener('resize', fitDossierPages);
+  window.addEventListener('beforeprint', fitDossierPages);
+  window.addEventListener('hashchange', function() {
+    var hash = window.location.hash.replace('#', '').toLowerCase();
+    if (VALID_LANGS.includes(hash)) applyLang(hash);
+  });
 
-  window.addEventListener('beforeprint', fitForPrint);
-  window.addEventListener('afterprint',  resetAfterPrint);
+  window.downloadDossierPDF = async function() {
+    prepareCoverWhiteLogos();
+    fitDossierPages();
+
+    if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+      window.print();
+      return;
+    }
+
+    var btn = document.getElementById('btn-download-pdf');
+    var originalHTML = btn ? btn.innerHTML : '';
+    var currentLang = getPreferredLang();
+    var loadingLabels = {
+      'es': '⏳ Generando PDF...',
+      'en': '⏳ Generating PDF...',
+      'fr': '⏳ Génération du PDF...',
+      'en-ca': '⏳ Generating PDF...'
+    };
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = loadingLabels[currentLang] || loadingLabels['es'];
+    }
+
+    try {
+      var jsPDF = window.jspdf.jsPDF;
+      var pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+
+      var pages = Array.from(document.querySelectorAll('.page'));
+      for (var i = 0; i < pages.length; i++) {
+        var pageEl = pages[i];
+        var canvas = await html2canvas(pageEl, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#F7F5EE',
+          logging: false,
+          width: pageEl.offsetWidth,
+          height: pageEl.offsetHeight,
+          windowWidth: 1200
+        });
+        var imgData = canvas.toDataURL('image/jpeg', 0.95);
+        if (i > 0) pdf.addPage('a4', 'portrait');
+        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+      }
+
+      var fileNames = {
+        'es': 'Guia_Compra_Espana_The_Spain_Connection_ES.pdf',
+        'en': 'Buying_Guide_Spain_The_Spain_Connection_EN.pdf',
+        'fr': 'Guide_Achat_Espagne_The_Spain_Connection_FR.pdf',
+        'en-ca': 'Buying_Guide_Spain_The_Spain_Connection_CA.pdf'
+      };
+      pdf.save(fileNames[currentLang] || fileNames['es']);
+    } catch (err) {
+      console.error('Error generating direct PDF, falling back to print:', err);
+      window.print();
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+      }
+    }
+  };
 })();
 </script>
 
