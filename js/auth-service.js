@@ -716,9 +716,9 @@ App.auth = (function() {
       user.status = newStatus;
       user.updatedAt = new Date().toISOString();
       saveDemoData();
-      // Notify admin of status change
+      // Notify admin and user of status change
       if (window.App && window.App.notifications) {
-        window.App.notifications.onUserStatusChange(user, newStatus).catch(() => {});
+        await window.App.notifications.onUserStatusChange(user, newStatus).catch(() => {});
       }
       return true;
     } else {
@@ -730,7 +730,7 @@ App.auth = (function() {
       try {
         const doc = await App.db.collection('users').doc(userId).get();
         if (doc.exists && window.App && window.App.notifications) {
-          window.App.notifications.onUserStatusChange({ id: userId, ...doc.data() }, newStatus).catch(() => {});
+          await window.App.notifications.onUserStatusChange({ id: userId, ...doc.data() }, newStatus).catch(() => {});
         }
       } catch (_) {}
       return true;
