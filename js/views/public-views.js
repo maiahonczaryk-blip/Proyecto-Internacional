@@ -77,7 +77,7 @@ App.views.public = {
       const newForm = form.cloneNode(true);
       form.parentNode.replaceChild(newForm, form);
 
-      newForm.addEventListener('submit', function(e) {
+      newForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const firstName = newForm.querySelector('#intake-firstName').value.trim();
@@ -94,8 +94,7 @@ App.views.public = {
           return;
         }
 
-        const newClient = {
-          id: 'cli-' + Date.now(),
+        const clientPayload = {
           firstName,
           lastName,
           email,
@@ -103,45 +102,45 @@ App.views.public = {
           currentLocation: country,
           budget: '',
           interestArea: targetLoc,
-          status: 'contacted',
-          notes: '',
+          notes: 'Client portal submission',
           referredBy: refCode || null,
           realtorId: null,
           realtorName: null,
           brokerId: null,
           localAgentId: null,
           localAgentName: null,
-          statusHistory: [{ status: 'contacted', date: new Date().toISOString(), note: 'Client portal submission' }],
           timeline: '',
-          objective: '',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          objective: ''
         };
 
         if (refCode && App.demoData && App.demoData.users) {
           const referrer = App.demoData.users.find(u => u.referralCode === refCode);
           if (referrer) {
-            newClient.referredBy = referrer.id;
+            clientPayload.referredBy = referrer.id;
             if (referrer.role === 'broker') {
-              newClient.brokerId = referrer.id;
+              clientPayload.brokerId = referrer.id;
             } else if (referrer.role === 'realtor') {
-              newClient.realtorId = referrer.id;
-              newClient.realtorName = `${referrer.firstName} ${referrer.lastName}`;
-              newClient.brokerId = referrer.brokerId || null;
+              clientPayload.realtorId = referrer.id;
+              clientPayload.realtorName = `${referrer.firstName} ${referrer.lastName}`;
+              clientPayload.brokerId = referrer.brokerId || null;
             }
           }
         }
 
-        App.demoData.clients.push(newClient);
-        App.auth.saveDemoData();
-
-        if (App.utils && App.utils.showToast) {
-          App.utils.showToast('Registration successful! We\'ll be in touch soon.', 'success');
+        try {
+          await App.auth.addReferralClient(clientPayload);
+          if (App.utils && App.utils.showToast) {
+            App.utils.showToast('Registration successful! We\'ll be in touch soon.', 'success');
+          }
+          sessionStorage.removeItem('referralCode');
+          newForm.reset();
+          setTimeout(() => App.router.navigateTo('home'), 1500);
+        } catch (err) {
+          console.error('[Intake] Error registering client:', err);
+          if (App.utils && App.utils.showToast) {
+            App.utils.showToast('Error submitting registration: ' + err.message, 'error');
+          }
         }
-
-        sessionStorage.removeItem('referralCode');
-        newForm.reset();
-        setTimeout(() => App.router.navigateTo('home'), 1500);
       });
     }
   },
@@ -788,47 +787,13 @@ App.views.public = {
             await App.auth.register(userPayload);
           }
 
-          // ---- Automatic Webinar Registration (Client / Buyer only) ----
+          // ---- Webinar Date for Confirmation Toast (addReferralClient / register already auto-enrolled in webinar) ----
           const settings = (App.auth && App.auth.getWebinarSettings)
             ? await App.auth.getWebinarSettings()
             : (App.auth && App.auth.getDefaultWebinarSettings ? App.auth.getDefaultWebinarSettings() : null);
 
-          const isClientType = contactType === 'client';
           const typeConfig = settings?.b2c || {};
-          const webinarTitle = typeConfig?.title || 'Spain Unlocked: Living & Investing';
           const webinarDate = typeConfig?.date || settings?.date || '2026-10-29';
-
-          if (isClientType) {
-            let webinarPayload = {
-              firstName,
-              lastName,
-              email,
-              phone,
-              agency: form.querySelector('#referral-objective')?.value || 'Client (Interested in Spain)',
-              clientInterest: form.querySelector('#referral-objective')?.value || form.querySelector('#referral-interestArea')?.value || 'Inversión / Mudanza',
-              country: form.querySelector('#referral-country')?.value || (market || 'United States'),
-              state: form.querySelector('#referral-market')?.value || 'N/A',
-              howHeard: 'Referral Link',
-              referrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : (inmomasAgent || ''),
-              webinar: webinarTitle,
-              webinarType: 'B2C',
-              webinarDate: webinarDate,
-              gdprConsent: true,
-              referralCode: referrer?.referralCode || refCode || null,
-              referrerId: referrer?.id || null,
-              agentReferrerId: referrer?.id || null,
-              agentReferrerName: referrer ? `${referrer.firstName} ${referrer.lastName}` : (inmomasAgent || null),
-              agentReferrerRole: referrer?.role || (inmomasAgent ? 'agent_inmomas' : null),
-              inmomasAgentName: inmomasAgent || null,
-              status: 'pending'
-            };
-
-            try {
-              await App.auth.saveWebinarRegistration(webinarPayload);
-            } catch (webinarErr) {
-              console.warn('[Referral] Automatic webinar registration failed:', webinarErr);
-            }
-          }
 
           App.utils.showToast(
             contactType === 'client'
