@@ -1044,39 +1044,32 @@ document.addEventListener('DOMContentLoaded', () => {
               source: 'download_dossier'
             };
 
-            // Open dossier synchronously inside the user gesture so browsers never block the popup
-            const dossierUrl = `dossier.html?download=1#${lang}`;
-            const popupWin = window.open(dossierUrl, '_blank');
+            const dossierUrl = `dossier.html#${lang}`;
+
+            App.utils.showToast(
+              s.toast,
+              'success'
+            );
 
             try {
               if (App.auth && typeof App.auth.saveDossierLead === 'function') {
-                await App.auth.saveDossierLead(leadData);
-              }
-              
-              App.utils.showToast(
-                s.toast,
-                'success'
-              );
-              
-              if (modalInstance && typeof modalInstance.close === 'function') {
-                modalInstance.close();
-              } else if (App.utils && typeof App.utils.closeModal === 'function') {
-                App.utils.closeModal();
-              }
-              
-              // Fallback if popup was blocked by an in-app browser
-              if (!popupWin || popupWin.closed || typeof popupWin.closed === 'undefined') {
-                window.location.href = dossierUrl;
+                await Promise.race([
+                  App.auth.saveDossierLead(leadData),
+                  new Promise(resolve => setTimeout(resolve, 2500))
+                ]);
               }
             } catch (err) {
               console.error('Error saving dossier lead:', err);
-              if (modalInstance && typeof modalInstance.close === 'function') {
-                modalInstance.close();
-              }
-              if (!popupWin || popupWin.closed || typeof popupWin.closed === 'undefined') {
-                window.location.href = dossierUrl;
-              }
             }
+
+            if (modalInstance && typeof modalInstance.close === 'function') {
+              modalInstance.close();
+            } else if (App.utils && typeof App.utils.closeModal === 'function') {
+              App.utils.closeModal();
+            }
+
+            // Navigate directly in current tab so Safari/mobile popup blockers never block it
+            window.location.href = dossierUrl;
           });
         }
       }
