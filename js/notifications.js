@@ -126,6 +126,12 @@
     return map[status] || status || '—';
   }
 
+  let lastSendTimestamp = 0;
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   async function sendEmail(templateId, params, toEmail = ADMIN_EMAIL) {
     initEmailJS();
     const effectiveTemplate = getActiveTemplate(templateId);
@@ -136,15 +142,39 @@
       );
       return;
     }
+
+    // Respect EmailJS 1 request/sec rate limit across consecutive sends
+    const now = Date.now();
+    const elapsed = now - lastSendTimestamp;
+    if (lastSendTimestamp > 0 && elapsed < 1150) {
+      await sleep(1150 - elapsed);
+    }
+
+    const payload = {
+      ...params,
+      to_email: toEmail,
+      email: toEmail,
+      recipient_email: toEmail,
+      user_email: params.user_email || toEmail,
+      to_name: params.user_name || '',
+      name: 'The Spain Connection — RE/MAX Inmomás',
+      admin_email: ADMIN_EMAIL
+    };
+
     try {
-      await emailjs.send(EMAILJS_SERVICE_ID, effectiveTemplate, { 
-        to_email: toEmail, 
-        admin_email: ADMIN_EMAIL,
-        ...params 
-      }, EMAILJS_PUBLIC_KEY);
+      lastSendTimestamp = Date.now();
+      await emailjs.send(EMAILJS_SERVICE_ID, effectiveTemplate, payload, EMAILJS_PUBLIC_KEY);
       console.info('[Notifications] Email enviado a', toEmail, '— template:', effectiveTemplate);
     } catch (err) {
-      console.warn('[Notifications] Error al enviar email:', err);
+      console.warn('[Notifications] Primer intento falló para', toEmail, '— reintentando en 1.3s:', err);
+      try {
+        await sleep(1300);
+        lastSendTimestamp = Date.now();
+        await emailjs.send(EMAILJS_SERVICE_ID, effectiveTemplate, payload, EMAILJS_PUBLIC_KEY);
+        console.info('[Notifications] Email enviado en reintento a', toEmail, '— template:', effectiveTemplate);
+      } catch (retryErr) {
+        console.warn('[Notifications] Error al enviar email a', toEmail, ':', retryErr);
+      }
     }
   }
 
@@ -239,32 +269,32 @@
 
   async function onUserStatusChange(user, newStatus) {
     const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
-    
-    // 1. Notificar al Admin del cambio de estado
-    for (const targetEmail of ADMIN_EMAILS) {
-      await sendEmail(EMAILJS_TEMPLATE_STATUS, {
-        user_type:   `Cambio Estado Usuario (${statusLabel(newStatus)})`,
-        user_name:   name,
-        user_email:  user.email || '—',
-        user_role:   roleLabel(user.role),
-        user_country:user.country || '—',
-        user_agency: user.agencyName || '—',
-        user_phone:  user.phone || '—',
-        new_status:  statusLabel(newStatus),
-        source:      `Estado actualizado a: ${newStatus}`,
-        registered_at: fmtDate(new Date().toISOString()),
-        updated_at:  fmtDate(new Date().toISOString()),
-        admin_url:   ADMIN_URL
-      }, targetEmail);
-    }
 
-    // 2. Si el usuario ha sido aprobado ('active'), enviarle correo a él
+    // 1. PRIORIDAD: Si el usuario ha sido aprobado ('active'), enviarle correo a él PRIMERO
     if (newStatus === 'active' && user.email) {
       await sendEmail(EMAILJS_TEMPLATE_USER_APPROVED, {
-        user_name: name,
+        user_name:  name,
         user_email: user.email,
-        login_url: 'https://thespainconnection.com/index.html#login'
+        login_url:  'https://thespainconnection.com/index.html#login'
       }, user.email);
+    }
+
+    // 2. Notificar al Admin del cambio de estado
+    for (const targetEmail of ADMIN_EMAILS) {
+      await sendEmail(EMAILJS_TEMPLATE_STATUS, {
+        user_type:     `Cambio Estado Usuario (${statusLabel(newStatus)})`,
+        user_name:     name,
+        user_email:    user.email || '—',
+        user_role:     roleLabel(user.role),
+        user_country:  user.country || '—',
+        user_agency:   user.agencyName || '—',
+        user_phone:    user.phone || '—',
+        new_status:    statusLabel(newStatus),
+        source:        `Estado actualizado a: ${newStatus}`,
+        registered_at: fmtDate(new Date().toISOString()),
+        updated_at:    fmtDate(new Date().toISOString()),
+        admin_url:     ADMIN_URL
+      }, targetEmail);
     }
   }
 
