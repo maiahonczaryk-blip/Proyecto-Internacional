@@ -3285,6 +3285,16 @@ body.lang-en-ca .lang-es, body.lang-en-ca .lang-en, body.lang-en-ca .lang-fr { d
 
   window.addEventListener('beforeprint', fitForPrint);
   window.addEventListener('afterprint',  resetAfterPrint);
+
+  // Auto-open PDF print/save dialog when opened from the Download Guide form (?download=1)
+  if (window.location.search.indexOf('download=1') !== -1) {
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        fitForPrint();
+        window.print();
+      }, 700);
+    });
+  }
 })();
 </script>
 
