@@ -72,8 +72,8 @@
   const EMAILJS_TEMPLATE_STATUS   = 'YOUR_TEMPLATE_STATUS';  // e.g. 'template_xyz456'
   const EMAILJS_TEMPLATE_USER_APPROVED = 'template_giaoa5e'; // Listo! (Plantilla C)
   // ── Admin Destination ─────────────────────────────────────────────────────
-  const ADMIN_EMAIL  = 'maia.honczaryk@remax.es';
-  const ADMIN_EMAILS = ['maia.honczaryk@remax.es', 'spainconnection0@gmail.com'];
+  const ADMIN_EMAIL  = 'spainconnection0@gmail.com';
+  const ADMIN_EMAILS = ['spainconnection0@gmail.com', 'maia.honczaryk@remax.es'];
   const ADMIN_URL    = 'https://thespainconnection.com/app.html#admin/users';
   // ──────────────────────────────────────────────────────────────────────────
 
@@ -255,31 +255,32 @@
       admin_url:     'https://thespainconnection.com/app.html#admin/webinar'
     };
 
-    // 1. Send to all Admin emails
+    // 1. If referred, send a copy to the agent/realtor FIRST (unless already in ADMIN_EMAILS)
     const targetList = Array.isArray(ADMIN_EMAILS) && ADMIN_EMAILS.length ? ADMIN_EMAILS : [ADMIN_EMAIL];
-    for (const target of targetList) {
-      await sendEmail(EMAILJS_TEMPLATE_NEW_REG, emailData, target);
+    if (agentEmail && !targetList.includes(agentEmail.toLowerCase().trim())) {
+      await sendEmail(EMAILJS_TEMPLATE_NEW_REG, emailData, agentEmail.trim());
     }
 
-    // 2. If referred, send a copy to the agent (unless already sent as admin)
-    if (agentEmail && !targetList.includes(agentEmail.toLowerCase().trim())) {
-      await sendEmail(EMAILJS_TEMPLATE_NEW_REG, emailData, agentEmail);
+    // 2. Send to all Admin emails (1st: The Spain Connection, 2nd: Maia)
+    for (const target of targetList) {
+      await sendEmail(EMAILJS_TEMPLATE_NEW_REG, emailData, target);
     }
   }
 
   async function onUserStatusChange(user, newStatus) {
     const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
+    const userEmail = (user.email || '').trim();
 
-    // 1. PRIORIDAD: Si el usuario ha sido aprobado ('active'), enviarle correo a él PRIMERO
-    if (newStatus === 'active' && user.email) {
+    // 1. PRIORIDAD: Si el usuario ha sido aprobado ('active'), enviarle correo al Realtor/Usuario PRIMERO
+    if (newStatus === 'active' && userEmail) {
       await sendEmail(EMAILJS_TEMPLATE_USER_APPROVED, {
         user_name:  name,
-        user_email: user.email,
+        user_email: userEmail,
         login_url:  'https://thespainconnection.com/index.html#login'
-      }, user.email);
+      }, userEmail);
     }
 
-    // 2. Notificar al Admin del cambio de estado
+    // 2. Notificar a los Admins (2º: The Spain Connection, 3º: Maia)
     for (const targetEmail of ADMIN_EMAILS) {
       await sendEmail(EMAILJS_TEMPLATE_STATUS, {
         user_type:     `Cambio Estado Usuario (${statusLabel(newStatus)})`,

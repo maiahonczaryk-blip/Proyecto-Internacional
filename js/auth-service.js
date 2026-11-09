@@ -228,9 +228,7 @@ App.auth = (function() {
 
       // Notify admin of new registration
       if (window.App && window.App.notifications) {
-        await window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
-
-        // If referred, notify the referring agent
+        // 1. If referred, notify the referring agent/realtor FIRST
         if (newUser.referredBy) {
           try {
             const allUsers = App.demoData.users;
@@ -242,6 +240,9 @@ App.auth = (function() {
             console.warn('[Notifications] Error finding referrer agent:', e);
           }
         }
+
+        // 2. Notify admins (The Spain Connection, then Maia)
+        await window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
       }
 
       // Auto-enroll user/client in upcoming webinar (silent since onNewUserRegistration already notified)
@@ -301,12 +302,11 @@ App.auth = (function() {
 
       await App.db.collection('users').doc(uid).set(userData);
 
-      // Notify admin of new registration
+      // Notify referring agent and admins of new registration
       if (window.App && window.App.notifications) {
         const fullUser = { id: uid, ...userData };
-        await window.App.notifications.onNewUserRegistration(fullUser).catch(() => {});
 
-        // If referred, notify the referring agent
+        // 1. If referred, notify the referring agent/realtor FIRST
         if (userData.referredBy) {
           try {
             const allUsers = await getAllUsers();
@@ -318,6 +318,9 @@ App.auth = (function() {
             console.warn('[Notifications] Error finding referrer agent:', e);
           }
         }
+
+        // 2. Notify admins (The Spain Connection, then Maia)
+        await window.App.notifications.onNewUserRegistration(fullUser).catch(() => {});
       }
 
       // Auto-enroll user/client in upcoming webinar (silent since onNewUserRegistration already notified)
@@ -571,9 +574,7 @@ App.auth = (function() {
 
       // Notify admin of new registration via Google
       if (window.App && window.App.notifications) {
-        await window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
-
-        // If referred, notify the referring agent
+        // 1. If referred, notify the referring agent/realtor FIRST
         if (newUser.referredBy) {
           try {
             const allUsers = App.demoData.users;
@@ -585,6 +586,9 @@ App.auth = (function() {
             console.warn('[Notifications] Error finding referrer agent:', e);
           }
         }
+
+        // 2. Notify admins (The Spain Connection, then Maia)
+        await window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
       }
 
       // Auto-enroll in webinar
@@ -2122,7 +2126,7 @@ App.auth = (function() {
       await App.db.collection('clients').doc(newClient.id).set(newClient);
     }
 
-    // Notify admin and referring agent of new client registration
+    // Notify referring agent and admins of new client registration
     if (window.App && window.App.notifications) {
       const clientForNotif = {
         ...newClient,
@@ -2130,8 +2134,8 @@ App.auth = (function() {
         country: newClient.currentLocation || '—',
         agencyName: newClient.objective || newClient.interestArea || 'Cliente / Comprador'
       };
-      await window.App.notifications.onNewUserRegistration(clientForNotif).catch(() => {});
 
+      // 1. Notify referring realtor/agent FIRST
       if (newClient.referredBy || newClient.realtorId || newClient.localAgentId || newClient.brokerId) {
         try {
           const allUsers = await getAllUsers();
@@ -2147,6 +2151,9 @@ App.auth = (function() {
           console.warn('[Notifications] Error finding referrer agent for client:', e);
         }
       }
+
+      // 2. Notify admins (The Spain Connection, then Maia)
+      await window.App.notifications.onNewUserRegistration(clientForNotif).catch(() => {});
     }
 
     // Auto-enroll client in B2C client webinar (silent since onNewUserRegistration already notified)
@@ -2194,8 +2201,7 @@ App.auth = (function() {
     }
 
     if (window.App && window.App.notifications) {
-      await window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
-      
+      // 1. Notify referring realtor/agent FIRST
       if (newUser.referredBy) {
         try {
           const allUsers = await getAllUsers();
@@ -2207,6 +2213,9 @@ App.auth = (function() {
           console.warn('[Notifications] Error finding referrer agent:', e);
         }
       }
+
+      // 2. Notify admins (The Spain Connection, then Maia)
+      await window.App.notifications.onNewUserRegistration(newUser).catch(() => {});
     }
 
     // Auto-enroll referred user in webinar
