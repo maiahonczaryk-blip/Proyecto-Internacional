@@ -1044,6 +1044,10 @@ document.addEventListener('DOMContentLoaded', () => {
               source: 'download_dossier'
             };
 
+            // Open dossier synchronously inside the user gesture so browsers never block the popup
+            const dossierUrl = `dossier.html?download=1#${lang}`;
+            const popupWin = window.open(dossierUrl, '_blank');
+
             try {
               if (App.auth && typeof App.auth.saveDossierLead === 'function') {
                 await App.auth.saveDossierLead(leadData);
@@ -1054,14 +1058,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 'success'
               );
               
-              modalInstance.close();
+              if (modalInstance && typeof modalInstance.close === 'function') {
+                modalInstance.close();
+              } else if (App.utils && typeof App.utils.closeModal === 'function') {
+                App.utils.closeModal();
+              }
               
-              // Open dossier in new tab
-              window.open('dossier.html', '_blank');
+              // Fallback if popup was blocked by an in-app browser
+              if (!popupWin || popupWin.closed || typeof popupWin.closed === 'undefined') {
+                window.location.href = dossierUrl;
+              }
             } catch (err) {
               console.error('Error saving dossier lead:', err);
-              App.utils.showToast('Error saving data. Please try again.', 'error');
-              if (submitBtn) submitBtn.disabled = false;
+              if (modalInstance && typeof modalInstance.close === 'function') {
+                modalInstance.close();
+              }
+              if (!popupWin || popupWin.closed || typeof popupWin.closed === 'undefined') {
+                window.location.href = dossierUrl;
+              }
             }
           });
         }
