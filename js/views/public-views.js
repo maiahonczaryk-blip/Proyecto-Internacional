@@ -241,6 +241,24 @@ App.views.public = {
         if (submitBtn) {
           submitBtn.innerHTML = `<span class="lang-en">Register Brokerage</span><span class="lang-es">Registrar Brokerage</span><span class="lang-fr">Inscrire l'Agence</span><span class="lang-en-ca">Register Brokerage</span>`;
         }
+      } else if (type === 'embajador') {
+        if (formTitle) {
+          formTitle.innerHTML = `<span class="lang-en">Ambassador Application</span><span class="lang-es">Postulación como Embajador</span><span class="lang-fr">Candidature Ambassadeur</span><span class="lang-en-ca">Ambassador Application</span>`;
+        }
+        if (welcomeMsg) {
+          welcomeMsg.innerHTML = refName
+            ? `<span class="lang-en">Executive invitation from <strong>${refName}</strong> · Lead your own umbrella of Brokers, Realtors, Collaborators &amp; Clients</span>
+               <span class="lang-es">Invitación ejecutiva de <strong>${refName}</strong> · Lidera tu propio paraguas de Brokers, Agentes, Colaboradores y Clientes</span>
+               <span class="lang-fr">Invitation exécutive de <strong>${refName}</strong> · Dirigez votre réseau de Courtiers, Agents, Partenaires et Clients</span>
+               <span class="lang-en-ca">Executive invitation from <strong>${refName}</strong> · Lead your own umbrella of Brokers, Realtors, Collaborators &amp; Clients</span>`
+            : `<span class="lang-en">Apply as Official Ambassador · The Spain Connection</span>
+               <span class="lang-es">Postúlate como Embajador Oficial · The Spain Connection</span>
+               <span class="lang-fr">Postuler comme Ambassadeur Officiel · The Spain Connection</span>
+               <span class="lang-en-ca">Apply as Official Ambassador · The Spain Connection</span>`;
+        }
+        if (submitBtn) {
+          submitBtn.innerHTML = `<span class="lang-en">Apply as Ambassador</span><span class="lang-es">Postularse como Embajador</span><span class="lang-fr">Postuler comme Ambassadeur</span><span class="lang-en-ca">Apply as Ambassador</span>`;
+        }
       } else {
         if (formTitle) {
           formTitle.innerHTML = `<span class="lang-en">Partner Registration</span><span class="lang-es">Registro de Colaborador</span><span class="lang-fr">Inscription Partenaire</span><span class="lang-en-ca">Partner Registration</span>`;
@@ -415,12 +433,28 @@ App.views.public = {
       if (profConsentBox) profConsentBox.checked = true;
 
       // Build type options based on referrer's role
+      // NOTE: 'embajador' ONLY appears on the Administrator's referral link (referrer.role === 'admin').
+      // An Embajador's referral link includes all umbrella variants ('broker', 'realtor', 'colaborador', 'client') EXCEPT 'embajador'.
       let availableTypes = ['realtor', 'client'];
       if (!referrer) {
         availableTypes = ['realtor', 'broker', 'colaborador', 'client'];
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
         } else {
+          selectedType = 'realtor';
+        }
+      } else if (referrer.role === 'admin') {
+        availableTypes = ['embajador', 'broker', 'realtor', 'colaborador', 'agent_inmomas', 'client'];
+        if (availableTypes.includes(requestedType)) {
+          selectedType = requestedType;
+        } else if (!availableTypes.includes(selectedType)) {
+          selectedType = 'realtor';
+        }
+      } else if (referrer.role === 'embajador') {
+        availableTypes = ['broker', 'realtor', 'colaborador', 'client'];
+        if (availableTypes.includes(requestedType)) {
+          selectedType = requestedType;
+        } else if (!availableTypes.includes(selectedType)) {
           selectedType = 'realtor';
         }
       } else if (referrer.role === 'realtor') {
@@ -437,10 +471,8 @@ App.views.public = {
         } else if (!availableTypes.includes(selectedType)) {
           selectedType = 'realtor';
         }
-      } else if (referrer.role === 'agent_inmomas' || referrer.role === 'colaborador' || referrer.role === 'admin' || referrer.role === 'partner') {
-        availableTypes = referrer.role === 'admin' 
-          ? ['realtor', 'broker', 'client', 'agent_inmomas', 'colaborador']
-          : ['realtor', 'broker', 'colaborador', 'client'];
+      } else if (referrer.role === 'agent_inmomas' || referrer.role === 'colaborador' || referrer.role === 'partner') {
+        availableTypes = ['realtor', 'broker', 'colaborador', 'client'];
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
         } else if (!availableTypes.includes(selectedType)) {
@@ -450,10 +482,20 @@ App.views.public = {
         availableTypes = ['realtor', 'broker', 'colaborador', 'client'];
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
+        } else {
+          selectedType = 'realtor';
         }
       }
 
       const typeConfig = {
+        embajador: {
+          icon: '👑',
+          badge: '',
+          labelEn: 'Ambassador',
+          labelEs: 'Embajador',
+          labelFr: 'Ambassadeur',
+          labelEnCa: 'Ambassador'
+        },
         client: {
           icon: '👤',
           badge: '',
@@ -721,7 +763,10 @@ App.views.public = {
 
             if (referrer) {
               clientPayload.referredBy = referrer.id;
-              if (referrer.role === 'broker') {
+              clientPayload.embajadorId = referrer.role === 'embajador' ? referrer.id : (referrer.embajadorId || null);
+              if (referrer.role === 'embajador') {
+                clientPayload.referredBy = referrer.id;
+              } else if (referrer.role === 'broker') {
                 clientPayload.brokerId = referrer.id;
               } else if (referrer.role === 'agent_inmomas') {
                 clientPayload.localAgentId = referrer.id;
@@ -748,6 +793,11 @@ App.views.public = {
 
             await App.auth.addReferralClient(clientPayload);
           } else {
+            // Strictly enforce that applying as 'embajador' is only permitted via an Administrator referral link
+            if (contactType === 'embajador' && (!referrer || referrer.role !== 'admin')) {
+              throw new Error('La postulación como Embajador solo está disponible a través del enlace oficial de Administración.');
+            }
+
             agencyName = form.querySelector('#referral-agencyName')?.value.trim() || '';
             if (!agencyName && referrer && referrer.role === 'broker' && referrer.agencyName) {
               agencyName = referrer.agencyName;
@@ -765,6 +815,10 @@ App.views.public = {
               (agencyName && referrer.agencyName && agencyName.toLowerCase() === referrer.agencyName.toLowerCase())
             );
 
+            const resolvedEmbajadorId = (referrer && contactType !== 'embajador')
+              ? (referrer.role === 'embajador' ? referrer.id : (referrer.embajadorId || null))
+              : null;
+
             const userPayload = {
               email,
               password,
@@ -775,7 +829,9 @@ App.views.public = {
               phone,
               country: market || 'United States',
               role: contactType,
-              brokerId: (referrer && referrer.role === 'broker') ? referrer.id : null,
+              brokerId: (referrer && referrer.role === 'broker' && contactType === 'realtor') ? referrer.id : null,
+              embajadorId: resolvedEmbajadorId,
+              referredByAdmin: Boolean(referrer && referrer.role === 'admin'),
               referredBy: referrer ? referrer.id : (inmomasAgent || null),
               inmomasAgentName: inmomasAgent || null,
               notes: notes || '',
@@ -1336,12 +1392,12 @@ App.views.public = {
 
         if (App.demoMode && App.demoData && App.demoData.users) {
           collaborators = App.demoData.users.filter(u =>
-            ['colaborador', 'realtor', 'broker'].includes(u.role) &&
+            ['embajador', 'colaborador', 'realtor', 'broker'].includes(u.role) &&
             u.status === 'active'
           );
         } else if (!App.demoMode && App.db) {
           // Firestore: query each role separately (Firestore doesn't support array-contains for 'in' on role without composite index)
-          const roles = ['colaborador', 'realtor', 'broker'];
+          const roles = ['embajador', 'colaborador', 'realtor', 'broker'];
           const snaps = await Promise.all(
             roles.map(r => App.db.collection('users').where('role', '==', r).where('status', '==', 'active').get())
           );
@@ -1384,7 +1440,7 @@ App.views.public = {
         };
         collaborators.sort((a, b) => getSortKey(a).localeCompare(getSortKey(b), undefined, { sensitivity: 'base' }));
 
-        const roleBadge = { colaborador: '🤝', realtor: '🏠', broker: '🏢' };
+        const roleBadge = { embajador: '👑', colaborador: '🤝', realtor: '🏠', broker: '🏢' };
 
         collaborators.forEach(u => {
           const name = u.name ? u.name.trim() : `${u.firstName || ''} ${u.lastName || ''}`.trim();

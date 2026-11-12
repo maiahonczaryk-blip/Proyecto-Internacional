@@ -114,6 +114,7 @@
 
   function roleLabel(role) {
     const map = {
+      embajador: 'Embajador',
       broker: 'Broker', realtor: 'Realtor',
       agent_inmomas: 'Agente Inmomás', admin: 'Administrador',
       colaborador: 'Colaborador', client: 'Cliente / Comprador'

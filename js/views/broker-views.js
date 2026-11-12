@@ -603,6 +603,11 @@
                  <div style="font-size:0.85rem; color:#374151;">
                    <p style="margin:0 0 0.5rem;"><strong>Contrato:</strong> Acuerdo de Colaboración Conjunta (25%)</p>
                    ${detail}
+                   <div style="margin-top:0.85rem; padding-top:0.75rem; border-top:1px solid #e5e7eb;">
+                     <button type="button" class="btn btn-outline btn-sm" style="width:100%; border-color:#1e3a8a; color:#1e3a8a; font-weight:700;" onclick="App.views.broker.exportRealtorAgreement('${r.id}')">
+                       📄 <span class="lang-en">Export Master Referral Agreement (Word .doc)</span><span class="lang-es">Exportar Master Referral Agreement (Word .doc)</span><span class="lang-fr">Exporter Accord-Cadre (Word .doc)</span><span class="lang-en-ca">Export Master Referral Agreement (Word .doc)</span>
+                     </button>
+                   </div>
                  </div>
                </div>`;
              }).join('')}
@@ -839,6 +844,24 @@
     }
   }
 
+  /* ── Export Team Realtor Agreement to Word ── */
+  function exportRealtorAgreement(realtorId) {
+    if (typeof App.generateReferralAgreementDoc !== 'function') {
+      App.utils.showToast('Generador de documento Word no disponible.', 'error');
+      return;
+    }
+    const realtor = (teamRealtors || []).find(r => r.id === realtorId);
+    const broker = currentUser || App.auth.getCurrentUser();
+    if (!realtor) {
+      App.utils.showToast('Realtor no encontrado.', 'error');
+      return;
+    }
+    // Use realtor's own contractCompanyData if submitted, otherwise fall back to Broker's company data
+    const hasRealtorCompanyData = realtor.contractCompanyData && (realtor.contractCompanyData.companyLegalName || realtor.contractCompanyData.taxId);
+    const primaryUserData = hasRealtorCompanyData ? realtor : (broker || realtor);
+    App.generateReferralAgreementDoc(primaryUserData, realtor);
+  }
+
   /* ── Utility ── */
   function setTextById(id, text) {
     const el = document.getElementById(id);
@@ -859,7 +882,8 @@
     approveRealtor,
     rejectRealtor,
     showAddClientModal,
-    handleAddClient
+    handleAddClient,
+    exportRealtorAgreement
   };
 
 })();

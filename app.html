@@ -8,7 +8,7 @@
   <meta property="og:title" content="REMAX Inmomás — International Advisory Division">
   <meta property="og:description" content="Your trusted team for buying property on Spain's Costa Blanca. Legal, tax & real estate advisory for international buyers.">
   <meta property="og:type" content="website">
-  <link rel="stylesheet" href="css/styles.css?v=20261022_v4">
+  <link rel="stylesheet" href="css/styles.css?v=20261112_v1">
   <link rel="icon" type="image/png" href="Globo_CMYK.png">
   <!-- EmailJS SDK — free email sending from the browser (200 emails/month) -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -209,6 +209,8 @@
       .mobile-section-group.active,
       body[data-role="admin"] #msec-group-admin,
       body[data-route^="admin/"] #msec-group-admin,
+      body[data-role="embajador"] #msec-group-embajador,
+      body[data-route^="embajador/"] #msec-group-embajador,
       body[data-role="agent_inmomas"] #msec-group-agent_inmomas,
       body[data-route^="agent_inmomas/"] #msec-group-agent_inmomas,
       body[data-role="colaborador"] #msec-group-colaborador,
@@ -279,6 +281,8 @@
       .dashboard-bnav-group.active,
       body[data-role="admin"] #bnav-group-admin,
       body[data-route^="admin/"] #bnav-group-admin,
+      body[data-role="embajador"] #bnav-group-embajador,
+      body[data-route^="embajador/"] #bnav-group-embajador,
       body[data-role="agent_inmomas"] #bnav-group-agent_inmomas,
       body[data-route^="agent_inmomas/"] #bnav-group-agent_inmomas,
       body[data-role="colaborador"] #bnav-group-colaborador,
@@ -458,6 +462,17 @@
       <a href="#admin/unified" class="sidebar-link"><span class="sidebar-link__icon">🗂️</span> <span class="lang-en">Unified Directory</span><span class="lang-es">Directorio Unificado</span></a>
     </nav>
 
+    <!-- Embajador Sidebar Nav -->
+    <nav class="sidebar-nav" id="sidebar-embajador" style="display:none;">
+      <div class="sidebar-nav__title">👑 <span class="lang-en">Ambassador Portal</span><span class="lang-es">Portal Embajador</span></div>
+      <a href="#embajador/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
+      <a href="#embajador/network" class="sidebar-link"><span class="sidebar-link__icon">🌐</span> <span class="lang-en">My Umbrella</span><span class="lang-es">Mi Paraguas / Red</span></a>
+      <a href="#embajador/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> <span class="lang-en">Clients</span><span class="lang-es">Clientes</span></a>
+      <a href="#embajador/webinar" class="sidebar-link"><span class="sidebar-link__icon">🎙️</span> <span class="lang-en">Webinars</span><span class="lang-es">Webinarios</span></a>
+      <a href="#embajador/documents" class="sidebar-link"><span class="sidebar-link__icon">📄</span> <span class="lang-en">Documents</span><span class="lang-es">Documentos</span></a>
+      <a href="#embajador/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> <span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></a>
+    </nav>
+
     <!-- Agente Inmomás Sidebar Nav -->
     <nav class="sidebar-nav" id="sidebar-agent_inmomas" style="display:none;">
       <div class="sidebar-nav__title">Agente Inmomás</div>
@@ -553,6 +568,16 @@
         <a href="#profile" class="mobile-section-pill"><span class="mobile-section-pill__icon">👤</span><span><span class="lang-en">Profile</span><span class="lang-es">Mi Perfil</span></span></a>
       </div>
 
+      <!-- Embajador Section Grid (6 items: 2 rows of 3) -->
+      <div class="mobile-section-group mobile-section-group--3cols" id="msec-group-embajador">
+        <a href="#embajador/dashboard" class="mobile-section-pill"><span class="mobile-section-pill__icon">📊</span><span>Panel</span></a>
+        <a href="#embajador/network" class="mobile-section-pill"><span class="mobile-section-pill__icon">🌐</span><span><span class="lang-en">Umbrella</span><span class="lang-es">Paraguas</span></span></a>
+        <a href="#embajador/clients" class="mobile-section-pill"><span class="mobile-section-pill__icon">🤝</span><span><span class="lang-en">Clients</span><span class="lang-es">Clientes</span></span></a>
+        <a href="#embajador/webinar" class="mobile-section-pill"><span class="mobile-section-pill__icon">🎙️</span><span>Webinar</span></a>
+        <a href="#embajador/documents" class="mobile-section-pill"><span class="mobile-section-pill__icon">📄</span><span><span class="lang-en">Docs</span><span class="lang-es">Documentos</span></span></a>
+        <a href="#embajador/finances" class="mobile-section-pill"><span class="mobile-section-pill__icon">💰</span><span><span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></span></a>
+      </div>
+
       <!-- Agente Inmomás Section Grid (6 items: 2 rows of 3) -->
       <div class="mobile-section-group mobile-section-group--3cols" id="msec-group-agent_inmomas">
         <a href="#agent_inmomas/dashboard" class="mobile-section-pill"><span class="mobile-section-pill__icon">📊</span><span>Panel</span></a>
@@ -620,15 +645,33 @@
         <div class="dashboard-section referral-quick">
           <h2>🔗 <span class="lang-en">Your Admin Referral Link</span><span class="lang-es">Tu Enlace de Referido de Administrador</span></h2>
           <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px;">
-            <span class="lang-en">Use this link to invite new Partners (Brokers, Realtors & RE/MAX Inmomás Agents) and list RE/MAX Inmomás as their referrer.</span>
-            <span class="lang-es">Usa este enlace para invitar a nuevos Colaboradores (Brokers, Realtors y Agentes de RE/MAX Inmomás) y registrar a RE/MAX Inmomás como su referidor.</span>
+            <span class="lang-en">Use this exclusive link to invite new <strong>Ambassadors (Embajadores)</strong>, Brokers, Realtors, Collaborators, RE/MAX Inmomás Agents &amp; Buyers. Note: The Ambassador application option ONLY appears on this Admin referral link.</span>
+            <span class="lang-es">Usa este enlace exclusivo para invitar a nuevos <strong>Embajadores</strong>, Brokers, Realtors, Colaboradores, Agentes de RE/MAX Inmomás y Clientes. La opción de postularse como Embajador aparece únicamente en este enlace de Administración.</span>
           </p>
-          <div style="display: flex; align-items: center; background: rgba(0, 67, 255, 0.04); border: 1px solid rgba(0, 67, 255, 0.15); border-radius: 12px; padding: 8px; gap: 12px; margin-top: 12px;">
+          <div style="display: flex; align-items: center; background: rgba(0, 67, 255, 0.04); border: 1px solid rgba(0, 67, 255, 0.15); border-radius: 12px; padding: 8px; gap: 12px; margin-top: 12px; flex-wrap: wrap;">
             <div style="background: white; border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
               <span style="font-size: 1.2rem;">👑</span>
             </div>
-            <input type="text" readonly id="admin-dash-referral-link" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--text-primary); outline: none; padding: 0; min-width: 0;">
-            <button class="btn btn-primary" id="admin-dash-copy-link" style="border-radius: 8px; padding: 10px 20px; white-space: nowrap;"><span class="lang-en">Copy Link</span><span class="lang-es">Copiar Enlace</span></button>
+            <input type="text" readonly id="admin-dash-referral-link" value="" style="flex: 1; background: transparent; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--text-primary); outline: none; padding: 0; min-width: 180px;">
+            <button class="btn btn-primary" id="admin-dash-copy-link" style="border-radius: 8px; padding: 10px 20px; white-space: nowrap;"><span class="lang-en">Copy General Link</span><span class="lang-es">Copiar Enlace General</span></button>
+          </div>
+          <!-- Direct Ambassador Invitation Shortcut -->
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 12px; padding: 10px 14px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.10) 0%, rgba(217, 119, 6, 0.05) 100%); border: 1px solid rgba(217, 119, 6, 0.28); border-radius: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.84rem; color: #78350f;">
+              <span style="font-size: 1.15rem;">👑</span>
+              <div>
+                <strong style="color: #92400e;"><span class="lang-en">Exclusive Invitation: Apply as Ambassador</span><span class="lang-es">Invitación Directa: Postularse como Embajador</span></strong>
+                <span style="display: block; font-size: 0.76rem; color: #92400e; opacity: 0.9;"><span class="lang-en">Pre-selects the Ambassador tab exclusively enabled by Admin</span><span class="lang-es">Abre directamente la pestaña de Embajador habilitada solo por Admin</span></span>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <button type="button" class="btn btn-outline btn-sm" id="admin-dash-copy-embajador-link" style="border-color: #d97706; color: #92400e; background: #fff;">
+                📋 <span class="lang-en">Copy Ambassador Link</span><span class="lang-es">Copiar Link Embajador</span>
+              </button>
+              <button type="button" class="btn btn-sm" id="admin-dash-wa-embajador-link" style="background: #25D366; color: #fff; border: none;">
+                💬 <span class="lang-en">Send via WhatsApp</span><span class="lang-es">Enviar por WhatsApp</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -683,8 +726,11 @@
           <div class="form-group" style="margin-bottom:0;">
             <select id="admin-filter-role" class="form-select">
               <option value="">All Roles</option>
-              <option value="broker">Brokers</option>
-              <option value="realtor">Realtors</option>
+              <option value="embajador">👑 Embajadores / Ambassadors</option>
+              <option value="broker">🏢 Brokers</option>
+              <option value="realtor">🏠 Realtors / Agentes</option>
+              <option value="colaborador">🤝 Colaboradores</option>
+              <option value="agent_inmomas">🇪🇸 Agentes Inmomás</option>
             </select>
           </div>
           <div class="form-group" style="margin-bottom:0;">
@@ -824,9 +870,14 @@
     <!-- ==================== VIEW: ADMIN AGREEMENTS ==================== -->
     <div id="view-admin-agreements" class="app-view">
       <div class="dashboard-content">
-        <div class="dashboard-header">
-          <h1>📋 <span class="lang-en">Collaboration Agreements &amp; Fiscal Data</span><span class="lang-es">Contratos de Colaboración y Datos Fiscales</span></h1>
-          <p class="dashboard-subtitle"><span class="lang-en">Review submitted company fiscal &amp; bank details to prepare external contracts and manage signed agreements.</span><span class="lang-es">Revisa los datos fiscales y bancarios enviados por Brokers y Agentes para armar el contrato externo y gestionar acuerdos activos.</span></p>
+        <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <h1>📋 <span class="lang-en">Collaboration Agreements &amp; Fiscal Data</span><span class="lang-es">Contratos de Colaboración y Datos Fiscales</span></h1>
+            <p class="dashboard-subtitle"><span class="lang-en">Review submitted company fiscal &amp; bank details to prepare external contracts and manage signed agreements.</span><span class="lang-es">Revisa los datos fiscales y bancarios enviados por Brokers y Agentes para armar el contrato externo y gestionar acuerdos activos.</span></p>
+          </div>
+          <button type="button" class="btn btn-primary" style="background:#1e3a8a; border-color:#1e3a8a; font-weight:700; display:inline-flex; align-items:center; gap:0.5rem;" onclick="App.views.admin.exportUserAgreementToWord('template')">
+            📄 <span class="lang-en">Download Master Agreement Template (Word .doc)</span><span class="lang-es">Descargar Plantilla Master Referral Agreement (Word .doc)</span>
+          </button>
         </div>
 
         <!-- Agreements Pending Contract Preparation / Signature -->
@@ -923,8 +974,10 @@
                 </label>
                 <select id="nl-recipients" class="form-control" style="width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border-light); font-size: 0.95rem;">
                   <option value="all"><span class="lang-en">All Subscribers</span><span class="lang-es">Todos los Suscriptores</span></option>
+                  <option value="embajador"><span class="lang-en">Ambassadors Only</span><span class="lang-es">Solo Embajadores</span></option>
                   <option value="broker"><span class="lang-en">Brokers Only</span><span class="lang-es">Solo Brokers</span></option>
                   <option value="realtor"><span class="lang-en">Realtors Only</span><span class="lang-es">Solo Realtors</span></option>
+                  <option value="colaborador"><span class="lang-en">Collaborators Only</span><span class="lang-es">Solo Colaboradores</span></option>
                   <option value="agent_inmomas"><span class="lang-en">Agentes Inmomás Only</span><span class="lang-es">Solo Agentes Inmomás</span></option>
                 </select>
               </div>
@@ -1913,6 +1966,368 @@
       </div>
     </div>
 
+    <!-- ==================== VIEW: EMBAJADOR DASHBOARD ==================== -->
+    <div id="view-embajador-dashboard" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <h1>👑 <span class="lang-en">Ambassador Executive Portal</span><span class="lang-es">Portal Ejecutivo de Embajador</span></h1>
+            <p class="dashboard-subtitle">
+              <span class="lang-en">Full visibility and management of your Umbrella Network — Brokers, Realtors, Collaborators &amp; End Clients</span>
+              <span class="lang-es">Visión ejecutiva integral de tu Paraguas — Brokers, Agentes, Colaboradores y Clientes Finales</span>
+            </p>
+          </div>
+          <div id="embajador-dash-add-client-btn"></div>
+        </div>
+
+        <div id="embajador-agreement-warning" style="display:none; margin-bottom:1.5rem;"></div>
+
+        <!-- Umbrella KPI Cards -->
+        <div class="stat-cards-grid stat-cards-grid--autofit">
+          <div class="stat-card stat-card--amber">
+            <div class="stat-card__icon stat-card__icon--amber">👑</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="embajador-stat-network">0</div>
+              <div class="stat-card__label"><span class="lang-en">Umbrella Professionals</span><span class="lang-es">Profesionales en Paraguas</span></div>
+              <div id="embajador-stat-network-breakdown" style="font-size:0.74rem; color:var(--text-secondary); margin-top:4px;"></div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--blue">
+            <div class="stat-card__icon stat-card__icon--blue">🏡</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="embajador-stat-clients">0</div>
+              <div class="stat-card__label"><span class="lang-en">Umbrella Buyers</span><span class="lang-es">Clientes en Paraguas</span></div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--green">
+            <div class="stat-card__icon stat-card__icon--green">✅</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="embajador-stat-sales">0</div>
+              <div class="stat-card__label"><span class="lang-en">Closed Operations</span><span class="lang-es">Operaciones Cerradas</span></div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--purple">
+            <div class="stat-card__icon stat-card__icon--purple">💰</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="embajador-stat-commissions">€0</div>
+              <div class="stat-card__label"><span class="lang-en">Umbrella Commissions</span><span class="lang-es">Comisiones del Paraguas</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Embajador Multi-Variant Referral Link Card -->
+        <div class="dashboard-section referral-quick">
+          <h2>🔗 <span class="lang-en">Your Ambassador Referral Link (All Umbrella Variants)</span><span class="lang-es">Tu Enlace de Referido de Embajador (Todas las Variantes de tu Paraguas)</span></h2>
+          <p style="font-size:0.84rem; color:var(--text-secondary); margin-top:4px;">
+            <span class="lang-en">Share your master link or any direct variant below to register <strong>Brokers</strong>, <strong>Realtors / Agents</strong>, <strong>Collaborators</strong>, and <strong>End Clients</strong> directly under your umbrella (excludes other Ambassadors).</span>
+            <span class="lang-es">Comparte tu enlace general o cualquiera de las variantes directas para registrar bajo tu paraguas a <strong>Brokers</strong>, <strong>Agentes / Realtors</strong>, <strong>Colaboradores</strong> y <strong>Clientes Finales</strong> (todas las variantes salvo otro Embajador).</span>
+          </p>
+          <div style="display:flex; align-items:center; background:rgba(217, 119, 6, 0.06); border:1px solid rgba(217, 119, 6, 0.25); border-radius:12px; padding:8px 10px; gap:12px; margin-top:12px; flex-wrap:wrap;">
+            <div style="background:white; border-radius:8px; width:40px; height:40px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+              <span style="font-size:1.25rem;">👑</span>
+            </div>
+            <input type="text" readonly id="embajador-dash-referral-link" value="" style="flex:1; background:transparent; border:none; font-family:'JetBrains Mono', monospace; font-size:0.92rem; color:var(--text-primary); outline:none; padding:0; min-width:180px;">
+            <button class="btn btn-primary" id="embajador-dash-copy-link" style="border-radius:8px; padding:10px 20px; white-space:nowrap;">
+              <span class="lang-en">Copy Master Link</span><span class="lang-es">Copiar Enlace General</span>
+            </button>
+          </div>
+          <!-- 4 Direct Variant Quick-Share Rows -->
+          <div id="embajador-referral-variants" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:10px; margin-top:14px;"></div>
+        </div>
+
+        <!-- Pipeline Overview + Recent Activity -->
+        <div class="dashboard-grid-2col" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
+          <div class="dashboard-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h2 style="margin:0;">📊 <span class="lang-en">Umbrella Pipeline Status</span><span class="lang-es">Estado del Pipeline del Paraguas</span></h2>
+              <a href="#embajador/clients" style="font-size:0.8rem; font-weight:700; color:var(--blue); text-decoration:none;"><span class="lang-en">View All →</span><span class="lang-es">Ver Todos →</span></a>
+            </div>
+            <div id="embajador-dash-pipeline"></div>
+          </div>
+
+          <div class="dashboard-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h2 style="margin:0;">🌐 <span class="lang-en">Recent Umbrella Partners</span><span class="lang-es">Últimos Profesionales del Paraguas</span></h2>
+              <a href="#embajador/network" style="font-size:0.8rem; font-weight:700; color:var(--blue); text-decoration:none;"><span class="lang-en">Full Network →</span><span class="lang-es">Ver Red →</span></a>
+            </div>
+            <div id="embajador-dash-recent-members"></div>
+          </div>
+        </div>
+
+        <div class="dashboard-section">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h2 style="margin:0;">🏡 <span class="lang-en">Recent Umbrella Buyers</span><span class="lang-es">Últimos Clientes Compradores en el Paraguas</span></h2>
+            <a href="#embajador/clients" style="font-size:0.8rem; font-weight:700; color:var(--blue); text-decoration:none;"><span class="lang-en">Open Pipeline →</span><span class="lang-es">Abrir Pipeline →</span></a>
+          </div>
+          <div id="embajador-dash-recent-clients"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW: EMBAJADOR NETWORK (UMBRELLA) ==================== -->
+    <div id="view-embajador-network" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <h1>🌐 <span class="lang-en">My Umbrella Network</span><span class="lang-es">Mi Paraguas de Colaboración</span></h1>
+            <p class="dashboard-subtitle">
+              <span class="lang-en">All Brokers, Realtors/Agents and Collaborators registered directly or transitively under your Ambassador network</span>
+              <span class="lang-es">Todos los Brokers, Agentes/Realtors y Colaboradores registrados directa o indirectamente bajo tu paraguas</span>
+            </p>
+          </div>
+          <button class="btn btn-primary" onclick="App.views.embajador.exportNetworkToExcel()">
+            📥 <span class="lang-en">Export Network (.xlsx)</span><span class="lang-es">Exportar Red (.xlsx)</span>
+          </button>
+        </div>
+
+        <!-- Role Quick Filter Pills -->
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+          <button type="button" id="emb-net-filter-all" class="btn btn-primary btn-sm" onclick="App.views.embajador.setNetworkRoleFilter('all')">
+            🌐 <span class="lang-en">All</span><span class="lang-es">Todos</span> (<span id="embajador-net-count-all">0</span>)
+          </button>
+          <button type="button" id="emb-net-filter-broker" class="btn btn-outline btn-sm" onclick="App.views.embajador.setNetworkRoleFilter('broker')">
+            🏢 Brokers (<span id="embajador-net-count-broker">0</span>)
+          </button>
+          <button type="button" id="emb-net-filter-realtor" class="btn btn-outline btn-sm" onclick="App.views.embajador.setNetworkRoleFilter('realtor')">
+            🏠 <span class="lang-en">Agents / Realtors</span><span class="lang-es">Agentes / Realtors</span> (<span id="embajador-net-count-realtor">0</span>)
+          </button>
+          <button type="button" id="emb-net-filter-colaborador" class="btn btn-outline btn-sm" onclick="App.views.embajador.setNetworkRoleFilter('colaborador')">
+            🤝 <span class="lang-en">Collaborators</span><span class="lang-es">Colaboradores</span> (<span id="embajador-net-count-colaborador">0</span>)
+          </button>
+        </div>
+
+        <!-- Search & Status Filter -->
+        <div class="dashboard-filters" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
+          <div class="form-group" style="margin-bottom:0; flex:1; min-width:220px;">
+            <input type="text" class="form-input" placeholder="🔍 Buscar por nombre, email, agencia, país o código..." oninput="App.views.embajador.searchNetwork(this.value)">
+          </div>
+          <div class="form-group" style="margin-bottom:0; min-width:180px;">
+            <select class="form-select" onchange="App.views.embajador.setNetworkStatusFilter(this.value)">
+              <option value="all">Todos los Estados / All Status</option>
+              <option value="approved">Aprobados / Approved</option>
+              <option value="pending">Pendientes / Pending</option>
+              <option value="rejected">Rechazados / Rejected</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="data-table-container">
+          <table class="data-table data-table--medium">
+            <thead>
+              <tr>
+                <th><span class="lang-en">Member</span><span class="lang-es">Profesional</span></th>
+                <th><span class="lang-en">Role</span><span class="lang-es">Rol</span></th>
+                <th><span class="lang-en">Agency / Country</span><span class="lang-es">Agencia / País</span></th>
+                <th><span class="lang-en">Umbrella Origin</span><span class="lang-es">Origen en Paraguas</span></th>
+                <th style="text-align:center;"><span class="lang-en">Clients / Sub-Net</span><span class="lang-es">Clientes / Sub-Red</span></th>
+                <th><span class="lang-en">Status</span><span class="lang-es">Estado</span></th>
+                <th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
+                <th><span class="lang-en">Actions</span><span class="lang-es">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody id="embajador-network-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW: EMBAJADOR CLIENTS ==================== -->
+    <div id="view-embajador-clients" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <h1>🤝 <span class="lang-en">Umbrella Client Pipeline</span><span class="lang-es">Pipeline de Clientes del Paraguas</span></h1>
+            <p class="dashboard-subtitle">
+              <span class="lang-en">Track every buyer referred directly by you or by any Broker, Realtor, or Collaborator in your umbrella</span>
+              <span class="lang-es">Seguimiento en tiempo real de los compradores referidos directamente o a través de tu red</span>
+            </p>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <div style="background:rgba(0,0,0,0.05); padding:4px; border-radius:8px; display:flex; gap:4px;">
+              <button type="button" id="btn-embajador-client-board" class="btn btn-primary btn-sm" onclick="App.views.embajador.toggleClientView('board')">Kanban</button>
+              <button type="button" id="btn-embajador-client-list" class="btn btn-outline btn-sm" onclick="App.views.embajador.toggleClientView('list')"><span class="lang-en">List</span><span class="lang-es">Lista</span></button>
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" onclick="App.views.embajador.exportClientsToExcel()">
+              📥 <span class="lang-en">Export</span><span class="lang-es">Exportar</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="App.views.embajador.showAddClientModal()">
+              ➕ <span class="lang-en">Add Client</span><span class="lang-es">Añadir Cliente</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="dashboard-filters" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px;">
+          <div class="form-group" style="margin-bottom:0; flex:1; min-width:220px;">
+            <input type="text" class="form-input" placeholder="🔍 Buscar cliente por nombre, email, zona o agente..." oninput="App.views.embajador.searchClients(this.value)">
+          </div>
+          <div class="form-group" style="margin-bottom:0; min-width:240px;">
+            <select id="embajador-client-member-filter" class="form-select" onchange="App.views.embajador.filterClientsByMember(this.value)">
+              <option value="all">🌐 Todos los orígenes del Paraguas</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="embajador-clients-board-wrap">
+          <div id="embajador-pipeline-board" class="pipeline-board"></div>
+        </div>
+
+        <div id="embajador-clients-list-wrap" style="display:none;" class="data-table-container">
+          <table class="data-table data-table--medium">
+            <thead>
+              <tr>
+                <th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th>
+                <th><span class="lang-en">Umbrella Origin</span><span class="lang-es">Origen en Paraguas</span></th>
+                <th><span class="lang-en">Area &amp; Budget</span><span class="lang-es">Zona y Presupuesto</span></th>
+                <th><span class="lang-en">Assigned Spain Agent</span><span class="lang-es">Agente España</span></th>
+                <th><span class="lang-en">Status</span><span class="lang-es">Estado</span></th>
+                <th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
+                <th><span class="lang-en">Actions</span><span class="lang-es">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody id="embajador-clients-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW: EMBAJADOR WEBINAR ==================== -->
+    <div id="view-embajador-webinar" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1>🎙️ <span class="lang-en">Umbrella Webinar Registrations</span><span class="lang-es">Inscripciones a Webinarios de tu Paraguas</span></h1>
+          <p class="dashboard-subtitle">
+            <span class="lang-en">Professionals (B2B) and Buyers (B2C) who registered for live events via your Ambassador network</span>
+            <span class="lang-es">Profesionales (B2B) y Compradores (B2C) inscritos a webinarios a través de los enlaces de tu paraguas</span>
+          </p>
+        </div>
+
+        <div class="stat-cards-grid stat-cards-grid--autofit">
+          <div class="stat-card stat-card--blue">
+            <div class="stat-card__icon stat-card__icon--blue">🎙️</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="embajador-webinar-total">0</div>
+              <div class="stat-card__label"><span class="lang-en">Total Attendees</span><span class="lang-es">Inscritos Totales</span></div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--purple">
+            <div class="stat-card__icon stat-card__icon--purple">🏢</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="embajador-webinar-b2b">0</div>
+              <div class="stat-card__label"><span class="lang-en">B2B Professionals</span><span class="lang-es">Profesionales B2B</span></div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--green">
+            <div class="stat-card__icon stat-card__icon--green">🏡</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="embajador-webinar-b2c">0</div>
+              <div class="stat-card__label"><span class="lang-en">B2C Buyers</span><span class="lang-es">Clientes B2C</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-filters" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px;">
+          <div style="display:flex; gap:6px;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="App.views.embajador.setWebinarFilter('all')"><span class="lang-en">All</span><span class="lang-es">Todos</span></button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="App.views.embajador.setWebinarFilter('b2b')">🏢 B2B</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="App.views.embajador.setWebinarFilter('b2c')">🏡 B2C</button>
+          </div>
+          <div class="form-group" style="margin-bottom:0; flex:1; min-width:220px;">
+            <input type="text" class="form-input" placeholder="🔍 Buscar asistente por nombre, email o referidor..." oninput="App.views.embajador.searchWebinar(this.value)">
+          </div>
+        </div>
+
+        <div class="data-table-container">
+          <table class="data-table data-table--medium">
+            <thead>
+              <tr>
+                <th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
+                <th><span class="lang-en">Type</span><span class="lang-es">Tipo</span></th>
+                <th><span class="lang-en">Attendee</span><span class="lang-es">Asistente</span></th>
+                <th><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></th>
+                <th><span class="lang-en">Agency / Interest</span><span class="lang-es">Agencia / Interés</span></th>
+                <th><span class="lang-en">Referred By</span><span class="lang-es">Referido Por</span></th>
+              </tr>
+            </thead>
+            <tbody id="embajador-webinar-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW: EMBAJADOR DOCUMENTS ==================== -->
+    <div id="view-embajador-documents" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1>📄 <span class="lang-en">Ambassador Agreement &amp; Fiscal Data</span><span class="lang-es">Acuerdo de Embajador y Datos Fiscales</span></h1>
+          <p class="dashboard-subtitle">
+            <span class="lang-en">Manage your company/tax information, international bank details, and signed collaboration contract with RE/MAX Inmomás</span>
+            <span class="lang-es">Gestiona tus datos fiscales, cuenta bancaria internacional y contrato de colaboración con RE/MAX Inmomás</span>
+          </p>
+        </div>
+        <div id="embajador-contract-section"></div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW: EMBAJADOR FINANCES ==================== -->
+    <div id="view-embajador-finances" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1>💰 <span class="lang-en">Umbrella Finances &amp; Commissions</span><span class="lang-es">Finanzas y Comisiones del Paraguas</span></h1>
+          <p class="dashboard-subtitle">
+            <span class="lang-en">Summary of closed real estate transactions and referral commissions generated across your entire Ambassador umbrella</span>
+            <span class="lang-es">Resumen de operaciones cerradas y comisiones generadas por toda la red bajo tu paraguas</span>
+          </p>
+        </div>
+
+        <div class="stat-cards-grid stat-cards-grid--autofit">
+          <div class="stat-card stat-card--blue">
+            <div class="stat-card__icon stat-card__icon--blue">🏠</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="embajador-fin-deals">0</div>
+              <div class="stat-card__label"><span class="lang-en">Commissionable Deals</span><span class="lang-es">Operaciones Registradas</span></div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--purple">
+            <div class="stat-card__icon stat-card__icon--purple">📈</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="embajador-fin-volume">€0</div>
+              <div class="stat-card__label"><span class="lang-en">Sales Volume</span><span class="lang-es">Volumen de Ventas</span></div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--green">
+            <div class="stat-card__icon stat-card__icon--green">✅</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="embajador-fin-paid">€0</div>
+              <div class="stat-card__label"><span class="lang-en">Paid Commissions</span><span class="lang-es">Comisiones Liquidadas</span></div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--amber">
+            <div class="stat-card__icon stat-card__icon--amber">⏳</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="embajador-fin-pending">€0</div>
+              <div class="stat-card__label"><span class="lang-en">Projected / Pending</span><span class="lang-es">Proyectadas / Pendientes</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="data-table-container">
+          <table class="data-table data-table--medium">
+            <thead>
+              <tr>
+                <th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th>
+                <th><span class="lang-en">Umbrella Origin</span><span class="lang-es">Origen en Paraguas</span></th>
+                <th><span class="lang-en">Property / Area</span><span class="lang-es">Propiedad / Zona</span></th>
+                <th><span class="lang-en">Sale Price</span><span class="lang-es">Precio Venta</span></th>
+                <th><span class="lang-en">Referral Commission</span><span class="lang-es">Comisión Referido</span></th>
+                <th><span class="lang-en">Status</span><span class="lang-es">Estado</span></th>
+              </tr>
+            </thead>
+            <tbody id="embajador-finances-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- ===================== MOBILE DASHBOARD BOTTOM NAV ===================== -->
@@ -1944,6 +2359,34 @@
         <span class="dashboard-bnav-icon">☰</span>
         <span class="lang-en">More</span><span class="lang-es">Más</span>
       </button>
+    </div>
+
+    <!-- Embajador Bottom Nav -->
+    <div class="dashboard-bnav-group" id="bnav-group-embajador">
+      <a href="#embajador/dashboard" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">📊</span>
+        <span class="lang-en">Panel</span><span class="lang-es">Panel</span>
+      </a>
+      <a href="#embajador/network" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">🌐</span>
+        <span class="lang-en">Umbrella</span><span class="lang-es">Paraguas</span>
+      </a>
+      <a href="#embajador/clients" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">🤝</span>
+        <span class="lang-en">Clients</span><span class="lang-es">Clientes</span>
+      </a>
+      <a href="#embajador/webinar" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">🎙️</span>
+        <span class="lang-en">Webinar</span><span class="lang-es">Webinar</span>
+      </a>
+      <a href="#embajador/documents" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">📄</span>
+        <span class="lang-en">Docs</span><span class="lang-es">Docs</span>
+      </a>
+      <a href="#embajador/finances" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">💰</span>
+        <span class="lang-en">Finances</span><span class="lang-es">Finanzas</span>
+      </a>
     </div>
 
     <!-- Agente Inmomás Bottom Nav -->
@@ -2094,18 +2537,19 @@
   <script src="js/xlsx.full.min.js"></script>
 
   <!-- ===================== SCRIPTS ===================== -->
-  <script src="js/notifications.js?v=20261109_v3"></script>
-  <script src="js/firebase-config.js?v=20261026_v1"></script>
-  <script src="js/utils.js?v=20261026_v1"></script>
-  <script src="js/auth-service.js?v=20261109_v3"></script>
-  <script src="js/router.js?v=20261026_v1"></script>
-  <script src="js/views/auth-views.js?v=20261026_v1"></script>
-  <script src="js/views/admin-views.js?v=20261026_v1"></script>
-  <script src="js/views/broker-views.js?v=20261026_v1"></script>
+  <script src="js/notifications.js?v=20261112_v1"></script>
+  <script src="js/firebase-config.js?v=20261112_v1"></script>
+  <script src="js/utils.js?v=20261112_v1"></script>
+  <script src="js/auth-service.js?v=20261112_v1"></script>
+  <script src="js/router.js?v=20261112_v1"></script>
+  <script src="js/views/auth-views.js?v=20261112_v1"></script>
+  <script src="js/views/admin-views.js?v=20261112_v1"></script>
+  <script src="js/views/embajador-views.js?v=20261112_v1"></script>
+  <script src="js/views/broker-views.js?v=20261109_v5"></script>
   <script src="js/views/realtor-views.js?v=20261026_v1"></script>
   <script src="js/views/agent-views.js?v=20261026_v1"></script>
   <script src="js/views/partner-views.js?v=20261026_v1"></script>
-  <script src="js/referral-agreement.js?v=20261026_v1"></script>
+  <script src="js/referral-agreement.js?v=20261112_v1"></script>
   <script src="js/main.js?v=20261109_v4"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {

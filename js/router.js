@@ -36,6 +36,14 @@ App.router = (function() {
     'admin/webinar':   { view: 'view-admin-webinar',   role: 'admin',  sidebar: 'admin', title: 'Webinar Registrations' },
     'admin/unified':   { view: 'view-admin-unified',   role: 'admin',  sidebar: 'admin', title: 'Unified Directory' },
 
+    // Embajador routes (above Broker, right below Admin for their umbrella)
+    'embajador/dashboard': { view: 'view-embajador-dashboard', role: 'embajador', sidebar: 'embajador', title: 'Ambassador Dashboard' },
+    'embajador/network':   { view: 'view-embajador-network',   role: 'embajador', sidebar: 'embajador', title: 'My Umbrella Network' },
+    'embajador/clients':   { view: 'view-embajador-clients',   role: 'embajador', sidebar: 'embajador', title: 'Umbrella Clients' },
+    'embajador/webinar':   { view: 'view-embajador-webinar',   role: 'embajador', sidebar: 'embajador', title: 'Webinar Registrations' },
+    'embajador/documents': { view: 'view-embajador-documents', role: 'embajador', sidebar: 'embajador', title: 'Documents & Agreement' },
+    'embajador/finances':  { view: 'view-embajador-finances',  role: 'embajador', sidebar: 'embajador', title: 'Finances & Commissions' },
+
     // Broker routes
     'broker/dashboard': { view: 'view-broker-dashboard', role: 'broker', sidebar: 'broker', title: 'Broker Dashboard' },
     'broker/team':      { view: 'view-broker-team',      role: 'broker', sidebar: 'broker', title: 'My Team' },
@@ -378,6 +386,7 @@ App.router = (function() {
         
         const roleLabels = {
           admin: 'Admin · Broker Inmomás',
+          embajador: '👑 Embajador',
           agent_inmomas: 'Agente Inmomás',
           colaborador: 'Colaborador',
           broker: 'Broker Portal',
@@ -396,7 +405,7 @@ App.router = (function() {
         if (mobileRoleEl) mobileRoleEl.textContent = formattedRole;
         if (mobileAvatarEl) mobileAvatarEl.innerHTML = initials;
         
-        sidebar.classList.remove('sidebar--admin', 'sidebar--broker', 'sidebar--realtor', 'sidebar--agent_inmomas', 'sidebar--colaborador');
+        sidebar.classList.remove('sidebar--admin', 'sidebar--embajador', 'sidebar--broker', 'sidebar--realtor', 'sidebar--agent_inmomas', 'sidebar--colaborador');
         sidebar.classList.add(`sidebar--${user.role}`);
       }
     } else {
@@ -499,6 +508,12 @@ App.router = (function() {
       'admin/newsletter':  () => App.views.admin && App.views.admin.initNewsletter(),
       'admin/webinar':    () => App.views.admin && App.views.admin.initWebinar(),
       'admin/unified':    () => App.views.admin && App.views.admin.initUnified(),
+      'embajador/dashboard': () => App.views.embajador && App.views.embajador.initDashboard(),
+      'embajador/network':   () => App.views.embajador && App.views.embajador.initNetwork(),
+      'embajador/clients':   () => App.views.embajador && App.views.embajador.initClients(),
+      'embajador/webinar':   () => App.views.embajador && App.views.embajador.initWebinar(),
+      'embajador/documents': () => App.views.embajador && App.views.embajador.initDocuments(),
+      'embajador/finances':  () => App.views.embajador && App.views.embajador.initFinances(),
       'webinar':          () => App.views.public && App.views.public.initWebinarRegister(),
       'broker/dashboard':  () => App.views.broker && App.views.broker.initDashboard(),
       'broker/team':       () => App.views.broker && App.views.broker.initTeam(),

@@ -3807,7 +3807,15 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   font-size: 0.82rem;
 }
 
-/* When 5 tabs are present (Admin referral link), center the bottom 2 tabs evenly (3 cols each) */
+/* When 4 tabs are present (e.g. Embajador referral link), display a clean 2x2 grid (3 cols each) */
+.referral-segmented-bar.referral-segmented-bar--multi .referral-seg-tab:nth-child(1):nth-last-child(4),
+.referral-segmented-bar.referral-segmented-bar--multi .referral-seg-tab:nth-child(2):nth-last-child(3),
+.referral-segmented-bar.referral-segmented-bar--multi .referral-seg-tab:nth-child(3):nth-last-child(2),
+.referral-segmented-bar.referral-segmented-bar--multi .referral-seg-tab:nth-child(4):last-child {
+  grid-column: span 3;
+}
+
+/* When 5 tabs are present, center the bottom 2 tabs evenly (3 cols each) */
 .referral-segmented-bar.referral-segmented-bar--multi .referral-seg-tab:nth-child(4):nth-last-child(2),
 .referral-segmented-bar.referral-segmented-bar--multi .referral-seg-tab:nth-child(5):last-child {
   grid-column: span 3;
@@ -4397,9 +4405,15 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   background: rgba(16, 185, 129, 0.1);
 }
 
-.sidebar--agent_inmomas .sidebar-link.active {
+.sidebar--agent_inmomas .sidebar-link.active,
+.sidebar--colaborador .sidebar-link.active {
   border-left-color: var(--agent-color);
   background: rgba(245, 158, 11, 0.1);
+}
+
+.sidebar--embajador .sidebar-link.active {
+  border-left-color: #f59e0b;
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.16), rgba(245, 158, 11, 0.04));
 }
 
 .sidebar-link__icon {
@@ -4483,9 +4497,16 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   color: #34D399;
 }
 
-.sidebar-user__role--agent_inmomas {
+.sidebar-user__role--agent_inmomas,
+.sidebar-user__role--colaborador {
   background: rgba(245, 158, 11, 0.15);
   color: #FBBF24;
+}
+
+.sidebar-user__role--embajador {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.25));
+  color: #FCD34D;
+  border: 1px solid rgba(251, 191, 36, 0.35);
 }
 
 /* Dashboard Main Area */
@@ -4881,6 +4902,17 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
 .badge--realtor {
   background: rgba(16, 185, 129, 0.1);
   color: #047857;
+}
+
+.badge--agent {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+}
+
+.badge--embajador {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(217, 119, 6, 0.14));
+  color: #92400e;
+  border: 1px solid rgba(217, 119, 6, 0.3);
 }
 
 /* ------------------------------------------

@@ -230,6 +230,38 @@ App.utils.shareBrokerPartnerWhatsApp = function(customLink) {
   window.open(whatsappUrl, '_blank');
 };
 
+App.utils.getColaboradorShareMessage = function(referralLink) {
+  const user = App.auth ? App.auth.getCurrentUser() : null;
+  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#referral');
+  const lang = (document.documentElement.lang || 'en').toLowerCase();
+  if (lang.startsWith('es')) {
+    return `🤝 ¡Hola! Te invito a registrarte como Colaborador Estratégico de The Spain Connection para referir clientes interesados en comprar o invertir en España con respaldo legal, fiscal e inmobiliario integral.\n\n🔗 Activa tu cuenta de Colaborador aquí: ${link}`;
+  }
+  return `🤝 Hello! You're invited to register as a Strategic Collaborator with The Spain Connection to refer clients interested in buying or investing in Spain with full legal, tax, and real estate backing.\n\n🔗 Activate your Collaborator account here: ${link}`;
+};
+
+App.utils.shareColaboradorWhatsApp = function(customLink) {
+  const message = App.utils.getColaboradorShareMessage(customLink);
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+  window.open(whatsappUrl, '_blank');
+};
+
+App.utils.getEmbajadorShareMessage = function(referralLink) {
+  const user = App.auth ? App.auth.getCurrentUser() : null;
+  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#referral');
+  const lang = (document.documentElement.lang || 'en').toLowerCase();
+  if (lang.startsWith('es')) {
+    return `👑 ¡Hola! Te comparto la invitación ejecutiva exclusiva para postularte como Embajador de The Spain Connection · RE/MAX Inmomás y liderar tu propia red de Brokers, Agentes, Colaboradores y Clientes hacia España.\n\n🔗 Postúlate como Embajador aquí: ${link}`;
+  }
+  return `👑 Hello! Here is your exclusive executive invitation to apply as an Ambassador with The Spain Connection · RE/MAX Inmomás and lead your own umbrella network of Brokers, Realtors, Collaborators, and Clients in Spain.\n\n🔗 Apply as Ambassador here: ${link}`;
+};
+
+App.utils.shareEmbajadorWhatsApp = function(customLink) {
+  const message = App.utils.getEmbajadorShareMessage(customLink);
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+  window.open(whatsappUrl, '_blank');
+};
+
 App.utils.copyWebinarInviteText = function(customLink) {
   const message = App.utils.getClientWebinarShareMessage(customLink);
   App.utils.copyToClipboard(message);
@@ -355,8 +387,16 @@ App.utils.getUserStatusBadge = function(status) {
 
 App.utils.getRoleBadge = function(role) {
   const safeRole = role || 'user';
-  const classes = { admin: 'badge--admin', broker: 'badge--broker', realtor: 'badge--realtor', agent_inmomas: 'badge--agent', colaborador: 'badge--agent' };
+  const classes = {
+    admin: 'badge--admin',
+    embajador: 'badge--embajador',
+    broker: 'badge--broker',
+    realtor: 'badge--realtor',
+    agent_inmomas: 'badge--agent',
+    colaborador: 'badge--agent'
+  };
   let displayName = safeRole.charAt(0).toUpperCase() + safeRole.slice(1);
+  if (safeRole === 'embajador') displayName = '👑 Embajador';
   if (safeRole === 'agent_inmomas') displayName = 'Agente Inmomás';
   if (safeRole === 'colaborador') displayName = 'Colaborador';
   return `<span class="badge ${classes[safeRole] || ''}">${displayName}</span>`;
@@ -612,7 +652,7 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
 
   const status = user.agreementStatus || 'none'; // 'none' | 'data_submitted' | 'uploaded' | 'signed'
   const saved = user.contractCompanyData || {};
-  const isBroker = user.role === 'broker';
+  const isBroker = user.role === 'broker' || user.role === 'embajador';
   const defaultBrokerName = isBroker
     ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
     : (user.brokerNameManual || '');
@@ -746,18 +786,28 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
 
     <!-- Form for Fiscal & Banking Details -->
     <div style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:0.875rem; padding:1.5rem; box-shadow:0 4px 12px rgba(15,23,42,0.04); text-align:left;">
-      <h3 style="margin:0 0 0.35rem; font-size:1.05rem; color:#0f172a; display:flex; align-items:center; gap:0.5rem;">
-        🏢 <span class="lang-en">Company Tax &amp; Banking Information Form</span>
-        <span class="lang-es">Formulario de Datos Fiscales de la Empresa y Cuenta Bancaria</span>
-        <span class="lang-fr">Formulaire de Données Fiscales et Bancaires de l'Entreprise</span>
-        <span class="lang-en-ca">Company Tax &amp; Banking Information Form</span>
-      </h3>
-      <p style="font-size:0.82rem; color:#64748b; margin:0 0 1.25rem;">
-        <span class="lang-en">Please complete these details accurately so our team can prepare your Collaboration Agreement.</span>
-        <span class="lang-es">Completa estos datos para que podamos redactar y presentaros el Acuerdo de Colaboración Conjunta.</span>
-        <span class="lang-fr">Veuillez remplir ces informations pour que nous puissions préparer votre accord de collaboration.</span>
-        <span class="lang-en-ca">Please complete these details accurately so our team can prepare your Collaboration Agreement.</span>
-      </p>
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem; padding-bottom:1rem; border-bottom:1px solid #f1f5f9;">
+        <div>
+          <h3 style="margin:0 0 0.35rem; font-size:1.05rem; color:#0f172a; display:flex; align-items:center; gap:0.5rem;">
+            🏢 <span class="lang-en">Company Tax &amp; Banking Information Form</span>
+            <span class="lang-es">Formulario de Datos Fiscales de la Empresa y Cuenta Bancaria</span>
+            <span class="lang-fr">Formulaire de Données Fiscales et Bancaires de l'Entreprise</span>
+            <span class="lang-en-ca">Company Tax &amp; Banking Information Form</span>
+          </h3>
+          <p style="font-size:0.82rem; color:#64748b; margin:0;">
+            <span class="lang-en">Please complete these details accurately so our team can prepare your Collaboration Agreement, or export the Master Referral Agreement in Word (.doc).</span>
+            <span class="lang-es">Completa estos datos para redactar el Acuerdo de Colaboración Conjunta o exporta directamente el Master Referral Agreement en documento Word (.doc).</span>
+            <span class="lang-fr">Veuillez remplir ces informations ou exporter le Master Referral Agreement au format Word (.doc).</span>
+            <span class="lang-en-ca">Please complete these details accurately or export the Master Referral Agreement in Word (.doc).</span>
+          </p>
+        </div>
+        <button type="button" class="btn btn-outline" onclick="App.utils.exportCurrentContractToWord('${prefix}')" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.65rem 1.15rem; font-weight:700; font-size:0.85rem; border-radius:0.6rem; border:1.5px solid #003da5; color:#003da5; background:#eff6ff; white-space:nowrap; cursor:pointer;">
+          📄 <span class="lang-en">Export Master Referral Agreement (Word .doc)</span>
+          <span class="lang-es">Exportar Master Referral Agreement (Word .doc)</span>
+          <span class="lang-fr">Exporter l'Accord en Word (.doc)</span>
+          <span class="lang-en-ca">Export Master Referral Agreement (Word .doc)</span>
+        </button>
+      </div>
 
       <form id="${prefix}-company-data-form" style="display:grid; gap:1.25rem;">
         <!-- Block 1: Datos Fiscales de la Empresa -->
@@ -793,7 +843,7 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
                 <span class="lang-en">Country *</span>
                 <span class="lang-es">País *</span>
               </label>
-              <input type="text" id="${prefix}-country" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="United States / Canada / España" value="${App.utils.escapeHtml(saved.country || user.country || '')}">
+              <input type="text" id="${prefix}-country" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="United States / Canada / España" value="${App.utils.escapeHtml(saved.country || saved.fiscalCountry || user.country || '')}">
             </div>
             <div style="grid-column: 1 / -1;">
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
@@ -807,21 +857,21 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
                 <span class="lang-en">Managing Broker / Legal Representative Name *</span>
                 <span class="lang-es">Nombre Completo del Broker / Representante Legal *</span>
               </label>
-              <input type="text" id="${prefix}-broker-name" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="Nombre y Apellidos del Broker" value="${App.utils.escapeHtml(saved.brokerFullName || defaultBrokerName)}">
+              <input type="text" id="${prefix}-broker-name" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="Nombre y Apellidos del Broker" value="${App.utils.escapeHtml(saved.brokerFullName || saved.brokerSignerName || defaultBrokerName)}">
             </div>
             <div>
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
                 <span class="lang-en">Broker Email *</span>
                 <span class="lang-es">Email del Broker *</span>
               </label>
-              <input type="email" id="${prefix}-broker-email" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="broker@agency.com" value="${App.utils.escapeHtml(saved.brokerEmail || (isBroker ? user.email : ''))}">
+              <input type="email" id="${prefix}-broker-email" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="broker@agency.com" value="${App.utils.escapeHtml(saved.brokerEmail || saved.brokerSignerEmail || (isBroker ? user.email : ''))}">
             </div>
             <div>
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
                 <span class="lang-en">Broker Phone *</span>
                 <span class="lang-es">Teléfono del Broker *</span>
               </label>
-              <input type="tel" id="${prefix}-broker-phone" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="+1 555 000 0000" value="${App.utils.escapeHtml(saved.brokerPhone || (isBroker ? user.phone : ''))}">
+              <input type="tel" id="${prefix}-broker-phone" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="+1 555 000 0000" value="${App.utils.escapeHtml(saved.brokerPhone || saved.brokerSignerPhone || (isBroker ? user.phone : ''))}">
             </div>
           </div>
         </div>
@@ -873,7 +923,7 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
                 <span class="lang-en">Additional Notes / Referring Agent Details (Optional)</span>
                 <span class="lang-es">Notas Adicionales o Datos del Agente Asociado (Opcional)</span>
               </label>
-              <textarea id="${prefix}-notes" class="form-input" rows="2" style="margin-bottom:0; width:100%; resize:vertical;" placeholder="Cualquier observación adicional para la redacción del contrato...">${App.utils.escapeHtml(saved.additionalNotes || '')}</textarea>
+              <textarea id="${prefix}-notes" class="form-input" rows="2" style="margin-bottom:0; width:100%; resize:vertical;" placeholder="Cualquier observación adicional para la redacción del contrato...">${App.utils.escapeHtml(saved.additionalNotes || saved.notes || '')}</textarea>
             </div>
           </div>
         </div>
@@ -882,12 +932,17 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
           <div id="${prefix}-save-status" style="font-size:0.85rem; color:#047857; font-weight:600;">
             ${saved.submittedAt ? `✅ <span class="lang-en">Last saved:</span><span class="lang-es">Última actualización:</span> ${App.utils.formatDate(saved.submittedAt)}` : ''}
           </div>
-          <button type="submit" class="btn btn-primary" id="${prefix}-submit-btn" style="padding:0.75rem 1.75rem; font-weight:700; border-radius:0.6rem;">
-            💾 <span class="lang-en">Save Details &amp; Notify Administration</span>
-            <span class="lang-es">Guardar Datos y Enviar a Administración</span>
-            <span class="lang-fr">Enregistrer et Notifier l'Administration</span>
-            <span class="lang-en-ca">Save Details &amp; Notify Administration</span>
-          </button>
+          <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+            <button type="button" class="btn btn-outline" onclick="App.utils.exportCurrentContractToWord('${prefix}')" style="padding:0.75rem 1.25rem; font-weight:700; border-radius:0.6rem; border:1.5px solid #003da5; color:#003da5; background:#fff; cursor:pointer;">
+              📄 <span class="lang-en">Export to Word (.doc)</span><span class="lang-es">Exportar a Word (.doc)</span><span class="lang-fr">Exporter en Word (.doc)</span><span class="lang-en-ca">Export to Word (.doc)</span>
+            </button>
+            <button type="submit" class="btn btn-primary" id="${prefix}-submit-btn" style="padding:0.75rem 1.75rem; font-weight:700; border-radius:0.6rem;">
+              💾 <span class="lang-en">Save Details &amp; Notify Administration</span>
+              <span class="lang-es">Guardar Datos y Enviar a Administración</span>
+              <span class="lang-fr">Enregistrer et Notifier l'Administration</span>
+              <span class="lang-en-ca">Save Details &amp; Notify Administration</span>
+            </button>
+          </div>
         </div>
       </form>
     </div>
@@ -912,6 +967,49 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
   }
 };
 
+App.utils.exportCurrentContractToWord = function(prefix = 'contract') {
+  if (typeof App.generateReferralAgreementDoc !== 'function') {
+    App.utils.showToast('El generador de Word no está disponible.', 'error');
+    return;
+  }
+  const currentUser = (App.auth && App.auth.getCurrentUser()) || {};
+  const saved = currentUser.contractCompanyData || {};
+
+  const getVal = (id, fallback) => {
+    const el = document.getElementById(id);
+    return (el && el.value.trim()) ? el.value.trim() : (fallback || '');
+  };
+
+  const liveContractData = {
+    ...saved,
+    companyLegalName: getVal(`${prefix}-legal-name`, saved.companyLegalName || currentUser.agencyName),
+    taxId:            getVal(`${prefix}-tax-id`, saved.taxId),
+    licenseNumber:    getVal(`${prefix}-license-number`, saved.licenseNumber),
+    country:          getVal(`${prefix}-country`, saved.country || saved.fiscalCountry || currentUser.country),
+    fiscalCountry:    getVal(`${prefix}-country`, saved.country || saved.fiscalCountry || currentUser.country),
+    fiscalAddress:    getVal(`${prefix}-fiscal-address`, saved.fiscalAddress),
+    brokerFullName:   getVal(`${prefix}-broker-name`, saved.brokerFullName || saved.brokerSignerName),
+    brokerSignerName: getVal(`${prefix}-broker-name`, saved.brokerFullName || saved.brokerSignerName),
+    brokerEmail:      getVal(`${prefix}-broker-email`, saved.brokerEmail || saved.brokerSignerEmail),
+    brokerSignerEmail:getVal(`${prefix}-broker-email`, saved.brokerEmail || saved.brokerSignerEmail),
+    brokerPhone:      getVal(`${prefix}-broker-phone`, saved.brokerPhone || saved.brokerSignerPhone),
+    brokerSignerPhone:getVal(`${prefix}-broker-phone`, saved.brokerPhone || saved.brokerSignerPhone),
+    bankAccountHolder:getVal(`${prefix}-bank-holder`, saved.bankAccountHolder),
+    bankName:         getVal(`${prefix}-bank-name`, saved.bankName),
+    bankAccountNumber:getVal(`${prefix}-bank-account`, saved.bankAccountNumber),
+    bankSwiftRouting: getVal(`${prefix}-bank-swift`, saved.bankSwiftRouting),
+    bankAddress:      getVal(`${prefix}-bank-address`, saved.bankAddress),
+    additionalNotes:  getVal(`${prefix}-notes`, saved.additionalNotes || saved.notes),
+    notes:            getVal(`${prefix}-notes`, saved.additionalNotes || saved.notes)
+  };
+
+  App.generateReferralAgreementDoc({
+    ...currentUser,
+    agencyName: liveContractData.companyLegalName || currentUser.agencyName,
+    contractCompanyData: liveContractData
+  });
+};
+
 App.utils.handleSaveContractData = async function(user, prefix, onDone) {
   const btn = document.getElementById(`${prefix}-submit-btn`);
   const statusEl = document.getElementById(`${prefix}-save-status`);
@@ -923,21 +1021,32 @@ App.utils.handleSaveContractData = async function(user, prefix, onDone) {
 
   try {
     const now = new Date().toISOString();
+    const countryVal = (document.getElementById(`${prefix}-country`)?.value || '').trim();
+    const brokerNameVal = (document.getElementById(`${prefix}-broker-name`)?.value || '').trim();
+    const brokerEmailVal = (document.getElementById(`${prefix}-broker-email`)?.value || '').trim();
+    const brokerPhoneVal = (document.getElementById(`${prefix}-broker-phone`)?.value || '').trim();
+    const notesVal = (document.getElementById(`${prefix}-notes`)?.value || '').trim();
+
     const contractCompanyData = {
       companyLegalName: (document.getElementById(`${prefix}-legal-name`)?.value || '').trim(),
       taxId:            (document.getElementById(`${prefix}-tax-id`)?.value || '').trim(),
       licenseNumber:    (document.getElementById(`${prefix}-license-number`)?.value || '').trim(),
-      country:          (document.getElementById(`${prefix}-country`)?.value || '').trim(),
+      country:          countryVal,
+      fiscalCountry:    countryVal,
       fiscalAddress:    (document.getElementById(`${prefix}-fiscal-address`)?.value || '').trim(),
-      brokerFullName:   (document.getElementById(`${prefix}-broker-name`)?.value || '').trim(),
-      brokerEmail:      (document.getElementById(`${prefix}-broker-email`)?.value || '').trim(),
-      brokerPhone:      (document.getElementById(`${prefix}-broker-phone`)?.value || '').trim(),
+      brokerFullName:   brokerNameVal,
+      brokerSignerName: brokerNameVal,
+      brokerEmail:      brokerEmailVal,
+      brokerSignerEmail:brokerEmailVal,
+      brokerPhone:      brokerPhoneVal,
+      brokerSignerPhone:brokerPhoneVal,
       bankAccountHolder:(document.getElementById(`${prefix}-bank-holder`)?.value || '').trim(),
       bankName:         (document.getElementById(`${prefix}-bank-name`)?.value || '').trim(),
       bankAccountNumber:(document.getElementById(`${prefix}-bank-account`)?.value || '').trim(),
       bankSwiftRouting: (document.getElementById(`${prefix}-bank-swift`)?.value || '').trim(),
       bankAddress:      (document.getElementById(`${prefix}-bank-address`)?.value || '').trim(),
-      additionalNotes:  (document.getElementById(`${prefix}-notes`)?.value || '').trim(),
+      additionalNotes:  notesVal,
+      notes:            notesVal,
       submittedAt:      now,
       submittedByRole:  user.role,
       submittedByName:  `${user.firstName || ''} ${user.lastName || ''}`.trim()

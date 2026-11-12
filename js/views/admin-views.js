@@ -178,6 +178,21 @@
             }
           };
         }
+        const copyEmbBtn = document.getElementById('admin-dash-copy-embajador-link');
+        if (copyEmbBtn) {
+          copyEmbBtn.onclick = () => {
+            const embUrl = `${referralLink}&type=embajador`;
+            App.utils.copyToClipboard(embUrl);
+            App.utils.showToast('👑 Enlace exclusivo de postulación como Embajador copiado al portapapeles', 'success');
+          };
+        }
+        const waEmbBtn = document.getElementById('admin-dash-wa-embajador-link');
+        if (waEmbBtn) {
+          waEmbBtn.onclick = () => {
+            const embUrl = `${referralLink}&type=embajador`;
+            App.utils.shareEmbajadorWhatsApp(embUrl);
+          };
+        }
       }
 
       // 8. Check pending Contract / Fiscal Data notifications for Admin Dashboard alert & sidebar badge
@@ -265,7 +280,7 @@
 
     bannerEl.style.display = 'block';
     const itemsPreview = notifications.slice(0, 3).map(n => {
-      const roleLabel = n.userRole === 'broker' ? '🏢 Broker' : '👤 Realtor';
+      const roleLabel = n.userRole === 'embajador' ? '👑 Embajador' : (n.userRole === 'broker' ? '🏢 Broker' : '👤 Realtor');
       const companyName = (n.contractCompanyData && n.contractCompanyData.companyLegalName) || n.agencyName || '—';
       return `<li style="margin-bottom:4px;"><strong>${App.utils.escapeHtml(n.userName)}</strong> (${roleLabel} — ${App.utils.escapeHtml(companyName)}) · <span style="color:#4b5563;">${App.utils.escapeHtml(n.email)}</span></li>`;
     }).join('');
@@ -380,6 +395,12 @@
         </div>
       ` : '';
 
+      const embajadorBookmark = requestedRole === 'embajador' ? `
+        <div style="position: absolute; top: 0; right: 12px; background: #d97706; color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+          Requested
+        </div>
+      ` : '';
+
       return `
         <div class="pipeline-card" style="margin-bottom: 1rem; padding: 1.25rem;">
           <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
@@ -402,6 +423,16 @@
             <div style="font-size: 0.8rem; font-weight: 600; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Approve Application As:</div>
             
             <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+              <!-- Embajador Approval Card -->
+              <div onclick="App.views.admin.approveWithRole('${user.id}', 'embajador')" 
+                   style="position: relative; flex: 1; min-width: 120px; border: 2px solid ${requestedRole === 'embajador' ? '#f59e0b' : defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 0.5rem; cursor: pointer; text-align: center; background: ${requestedRole === 'embajador' ? '#fffbeb' : defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                   onmouseover="this.style.borderColor='#d97706'; this.style.backgroundColor='#fffbeb'; this.style.boxShadow='0 4px 6px -1px rgba(217,119,6,0.15)';" 
+                   onmouseout="this.style.borderColor='${requestedRole === 'embajador' ? '#f59e0b' : defaultBorder}'; this.style.backgroundColor='${requestedRole === 'embajador' ? '#fffbeb' : defaultBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
+                ${embajadorBookmark}
+                <div style="font-size: 2.25rem; margin-bottom: 0.25rem;">👑</div>
+                <div style="font-weight: 700; font-size: 0.9rem; color: #92400e; letter-spacing: 0.05em; text-transform: uppercase;">Embajador</div>
+              </div>
+
               <!-- Broker Approval Card -->
               <div onclick="App.views.admin.approveWithRole('${user.id}', 'broker')" 
                    style="position: relative; flex: 1; min-width: 120px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 0.5rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
@@ -806,6 +837,12 @@
         </div>
       ` : '';
 
+      const embajadorBookmark = requestedRole === 'embajador' ? `
+        <div style="position: absolute; top: 0; right: 12px; background: #d97706; color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+          Requested
+        </div>
+      ` : '';
+
       App.utils.showModal({
         title: 'Approve User',
         body: `
@@ -815,6 +852,16 @@
           </div>
           
           <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+            <!-- Embajador Approval Card -->
+            <div onclick="App.views.admin.approveWithRole('${user.id}', 'embajador')" 
+                 style="position: relative; flex: 1; min-width: 120px; border: 2px solid ${requestedRole === 'embajador' ? '#f59e0b' : defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 0.5rem; cursor: pointer; text-align: center; background: ${requestedRole === 'embajador' ? '#fffbeb' : defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
+                 onmouseover="this.style.borderColor='#d97706'; this.style.backgroundColor='#fffbeb'; this.style.boxShadow='0 4px 6px -1px rgba(217,119,6,0.15)';" 
+                 onmouseout="this.style.borderColor='${requestedRole === 'embajador' ? '#f59e0b' : defaultBorder}'; this.style.backgroundColor='${requestedRole === 'embajador' ? '#fffbeb' : defaultBg}'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.02)';">
+              ${embajadorBookmark}
+              <div style="font-size: 2.25rem; margin-bottom: 0.25rem;">👑</div>
+              <div style="font-weight: 700; font-size: 0.9rem; color: #92400e; letter-spacing: 0.05em; text-transform: uppercase;">Embajador</div>
+            </div>
+
             <!-- Broker Approval Card -->
             <div onclick="App.views.admin.approveWithRole('${user.id}', 'broker')" 
                  style="position: relative; flex: 1; min-width: 120px; border: 2px solid ${defaultBorder}; border-radius: 0.75rem; padding: 1.25rem 0.5rem; cursor: pointer; text-align: center; background: ${defaultBg}; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.02);"
@@ -979,6 +1026,18 @@
       const statusBadge = App.utils.getUserStatusBadge(user.status);
 
       const allSysUsers = await App.auth.getAllUsers();
+      const embajadorUmbrellaInfo = user.role === 'embajador'
+        ? await App.auth.getUmbrellaData(user.id)
+        : null;
+      const activeEmbajadores = allSysUsers.filter(u => u.role === 'embajador' && u.status === 'active');
+      const embajadorOptions = `
+        <option value="">-- Sin Embajador (Directo) --</option>
+        ${activeEmbajadores.map(e => `
+          <option value="${e.id}" ${user.embajadorId === e.id || user.referredBy === e.id || (e.referralCode && user.referredBy === e.referralCode) ? 'selected' : ''}>
+            👑 ${App.utils.escapeHtml(e.firstName)} ${App.utils.escapeHtml(e.lastName)} (${App.utils.escapeHtml(e.referralCode || e.id)})
+          </option>
+        `).join('')}
+      `;
       const localAgents = allSysUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
       const agentOptions = `
         <option value="">-- Direct / No Referral --</option>
@@ -1052,13 +1111,47 @@
             <label style="font-weight: 600; font-size: 0.875rem; color: #374151; display: block; margin-bottom: 0.5rem;">Modify User Role</label>
             <div style="display: flex; gap: 0.5rem;">
               <select id="user-role-select" class="form-control" style="flex: 1; padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; background-color: white;">
-                <option value="realtor" ${user.role === 'realtor' ? 'selected' : ''}>Realtor</option>
+                <option value="embajador" ${user.role === 'embajador' ? 'selected' : ''}>👑 Embajador / Ambassador</option>
                 <option value="broker" ${user.role === 'broker' ? 'selected' : ''}>Broker</option>
-                <option value="agent_inmomas" ${user.role === 'agent_inmomas' ? 'selected' : ''}>Agent Inmomás</option>
+                <option value="realtor" ${user.role === 'realtor' ? 'selected' : ''}>Realtor</option>
                 <option value="colaborador" ${user.role === 'colaborador' ? 'selected' : ''}>Colaborador</option>
+                <option value="agent_inmomas" ${user.role === 'agent_inmomas' ? 'selected' : ''}>Agent Inmomás</option>
               </select>
               <button class="btn btn-primary btn-sm" id="save-user-role-btn">Update Role</button>
             </div>
+          </div>
+          ` : ''}
+
+          ${user.role === 'embajador' && embajadorUmbrellaInfo ? `
+          <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
+            <label style="font-weight: 700; font-size: 0.875rem; color: #92400e; display: block; margin-bottom: 0.5rem;">
+              👑 Red Bajo su Paraguas (${embajadorUmbrellaInfo.users.length} profesionales · ${embajadorUmbrellaInfo.clients.length} clientes)
+            </label>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:0.5rem; font-size:0.76rem;">
+              <span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:999px; font-weight:700;">🏢 ${embajadorUmbrellaInfo.brokers.length} Brokers</span>
+              <span style="background:#ecfdf5; color:#047857; padding:2px 8px; border-radius:999px; font-weight:700;">🏠 ${embajadorUmbrellaInfo.realtors.length} Agentes</span>
+              <span style="background:#fffbeb; color:#b45309; padding:2px 8px; border-radius:999px; font-weight:700;">🤝 ${embajadorUmbrellaInfo.colaboradores.length} Colaboradores</span>
+              <span style="background:#f5f3ff; color:#6d28d9; padding:2px 8px; border-radius:999px; font-weight:700;">🏡 ${embajadorUmbrellaInfo.clients.length} Clientes</span>
+            </div>
+            <div style="max-height: 130px; overflow-y: auto; font-size: 0.82rem; border: 1px solid #fde68a; border-radius: 0.45rem; padding: 0.55rem; background: #fffbeb;">
+              ${embajadorUmbrellaInfo.users.length === 0
+                ? '<div style="color:#92400e; text-align:center;">Aún no hay contactos profesionales registrados bajo su paraguas.</div>'
+                : '<ul style="margin:0; padding-left:1.1rem; color:#374151;">' + embajadorUmbrellaInfo.users.map(m => `<li><strong>${App.utils.escapeHtml(m.firstName)} ${App.utils.escapeHtml(m.lastName)}</strong> (${m.role}) — <span style="color:#6b7280;">${App.utils.escapeHtml(m._umbrellaParentName || 'Directo')}</span></li>`).join('') + '</ul>'
+              }
+            </div>
+          </div>
+          ` : ''}
+
+          ${['broker', 'realtor', 'colaborador'].includes(user.role) ? `
+          <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
+            <label style="font-weight: 600; font-size: 0.875rem; color: #92400e; display: block; margin-bottom: 0.5rem;">👑 Asignar Paraguas de Embajador</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <select id="user-embajador-select" class="form-control" style="flex: 1; padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; background-color: white;">
+                ${embajadorOptions}
+              </select>
+              <button class="btn btn-primary btn-sm" id="save-user-embajador-btn" style="background:#d97706; border-color:#d97706;">Vincular</button>
+            </div>
+            <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.4rem;">Vincula este ${user.role} (y los contactos que genere) al paraguas del Embajador seleccionado.</p>
           </div>
           ` : ''}
           
@@ -1303,6 +1396,32 @@
           } catch (err) {
             console.error('[Admin] Error updating user referral:', err);
             App.utils.showToast('Error assigning agent: ' + err.message, 'error');
+          }
+        });
+      }
+
+      const saveEmbajadorBtn = document.getElementById('save-user-embajador-btn');
+      if (saveEmbajadorBtn) {
+        saveEmbajadorBtn.addEventListener('click', async () => {
+          const selectedEmbId = document.getElementById('user-embajador-select').value;
+          App.utils.closeModal();
+
+          if (!isMaiaOrSuperAdmin()) {
+            await requestChangeApproval(
+              'Asignación de Paraguas de Embajador',
+              `Asignar Embajador "${selectedEmbId || 'Ninguno'}" al usuario "${user.firstName} ${user.lastName}" (${user.email}).`
+            );
+            return;
+          }
+
+          try {
+            await App.auth.updateUserEmbajador(userId, selectedEmbId || null);
+            App.utils.showToast('👑 Paraguas de Embajador actualizado correctamente.', 'success');
+            const route = App.router.getCurrentRoute();
+            if (route === 'admin/users') await initUsers();
+          } catch (err) {
+            console.error('[Admin] Error updating user embajador:', err);
+            App.utils.showToast('Error actualizando Embajador: ' + err.message, 'error');
           }
         });
       }
@@ -1582,6 +1701,12 @@
               <button class="btn btn-outline btn-sm" onclick="App.views.admin.confirmConvertClient('${client.id}', '${App.utils.escapeHtml(client.firstName)} ${App.utils.escapeHtml(client.lastName)}', 'broker')" style="border-color: #0043ff; color: #0043ff;">
                 🏢 Convertir a Broker
               </button>
+              <button class="btn btn-outline btn-sm" onclick="App.views.admin.confirmConvertClient('${client.id}', '${App.utils.escapeHtml(client.firstName)} ${App.utils.escapeHtml(client.lastName)}', 'colaborador')" style="border-color: #d97706; color: #b45309;">
+                🤝 Convertir a Colaborador
+              </button>
+              <button class="btn btn-outline btn-sm" onclick="App.views.admin.confirmConvertClient('${client.id}', '${App.utils.escapeHtml(client.firstName)} ${App.utils.escapeHtml(client.lastName)}', 'embajador')" style="border-color: #b45309; color: #92400e; background: rgba(245,158,11,0.08);">
+                👑 Convertir a Embajador
+              </button>
             </div>
           </div>
 
@@ -1728,7 +1853,13 @@
   }
 
   async function confirmConvertClient(clientId, clientName, targetRole = 'realtor') {
-    const roleLabel = targetRole === 'broker' ? 'Broker' : 'Agente (Realtor)';
+    const roleMap = {
+      embajador: 'Embajador',
+      broker: 'Broker',
+      colaborador: 'Colaborador',
+      realtor: 'Agente (Realtor)'
+    };
+    const roleLabel = roleMap[targetRole] || 'Agente (Realtor)';
 
     if (!isMaiaOrSuperAdmin()) {
       await requestChangeApproval(
@@ -1745,24 +1876,31 @@
   }
 
   async function handleConvertClient(clientId, targetRole = 'realtor') {
+    const roleMap = {
+      embajador: 'Embajador',
+      broker: 'Broker',
+      colaborador: 'Colaborador',
+      realtor: 'Realtor'
+    };
+    const roleLabel = roleMap[targetRole] || 'Realtor';
     try {
       if (!isMaiaOrSuperAdmin()) {
         const client = allClients.find(c => c.id === clientId);
         const clientName = client ? `${client.firstName || ''} ${client.lastName || ''}`.trim() : clientId;
         await requestChangeApproval(
-          `Convertir Cliente a ${targetRole === 'broker' ? 'Broker' : 'Realtor'}`,
+          `Convertir Cliente a ${roleLabel}`,
           `Crear cuenta de ${targetRole} para "${clientName}".`
         );
         return;
       }
 
       const res = await App.auth.convertClientToUser(clientId, targetRole);
-      App.utils.showToast(`¡Contacto convertido exitosamente a ${targetRole === 'broker' ? 'Broker' : 'Realtor'}! Ahora aparece en Gestión de Usuarios. 🎉`, 'success');
+      App.utils.showToast(`¡Contacto convertido exitosamente a ${roleLabel}! Ahora aparece en Gestión de Usuarios. 🎉`, 'success');
       App.utils.closeModal();
       await initClients();
     } catch (err) {
       console.error('[Admin] handleConvertClient error:', err);
-      App.utils.showToast(err.message || 'Error al convertir cliente a agente.', 'error');
+      App.utils.showToast(err.message || 'Error al convertir cliente a profesional.', 'error');
     }
   }
 
@@ -1943,8 +2081,9 @@
   async function initNewsletter() {
     try {
       // 1. Load all subscriber groups
-      const [allSubs, brokerSubs, realtorSubs, agentSubs, history] = await Promise.all([
+      const [allSubs, embajadorSubs, brokerSubs, realtorSubs, agentSubs, history] = await Promise.all([
         App.auth.getNewsletterSubscribers(null),
+        App.auth.getNewsletterSubscribers('embajador'),
         App.auth.getNewsletterSubscribers('broker'),
         App.auth.getNewsletterSubscribers('realtor'),
         App.auth.getNewsletterSubscribers('agent_inmomas'),
@@ -1953,6 +2092,7 @@
 
       const subscriberMap = {
         all: allSubs,
+        embajador: embajadorSubs,
         broker: brokerSubs,
         realtor: realtorSubs,
         agent_inmomas: agentSubs
@@ -2077,7 +2217,7 @@
       return;
     }
 
-    const roleLabel = { all: 'All', broker: 'Brokers', realtor: 'Realtors', agent_inmomas: 'Agents', colaborador: 'Colaboradores' };
+    const roleLabel = { all: 'All', embajador: 'Embajadores', broker: 'Brokers', realtor: 'Realtors', agent_inmomas: 'Agents', colaborador: 'Colaboradores' };
 
     const rows = history.map(nl => {
       const date = new Date(nl.sentAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -2332,7 +2472,7 @@
 
     // 2. Explicit role/contactType
     if (role === 'client' || role === 'cliente') return false;
-    if (['realtor', 'broker', 'agent', 'agent_inmomas', 'colaborador'].includes(role)) return true;
+    if (['embajador', 'realtor', 'broker', 'agent', 'agent_inmomas', 'colaborador'].includes(role)) return true;
 
     // 3. Client interest field present -> B2C
     if (interest && interest.length > 0) return false;
@@ -2390,10 +2530,10 @@
       return true;
     }
 
-    // 7. Referral code prefixes (REA, BRO, LOC, COL)
+    // 7. Referral code prefixes (EMB, REA, BRO, BRK, LOC, COL)
     if (r.referralCode) {
       const code = String(r.referralCode).toUpperCase().trim();
-      if (code.startsWith('REA-') || code.startsWith('BRO-') || code.startsWith('LOC-') || code.startsWith('COL-')) {
+      if (code.startsWith('EMB-') || code.startsWith('REA-') || code.startsWith('BRO-') || code.startsWith('BRK-') || code.startsWith('LOC-') || code.startsWith('COL-')) {
         return true;
       }
     }
@@ -3248,7 +3388,7 @@
           <div>
             <div style="font-weight:800; font-size:1.05rem; color:#111827;">${App.utils.escapeHtml(n.userName)}</div>
             <div style="font-size:0.84rem; color:#4b5563; margin-top:2px;">
-              ${n.userRole === 'broker' ? '🏢 Broker' : '👤 Realtor'} &nbsp;·&nbsp; <strong>${App.utils.escapeHtml(cd.companyLegalName || n.agencyName || '—')}</strong> &nbsp;·&nbsp; ${App.utils.escapeHtml(n.email)}
+              ${n.userRole === 'embajador' ? '👑 Embajador' : (n.userRole === 'broker' ? '🏢 Broker' : '👤 Realtor')} &nbsp;·&nbsp; <strong>${App.utils.escapeHtml(cd.companyLegalName || n.agencyName || '—')}</strong> &nbsp;·&nbsp; ${App.utils.escapeHtml(n.email)}
             </div>
             <div style="font-size:0.78rem; color:#6b7280; margin-top:4px;">
               🕒 Enviado el: ${App.utils.formatDate(n.uploadedAt)}
@@ -3266,9 +3406,9 @@
             <div style="margin-bottom:3px;"><strong>Razón Social:</strong> ${App.utils.escapeHtml(cd.companyLegalName || '—')}</div>
             <div style="margin-bottom:3px;"><strong>Tax ID / EIN / CIF:</strong> ${App.utils.escapeHtml(cd.taxId || '—')}</div>
             <div style="margin-bottom:3px;"><strong>Nº Licencia:</strong> ${App.utils.escapeHtml(cd.licenseNumber || '—')}</div>
-            <div style="margin-bottom:3px;"><strong>Domicilio Fiscal:</strong> ${App.utils.escapeHtml(cd.fiscalAddress || '—')} (${App.utils.escapeHtml(cd.fiscalCountry || '—')})</div>
-            <div style="margin-bottom:3px;"><strong>Broker Firmante:</strong> ${App.utils.escapeHtml(cd.brokerSignerName || '—')}</div>
-            <div><strong>Contacto Broker:</strong> ${App.utils.escapeHtml(cd.brokerSignerEmail || '—')} · ${App.utils.escapeHtml(cd.brokerSignerPhone || '—')}</div>
+            <div style="margin-bottom:3px;"><strong>Domicilio Fiscal:</strong> ${App.utils.escapeHtml(cd.fiscalAddress || '—')} (${App.utils.escapeHtml(cd.country || cd.fiscalCountry || '—')})</div>
+            <div style="margin-bottom:3px;"><strong>Broker Firmante:</strong> ${App.utils.escapeHtml(cd.brokerFullName || cd.brokerSignerName || '—')}</div>
+            <div><strong>Contacto Broker:</strong> ${App.utils.escapeHtml(cd.brokerEmail || cd.brokerSignerEmail || '—')} · ${App.utils.escapeHtml(cd.brokerPhone || cd.brokerSignerPhone || '—')}</div>
           </div>
           <div>
             <div style="font-weight:700; color:#166534; margin-bottom:6px; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">🏦 Datos Bancarios Corporativos</div>
@@ -3277,13 +3417,16 @@
             <div style="margin-bottom:3px;"><strong>IBAN / Nº Cuenta:</strong> <code style="background:#fff; padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; font-weight:700;">${App.utils.escapeHtml(cd.bankAccountNumber || '—')}</code></div>
             <div style="margin-bottom:3px;"><strong>SWIFT / BIC / Routing:</strong> <code style="background:#fff; padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; font-weight:700;">${App.utils.escapeHtml(cd.bankSwiftRouting || '—')}</code></div>
             <div style="margin-bottom:3px;"><strong>Dirección Banco:</strong> ${App.utils.escapeHtml(cd.bankAddress || '—')}</div>
-            ${cd.notes ? `<div style="margin-top:4px; color:#475569;"><strong>Notas:</strong> ${App.utils.escapeHtml(cd.notes)}</div>` : ''}
+            ${(cd.additionalNotes || cd.notes) ? `<div style="margin-top:4px; color:#475569;"><strong>Notas:</strong> ${App.utils.escapeHtml(cd.additionalNotes || cd.notes)}</div>` : ''}
           </div>
         </div>
         ` : ''}
 
         <div style="display:flex; flex-direction:column; gap:0.75rem;">
           <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
+            <button type="button" class="btn btn-outline btn-sm" style="border-color:#003da5; color:#003da5; background:#eff6ff; font-weight:700;" onclick="App.views.admin.exportUserAgreementToWord('${n.userId}')">
+              📄 Exportar Master Referral Agreement (Word .doc)
+            </button>
             ${hasFiscalData ? `
               <button type="button" class="btn btn-outline btn-sm" onclick="App.views.admin.copyContractData('${n.userId}')">
                 📋 Copiar Datos para Contrato
@@ -3321,7 +3464,7 @@
     tbody.innerHTML = users.map(u => {
       const cd = u.contractCompanyData || {};
       const companySummary = cd.companyLegalName
-        ? `<div><strong>${App.utils.escapeHtml(cd.companyLegalName)}</strong></div><div style="font-size:0.75rem;color:#6b7280;">ID: ${App.utils.escapeHtml(cd.taxId || '—')} · ${App.utils.escapeHtml(cd.fiscalCountry || '')}</div>`
+        ? `<div><strong>${App.utils.escapeHtml(cd.companyLegalName)}</strong></div><div style="font-size:0.75rem;color:#6b7280;">ID: ${App.utils.escapeHtml(cd.taxId || '—')} · ${App.utils.escapeHtml(cd.country || cd.fiscalCountry || '')}</div>`
         : App.utils.escapeHtml(u.agencyName || u.brokerNameManual || '—');
       const bankSummary = cd.bankAccountNumber
         ? `<div><strong>${App.utils.escapeHtml(cd.bankName || '—')}</strong></div><div style="font-size:0.75rem;color:#6b7280;"><code>${App.utils.escapeHtml(cd.bankAccountNumber)}</code></div>`
@@ -3330,7 +3473,7 @@
       return `
       <tr>
         <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.85rem;font-weight:600;">${App.utils.escapeHtml(u.firstName)} ${App.utils.escapeHtml(u.lastName)}</td>
-        <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${u.role === 'broker' ? '🏢 Broker' : '👤 Realtor'}</td>
+        <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${u.role === 'embajador' ? '👑 Embajador' : (u.role === 'broker' ? '🏢 Broker' : '👤 Realtor')}</td>
         <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${companySummary}</td>
         <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${bankSummary}</td>
         <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${App.utils.escapeHtml(u.email)}</td>
@@ -3340,6 +3483,7 @@
         </td>
         <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn btn-outline btn-xs" onclick="App.views.admin.exportUserAgreementToWord('${u.id}')" style="padding:2px 8px;font-size:0.75rem;border-color:#003da5;color:#003da5;background:#eff6ff;font-weight:700;">📄 Word (.doc)</button>
             ${cd.companyLegalName ? `<button class="btn btn-outline btn-xs" onclick="App.views.admin.copyContractData('${u.id}')" style="padding:2px 8px;font-size:0.75rem;">📋 Copiar Datos</button>` : ''}
             <button class="btn btn-outline btn-xs" onclick="document.getElementById('admin-reupload-file-input-${u.id}').click()" style="padding:2px 8px;font-size:0.75rem;">
               📎 Adjuntar PDF
@@ -3353,6 +3497,23 @@
     }).join('');
   }
 
+  function exportUserAgreementToWord(userId) {
+    if (typeof App.generateReferralAgreementDoc !== 'function') {
+      App.utils.showToast('El generador de documento Word no está disponible.', 'error');
+      return;
+    }
+    if (!userId || userId === 'template') {
+      App.generateReferralAgreementDoc({ isTemplate: true });
+      return;
+    }
+    const user = (allUsers || []).find(u => u.id === userId) || (App.demoData && App.demoData.users ? App.demoData.users.find(u => u.id === userId) : null);
+    if (!user) {
+      App.generateReferralAgreementDoc({ isTemplate: true });
+      return;
+    }
+    App.generateReferralAgreementDoc(user);
+  }
+
   function copyContractData(userId) {
     const user = (allUsers || []).find(u => u.id === userId) || (App.demoData && App.demoData.users ? App.demoData.users.find(u => u.id === userId) : null);
     if (!user || !user.contractCompanyData) {
@@ -3362,7 +3523,7 @@
     const cd = user.contractCompanyData;
     const text = [
       `=== DATOS PARA CONTRATO DE COLABORACIÓN ===`,
-      `Colaborador: ${user.firstName || ''} ${user.lastName || ''} (${user.role === 'broker' ? 'Broker' : 'Realtor'})`,
+      `Colaborador: ${user.firstName || ''} ${user.lastName || ''} (${user.role === 'embajador' ? 'Embajador' : (user.role === 'broker' ? 'Broker' : 'Realtor')})`,
       `Email usuario: ${user.email || '—'}`,
       ``,
       `-- DATOS FISCALES DE LA EMPRESA --`,
@@ -3370,10 +3531,10 @@
       `NIF / Tax ID / EIN / CIF: ${cd.taxId || '—'}`,
       `Nº Licencia Inmobiliaria: ${cd.licenseNumber || '—'}`,
       `Domicilio Fiscal: ${cd.fiscalAddress || '—'}`,
-      `País Fiscal: ${cd.fiscalCountry || '—'}`,
-      `Broker Responsable (Firmante): ${cd.brokerSignerName || '—'}`,
-      `Email del Broker: ${cd.brokerSignerEmail || '—'}`,
-      `Teléfono del Broker: ${cd.brokerSignerPhone || '—'}`,
+      `País Fiscal: ${cd.country || cd.fiscalCountry || '—'}`,
+      `Broker Responsable (Firmante): ${cd.brokerFullName || cd.brokerSignerName || '—'}`,
+      `Email del Broker: ${cd.brokerEmail || cd.brokerSignerEmail || '—'}`,
+      `Teléfono del Broker: ${cd.brokerPhone || cd.brokerSignerPhone || '—'}`,
       ``,
       `-- DATOS BANCARIOS CORPORATIVOS --`,
       `Titular de la Cuenta: ${cd.bankAccountHolder || '—'}`,
@@ -3381,7 +3542,7 @@
       `IBAN / Número de Cuenta: ${cd.bankAccountNumber || '—'}`,
       `SWIFT / BIC / Routing ABA: ${cd.bankSwiftRouting || '—'}`,
       `Dirección del Banco: ${cd.bankAddress || '—'}`,
-      `Notas Adicionales: ${cd.notes || '—'}`
+      `Notas Adicionales: ${cd.additionalNotes || cd.notes || '—'}`
     ].join('\n');
 
     App.utils.copyToClipboard(text);
@@ -3975,6 +4136,7 @@
     initAgreementsView,
     handleAdminAgreementUpload,
     copyContractData,
+    exportUserAgreementToWord,
     markAgreementSigned,
     handleDeleteUser,
     handleDeleteWebinarRegistration,

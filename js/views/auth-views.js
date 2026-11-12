@@ -415,6 +415,41 @@ App.views.auth = {
               </div>
             </div>
           `;
+        } else if (user.role === 'embajador') {
+          const umb = await App.auth.getUmbrellaData(user.id);
+          const activeClients = (umb.clients || []).filter(c => c.status !== 'closed' && c.status !== 'rejected').length;
+          const totalVolume = (umb.commissions || []).reduce((sum, c) => sum + (c.salePrice || 0), 0);
+
+          statsHTML = `
+            <div class="profile-stat-card">
+              <div class="profile-stat-icon" style="background: rgba(245, 158, 11, 0.14); color: #b45309;">👑</div>
+              <div>
+                <div class="profile-stat-value">${(umb.users || []).length}</div>
+                <div class="profile-stat-label">Red Paraguas</div>
+              </div>
+            </div>
+            <div class="profile-stat-card">
+              <div class="profile-stat-icon" style="background: rgba(0, 67, 255, 0.08); color: var(--blue);">🏢</div>
+              <div>
+                <div class="profile-stat-value">${(umb.brokers || []).length} / ${(umb.realtors || []).length}</div>
+                <div class="profile-stat-label">Brokers / Agentes</div>
+              </div>
+            </div>
+            <div class="profile-stat-card">
+              <div class="profile-stat-icon" style="background: rgba(253, 224, 71, 0.15); color: #a16207;">⚡</div>
+              <div>
+                <div class="profile-stat-value">${activeClients}</div>
+                <div class="profile-stat-label">Clientes Activos</div>
+              </div>
+            </div>
+            <div class="profile-stat-card">
+              <div class="profile-stat-icon" style="background: rgba(34, 197, 94, 0.08); color: #15803d;">🏠</div>
+              <div>
+                <div class="profile-stat-value">€${totalVolume.toLocaleString()}</div>
+                <div class="profile-stat-label">Volumen Paraguas</div>
+              </div>
+            </div>
+          `;
         } else if (user.role === 'broker') {
           const team = await App.auth.getAllUsers({ brokerId: user.id });
           const clients = await App.auth.getClients({ brokerId: user.id });

@@ -274,6 +274,25 @@ App.demoData = {
       createdAt: '2025-02-01T10:00:00Z'
     },
     {
+      id: 'embajador-001',
+      email: 'sofia.embajador@thespainconnection.com',
+      password: 'embajador123',
+      role: 'embajador',
+      status: 'active',
+      firstName: 'Sofía',
+      lastName: 'Valenzuela',
+      agencyName: 'Valenzuela Global Advisory',
+      phone: '+1 305 555 8899',
+      country: 'United States',
+      referralCode: 'EMB-VALENZUELA',
+      referredBy: 'admin-001',
+      profileImage: null,
+      agreementSigned: true,
+      agreementStatus: 'signed',
+      agreementSignedAt: '2025-02-10T10:00:00Z',
+      createdAt: '2025-02-10T10:00:00Z'
+    },
+    {
       id: 'partner-001',
       username: 'UCI',
       email: '',
