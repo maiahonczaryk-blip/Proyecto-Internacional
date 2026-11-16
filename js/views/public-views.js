@@ -971,15 +971,17 @@ App.views.public = {
         topBannerEl.classList.remove('webinar-theme--b2b', 'webinar-theme--b2c');
         topBannerEl.classList.add('webinar-theme--' + activeType);
         topBannerEl.style.background = isB2C
-          ? 'linear-gradient(90deg, #180309 0%, #881337 35%, #e11d48 65%, #f97316 90%, #180309 100%)'
-          : 'linear-gradient(90deg, #04081a 0%, #003f99 35%, #880000 65%, #04081a 100%)';
+          ? 'linear-gradient(90deg, rgba(22, 52, 82, 0.94) 0%, rgba(6, 114, 197, 0.92) 55%, rgba(254, 137, 51, 0.92) 100%)'
+          : 'linear-gradient(90deg, rgba(22, 52, 82, 0.94) 0%, rgba(6, 114, 197, 0.92) 58%, rgba(254, 137, 51, 0.90) 100%)';
+        topBannerEl.style.backdropFilter = 'saturate(180%) blur(20px)';
+        topBannerEl.style.webkitBackdropFilter = 'saturate(180%) blur(20px)';
       }
 
       const topBannerBtn = document.getElementById('webinar-top-banner-btn');
       if (topBannerBtn) {
-        topBannerBtn.style.background = isB2C ? '#fff1f2' : '#ffffff';
-        topBannerBtn.style.color = isB2C ? '#881337' : '#003f99';
-        topBannerBtn.style.boxShadow = isB2C ? '0 2px 14px rgba(225,29,72,.4)' : 'none';
+        topBannerBtn.style.background = '#ffffff';
+        topBannerBtn.style.color = '#0672C5';
+        topBannerBtn.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.16)';
       }
 
       // ── Section & Ambient Glow Orbs Styling ──
