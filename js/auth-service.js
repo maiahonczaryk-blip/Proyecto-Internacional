@@ -176,15 +176,43 @@ App.auth = (function() {
       throw new Error('Password must be at least 6 characters.');
     }
 
-    if (!['broker', 'realtor', 'client', 'colaborador', 'agent_inmomas'].includes(role)) {
+    if (!['embajador', 'broker', 'realtor', 'client', 'colaborador', 'agent_inmomas'].includes(role)) {
       throw new Error('Invalid role selected.');
     }
+
+    // Security check: 'embajador' applications are strictly restricted to the Admin referral link
+    if (role === 'embajador' && !data.referredByAdmin) {
+      const refStr = String(referredBy || '').toUpperCase().trim();
+      if (!refStr.startsWith('ADM-') && refStr !== 'ADMIN-001') {
+        throw new Error('Ambassador applications are exclusively available via an Administrator invitation link.');
+      }
+    }
+
+    const getPrefixForRole = (r) => {
+      if (r === 'admin') return 'ADM';
+      if (r === 'embajador') return 'EMB';
+      if (r === 'broker') return 'BRK';
+      if (r === 'agent_inmomas') return 'LOC';
+      if (r === 'colaborador') return 'COL';
+      return 'REA';
+    };
 
     if (App.demoMode) {
       // Check duplicate email
       const exists = App.demoData.users.find(u => u.email.toLowerCase() === email.toLowerCase());
       if (exists) {
         throw new Error('An account with this email already exists.');
+      }
+
+      // Resolve umbrella embajadorId from referrer if applicable
+      let resolvedEmbajadorId = data.embajadorId || null;
+      if (!resolvedEmbajadorId && referredBy && role !== 'embajador') {
+        const refUser = App.demoData.users.find(u =>
+          u.id === referredBy || (u.referralCode && u.referralCode.toUpperCase() === String(referredBy).toUpperCase())
+        );
+        if (refUser) {
+          resolvedEmbajadorId = refUser.role === 'embajador' ? refUser.id : (refUser.embajadorId || null);
+        }
       }
 
       const newUser = {
@@ -201,7 +229,8 @@ App.auth = (function() {
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
-        referralCode: `${role === 'admin' ? 'ADM' : (role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : (role === 'colaborador' ? 'COL' : 'REA')))}-${lastName.toUpperCase()}`,
+        embajadorId: role === 'embajador' ? null : resolvedEmbajadorId,
+        referralCode: `${getPrefixForRole(role)}-${lastName.toUpperCase()}`,
         profileImage: null,
         agreementSigned: false,
         agreementSignedAt: null,
@@ -248,7 +277,7 @@ App.auth = (function() {
       // Auto-enroll user/client in upcoming webinar (silent since onNewUserRegistration already notified)
       if (newUser.role === 'client') {
         await autoEnrollClientWebinar(newUser, { silent: true });
-      } else if (['realtor', 'broker'].includes(newUser.role)) {
+      } else if (['realtor', 'broker', 'embajador', 'colaborador'].includes(newUser.role)) {
         await autoEnrollRealtorWebinar(newUser, { silent: true });
       }
 
@@ -270,7 +299,19 @@ App.auth = (function() {
 
       const finalRole = isMaiaAccount ? 'admin' : role;
       const finalStatus = isMaiaAccount ? 'active' : 'pending';
-      const finalReferralCode = isMaiaAccount ? 'ADM-INMOMAS' : `${role === 'admin' ? 'ADM' : (role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : (role === 'colaborador' ? 'COL' : 'REA')))}-${lastName.toUpperCase()}-${uid.substring(0, 4)}`;
+      const finalReferralCode = isMaiaAccount ? 'ADM-INMOMAS' : `${getPrefixForRole(role)}-${lastName.toUpperCase()}-${uid.substring(0, 4)}`;
+
+      // Resolve umbrella embajadorId from referrer if not explicitly passed
+      let resolvedEmbajadorId = data.embajadorId || null;
+      if (!resolvedEmbajadorId && referredBy && finalRole !== 'embajador' && finalRole !== 'admin') {
+        try {
+          const refDoc = await App.db.collection('users').doc(referredBy).get();
+          if (refDoc.exists) {
+            const rData = refDoc.data();
+            resolvedEmbajadorId = rData.role === 'embajador' ? refDoc.id : (rData.embajadorId || null);
+          }
+        } catch (_) {}
+      }
 
       const userData = {
         email: emailLower,
@@ -284,6 +325,7 @@ App.auth = (function() {
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
+        embajadorId: (finalRole === 'embajador' || finalRole === 'admin') ? null : resolvedEmbajadorId,
         referralCode: finalReferralCode,
         profileImage: null,
         agreementSigned: isMaiaAccount ? true : false,
@@ -393,7 +435,7 @@ App.auth = (function() {
 
         // Auto-generate referralCode if missing (for users registered before this field existed)
         if (!userData.referralCode && userData.role && userData.lastName) {
-          const prefix = userData.role === 'admin' ? 'ADM' : (userData.role === 'broker' ? 'BRK' : (userData.role === 'agent_inmomas' ? 'LOC' : (userData.role === 'colaborador' ? 'COL' : 'REA')));
+          const prefix = userData.role === 'admin' ? 'ADM' : (userData.role === 'embajador' ? 'EMB' : (userData.role === 'broker' ? 'BRK' : (userData.role === 'agent_inmomas' ? 'LOC' : (userData.role === 'colaborador' ? 'COL' : 'REA'))));
           const uid = credential.user.uid;
           userData.referralCode = `${prefix}-${userData.lastName.toUpperCase()}-${uid.substring(0, 4)}`;
           // Save back to Firestore
@@ -512,7 +554,7 @@ App.auth = (function() {
 
       // Auto-generate referralCode if missing
       if (!userData.referralCode && userData.role && userData.lastName) {
-        const prefix = userData.role === 'admin' ? 'ADM' : (userData.role === 'broker' ? 'BRK' : (userData.role === 'agent_inmomas' ? 'LOC' : (userData.role === 'colaborador' ? 'COL' : 'REA')));
+        const prefix = userData.role === 'admin' ? 'ADM' : (userData.role === 'embajador' ? 'EMB' : (userData.role === 'broker' ? 'BRK' : (userData.role === 'agent_inmomas' ? 'LOC' : (userData.role === 'colaborador' ? 'COL' : 'REA'))));
         userData.referralCode = `${prefix}-${userData.lastName.toUpperCase()}-${firebaseUser.uid.substring(0, 4)}`;
         await App.db.collection('users').doc(firebaseUser.uid).update({ referralCode: userData.referralCode });
       }
@@ -531,8 +573,15 @@ App.auth = (function() {
       throw new Error('Please select a role (Broker or Realtor).');
     }
 
-    if (!['broker', 'realtor', 'client', 'colaborador', 'agent_inmomas'].includes(role)) {
+    if (!['embajador', 'broker', 'realtor', 'client', 'colaborador', 'agent_inmomas'].includes(role)) {
       throw new Error('Invalid role selected.');
+    }
+
+    if (role === 'embajador' && !data.referredByAdmin) {
+      const refStr = String(referredBy || '').toUpperCase().trim();
+      if (!refStr.startsWith('ADM-') && refStr !== 'ADMIN-001') {
+        throw new Error('Ambassador applications are exclusively available via an Administrator invitation link.');
+      }
     }
 
     if (App.demoMode) {
@@ -551,7 +600,8 @@ App.auth = (function() {
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
-        referralCode: `${role === 'admin' ? 'ADM' : (role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : (role === 'colaborador' ? 'COL' : 'REA')))}-${mockLastName.toUpperCase()}`,
+        embajadorId: role === 'embajador' ? null : (data.embajadorId || null),
+        referralCode: `${role === 'admin' ? 'ADM' : (role === 'embajador' ? 'EMB' : (role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : (role === 'colaborador' ? 'COL' : 'REA'))))}-${mockLastName.toUpperCase()}`,
         profileImage: null,
         agreementSigned: false,
         agreementSignedAt: null,
@@ -630,7 +680,8 @@ App.auth = (function() {
         phone: phone || '',
         country: country || '',
         brokerId: brokerId || null,
-        referralCode: `${role === 'admin' ? 'ADM' : (role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : (role === 'colaborador' ? 'COL' : 'REA')))}-${(finalLastName || 'USER').toUpperCase()}-${uid.substring(0, 4)}`,
+        embajadorId: role === 'embajador' ? null : (data.embajadorId || null),
+        referralCode: `${role === 'admin' ? 'ADM' : (role === 'embajador' ? 'EMB' : (role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : (role === 'colaborador' ? 'COL' : 'REA'))))}-${(finalLastName || 'USER').toUpperCase()}-${uid.substring(0, 4)}`,
         profileImage: firebaseUser.photoURL || null,
         agreementSigned: false,
         agreementSignedAt: null,
@@ -742,19 +793,22 @@ App.auth = (function() {
   }
 
   async function updateUserRole(userId, newRole) {
+    const rolePrefix = newRole === 'admin' ? 'ADM' : (newRole === 'embajador' ? 'EMB' : (newRole === 'broker' ? 'BRK' : (newRole === 'agent_inmomas' ? 'LOC' : (newRole === 'colaborador' ? 'COL' : 'REA'))));
     if (App.demoMode) {
       const user = App.demoData.users.find(u => u.id === userId);
       if (!user) throw new Error('User not found.');
       user.role = newRole;
+      if (newRole === 'embajador' || newRole === 'admin') {
+        user.embajadorId = null;
+      }
       if (user.referralCode) {
         const parts = user.referralCode.split('-');
-        const prefix = newRole === 'admin' ? 'ADM' : (newRole === 'broker' ? 'BRK' : (newRole === 'agent_inmomas' ? 'LOC' : (newRole === 'colaborador' ? 'COL' : 'REA')));
         if (parts.length > 1) {
-          parts[0] = prefix;
+          parts[0] = rolePrefix;
           user.referralCode = parts.join('-');
         } else {
           const lastName = user.lastName || 'USER';
-          user.referralCode = `${prefix}-${lastName.toUpperCase()}`;
+          user.referralCode = `${rolePrefix}-${lastName.toUpperCase()}`;
         }
       }
       user.updatedAt = new Date().toISOString();
@@ -768,20 +822,23 @@ App.auth = (function() {
         let updatedRefCode = userData.referralCode;
         if (updatedRefCode) {
           const parts = updatedRefCode.split('-');
-          const prefix = newRole === 'admin' ? 'ADM' : (newRole === 'broker' ? 'BRK' : (newRole === 'agent_inmomas' ? 'LOC' : (newRole === 'colaborador' ? 'COL' : 'REA')));
           if (parts.length > 1) {
-            parts[0] = prefix;
+            parts[0] = rolePrefix;
             updatedRefCode = parts.join('-');
           } else {
             const lastName = userData.lastName || 'USER';
-            updatedRefCode = `${prefix}-${lastName.toUpperCase()}-${userId.substring(0, 4)}`;
+            updatedRefCode = `${rolePrefix}-${lastName.toUpperCase()}-${userId.substring(0, 4)}`;
           }
         }
-        await docRef.update({
+        const updatePayload = {
           role: newRole,
           referralCode: updatedRefCode,
           updatedAt: new Date().toISOString()
-        });
+        };
+        if (newRole === 'embajador' || newRole === 'admin') {
+          updatePayload.embajadorId = null;
+        }
+        await docRef.update(updatePayload);
       }
       return true;
     }
@@ -884,6 +941,34 @@ App.auth = (function() {
         source: referrerCode ? 'Admin Assigned Referral' : null,
         updatedAt: new Date().toISOString()
       });
+      return true;
+    }
+  }
+
+  /* ---- Assign / Unassign User to an Embajador's Umbrella (Admin action) ---- */
+  async function updateUserEmbajador(userId, embajadorId) {
+    const cleanEmbId = embajadorId ? String(embajadorId).trim() : null;
+    if (App.demoMode) {
+      const u = App.demoData.users.find(usr => usr.id === userId);
+      if (!u) throw new Error('User not found.');
+      u.embajadorId = cleanEmbId;
+      if (cleanEmbId && !u.referredBy) {
+        u.referredBy = cleanEmbId;
+      }
+      u.updatedAt = new Date().toISOString();
+      saveDemoData();
+      return true;
+    } else {
+      const userRef = App.db.collection('users').doc(userId);
+      const doc = await userRef.get();
+      const payload = {
+        embajadorId: cleanEmbId,
+        updatedAt: new Date().toISOString()
+      };
+      if (cleanEmbId && doc.exists && !doc.data().referredBy) {
+        payload.referredBy = cleanEmbId;
+      }
+      await userRef.update(payload);
       return true;
     }
   }
@@ -1174,6 +1259,7 @@ App.auth = (function() {
         clientName: `${client.firstName} ${client.lastName}`,
         realtorId: client.referredBy,
         brokerId: client.brokerId,
+        embajadorId: client.embajadorId || null,
         agentId: client.localAgentId,
         salePrice: sPrice,
         totalCommission,
@@ -2040,8 +2126,9 @@ App.auth = (function() {
       needsFuster: clientData.needsFuster || false,
       needsHolidays: clientData.needsHolidays || false,
       status: 'contacted',
-      referredBy: (user.role === 'realtor' || user.role === 'colaborador') ? user.id : null,
+      referredBy: (user.role === 'realtor' || user.role === 'colaborador' || user.role === 'embajador') ? user.id : null,
       brokerId: (user.role === 'broker') ? user.id : (user.brokerId || null),
+      embajadorId: (user.role === 'embajador') ? user.id : (user.embajadorId || null),
       localAgentId: (user.role === 'agent_inmomas') ? user.id : null,
       localAgentName: (user.role === 'agent_inmomas') ? (user.firstName + ' ' + user.lastName) : null,
       addedManuallyBy: user.id,
@@ -2103,6 +2190,7 @@ App.auth = (function() {
       realtorId: clientData.realtorId || null,
       realtorName: clientData.realtorName || null,
       brokerId: clientData.brokerId || null,
+      embajadorId: clientData.embajadorId || null,
       localAgentId: clientData.localAgentId || null,
       localAgentName: clientData.localAgentName || clientData.inmomasAgentName || null,
       inmomasAgentName: clientData.inmomasAgentName || null,
@@ -2181,13 +2269,14 @@ App.auth = (function() {
       agencyName: userData.agencyName || '',
       market: userData.market || '',
       notes: userData.notes || '',
-      referralCode: `${userData.role === 'broker' ? 'BRK' : 'REA'}-${(userData.lastName || 'USER').toUpperCase()}`,
+      referralCode: `${userData.role === 'embajador' ? 'EMB' : (userData.role === 'broker' ? 'BRK' : (userData.role === 'colaborador' ? 'COL' : 'REA'))}-${(userData.lastName || 'USER').toUpperCase()}`,
       source: 'referral',
       referredBy: userData.referredBy || userData.inmomasAgentName || null,
       inmomasAgentName: userData.inmomasAgentName || null,
       termsAccepted: userData.termsAccepted !== undefined ? userData.termsAccepted : true,
       termsAcceptedAt: userData.termsAcceptedAt || new Date().toISOString(),
       brokerId: userData.brokerId || null,
+      embajadorId: userData.embajadorId || null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -2265,7 +2354,7 @@ App.auth = (function() {
         ? client.id.replace(/^client_|^cli-/, 'usr_') 
         : ('usr_' + Date.now());
 
-      const referralCode = `${targetRole === 'broker' ? 'BRK' : (targetRole === 'agent_inmomas' ? 'LOC' : (targetRole === 'colaborador' ? 'COL' : 'REA'))}-${lastName.toUpperCase().replace(/[^A-Z0-9]/g, '')}-${Date.now().toString().slice(-4)}`;
+      const referralCode = `${targetRole === 'embajador' ? 'EMB' : (targetRole === 'broker' ? 'BRK' : (targetRole === 'agent_inmomas' ? 'LOC' : (targetRole === 'colaborador' ? 'COL' : 'REA')))}-${lastName.toUpperCase().replace(/[^A-Z0-9]/g, '')}-${Date.now().toString().slice(-4)}`;
 
       let user = App.demoData.users.find(u => u.email.toLowerCase() === email);
       if (user) {
@@ -2320,7 +2409,7 @@ App.auth = (function() {
         ? clientId.replace(/^client_|^cli-/, 'usr_')
         : ('usr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4));
 
-      const referralCode = `${targetRole === 'broker' ? 'BRK' : (targetRole === 'agent_inmomas' ? 'LOC' : (targetRole === 'colaborador' ? 'COL' : 'REA'))}-${lastName.toUpperCase().replace(/[^A-Z0-9]/g, '')}-${Date.now().toString().slice(-4)}`;
+      const referralCode = `${targetRole === 'embajador' ? 'EMB' : (targetRole === 'broker' ? 'BRK' : (targetRole === 'agent_inmomas' ? 'LOC' : (targetRole === 'colaborador' ? 'COL' : 'REA')))}-${lastName.toUpperCase().replace(/[^A-Z0-9]/g, '')}-${Date.now().toString().slice(-4)}`;
 
       const userSnap = await App.db.collection('users').where('email', '==', email).get();
       let finalUser;
@@ -2486,6 +2575,184 @@ App.auth = (function() {
     }
   }
 
+  /* ============================================
+     Umbrella Network Resolution (Embajador)
+     Resolves all direct & indirect contacts under
+     an Embajador's umbrella: Brokers, Realtors,
+     Colaboradores, Clients, Commissions & Webinars.
+     ============================================ */
+  async function getUmbrellaData(embajadorId) {
+    if (!embajadorId) {
+      return {
+        embajador: null,
+        users: [],
+        brokers: [],
+        realtors: [],
+        colaboradores: [],
+        clients: [],
+        commissions: [],
+        webinarRegistrations: []
+      };
+    }
+
+    const [allUsers, allClients, allCommissions, allWebinars] = await Promise.all([
+      getAllUsers(),
+      getClients(),
+      getCommissions(),
+      getWebinarRegistrations()
+    ]);
+
+    const userById = new Map();
+    const userByRefCode = new Map();
+    allUsers.forEach(u => {
+      if (u.id) userById.set(u.id, u);
+      if (u.referralCode) {
+        userByRefCode.set(String(u.referralCode).toUpperCase().trim(), u);
+      }
+    });
+
+    const embajadorUser = userById.get(embajadorId) || (currentUser && currentUser.id === embajadorId ? currentUser : null);
+    const umbrellaUserIds = new Set([embajadorId]);
+    const umbrellaRefCodes = new Set();
+    if (embajadorUser && embajadorUser.referralCode) {
+      umbrellaRefCodes.add(String(embajadorUser.referralCode).toUpperCase().trim());
+    }
+
+    const umbrellaMembersMap = new Map();
+    const eligibleRoles = new Set(['broker', 'realtor', 'colaborador']);
+
+    const resolveParentUser = (u) => {
+      if (u.referredBy) {
+        const byId = userById.get(u.referredBy);
+        if (byId) return byId;
+        const byCode = userByRefCode.get(String(u.referredBy).toUpperCase().trim());
+        if (byCode) return byCode;
+      }
+      if (u.brokerId && userById.has(u.brokerId)) {
+        return userById.get(u.brokerId);
+      }
+      if (u.embajadorId && userById.has(u.embajadorId)) {
+        return userById.get(u.embajadorId);
+      }
+      return null;
+    };
+
+    // Multi-level graph expansion (Embajador -> Broker/Colaborador -> Realtor -> etc.)
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const u of allUsers) {
+        if (!u || !u.id || u.id === embajadorId || umbrellaMembersMap.has(u.id)) continue;
+        if (!eligibleRoles.has(u.role)) continue;
+
+        const refCodeUpper = u.referredBy ? String(u.referredBy).toUpperCase().trim() : '';
+        const matchesEmbajadorId = Boolean(u.embajadorId && umbrellaUserIds.has(u.embajadorId));
+        const matchesBrokerId = Boolean(u.brokerId && umbrellaUserIds.has(u.brokerId));
+        const matchesReferredBy = Boolean(
+          u.referredBy && (umbrellaUserIds.has(u.referredBy) || (refCodeUpper && umbrellaRefCodes.has(refCodeUpper)))
+        );
+
+        if (matchesEmbajadorId || matchesBrokerId || matchesReferredBy) {
+          const parent = resolveParentUser(u);
+          const isDirect = !parent || parent.id === embajadorId;
+          const parentMember = (!isDirect && parent) ? umbrellaMembersMap.get(parent.id) : null;
+          const enrichedMember = {
+            ...u,
+            _umbrellaLevel: isDirect ? 1 : ((parentMember ? parentMember._umbrellaLevel : 1) + 1),
+            _isDirectFromEmbajador: isDirect,
+            _umbrellaParentId: parent ? parent.id : embajadorId,
+            _umbrellaParentName: isDirect
+              ? 'Directo (Embajador)'
+              : `${parent.firstName || ''} ${parent.lastName || ''}`.trim() || parent.agencyName || 'Red Paraguas',
+            _umbrellaParentRole: isDirect ? 'embajador' : (parent.role || '')
+          };
+
+          umbrellaMembersMap.set(u.id, enrichedMember);
+          umbrellaUserIds.add(u.id);
+          if (u.referralCode) {
+            umbrellaRefCodes.add(String(u.referralCode).toUpperCase().trim());
+          }
+          changed = true;
+        }
+      }
+    }
+
+    const umbrellaUsers = Array.from(umbrellaMembersMap.values())
+      .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+    // Resolve all clients generated anywhere under the Embajador's umbrella
+    const umbrellaClients = [];
+    for (const c of allClients) {
+      if (!c) continue;
+      const refCodeUpper = c.referredBy ? String(c.referredBy).toUpperCase().trim() : '';
+      const inUmbrella = Boolean(
+        (c.embajadorId && umbrellaUserIds.has(c.embajadorId)) ||
+        (c.referredBy && (umbrellaUserIds.has(c.referredBy) || (refCodeUpper && umbrellaRefCodes.has(refCodeUpper)))) ||
+        (c.realtorId && umbrellaUserIds.has(c.realtorId)) ||
+        (c.brokerId && umbrellaUserIds.has(c.brokerId)) ||
+        (c.addedManuallyBy && umbrellaUserIds.has(c.addedManuallyBy))
+      );
+
+      if (inUmbrella) {
+        const originKey = c.realtorId || c.referredBy || c.brokerId || c.addedManuallyBy || embajadorId;
+        const originUser = userById.get(originKey) ||
+          (originKey ? userByRefCode.get(String(originKey).toUpperCase().trim()) : null);
+        const isDirect = !originUser || originUser.id === embajadorId;
+
+        umbrellaClients.push({
+          ...c,
+          _isDirectFromEmbajador: isDirect,
+          _originMemberId: originUser ? originUser.id : embajadorId,
+          _originMemberName: isDirect
+            ? 'Directo (Embajador)'
+            : (`${originUser.firstName || ''} ${originUser.lastName || ''}`.trim() || c.realtorName || 'Miembro Paraguas'),
+          _originMemberRole: isDirect ? 'embajador' : (originUser.role || 'realtor')
+        });
+      }
+    }
+    umbrellaClients.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+    // Resolve umbrella commissions
+    const umbrellaClientIds = new Set(umbrellaClients.map(c => c.id));
+    const umbrellaCommissions = allCommissions.filter(comm => {
+      if (!comm) return false;
+      return Boolean(
+        comm.embajadorId === embajadorId ||
+        (comm.clientId && umbrellaClientIds.has(comm.clientId)) ||
+        (comm.realtorId && umbrellaUserIds.has(comm.realtorId)) ||
+        (comm.brokerId && umbrellaUserIds.has(comm.brokerId))
+      );
+    });
+
+    // Resolve umbrella webinar registrations
+    const umbrellaEmails = new Set();
+    umbrellaUsers.forEach(u => { if (u.email) umbrellaEmails.add(String(u.email).toLowerCase().trim()); });
+    umbrellaClients.forEach(c => { if (c.email) umbrellaEmails.add(String(c.email).toLowerCase().trim()); });
+
+    const umbrellaWebinars = allWebinars.filter(w => {
+      if (!w) return false;
+      const wCode = w.referralCode ? String(w.referralCode).toUpperCase().trim() : '';
+      const wEmail = w.email ? String(w.email).toLowerCase().trim() : '';
+      return Boolean(
+        (wCode && umbrellaRefCodes.has(wCode)) ||
+        (w.referrerId && umbrellaUserIds.has(w.referrerId)) ||
+        (w.agentReferrerId && umbrellaUserIds.has(w.agentReferrerId)) ||
+        (wEmail && umbrellaEmails.has(wEmail))
+      );
+    });
+
+    return {
+      embajador: embajadorUser,
+      users: umbrellaUsers,
+      brokers: umbrellaUsers.filter(u => u.role === 'broker'),
+      realtors: umbrellaUsers.filter(u => u.role === 'realtor'),
+      colaboradores: umbrellaUsers.filter(u => u.role === 'colaborador'),
+      clients: umbrellaClients,
+      commissions: umbrellaCommissions,
+      webinarRegistrations: umbrellaWebinars
+    };
+  }
+
   /* ---- Public API ---- */
   return {
     init,
@@ -2499,7 +2766,9 @@ App.auth = (function() {
     updateUserStatus,
     updateUserRole,
     updateUserReferral,
+    updateUserEmbajador,
     updateUserAgencyBranding,
+    getUmbrellaData,
     updateProfile,
     updateAuthEmail,
     getAllUsers,

@@ -21,24 +21,24 @@
   <meta name="twitter:description" content="Live VIP Masterclass · September 24 at 7:00 PM CEST (Spain) / 1:00 PM EDT (Miami, NY, Toronto) / 1:00 PM AST (PR) / 10:00 AM PDT. Earn 25% referral commissions in Spain with RE/MAX Inmomás.">
   <meta name="twitter:image" content="https://proyecto-internacional.vercel.app/images/webinar-share-sept24.jpg">
   <!-- Mobile / PWA -->
-  <meta name="theme-color" content="#1b5b7f">
+  <meta name="theme-color" content="#0672C5">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="mobile-web-app-capable" content="yes">
-  <link rel="stylesheet" href="css/styles.css?v=20261022_v4">
+  <link rel="stylesheet" href="css/styles.css?v=20261116_ios3">
   <link rel="icon" type="image/png" href="Globo_CMYK.png">
   <!-- EmailJS SDK — free email sending from the browser -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     @keyframes webinar-pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: .45; transform: scale(1.4); }
+      50% { opacity: .45; transform: scale(1.3); }
     }
     @media (max-width: 768px) {
       #webinar-top-banner {
         position: relative !important;
         height: auto !important;
-        padding: 12px 10px !important;
+        padding: 10px 12px !important;
       }
       #webinar-top-banner > div {
         gap: 8px !important;
@@ -52,28 +52,40 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 40px;
-      margin-top: 50px;
+      gap: 48px;
+      margin-top: 48px;
+      background: linear-gradient(145deg, #ffffff 0%, #fdfaf4 100%);
+      border: 1px solid rgba(255, 140, 66, 0.16);
+      border-radius: 28px;
+      padding: 40px 48px;
+      box-shadow: 0 12px 34px -8px rgba(27, 91, 127, 0.07), 0 2px 8px rgba(255, 140, 66, 0.04);
+      transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .testimonial-row:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 42px -10px rgba(27, 91, 127, 0.10), 0 4px 12px rgba(255, 140, 66, 0.06);
     }
     .testimonial-row.reverse {
       flex-direction: row-reverse;
     }
     .testimonial-video {
-      flex: 1 1 315px;
+      flex: 0 1 285px;
       display: flex;
       justify-content: center;
       width: 100%;
     }
     .testimonial-text {
-      flex: 1 1 400px;
+      flex: 1 1 380px;
     }
     @media (max-width: 850px) {
       .testimonial-row, .testimonial-row.reverse {
         flex-direction: column;
         text-align: center;
+        padding: 28px 22px;
+        gap: 24px;
       }
       .testimonial-row .testimonial-video, .testimonial-row.reverse .testimonial-video {
-        margin-bottom: 20px;
+        margin-bottom: 4px;
       }
     }
   </style>
@@ -82,24 +94,24 @@
 <body class="lang-en" data-route="home">
 
   <!-- ── WEBINAR ANNOUNCEMENT BANNER ── -->
-  <div id="webinar-top-banner" style="background:linear-gradient(90deg,#180309 0%,#881337 35%,#e11d48 65%,#f97316 90%,#180309 100%);padding:10px 16px;text-align:center;position:fixed;top:0;left:0;right:0;z-index:1001;height:40px;display:flex;align-items:center;justify-content:center;">
-    <div id="webinar-top-banner-inner" style="display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;width:100%;">
-      <div id="webinar-top-banner-live" style="display:flex;align-items:center;gap:7px;">
-        <span style="width:8px;height:8px;border-radius:50%;background:#ff4444;box-shadow:0 0 7px #ff4444;animation:webinar-pulse 1.5s ease-in-out infinite;flex-shrink:0;"></span>
-        <span class="webinar-banner-live-label" style="color:rgba(255,255,255,.65);font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;">
+  <div id="webinar-top-banner" style="background:linear-gradient(90deg,rgba(22,52,82,0.94) 0%,rgba(6,114,197,0.92) 55%,rgba(254,137,51,0.92) 100%);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:0.5px solid rgba(255,255,255,0.16);padding:8px 16px;text-align:center;position:fixed;top:0;left:0;right:0;z-index:1001;height:40px;display:flex;align-items:center;justify-content:center;">
+    <div id="webinar-top-banner-inner" style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;width:100%;">
+      <div id="webinar-top-banner-live" style="display:flex;align-items:center;gap:6px;">
+        <span style="width:7px;height:7px;border-radius:50%;background:#ef4444;box-shadow:0 0 0 2px rgba(239,68,68,0.25);animation:webinar-pulse 1.8s ease-in-out infinite;flex-shrink:0;"></span>
+        <span class="webinar-banner-live-label" style="color:rgba(255,255,255,.7);font-size:.69rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;">
           <span class="lang-en">Live Webinar</span>
           <span class="lang-es">Webinar en Vivo</span>
           <span class="lang-fr">Webinaire en Direct</span>
           <span class="lang-en-ca">Live Webinar</span>
         </span>
       </div>
-      <span id="webinar-top-banner-text" style="color:#fff;font-size:.85rem;font-weight:600;">
+      <span id="webinar-top-banner-text" style="color:rgba(255,255,255,0.95);font-size:.82rem;font-weight:500;letter-spacing:-0.008em;">
         <span class="lang-en">🏡 <strong>Spain Unlocked</strong> &nbsp;&middot;&nbsp; Oct 29<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; 2:00 PM EDT / 7:00 PM Spain &nbsp;&middot;&nbsp; Free for Buyers &amp; Investors</span></span>
         <span class="lang-es">🏡 <strong>Descubre España</strong> &nbsp;&middot;&nbsp; 29 oct<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; 19:00 h España (2:00 PM EDT) &nbsp;&middot;&nbsp; Gratuito para Compradores e Inversores</span></span>
         <span class="lang-fr">🏡 <strong>Découvrez l'Espagne</strong> &nbsp;&middot;&nbsp; 29 oct<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; 19 h CET (14 h EDT) &nbsp;&middot;&nbsp; Gratuit pour Acheteurs &amp; Investisseurs</span></span>
         <span class="lang-en-ca">🏡 <strong>Spain Unlocked</strong> &nbsp;&middot;&nbsp; Oct 29<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; 2:00 PM EDT / 7:00 PM Spain &nbsp;&middot;&nbsp; Free for Buyers &amp; Investors</span></span>
       </span>
-      <span id="webinar-top-banner-spots" style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,200,0,.18);border:1px solid rgba(255,200,0,.45);border-radius:50px;padding:2px 10px;font-size:.72rem;font-weight:800;color:#ffe066;white-space:nowrap;letter-spacing:.04em;">
+      <span id="webinar-top-banner-spots" style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,140,66,.18);border:1px solid rgba(255,140,66,.35);border-radius:50px;padding:2px 9px;font-size:.69rem;font-weight:600;color:#ffd8bd;white-space:nowrap;">
         &#x1F525;
         <span class="lang-en">25 spots only</span>
         <span class="lang-es">Solo 25 plazas</span>
@@ -107,8 +119,8 @@
         <span class="lang-en-ca">25 spots only</span>
       </span>
       <a href="#webinar" id="webinar-top-banner-btn"
-         style="display:inline-flex;align-items:center;gap:5px;background:#fff1f2;color:#881337;padding:5px 16px;border-radius:50px;font-weight:800;font-size:.78rem;text-decoration:none;white-space:nowrap;transition:transform .15s,opacity .15s,box-shadow .15s;box-shadow:0 2px 14px rgba(225,29,72,.4);"
-         onmouseover="this.style.opacity='.88';this.style.transform='scale(1.04)'"
+         style="display:inline-flex;align-items:center;gap:5px;background:#ffffff;color:#0672C5;padding:4px 14px;border-radius:50px;font-weight:600;font-size:.76rem;text-decoration:none;white-space:nowrap;transition:transform .18s cubic-bezier(0.22,1,0.36,1),opacity .18s;box-shadow:0 1px 4px rgba(0,0,0,.16);"
+         onmouseover="this.style.opacity='.92';this.style.transform='scale(1.02)'"
          onmouseout="this.style.opacity='1';this.style.transform=''">
         <span class="lang-en">Reserve<span class="webinar-banner-extra"> My Spot</span> &rarr;</span>
         <span class="lang-es">Reservar<span class="webinar-banner-extra"> mi Plaza</span> &rarr;</span>
@@ -312,8 +324,8 @@
       <!-- HERO -->
       <section class="hero" id="hero">
         <div class="hero-bg" style="overflow: hidden;">
-          <div id="hero-video-cover" style="position: absolute; inset: 0; z-index: 1; transition: opacity 0.8s ease; pointer-events: none; overflow: hidden; background-color: #050b14;">
-            <div style="position: absolute; top: 50%; left: 50%; width: max(100vw, 213.33vh); height: max(56.25vw, 120vh); transform: translate(-50%, -50%) scale(1.05); background-image: url('https://img.youtube.com/vi/uH8EViA-9Ns/maxresdefault.jpg'); background-size: cover; background-position: center;"></div>
+          <div id="hero-video-cover" style="position: absolute; inset: 0; z-index: 1; transition: opacity 0.8s ease; pointer-events: none; overflow: hidden; background-color: #163654;">
+            <div style="position: absolute; top: 50%; left: 50%; width: max(100vw, 213.33vh); height: max(56.25vw, 120vh); transform: translate(-50%, -50%) scale(1.05); background-image: url('https://img.youtube.com/vi/uH8EViA-9Ns/maxresdefault.jpg'), url('images/lifestyle-mediterranean.png'); background-size: cover; background-position: center;"></div>
           </div>
           <iframe 
             id="hero-video"
@@ -331,51 +343,78 @@
             if(firstScript) { firstScript.parentNode.insertBefore(ytTag, firstScript); } 
             else { document.head.appendChild(ytTag); }
 
-            var heroPlayer;
-            function onYouTubeIframeAPIReady() {
-              heroPlayer = new YT.Player('hero-video', {
+            var heroPlayer, realtorsPlayer;
+            function createBgLoopPlayer(iframeId, coverId) {
+              var el = document.getElementById(iframeId);
+              if (!el) return null;
+              var player = new YT.Player(iframeId, {
                 events: {
+                  'onReady': function(event) {
+                    try { event.target.mute(); event.target.playVideo(); } catch (e) {}
+                  },
                   'onStateChange': function(event) {
-                    var cover = document.getElementById('hero-video-cover');
+                    var cover = document.getElementById(coverId);
                     if (!cover) return;
                     if (event.data === YT.PlayerState.PLAYING) {
-                      // Smoothly fade out cover to reveal the video
                       cover.style.transition = 'opacity 0.8s ease';
                       cover.style.opacity = '0';
+                    } else if (event.data === YT.PlayerState.ENDED) {
+                      event.target.seekTo(0.1);
+                      event.target.playVideo();
                     } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.BUFFERING || event.data === YT.PlayerState.UNSTARTED) {
-                      // Instantly cover the video to hide YouTube UI
                       cover.style.transition = 'none';
                       cover.style.opacity = '1';
                     }
                   }
                 }
               });
-
-              // Seamless loop check with crossfade mask
               setInterval(function() {
-                if (heroPlayer && typeof heroPlayer.getCurrentTime === 'function') {
-                  var currentTime = heroPlayer.getCurrentTime();
-                  var cover = document.getElementById('hero-video-cover');
-                  
-                  // 1. Fade cover IN just before the end
+                if (player && typeof player.getCurrentTime === 'function') {
+                  var currentTime = player.getCurrentTime();
+                  var cover = document.getElementById(coverId);
                   if (currentTime >= 18.5) {
                     if (cover && cover.style.opacity !== '1') {
                       cover.style.transition = 'opacity 0.8s ease';
                       cover.style.opacity = '1';
                     }
                   }
-
-                  // 2. Seek back instantly while hidden
                   if (currentTime >= 19.5) {
                     if (cover) {
                       cover.style.transition = 'none';
                       cover.style.opacity = '1';
                     }
-                    heroPlayer.seekTo(0.1);
+                    player.seekTo(0.1);
                   }
                 }
               }, 100);
+              return player;
             }
+
+            function onYouTubeIframeAPIReady() {
+              heroPlayer = createBgLoopPlayer('hero-video', 'hero-video-cover');
+              realtorsPlayer = createBgLoopPlayer('realtors-video', 'realtors-video-cover');
+            }
+
+            // Ensure background video resumes smoothly when switching to Home or For Realtors
+            function resumeBgVideos() {
+              try {
+                if (heroPlayer && typeof heroPlayer.playVideo === 'function') { heroPlayer.mute(); heroPlayer.playVideo(); }
+                if (realtorsPlayer && typeof realtorsPlayer.playVideo === 'function') { realtorsPlayer.mute(); realtorsPlayer.playVideo(); }
+              } catch (e) {}
+              ['hero-video', 'realtors-video'].forEach(function(id) {
+                var frame = document.getElementById(id);
+                if (frame && frame.contentWindow) {
+                  try {
+                    frame.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+                    frame.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                  } catch (e) {}
+                }
+              });
+            }
+            window.addEventListener('hashchange', function() {
+              setTimeout(resumeBgVideos, 120);
+              setTimeout(resumeBgVideos, 500);
+            });
           </script>
         </div>
         <div class="container">
@@ -508,12 +547,12 @@
           </div>
           
           <!-- Partners Grid -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; margin-top: 60px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 22px; margin-top: 52px;">
             <!-- RE/MAX -->
-            <div class="card" style="text-align: center; padding: 40px 20px;">
-              <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX Inmomás" style="height: 50px; margin-bottom: 20px;">
-              <h3 style="font-size: 1.2rem; margin-bottom: 10px;">RE/MAX Inmomás</h3>
-              <p style="color: var(--text-secondary); font-size: 0.95rem;">
+            <div class="card" style="text-align: center; padding: 36px 22px;">
+              <img src="LOGO_NUEVO_REMAX_Inmomás_RGB_AZUL-01.png" alt="RE/MAX Inmomás" style="height: 44px; margin: 0 auto 18px; object-fit: contain;">
+              <h3 style="font-size: 1.12rem; margin-bottom: 6px; letter-spacing: -0.015em;">RE/MAX Inmomás</h3>
+              <p style="color: var(--text-secondary); font-size: 0.9rem;">
                 <span class="lang-en">Real Estate & Project Driver</span>
                 <span class="lang-es">Inmobiliaria y Proyectos</span>
                 <span class="lang-fr">Agence Immobilière et Projets</span>
@@ -521,10 +560,10 @@
               </p>
             </div>
             <!-- Fuster -->
-            <div class="card" style="text-align: center; padding: 40px 20px;">
-              <img src="logo fuster.png" alt="Fuster & Associates" style="height: 50px; margin-bottom: 20px; mix-blend-mode: multiply;">
-              <h3 style="font-size: 1.2rem; margin-bottom: 10px;">Fuster & Associates</h3>
-              <p style="color: var(--text-secondary); font-size: 0.95rem;">
+            <div class="card" style="text-align: center; padding: 36px 22px;">
+              <img src="logo fuster.png" alt="Fuster & Associates" style="height: 48px; margin: 0 auto 16px; object-fit: contain; mix-blend-mode: multiply;">
+              <h3 style="font-size: 1.12rem; margin-bottom: 6px; letter-spacing: -0.015em;">Fuster & Associates</h3>
+              <p style="color: var(--text-secondary); font-size: 0.9rem;">
                 <span class="lang-en">Legal & Tax Representation</span>
                 <span class="lang-es">Representación Legal y Fiscal</span>
                 <span class="lang-fr">Représentation Légale et Fiscale</span>
@@ -532,10 +571,10 @@
               </p>
             </div>
             <!-- UCI -->
-            <div class="card" style="text-align: center; padding: 40px 20px;">
-              <img src="Logo_UCI.png" alt="Banco UCI" style="height: 50px; margin-bottom: 20px;">
-              <h3 style="font-size: 1.2rem; margin-bottom: 10px;">Banco UCI</h3>
-              <p style="color: var(--text-secondary); font-size: 0.95rem;">
+            <div class="card" style="text-align: center; padding: 36px 22px;">
+              <img src="Logo_UCI.png" alt="Banco UCI" style="height: 44px; margin: 0 auto 18px; object-fit: contain;">
+              <h3 style="font-size: 1.12rem; margin-bottom: 6px; letter-spacing: -0.015em;">Banco UCI</h3>
+              <p style="color: var(--text-secondary); font-size: 0.9rem;">
                 <span class="lang-en">International Mortgages</span>
                 <span class="lang-es">Hipotecas Internacionales</span>
                 <span class="lang-fr">Prêts Hypothécaires Internationaux</span>
@@ -543,10 +582,10 @@
               </p>
             </div>
             <!-- Inmomas Holidays -->
-            <div class="card" style="text-align: center; padding: 40px 20px;">
-              <img src="Inmomas-holidays-Op-3-color-e1752073650140.png" alt="Inmomás Holidays" style="height: 50px; margin-bottom: 20px;">
-              <h3 style="font-size: 1.2rem; margin-bottom: 10px;">Inmomás Holidays</h3>
-              <p style="color: var(--text-secondary); font-size: 0.95rem;">
+            <div class="card" style="text-align: center; padding: 36px 22px;">
+              <img src="Inmomas-holidays-Op-3-color-e1752073650140.png" alt="Inmomás Holidays" style="height: 44px; margin: 0 auto 18px; object-fit: contain;">
+              <h3 style="font-size: 1.12rem; margin-bottom: 6px; letter-spacing: -0.015em;">Inmomás Holidays</h3>
+              <p style="color: var(--text-secondary); font-size: 0.9rem;">
                 <span class="lang-en">Vacation Rentals & Management</span>
                 <span class="lang-es">Alquileres Vacacionales y Gestión</span>
                 <span class="lang-fr">Locations de Vacances et Gestion</span>
@@ -657,7 +696,7 @@
       </section>
 
       <!-- TESTIMONIALS SECTION -->
-      <section class="section testimonials" id="testimonials" style="background: var(--bg-primary); border-top: 1px solid var(--border-subtle);">
+      <section class="section testimonials" id="testimonials" style="background: var(--bg-secondary); border-top: 0.5px solid var(--border-subtle);">
         <div class="container">
           <div class="text-center reveal">
             <span class="section-label">
@@ -677,18 +716,18 @@
           <!-- Debra & Angel -->
           <div class="testimonial-row reverse reveal">
             <div class="testimonial-video">
-              <div style="width: 100%; max-width: 315px; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-md); aspect-ratio: 9/16; background: #000;">
+              <div style="width: 100%; max-width: 280px; border-radius: 22px; overflow: hidden; box-shadow: 0 16px 36px -8px rgba(18, 51, 72, 0.18), 0 0 0 1px rgba(18, 51, 72, 0.08); aspect-ratio: 9/16; background: #000;">
                 <iframe src="https://www.youtube.com/embed/Hxf1KoSkTls" style="width: 100%; height: 100%; border:0;" allowfullscreen></iframe>
               </div>
             </div>
             <div class="testimonial-text">
-              <h3 style="font-size: 1.8rem; margin-bottom: 15px; color: var(--text-primary);">
+              <h3 style="font-size: 1.55rem; font-weight: 700; letter-spacing: -0.022em; line-height: 1.24; margin-bottom: 14px; color: var(--text-primary);">
                 <span class="lang-en">From US Realtors to Spain Experts: Debra & Angel</span>
                 <span class="lang-es">De Realtors en EE.UU. a Expertos en España: Debra y Ángel</span>
                 <span class="lang-fr">De courtiers américains à experts en Espagne : Debra & Angel</span>
                 <span class="lang-en-ca">From US Realtors to Spain Experts: Debra & Angel</span>
               </h3>
-              <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px;">
+              <p style="color: var(--text-secondary); font-size: 1.04rem; line-height: 1.68; margin-bottom: 0;">
                 <span class="lang-en">After experiencing the journey of moving from the US to Spain themselves, Debra and Angel joined RE/MAX Inmomás. Today, they use their personal experience to guide North American buyers, ensuring every step is as seamless as their own.</span>
                 <span class="lang-es">Después de vivir el proceso de mudarse desde EE.UU. a España, Debra y Ángel decidieron unirse a RE/MAX Inmomás. Hoy, utilizan su propia experiencia para guiar a compradores de Norteamérica, asegurando que cada paso sea tan sencillo como el suyo.</span>
                 <span class="lang-fr">Après avoir vécu eux-mêmes le processus de déménagement des États-Unis vers l'Espagne, Debra et Angel ont rejoint RE/MAX Inmomás. Aujourd'hui, ils utilisent leur expérience pour guider les acheteurs nord-américains, garantissant un processus sans faille.</span>
@@ -698,20 +737,20 @@
           </div>
 
           <!-- Denise McNeal -->
-          <div class="testimonial-row reveal" style="margin-top: 80px;">
+          <div class="testimonial-row reveal" style="margin-top: 28px;">
             <div class="testimonial-video">
-              <div style="width: 100%; max-width: 315px; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-md); aspect-ratio: 9/16; background: #000;">
+              <div style="width: 100%; max-width: 280px; border-radius: 22px; overflow: hidden; box-shadow: 0 16px 36px -8px rgba(18, 51, 72, 0.18), 0 0 0 1px rgba(18, 51, 72, 0.08); aspect-ratio: 9/16; background: #000;">
                 <iframe src="https://www.youtube.com/embed/A5WlvahUVxo" style="width: 100%; height: 100%; border:0;" allowfullscreen></iframe>
               </div>
             </div>
             <div class="testimonial-text">
-              <h3 style="font-size: 1.8rem; margin-bottom: 15px; color: var(--text-primary);">
+              <h3 style="font-size: 1.55rem; font-weight: 700; letter-spacing: -0.022em; line-height: 1.24; margin-bottom: 14px; color: var(--text-primary);">
                 <span class="lang-en">Your Trusted Guide in Spain: Meet Denise</span>
                 <span class="lang-es">Tu guía de confianza en España: Conoce a Denise</span>
                 <span class="lang-fr">Votre guide de confiance en Espagne : Rencontrez Denise</span>
                 <span class="lang-en-ca">Your Trusted Guide in Spain: Meet Denise</span>
               </h3>
-              <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px;">
+              <p style="color: var(--text-secondary); font-size: 1.04rem; line-height: 1.68; margin-bottom: 0;">
                 <span class="lang-en">As a US Realtor who made the leap to invest and live in Spain, Denise perfectly understands your concerns. Now, as a RE/MAX Inmomás agent, she guides you with unique empathy and expertise to make your dream a reality.</span>
                 <span class="lang-es">Como Realtor de EE.UU. que dio el salto para invertir y vivir en España, Denise comprende perfectamente tus expectativas. Ahora, como agente de RE/MAX Inmomás, te acompaña con una empatía y conocimiento únicos para que tú también cumplas el sueño.</span>
                 <span class="lang-fr">En tant que Realtor américaine ayant franchi le pas pour vivre en Espagne, Denise comprend parfaitement vos attentes. Aujourd'hui agente RE/MAX Inmomás, elle vous guide avec une empathie et une expertise uniques pour réaliser votre rêve.</span>
@@ -721,20 +760,20 @@
           </div>
 
           <!-- Isabelle & James -->
-          <div class="testimonial-row reverse reveal" style="margin-top: 80px;">
+          <div class="testimonial-row reverse reveal" style="margin-top: 28px;">
             <div class="testimonial-video">
-              <div style="width: 100%; max-width: 315px; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-md); aspect-ratio: 9/16; background: #000;">
+              <div style="width: 100%; max-width: 280px; border-radius: 22px; overflow: hidden; box-shadow: 0 16px 36px -8px rgba(18, 51, 72, 0.18), 0 0 0 1px rgba(18, 51, 72, 0.08); aspect-ratio: 9/16; background: #000;">
                 <iframe src="https://www.youtube.com/embed/Q1gpVRHR5zg" style="width: 100%; height: 100%; border:0;" allowfullscreen></iframe>
               </div>
             </div>
             <div class="testimonial-text">
-              <h3 style="font-size: 1.8rem; margin-bottom: 15px; color: var(--text-primary);">
+              <h3 style="font-size: 1.55rem; font-weight: 700; letter-spacing: -0.022em; line-height: 1.24; margin-bottom: 14px; color: var(--text-primary);">
                 <span class="lang-en">Your Trusted Guides in Spain: Meet Isabelle & James</span>
                 <span class="lang-es">Tus guías de confianza en España: Conoce a Isabelle y James</span>
                 <span class="lang-fr">Vos guides de confiance en Espagne : Rencontrez Isabelle et James</span>
                 <span class="lang-en-ca">Your Trusted Guides in Spain: Meet Isabelle & James</span>
               </h3>
-              <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px;">
+              <p style="color: var(--text-secondary); font-size: 1.04rem; line-height: 1.68; margin-bottom: 0;">
                 <span class="lang-en">Discover how they can help you find your dream home in Spain with RE/MAX Inmomás. Their dedication and local expertise ensure a smooth and successful journey.</span>
                 <span class="lang-es">Descubre cómo pueden ayudarte a encontrar la casa de tus sueños en España con RE/MAX Inmomás. Su dedicación y experiencia local garantizan un proceso exitoso.</span>
                 <span class="lang-fr">Découvrez comment ils peuvent vous aider à trouver la maison de vos rêves en Espagne avec RE/MAX Inmomás. Leur dévouement et leur expertise locale garantissent un parcours sans faille.</span>
@@ -744,20 +783,20 @@
           </div>
 
           <!-- Sepehr -->
-          <div class="testimonial-row reveal" style="margin-top: 80px;">
+          <div class="testimonial-row reveal" style="margin-top: 28px;">
             <div class="testimonial-video">
-              <div style="width: 100%; max-width: 315px; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-md); aspect-ratio: 9/16; background: #000;">
+              <div style="width: 100%; max-width: 280px; border-radius: 22px; overflow: hidden; box-shadow: 0 16px 36px -8px rgba(18, 51, 72, 0.18), 0 0 0 1px rgba(18, 51, 72, 0.08); aspect-ratio: 9/16; background: #000;">
                 <iframe src="https://www.youtube.com/embed/_NyYSGyfAVQ" style="width: 100%; height: 100%; border:0;" allowfullscreen></iframe>
               </div>
             </div>
             <div class="testimonial-text">
-              <h3 style="font-size: 1.8rem; margin-bottom: 15px; color: var(--text-primary);">
+              <h3 style="font-size: 1.55rem; font-weight: 700; letter-spacing: -0.022em; line-height: 1.24; margin-bottom: 14px; color: var(--text-primary);">
                 <span class="lang-en">Your Trusted Guide in Spain: Meet Sepehr</span>
                 <span class="lang-es">Tu guía de confianza en España: Conoce a Sepehr</span>
                 <span class="lang-fr">Votre guide de confiance en Espagne : Rencontrez Sepehr</span>
                 <span class="lang-en-ca">Your Trusted Guide in Spain: Meet Sepehr</span>
               </h3>
-              <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px;">
+              <p style="color: var(--text-secondary); font-size: 1.04rem; line-height: 1.68; margin-bottom: 0;">
                 <span class="lang-en">Discover how Sepehr can help you find your dream home in Spain with RE/MAX Inmomás. His dedication and local expertise ensure a smooth and successful journey.</span>
                 <span class="lang-es">Descubre cómo Sepehr puede ayudarte a encontrar la casa de tus sueños en España con RE/MAX Inmomás. Su dedicación y experiencia local garantizan un proceso exitoso.</span>
                 <span class="lang-fr">Découvrez comment Sepehr peut vous aider à trouver la maison de vos rêves en Espagne avec RE/MAX Inmomás. Son dévouement et son expertise locale garantissent un parcours sans faille.</span>
@@ -1205,7 +1244,21 @@
 
     <!-- ==================== VIEW: FOR REALTORS (B2B) ==================== -->
     <div id="view-for-realtors" class="app-view">
-      <section class="hero hero-split" style="padding-top: 100px;">
+      <section class="hero" id="realtors-hero">
+        <div class="hero-bg" style="overflow: hidden;">
+          <div id="realtors-video-cover" style="position: absolute; inset: 0; z-index: 1; transition: opacity 0.8s ease; pointer-events: none; overflow: hidden; background-color: #163654;">
+            <div style="position: absolute; top: 50%; left: 50%; width: max(100vw, 213.33vh); height: max(56.25vw, 120vh); transform: translate(-50%, -50%) scale(1.05); background-image: url('https://img.youtube.com/vi/uH8EViA-9Ns/maxresdefault.jpg'), url('images/lifestyle-mediterranean.png'); background-size: cover; background-position: center;"></div>
+          </div>
+          <iframe 
+            id="realtors-video"
+            src="https://www.youtube.com/embed/uH8EViA-9Ns?autoplay=1&mute=1&start=0&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&enablejsapi=1" 
+            frameborder="0" 
+            allow="autoplay; encrypted-media" 
+            style="position: absolute; top: 50%; left: 50%; width: 100vw; height: 56.25vw; min-height: 120vh; min-width: 213.33vh; pointer-events: none; transform: translate(-50%, -50%) scale(1.05);"
+            title="Spain Background Video — For Realtors">
+          </iframe>
+          <a href="https://www.youtube.com/watch?v=uH8EViA-9Ns" target="_blank" style="position: absolute; inset: 0; z-index: 2;"></a>
+        </div>
         <div class="container">
           <div class="hero-content">
             <div class="hero-badge">
@@ -2970,18 +3023,19 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-  <script src="js/notifications.js?v=20261109_v3"></script>
-  <script src="js/firebase-config.js?v=20261026_v1"></script>
-  <script src="js/utils.js?v=20261026_v1"></script>
-  <script src="js/auth-service.js?v=20261109_v3"></script>
-  <script src="js/router.js?v=20261026_v1"></script>
-  <script src="js/views/public-views.js?v=20261109_v2"></script>
-  <script src="js/views/auth-views.js?v=20261026_v1"></script>
-  <script src="js/views/admin-views.js?v=20261026_v1"></script>
-  <script src="js/views/broker-views.js?v=20261026_v1"></script>
+  <script src="js/notifications.js?v=20261112_v1"></script>
+  <script src="js/firebase-config.js?v=20261112_v1"></script>
+  <script src="js/utils.js?v=20261112_v1"></script>
+  <script src="js/auth-service.js?v=20261112_v1"></script>
+  <script src="js/router.js?v=20261112_v1"></script>
+  <script src="js/views/public-views.js?v=20261112_v1"></script>
+  <script src="js/views/auth-views.js?v=20261112_v1"></script>
+  <script src="js/views/admin-views.js?v=20261112_v1"></script>
+  <script src="js/views/embajador-views.js?v=20261112_v1"></script>
+  <script src="js/views/broker-views.js?v=20261109_v5"></script>
   <script src="js/views/realtor-views.js?v=20261026_v1"></script>
   <script src="js/views/agent-views.js?v=20261026_v1"></script>
-  <script src="js/referral-agreement.js?v=20261026_v1"></script>
+  <script src="js/referral-agreement.js?v=20261112_v1"></script>
   <script src="js/main.js?v=20261109_v4"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {

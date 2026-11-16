@@ -12,25 +12,46 @@
   window.App = window.App || {};
 
   /**
-   * generateReferralAgreementDoc(userData)
+   * generateReferralAgreementDoc(userData, agentData)
    * Creates and downloads a Word-compatible .doc file with
-   * the Master Referral Agreement pre-filled with user data.
-   * @param {Object} userData - Current user profile object
+   * the Master Referral Agreement pre-filled with user & fiscal/bank data.
+   * @param {Object} userData - User profile object (or { isTemplate: true } for blank template)
+   * @param {Object} agentData - Optional Referring Agent object
    */
   App.generateReferralAgreementDoc = function(userData, agentData) {
-    const user       = userData || App.auth.getCurrentUser() || {};
+    const isTemplate = Boolean(userData && userData.isTemplate);
+    const user       = isTemplate ? {} : (userData || (App.auth && App.auth.getCurrentUser()) || {});
+    const cd         = user.contractCompanyData || {};
     const agent      = agentData || {};
-    const fullName   = `${user.firstName || ''} ${user.lastName || ''}`.trim() || '___________________';
-    const agency     = user.agencyName || user.brokerNameManual || '___________________';
-    const email      = user.email || '___________________';
-    const phone      = user.phone || '___________________';
-    const country    = user.country || 'United States / Canada';
-    // Agent fields — if agentData is not provided, fall back to blank
-    const agentName  = agent.firstName && agent.lastName
+
+    const esc = (val) => (App.utils && typeof App.utils.escapeHtml === 'function')
+      ? App.utils.escapeHtml(String(val ?? ''))
+      : String(val ?? '');
+
+    const userFullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+    const fullName     = cd.brokerFullName || cd.brokerSignerName || ((user.role === 'broker' || user.role === 'embajador') ? userFullName : (user.brokerNameManual || userFullName)) || '___________________';
+    const agency       = cd.companyLegalName || user.agencyName || user.brokerNameManual || '___________________';
+    const taxId        = cd.taxId || '___________________';
+    const licenseNum   = cd.licenseNumber || '___________________';
+    const fiscalAddr   = cd.fiscalAddress || '___________________';
+    const email        = cd.brokerEmail || cd.brokerSignerEmail || user.email || '___________________';
+    const phone        = cd.brokerPhone || cd.brokerSignerPhone || user.phone || '___________________';
+    const country      = cd.country || cd.fiscalCountry || user.country || 'United States / Canada';
+
+    // Referring Agent fields — use agentData if provided, or user if user is a realtor
+    const agentName  = (agent.firstName && agent.lastName)
                          ? `${agent.firstName} ${agent.lastName}`.trim()
-                         : (agent.name || '___________________');
-    const agentEmail = agent.email || '___________________';
-    const today      = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                         : (agent.name || (user.role === 'realtor' && userFullName ? userFullName : '___________________'));
+    const agentEmail = agent.email || (user.role === 'realtor' && user.email ? user.email : '___________________');
+
+    // Corporate Bank Details (for commission wire settlement)
+    const bankHolder  = cd.bankAccountHolder || (cd.companyLegalName ? cd.companyLegalName : '___________________');
+    const bankName    = cd.bankName || '___________________';
+    const bankAccount = cd.bankAccountNumber || '___________________';
+    const bankSwift   = cd.bankSwiftRouting || '___________________';
+    const bankAddress = cd.bankAddress || '___________________';
+
+    const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
     const html = `
 <!DOCTYPE html>
@@ -75,12 +96,12 @@
     .doc-ref { text-align: right; font-size: 9pt; color: #95a5a6; margin-bottom: 16pt; border-bottom: 1pt solid #ecf0f1; padding-bottom: 8pt; }
     table { width: 100%; border-collapse: collapse; margin-bottom: 20pt; }
     td, th { border: 1pt solid #bdc3c7; padding: 7pt 10pt; font-size: 10pt; vertical-align: middle; }
-    th { background-color: #f4f6f9; color: #003da5; font-weight: bold; width: 32%; text-align: left; }
+    th { background-color: #f4f6f9; color: #003da5; font-weight: bold; width: 34%; text-align: left; }
     .broker-title { font-size: 11pt; font-weight: bold; color: #ffffff; background: #003da5; padding: 7pt 12pt; margin-bottom: 0; border: 1pt solid #003da5; }
     .example-box { background: #f8f9fa; border-left: 3pt solid #e11b22; padding: 10pt 14pt; margin: 10pt 0; font-size: 10pt; color: #34495e; }
     .lang-divider { display: block; color: #7f8c8d; font-size: 9.5pt; font-style: italic; margin-top: 4pt; line-height: 1.4; }
     .clause { margin-bottom: 16pt; text-align: justify; }
-    .signatures { margin-top: 40pt; page-break-inside: avoid; }
+    .signatures { margin-top: 32pt; page-break-inside: avoid; }
     .sig-field { font-size: 10pt; color: #2c3e50; margin: 4pt 0; }
     .sig-line { border-bottom: 1pt solid #2c3e50; margin: 24pt 0 4pt; width: 90%; }
     .footer { margin-top: 30pt; padding-top: 12pt; border-top: 1pt solid #ecf0f1; font-size: 8.5pt; color: #95a5a6; text-align: center; }
@@ -110,26 +131,55 @@
       <td style="width:50%; vertical-align:top; padding:0;">
         <div class="broker-title">Broker A — Referring Brokerage / Agencia Referente</div>
         <table style="margin-bottom:0; border-top:none;">
-          <tr><th>Brokerage / Agencia</th><td>${App.utils ? App.utils.escapeHtml(agency) : agency}</td></tr>
-          <tr><th>Broker of Record</th><td>${App.utils ? App.utils.escapeHtml(fullName) : fullName}</td></tr>
-          <tr><th>Country / País</th><td>${App.utils ? App.utils.escapeHtml(country) : country}</td></tr>
-          <tr><th>Email</th><td>${App.utils ? App.utils.escapeHtml(email) : email}</td></tr>
-          <tr><th>Phone / Teléfono</th><td>${App.utils ? App.utils.escapeHtml(phone) : phone}</td></tr>
-          <tr><th>License # / Licencia</th><td>&nbsp;</td></tr>
+          <tr><th>Legal Name / Razón Social</th><td>${esc(agency)}</td></tr>
+          <tr><th>Tax ID / EIN / NIF</th><td>${esc(taxId)}</td></tr>
+          <tr><th>Broker of Record</th><td>${esc(fullName)}</td></tr>
+          <tr><th>License # / Licencia</th><td>${esc(licenseNum)}</td></tr>
+          <tr><th>Registered Address / Domicilio</th><td>${esc(fiscalAddr)}</td></tr>
+          <tr><th>Country / País</th><td>${esc(country)}</td></tr>
+          <tr><th>Email</th><td>${esc(email)}</td></tr>
+          <tr><th>Phone / Teléfono</th><td>${esc(phone)}</td></tr>
+          <tr><th>Referring Agent / Agente</th><td>${esc(agentName)} (${esc(agentEmail)})</td></tr>
         </table>
       </td>
       <td style="width:4%; border:none; background:none;"></td>
       <td style="width:46%; vertical-align:top; padding:0;">
         <div class="broker-title">Broker B — Receiving Brokerage / Agencia Receptora</div>
         <table style="margin-bottom:0; border-top:none;">
-          <tr><th>Brokerage / Agencia</th><td>Megagestión Servicios Inmobiliarios</td></tr>
+          <tr><th>Legal Name / Razón Social</th><td>Megagestión Servicios Inmobiliarios S.L. (RE/MAX Inmomás)</td></tr>
+          <tr><th>CIF (Tax ID)</th><td>B-54829767</td></tr>
           <tr><th>Broker of Record</th><td><strong>José Martínez Sánchez</strong></td></tr>
+          <tr><th>Registered Address / Domicilio</th><td>Carrer Conrado del Campo 16, 03204, Elche (Alicante)</td></tr>
           <tr><th>Country / País</th><td>Spain / España</td></tr>
           <tr><th>Email</th><td>jose.martinez@remax.es</td></tr>
           <tr><th>Phone / Teléfono</th><td>+34 966 665 651</td></tr>
-          <tr><th>CIF (Tax ID)</th><td>B-54829767</td></tr>
         </table>
       </td>
+    </tr>
+  </table>
+
+  <!-- Corporate Bank Account Details for Broker A -->
+  <table>
+    <tr>
+      <td colspan="4" class="broker-title" style="background:#1e3a8a; border-color:#1e3a8a;">
+        Broker A — Corporate Bank Account for Commission Wire / Cuenta Bancaria para Transferencia de Comisiones
+      </td>
+    </tr>
+    <tr>
+      <th style="width:22%;">Account Holder / Titular</th>
+      <td style="width:28%;">${esc(bankHolder)}</td>
+      <th style="width:22%;">Bank Name / Banco</th>
+      <td style="width:28%;">${esc(bankName)}</td>
+    </tr>
+    <tr>
+      <th>Account # / IBAN</th>
+      <td>${esc(bankAccount)}</td>
+      <th>SWIFT / BIC / Routing (ABA)</th>
+      <td>${esc(bankSwift)}</td>
+    </tr>
+    <tr>
+      <th>Bank Address / Dirección</th>
+      <td colspan="3">${esc(bankAddress)}</td>
     </tr>
   </table>
 
@@ -207,7 +257,7 @@
           <p class="sig-field">Signature / Firma</p>
           <br>
           <div class="sig-line"></div>
-          <p class="sig-field">Print Name / Nombre: <strong>${App.utils ? App.utils.escapeHtml(fullName) : fullName}</strong></p>
+          <p class="sig-field">Print Name / Nombre: <strong>${esc(fullName)}</strong></p>
           <br>
           <div class="sig-line"></div>
           <p class="sig-field">Title / Cargo: ___________________________</p>
@@ -244,16 +294,27 @@
 </body>
 </html>`;
 
+    // Build clean filename
+    const slugSource = isTemplate
+      ? 'Template'
+      : (cd.companyLegalName || user.agencyName || user.lastName || user.firstName || 'Partner')
+          .replace(/[^a-zA-Z0-9À-ÿ]+/g, '_')
+          .replace(/^_+|_+$/g, '');
+
     // Create and download as .doc (Word-compatible HTML)
     const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href     = url;
-    a.download = `Referral_Agreement_${(user.lastName || 'User').replace(/\s+/g,'_')}_${agentName !== '___________________' ? agentName.split(' ').pop().replace(/\s+/g,'_') + '_' : ''}${new Date().toISOString().slice(0,10)}.doc`;
+    a.download = `Master_Referral_Agreement_${slugSource}_${new Date().toISOString().slice(0,10)}.doc`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+    if (App.utils && typeof App.utils.showToast === 'function') {
+      App.utils.showToast('📄 Master Referral Agreement exportado a Word (.doc)', 'success');
+    }
   };
 
 })();

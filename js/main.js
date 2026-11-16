@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .shake { animation: shake 0.5s ease; }
     .spinner { display:inline-block; width:18px; height:18px; border:2px solid rgba(10,22,40,0.2); border-top-color:#0A1628; border-radius:50%; animation:spin 0.6s linear infinite; }
     @keyframes spin { to{transform:rotate(360deg)} }
-    .form-success-msg { text-align:center; padding:16px 0 0; color:#4ADE80; font-weight:500; font-size:0.9rem; animation:fadeUp 0.5s ease; }
+    .form-success-msg { text-align:center; padding:16px 0 0; color:#059669; font-weight:600; font-size:0.9rem; animation:fadeUp 0.5s ease; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
   `;
   document.head.appendChild(style);
