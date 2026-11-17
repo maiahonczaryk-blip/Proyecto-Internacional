@@ -167,6 +167,15 @@ App.auth = (function() {
   /* ---- Register ---- */
   async function register(data) {
     const { email, password, firstName, lastName, agencyName, phone, country, role, brokerId, referredBy, source } = data;
+    const nationality = (data.nationality || country || '').trim();
+    const inferredRegion = (App.utils && App.utils.resolveRegionFromCountry)
+      ? App.utils.resolveRegionFromCountry(data.region || nationality || country || '')
+      : '';
+    const regions = Array.isArray(data.regions) && data.regions.length > 0
+      ? data.regions
+      : (inferredRegion ? [inferredRegion] : []);
+    const primaryRegion = data.region || regions[0] || inferredRegion || '';
+    const languages = Array.isArray(data.languages) ? data.languages : [];
 
     if (!email || !password || !firstName || !lastName || !role) {
       throw new Error('Please fill in all required fields.');
@@ -227,7 +236,11 @@ App.auth = (function() {
         agencyName: agencyName || '',
         agencyLogo: data.agencyLogo || null,
         phone: phone || '',
-        country: country || '',
+        country: country || nationality || '',
+        nationality: nationality || country || '',
+        region: primaryRegion,
+        regions: regions,
+        languages: languages,
         brokerId: brokerId || null,
         embajadorId: role === 'embajador' ? null : resolvedEmbajadorId,
         referralCode: `${getPrefixForRole(role)}-${lastName.toUpperCase()}`,
@@ -323,7 +336,11 @@ App.auth = (function() {
         agencyName: agencyName || (isMaiaAccount ? 'RE/MAX Inmomás' : ''),
         agencyLogo: data.agencyLogo || null,
         phone: phone || '',
-        country: country || '',
+        country: country || nationality || '',
+        nationality: nationality || country || '',
+        region: primaryRegion,
+        regions: regions,
+        languages: languages,
         brokerId: brokerId || null,
         embajadorId: (finalRole === 'embajador' || finalRole === 'admin') ? null : resolvedEmbajadorId,
         referralCode: finalReferralCode,
@@ -568,6 +585,15 @@ App.auth = (function() {
   /* ---- Google Registration ---- */
   async function registerWithGoogle(data) {
     const { role, firstName, lastName, agencyName, phone, country, brokerId, referredBy, source } = data;
+    const nationality = (data.nationality || country || '').trim();
+    const inferredRegion = (App.utils && App.utils.resolveRegionFromCountry)
+      ? App.utils.resolveRegionFromCountry(data.region || nationality || country || '')
+      : '';
+    const regions = Array.isArray(data.regions) && data.regions.length > 0
+      ? data.regions
+      : (inferredRegion ? [inferredRegion] : []);
+    const primaryRegion = data.region || regions[0] || inferredRegion || '';
+    const languages = Array.isArray(data.languages) ? data.languages : [];
 
     if (!role) {
       throw new Error('Please select a role (Broker or Realtor).');
@@ -598,7 +624,11 @@ App.auth = (function() {
         lastName: mockLastName,
         agencyName: agencyName || '',
         phone: phone || '',
-        country: country || '',
+        country: country || nationality || '',
+        nationality: nationality || country || '',
+        region: primaryRegion,
+        regions: regions,
+        languages: languages,
         brokerId: brokerId || null,
         embajadorId: role === 'embajador' ? null : (data.embajadorId || null),
         referralCode: `${role === 'admin' ? 'ADM' : (role === 'embajador' ? 'EMB' : (role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : (role === 'colaborador' ? 'COL' : 'REA'))))}-${mockLastName.toUpperCase()}`,
@@ -678,7 +708,11 @@ App.auth = (function() {
         lastName: finalLastName,
         agencyName: agencyName || '',
         phone: phone || '',
-        country: country || '',
+        country: country || nationality || '',
+        nationality: nationality || country || '',
+        region: primaryRegion,
+        regions: regions,
+        languages: languages,
         brokerId: brokerId || null,
         embajadorId: role === 'embajador' ? null : (data.embajadorId || null),
         referralCode: `${role === 'admin' ? 'ADM' : (role === 'embajador' ? 'EMB' : (role === 'broker' ? 'BRK' : (role === 'agent_inmomas' ? 'LOC' : (role === 'colaborador' ? 'COL' : 'REA'))))}-${(finalLastName || 'USER').toUpperCase()}-${uid.substring(0, 4)}`,
@@ -849,6 +883,13 @@ App.auth = (function() {
     if (!user) throw new Error('No user is currently logged in.');
 
     const { firstName, lastName, phone, agencyName, country, profileImage } = data;
+    const nationality = data.nationality !== undefined ? (data.nationality || '').trim() : undefined;
+    const regions = Array.isArray(data.regions) ? data.regions : undefined;
+    const languages = Array.isArray(data.languages) ? data.languages : undefined;
+    const inferredRegion = (App.utils && App.utils.resolveRegionFromCountry)
+      ? App.utils.resolveRegionFromCountry(data.region || (regions && regions[0]) || nationality || country || '')
+      : '';
+    const primaryRegion = data.region || (regions && regions[0]) || inferredRegion || undefined;
 
     if (!firstName || !lastName) {
       throw new Error('First name and last name are required.');
@@ -863,6 +904,10 @@ App.auth = (function() {
       demoUser.phone = phone || '';
       demoUser.agencyName = agencyName || '';
       demoUser.country = country || '';
+      if (nationality !== undefined) demoUser.nationality = nationality;
+      if (primaryRegion !== undefined) demoUser.region = primaryRegion;
+      if (regions !== undefined) demoUser.regions = regions;
+      if (languages !== undefined) demoUser.languages = languages;
       if (profileImage !== undefined) {
         demoUser.profileImage = profileImage;
       }
@@ -880,6 +925,10 @@ App.auth = (function() {
         country: country || '',
         updatedAt: new Date().toISOString()
       };
+      if (nationality !== undefined) updateData.nationality = nationality;
+      if (primaryRegion !== undefined) updateData.region = primaryRegion;
+      if (regions !== undefined) updateData.regions = regions;
+      if (languages !== undefined) updateData.languages = languages;
       if (profileImage !== undefined) {
         updateData.profileImage = profileImage;
       }
@@ -888,6 +937,48 @@ App.auth = (function() {
       Object.assign(currentUser, updateData);
       notifyAuthChange();
       return currentUser;
+    }
+  }
+
+  /* ---- Update User Nationality & Regions (Admin action) ---- */
+  async function updateUserRegionalProfile(userId, regionalData = {}) {
+    if (!userId) throw new Error('User ID is required.');
+    const nationality = (regionalData.nationality || '').trim();
+    const country = regionalData.country !== undefined ? (regionalData.country || '').trim() : undefined;
+    const regions = Array.isArray(regionalData.regions) ? regionalData.regions : [];
+    const languages = Array.isArray(regionalData.languages) ? regionalData.languages : [];
+    const inferredRegion = (App.utils && App.utils.resolveRegionFromCountry)
+      ? App.utils.resolveRegionFromCountry(regionalData.region || regions[0] || nationality || country || '')
+      : '';
+    const primaryRegion = regionalData.region || regions[0] || inferredRegion || '';
+    const finalRegions = regions.length > 0 ? regions : (primaryRegion ? [primaryRegion] : []);
+
+    if (App.demoMode) {
+      const u = App.demoData.users.find(usr => usr.id === userId);
+      if (!u) throw new Error('User not found.');
+      u.nationality = nationality || u.nationality || '';
+      if (country !== undefined) u.country = country;
+      u.region = primaryRegion;
+      u.regions = finalRegions;
+      u.languages = languages;
+      u.updatedAt = new Date().toISOString();
+      saveDemoData();
+      return true;
+    } else {
+      const payload = {
+        nationality: nationality,
+        region: primaryRegion,
+        regions: finalRegions,
+        languages: languages,
+        updatedAt: new Date().toISOString()
+      };
+      if (country !== undefined) payload.country = country;
+      await App.db.collection('users').doc(userId).update(payload);
+      if (currentUser && currentUser.id === userId) {
+        Object.assign(currentUser, payload);
+        notifyAuthChange();
+      }
+      return true;
     }
   }
 
@@ -1415,8 +1506,16 @@ App.auth = (function() {
 
   /* ---- Webinar Registrations ---- */
   async function saveWebinarRegistration(data, options = {}) {
+    const resolvedRegion = data.webinarRegion || data.region || (
+      App.utils && App.utils.resolveRegionFromCountry
+        ? App.utils.resolveRegionFromCountry(data.country || '')
+        : ''
+    ) || 'north_america';
+
     const payload = {
       ...data,
+      region: resolvedRegion,
+      webinarRegion: resolvedRegion,
       createdAt: data.createdAt || new Date().toISOString()
     };
 
@@ -1509,10 +1608,14 @@ App.auth = (function() {
       if (!client || !client.email) return;
       const emailNorm = client.email.toLowerCase().trim();
 
+      const clientCountry = client.currentLocation || client.country || 'United States';
+      const clientRegion = client.region || (App.utils && App.utils.resolveRegionFromCountry ? App.utils.resolveRegionFromCountry(clientCountry) : '') || 'north_america';
+
       const settings = (await getWebinarSettings()) || getDefaultWebinarSettings();
-      const b2cConfig = settings?.b2c || {};
-      const webinarTitle = b2cConfig.title || (settings.activeType === 'b2c' ? settings.title : 'Spain Unlocked: Living & Investing');
-      const webinarDate = b2cConfig.date || (settings.activeType === 'b2c' ? settings.date : '2026-10-29');
+      const regCfg = getRegionalWebinarConfig(settings, clientRegion, 'b2c');
+      const webinarTitle = regCfg.title || 'Spain Unlocked: Living & Investing';
+      const webinarDate = regCfg.date || '2026-10-29';
+      const webinarLanguage = regCfg.language || 'en';
 
       let agentReferrerId = client.localAgentId || client.realtorId || extraOptions.agentReferrerId || null;
       let agentReferrerName = client.localAgentName || client.realtorName || extraOptions.agentReferrerName || null;
@@ -1554,6 +1657,9 @@ App.auth = (function() {
         webinar: webinarTitle,
         webinarType: 'B2C',
         webinarDate: webinarDate,
+        webinarRegion: clientRegion,
+        region: clientRegion,
+        webinarLanguage: webinarLanguage,
         gdprConsent: true,
         role: 'client',
         contactType: 'client',
@@ -1574,10 +1680,14 @@ App.auth = (function() {
       if (!user || !user.email) return;
       const emailNorm = user.email.toLowerCase().trim();
 
+      const userCountry = user.country || user.nationality || 'United States';
+      const userRegion = user.region || (Array.isArray(user.regions) && user.regions[0]) || (App.utils && App.utils.resolveRegionFromCountry ? App.utils.resolveRegionFromCountry(userCountry) : '') || 'north_america';
+
       const settings = (await getWebinarSettings()) || getDefaultWebinarSettings();
-      const b2bConfig = settings?.b2b || {};
-      const webinarTitle = b2bConfig.title || (settings.activeType === 'b2b' ? settings.title : 'Beyond Borders');
-      const webinarDate = b2bConfig.date || (settings.activeType === 'b2b' ? settings.date : '2026-09-24');
+      const regCfg = getRegionalWebinarConfig(settings, userRegion, 'b2b');
+      const webinarTitle = regCfg.title || 'Beyond Borders';
+      const webinarDate = regCfg.date || '2026-09-24';
+      const webinarLanguage = regCfg.language || 'en';
 
       let agentReferrerId = extraOptions.agentReferrerId || null;
       let agentReferrerName = extraOptions.agentReferrerName || null;
@@ -1615,6 +1725,9 @@ App.auth = (function() {
         webinar: webinarTitle,
         webinarType: 'B2B',
         webinarDate: webinarDate,
+        webinarRegion: userRegion,
+        region: userRegion,
+        webinarLanguage: webinarLanguage,
         gdprConsent: true,
         role: user.role || 'realtor',
         contactType: user.role || 'realtor',
@@ -1951,7 +2064,7 @@ App.auth = (function() {
       try { localStorage.setItem('remax_webinar_settings', JSON.stringify(currentSettings)); } catch(e) {}
     }
 
-    return currentSettings;
+    return ensureRegionalWebinarConfigs(currentSettings);
   }
 
   async function saveWebinarSettings(newSettings) {
@@ -1980,8 +2093,160 @@ App.auth = (function() {
     return merged;
   }
 
+  function ensureRegionalWebinarConfigs(settingsObj) {
+    const s = settingsObj || JSON.parse(JSON.stringify(DEFAULT_WEBINAR_SETTINGS));
+    if (!s.regionalConfigs || typeof s.regionalConfigs !== 'object') {
+      s.regionalConfigs = {};
+    }
+    const regionDefaults = {
+      north_america: {
+        activeType: s.activeType || 'b2c',
+        language: 'en',
+        b2b: {
+          title: s.b2b?.title || 'Beyond Borders — North America',
+          subtitle: s.b2b?.subtitle || 'Passive International Commissions for US, Canadian & PR Realtors',
+          targetAudience: s.b2b?.targetAudience || 'US, Canadian & Puerto Rico Realtors & Brokers',
+          date: s.b2b?.date || '2026-09-24',
+          time: s.b2b?.time || '19:00',
+          spots: s.b2b?.spots || 25,
+          language: 'en'
+        },
+        b2c: {
+          title: s.b2c?.title || 'Spain Unlocked: Living & Investing',
+          subtitle: s.b2c?.subtitle || 'How North American Buyers Safely Purchase, Relocate & Invest in Spain',
+          targetAudience: s.b2c?.targetAudience || 'US, Canadian & PR Buyers, Expats & Investors',
+          date: s.b2c?.date || s.date || '2026-10-29',
+          time: s.b2c?.time || s.time || '18:00',
+          spots: s.b2c?.spots || s.spotsAvailable || 25,
+          language: 'en'
+        }
+      },
+      latam: {
+        activeType: 'b2c',
+        language: 'es',
+        b2b: {
+          title: 'Beyond Borders — Alianza Latinoamérica',
+          subtitle: 'Comisiones Internacionales del 25% en España para Brokers e Inmobiliarias de Latam',
+          targetAudience: 'Brokers y Agentes Inmobiliarios de Latinoamérica y Caribe',
+          date: '2026-10-15',
+          time: '18:00',
+          spots: 30,
+          language: 'es'
+        },
+        b2c: {
+          title: 'Invertir y Vivir en España — Edición Latinoamérica',
+          subtitle: 'Guía legal, fiscal, hipotecaria e inmobiliaria para inversores y familias latinoamericanas',
+          targetAudience: 'Inversores y Compradores de México, Colombia, Argentina, Chile y Latam',
+          date: '2026-11-05',
+          time: '18:00',
+          spots: 30,
+          language: 'es'
+        }
+      },
+      western_europe: {
+        activeType: 'b2c',
+        language: 'en',
+        b2b: {
+          title: 'Beyond Borders — Western Europe Partner Network',
+          subtitle: 'Cross-Border Spain Referral Commissions for European Agencies & Advisors',
+          targetAudience: 'UK, French, Belgian, German, Dutch & Nordic Real Estate Advisors',
+          date: '2026-10-22',
+          time: '17:00',
+          spots: 25,
+          language: 'en'
+        },
+        b2c: {
+          title: 'Spain Unlocked — European Buyers & Second Homes',
+          subtitle: 'Mediterranean Property, Tax & Legal Turnkey Advisory in Spain',
+          targetAudience: 'UK, French, German, Benelux & Nordic Buyers',
+          date: '2026-11-12',
+          time: '18:00',
+          spots: 25,
+          language: 'en'
+        }
+      },
+      eastern_europe: {
+        activeType: 'b2c',
+        language: 'en',
+        b2b: {
+          title: 'Beyond Borders — Eastern Europe & Baltics Partners',
+          subtitle: 'International Referral Partnership in Spain for Real Estate Agencies',
+          targetAudience: 'Polish, Ukrainian, Romanian, Czech & Baltic Real Estate Brokers',
+          date: '2026-11-19',
+          time: '17:00',
+          spots: 25,
+          language: 'en'
+        },
+        b2c: {
+          title: 'Safe Property Investment in Spain — Eastern Europe Edition',
+          subtitle: 'Full Turnkey Legal, Banking & Real Estate Representation in Costa Blanca & Spain',
+          targetAudience: 'Investors & Families from Eastern Europe & Baltics',
+          date: '2026-11-26',
+          time: '18:00',
+          spots: 25,
+          language: 'en'
+        }
+      },
+      mena: {
+        activeType: 'b2c',
+        language: 'en',
+        b2b: {
+          title: 'Beyond Borders — MENA & International Wealth Partners',
+          subtitle: 'Luxury Real Estate & Investment Advisory Partnership in Spain',
+          targetAudience: 'UAE, Gulf, MENA & International Real Estate Advisors',
+          date: '2026-12-03',
+          time: '16:00',
+          spots: 20,
+          language: 'en'
+        },
+        b2c: {
+          title: 'Prime Spain Real Estate & Lifestyle — MENA & Global Investors',
+          subtitle: 'Turnkey Prime Acquisitions, Legal Structuring & Property Management in Spain',
+          targetAudience: 'MENA & International Investors',
+          date: '2026-12-10',
+          time: '16:00',
+          spots: 20,
+          language: 'en'
+        }
+      }
+    };
+
+    Object.keys(regionDefaults).forEach(regKey => {
+      if (!s.regionalConfigs[regKey]) {
+        s.regionalConfigs[regKey] = regionDefaults[regKey];
+      } else {
+        s.regionalConfigs[regKey] = {
+          ...regionDefaults[regKey],
+          ...s.regionalConfigs[regKey],
+          b2b: { ...regionDefaults[regKey].b2b, ...(s.regionalConfigs[regKey].b2b || {}) },
+          b2c: { ...regionDefaults[regKey].b2c, ...(s.regionalConfigs[regKey].b2c || {}) }
+        };
+      }
+    });
+    return s;
+  }
+
+  function getRegionalWebinarConfig(settingsObj, regionId = 'north_america', forceType = null) {
+    const s = ensureRegionalWebinarConfigs(settingsObj || DEFAULT_WEBINAR_SETTINGS);
+    const cleanReg = (regionId && s.regionalConfigs[regionId]) ? regionId : 'north_america';
+    const regBlock = s.regionalConfigs[cleanReg];
+    const activeType = forceType || regBlock.activeType || s.activeType || 'b2c';
+    const typeCfg = regBlock[activeType] || s[activeType] || {};
+    const baseGlobalTypeCfg = s[activeType] || {};
+    return {
+      ...baseGlobalTypeCfg,
+      ...typeCfg,
+      region: cleanReg,
+      activeType,
+      language: typeCfg.language || regBlock.language || 'en',
+      date: typeCfg.date || (cleanReg === 'north_america' ? s.date : '') || '2026-10-29',
+      time: typeCfg.time || (cleanReg === 'north_america' ? s.time : '') || '18:00',
+      spots: typeCfg.spots || (cleanReg === 'north_america' ? s.spotsAvailable : 25) || 25
+    };
+  }
+
   function getDefaultWebinarSettings() {
-    return JSON.parse(JSON.stringify(DEFAULT_WEBINAR_SETTINGS));
+    return ensureRegionalWebinarConfigs(JSON.parse(JSON.stringify(DEFAULT_WEBINAR_SETTINGS)));
   }
 
   async function deleteDossierLead(leadId) {
@@ -2117,6 +2382,7 @@ App.auth = (function() {
       email: clientData.email,
       phone: clientData.phone || '—',
       country: clientData.country || '—',
+      region: clientData.region || (App.utils && App.utils.resolveRegionFromCountry ? App.utils.resolveRegionFromCountry(clientData.country || '') : '') || '',
       budget: clientData.budget || '—',
       interestArea: clientData.interestArea || '—',
       notes: clientData.notes || '',
@@ -2175,7 +2441,9 @@ App.auth = (function() {
       lastName: clientData.lastName,
       email: clientData.email,
       phone: clientData.phone || '—',
-      currentLocation: clientData.currentLocation || '—',
+      country: clientData.country || clientData.currentLocation || '—',
+      currentLocation: clientData.currentLocation || clientData.country || '—',
+      region: clientData.region || (App.utils && App.utils.resolveRegionFromCountry ? App.utils.resolveRegionFromCountry(clientData.country || clientData.currentLocation || '') : '') || '',
       budget: clientData.budget || 'TBD',
       interestArea: clientData.interestArea || '—',
       timeline: clientData.timeline || '—',
@@ -2487,13 +2755,18 @@ App.auth = (function() {
    * Returns all users that have consented to newsletter, optionally filtered by role.
    * @param {string|null} roleFilter - 'broker', 'realtor', 'agent_inmomas', or null for all.
    */
-  async function getNewsletterSubscribers(roleFilter) {
+  async function getNewsletterSubscribers(roleFilter, regionFilter = '') {
     const users = await getAllUsers();
     return users.filter(u => {
       const hasConsent = u.newsletterConsent === true;
       const isActive = u.status === 'active';
-      const matchesRole = !roleFilter || u.role === roleFilter;
-      return hasConsent && isActive && matchesRole;
+      const matchesRole = !roleFilter || roleFilter === 'all' || u.role === roleFilter;
+      let matchesRegion = true;
+      if (regionFilter && App.utils && App.utils.getUserRegions) {
+        const uRegs = App.utils.getUserRegions(u);
+        matchesRegion = uRegs.includes(regionFilter);
+      }
+      return hasConsent && isActive && matchesRole && matchesRegion;
     });
   }
 
@@ -2767,6 +3040,7 @@ App.auth = (function() {
     updateUserRole,
     updateUserReferral,
     updateUserEmbajador,
+    updateUserRegionalProfile,
     updateUserAgencyBranding,
     getUmbrellaData,
     updateProfile,
@@ -2805,6 +3079,7 @@ App.auth = (function() {
     getWebinarSettings,
     saveWebinarSettings,
     getDefaultWebinarSettings,
+    getRegionalWebinarConfig,
     getWebinarFeedbacks,
     deleteWebinarFeedback,
     autoEnrollClientWebinar,

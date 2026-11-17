@@ -669,6 +669,35 @@
               </button>
             </div>
           </div>
+          <!-- Direct RE/MAX MÁS Agent Invitation Shortcut -->
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 10px; padding: 10px 14px; background: linear-gradient(135deg, rgba(0, 63, 153, 0.08) 0%, rgba(37, 99, 235, 0.04) 100%); border: 1px solid rgba(0, 63, 153, 0.22); border-radius: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.84rem; color: #1e3a8a;">
+              <span style="font-size: 1.15rem;">🇪🇸</span>
+              <div>
+                <strong style="color: #003f99;"><span class="lang-en">Direct Registration: RE/MAX MÁS Agent (Nationality + Region)</span><span class="lang-es">Registro Directo: Agente RE/MAX MÁS (Nacionalidad + Región)</span></strong>
+                <span style="display: block; font-size: 0.76rem; color: #1e40af; opacity: 0.9;"><span class="lang-en">Opens the RE/MAX MÁS Agent tab with Nationality &amp; Regional Market selector</span><span class="lang-es">Abre directamente el registro de Agente RE/MAX MÁS para elegir País/Nacionalidad y Región</span></span>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <button type="button" class="btn btn-outline btn-sm" id="admin-dash-copy-mas-agent-link" style="border-color: #003f99; color: #003f99; background: #fff;">
+                📋 <span class="lang-en">Copy RE/MAX MÁS Link</span><span class="lang-es">Copiar Link Agente MÁS</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Global Regional Overview Section -->
+        <div class="dashboard-section">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+            <div>
+              <h2 style="margin:0;">🌍 <span class="lang-en">International Regions &amp; RE/MAX MÁS Coverage</span><span class="lang-es">Visión Global por Regiones y Agentes RE/MAX MÁS</span></h2>
+              <p style="font-size:0.82rem; color:var(--text-secondary); margin:4px 0 0;">
+                <span class="lang-en">Segmented CRM databases, active RE/MAX MÁS agents, partners, buyers, and webinars by region. Click a region to filter directly.</span>
+                <span class="lang-es">Bases de datos segmentadas por región, agentes RE/MAX MÁS asignados, realtors, clientes y webinarios. Haz clic en una región para filtrar.</span>
+              </p>
+            </div>
+          </div>
+          <div id="admin-regional-overview-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px;"></div>
         </div>
 
         <div class="dashboard-section">
@@ -715,32 +744,42 @@
             <span id="admin-user-count">0</span> <span class="lang-en">Users</span><span class="lang-es">Usuarios</span>
           </div>
         </div>
-        <div class="dashboard-filters">
-          <div class="form-group" style="margin-bottom:0;">
-            <input type="text" id="admin-search-input" placeholder="Search by name or email..." class="form-input">
+        <div class="dashboard-filters" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <div class="form-group" style="margin-bottom:0; flex:1; min-width:210px;">
+            <input type="text" id="admin-search-input" placeholder="🔍 Buscar por nombre, email, agencia o país..." class="form-input">
           </div>
-          <div class="form-group" style="margin-bottom:0;">
+          <div class="form-group" style="margin-bottom:0; min-width:175px;">
             <select id="admin-filter-role" class="form-select">
-              <option value="">All Roles</option>
+              <option value="">All Roles / Todos los Roles</option>
               <option value="embajador">👑 Embajadores / Ambassadors</option>
               <option value="broker">🏢 Brokers</option>
               <option value="realtor">🏠 Realtors / Agentes</option>
               <option value="colaborador">🤝 Colaboradores</option>
-              <option value="agent_inmomas">🇪🇸 Agentes Inmomás</option>
+              <option value="agent_inmomas">🇪🇸 Agentes RE/MAX MÁS</option>
             </select>
           </div>
-          <div class="form-group" style="margin-bottom:0;">
+          <div class="form-group" style="margin-bottom:0; min-width:190px;">
+            <select id="admin-filter-region" class="form-select">
+              <option value="">🌍 Todas las Regiones</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0; min-width:165px;">
+            <select id="admin-filter-country" class="form-select">
+              <option value="">🏳️ Todos los Países</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0; min-width:140px;">
             <select id="admin-filter-status" class="form-select">
               <option value="">All Status</option>
               <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
+              <option value="active">Active / Approved</option>
               <option value="rejected">Rejected</option>
             </select>
           </div>
         </div>
         <div class="data-table-container">
           <table class="data-table data-table--medium">
-            <thead><tr><th><span class="lang-en">User</span><span class="lang-es">Usuario</span></th><th>Email</th><th><span class="lang-en">Agency</span><span class="lang-es">Agencia</span></th><th><span class="lang-en">Role</span><span class="lang-es">Rol</span></th><th>Status</th><th><span class="lang-en">Webinar</span><span class="lang-es">Webinario</span></th><th><span class="lang-en">Source/Agent</span><span class="lang-es">Origen/Agente</span></th><th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th><th><span class="lang-en">Actions</span><span class="lang-es">Acciones</span></th></tr></thead>
+            <thead><tr><th><span class="lang-en">User</span><span class="lang-es">Usuario</span></th><th>Email</th><th><span class="lang-en">Agency</span><span class="lang-es">Agencia</span></th><th><span class="lang-en">Role</span><span class="lang-es">Rol</span></th><th><span class="lang-en">Region &amp; Country</span><span class="lang-es">Región / Nacionalidad</span></th><th>Status</th><th><span class="lang-en">Webinar</span><span class="lang-es">Webinario</span></th><th><span class="lang-en">Source/Agent</span><span class="lang-es">Origen/Agente</span></th><th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th><th><span class="lang-en">Actions</span><span class="lang-es">Acciones</span></th></tr></thead>
             <tbody id="admin-users-table-body"></tbody>
           </table>
         </div>
@@ -763,15 +802,25 @@
           </div>
         </div>
         <div class="dashboard-filters" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-          <div class="form-group" style="margin-bottom:0; flex:1; min-width:240px;">
+          <div class="form-group" style="margin-bottom:0; flex:1; min-width:220px;">
             <input type="text" id="admin-unified-search" placeholder="🔍 Buscar por nombre, email, teléfono, agencia, país o agente..." class="form-input">
           </div>
-          <div class="form-group" style="margin-bottom:0; min-width:200px;">
+          <div class="form-group" style="margin-bottom:0; min-width:190px;">
+            <select id="admin-unified-filter-region" class="form-select">
+              <option value="">🌍 Todas las Regiones</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0; min-width:165px;">
+            <select id="admin-unified-filter-country" class="form-select">
+              <option value="">🏳️ Todos los Países</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0; min-width:190px;">
             <select id="admin-unified-filter-agent" class="form-select">
               <option value="">👤 Todos los Agentes / Referidos</option>
             </select>
           </div>
-          <div class="form-group" style="margin-bottom:0; min-width:180px;">
+          <div class="form-group" style="margin-bottom:0; min-width:175px;">
             <select id="admin-unified-filter-status" class="form-select">
               <option value="">📊 Todos los Estados</option>
               <option value="Ambos">Ambos (Plataforma + Webinar)</option>
@@ -822,17 +871,26 @@
             </button>
           </div>
         </div>
-        <!-- Client Pipeline Search & Quick Summary Bar -->
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; background: var(--bg-card); padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);">
+        <!-- Client Pipeline Search, Region/Country & Agent Filters -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; background: var(--bg-card); padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);">
           <div style="display: flex; gap: 10px; align-items: center;">
             <span style="font-size: 1.2rem;">🇪🇸</span>
             <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary);">
-              <span class="lang-en">Spain Buyers & Investors</span><span class="lang-es">Compradores e Inversores en España</span>
+              <span class="lang-en">Spain Buyers &amp; Investors</span><span class="lang-es">Compradores e Inversores</span>
             </div>
             <span class="badge badge--approved" id="admin-client-count-badge" style="font-size: 0.8rem; font-weight: 700; padding: 3px 10px; border-radius: 999px;">0 clientes</span>
           </div>
-          <div style="display: flex; gap: 8px; align-items: center; min-width: 280px; flex: 1; max-width: 450px;">
-            <input type="text" id="admin-client-search-input" placeholder="Buscar cliente por nombre, email o zona..." class="form-input" style="margin-bottom: 0; padding: 7px 12px; font-size: 0.85rem; border-radius: 8px; width: 100%;">
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; flex: 1; justify-content: flex-end;">
+            <select id="admin-client-filter-region" class="form-select" style="margin-bottom:0; min-width:185px; padding:7px 10px; font-size:0.84rem; border-radius:8px;">
+              <option value="">🌍 Todas las Regiones</option>
+            </select>
+            <select id="admin-client-filter-country" class="form-select" style="margin-bottom:0; min-width:155px; padding:7px 10px; font-size:0.84rem; border-radius:8px;">
+              <option value="">🏳️ Todos los Países</option>
+            </select>
+            <select id="admin-client-filter-agent" class="form-select" style="margin-bottom:0; min-width:185px; padding:7px 10px; font-size:0.84rem; border-radius:8px;">
+              <option value="">🇪🇸 Todos los Agentes MÁS</option>
+            </select>
+            <input type="text" id="admin-client-search-input" placeholder="🔍 Buscar por nombre, email, zona..." class="form-input" style="margin-bottom: 0; padding: 7px 12px; font-size: 0.85rem; border-radius: 8px; min-width: 210px; flex: 1; max-width: 300px;">
           </div>
         </div>
 
@@ -974,7 +1032,16 @@
                   <option value="broker"><span class="lang-en">Brokers Only</span><span class="lang-es">Solo Brokers</span></option>
                   <option value="realtor"><span class="lang-en">Realtors Only</span><span class="lang-es">Solo Realtors</span></option>
                   <option value="colaborador"><span class="lang-en">Collaborators Only</span><span class="lang-es">Solo Colaboradores</span></option>
-                  <option value="agent_inmomas"><span class="lang-en">Agentes Inmomás Only</span><span class="lang-es">Solo Agentes Inmomás</span></option>
+                  <option value="agent_inmomas"><span class="lang-en">RE/MAX MÁS Agents Only</span><span class="lang-es">Solo Agentes RE/MAX MÁS</span></option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 18px;">
+                <label for="nl-region" style="font-weight: 600; margin-bottom: 8px; display: block;">
+                  🌍 <span class="lang-en">Target Region / Market</span><span class="lang-es">Región / Mercado Destinatario</span>
+                </label>
+                <select id="nl-region" class="form-control" style="width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border-light); font-size: 0.95rem;">
+                  <option value="">🌍 Todas las Regiones / All Regions</option>
                 </select>
               </div>
 
@@ -1070,6 +1137,29 @@
 
         <!-- ── WEBINAR SWITCH & CONFIGURATION CONTROL CARD ── -->
         <div class="dashboard-card" style="background:#fff;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 10px 25px -5px rgba(0,0,0,0.05);padding:24px;margin-bottom:28px;">
+
+          <!-- Parallel Regional Selector Bar -->
+          <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f3f4f6;">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+              <div>
+                <div style="font-size:0.76rem;font-weight:800;color:#003f99;text-transform:uppercase;letter-spacing:0.08em;">
+                  🌍 <span class="lang-en">Parallel Regional Webinars</span><span class="lang-es">Webinarios en Paralelo por Región / Mercado</span>
+                </div>
+                <div style="font-size:0.9rem;color:#4b5563;margin-top:2px;">
+                  <span class="lang-en">Configure independent dates, languages, and B2B/B2C tracks for each international region in parallel:</span>
+                  <span class="lang-es">Configura fechas, idiomas y modalidad (B2B / B2C) independientes para cada región internacional en paralelo:</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;background:#f8fafc;border:1px solid #e2e8f0;padding:5px 10px;border-radius:8px;font-size:0.78rem;">
+                <span style="font-weight:700;color:#334155;">🔗 <span class="lang-en">Region Link:</span><span class="lang-es">Link Región:</span></span>
+                <code id="admin-webinar-regional-link" style="color:#003f99;font-weight:600;">https://thespainconnection.com/index.html#webinar?region=north_america</code>
+                <button type="button" class="btn btn-outline btn-xs" style="padding:2px 8px;font-size:0.73rem;" onclick="App.utils.copyToClipboard(document.getElementById('admin-webinar-regional-link').textContent)">📋</button>
+              </div>
+            </div>
+            <div id="admin-webinar-region-tabs" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+            <!-- Parallel Summary Strip -->
+            <div id="admin-webinar-parallel-strip" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:8px;margin-top:12px;"></div>
+          </div>
           
           <!-- Mode Switch Bar -->
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f3f4f6;">
@@ -1131,6 +1221,23 @@
                   🔥 <span class="lang-en">Available Spots (Urgency Badge) *</span><span class="lang-es">Plazas Disponibles (Urgencia) *</span>
                 </label>
                 <input type="number" id="admin-webinar-spots" min="5" max="500" required class="form-input" style="font-weight:600;" value="25">
+              </div>
+
+              <div class="form-group">
+                <label for="admin-webinar-language" style="display:block;font-size:0.82rem;font-weight:700;color:#374151;margin-bottom:6px;">
+                  🗣️ <span class="lang-en">Webinar Language *</span><span class="lang-es">Idioma del Webinario *</span>
+                </label>
+                <select id="admin-webinar-language" class="form-select" style="font-weight:600;">
+                  <option value="en">🇬🇧 Inglés (English)</option>
+                  <option value="es">🇪🇸 Español (Spanish)</option>
+                  <option value="fr">🇫🇷 Francés (Français)</option>
+                  <option value="de">🇩🇪 Alemán (Deutsch)</option>
+                  <option value="nl">🇳🇱 Neerlandés (Nederlands)</option>
+                  <option value="pl">🇵🇱 Polaco (Polski)</option>
+                  <option value="uk">🇺🇦 Ucraniano / Ruso</option>
+                  <option value="ar">🇦🇪 Árabe / Persa (MENA)</option>
+                  <option value="bilingual">🌐 Bilingüe (ES / EN)</option>
+                </select>
               </div>
             </div>
 
@@ -1212,9 +1319,18 @@
               </button>
             </div>
 
-            <!-- Search Filter -->
-            <div style="min-width:240px;">
-              <input type="text" id="admin-webinar-search" oninput="App.views.admin.searchWebinarTable(this.value)" placeholder="🔍 Buscar por nombre, email, país..." class="form-input" style="font-size:0.85rem;padding:7px 14px;border-radius:8px;">
+            <!-- Region, Country, Agent & Search Filters -->
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;flex:1;justify-content:flex-end;">
+              <select id="webinar-filter-region" onchange="App.views.admin.setWebinarRegionFilter(this.value)" class="form-select" style="font-size:0.84rem;padding:7px 10px;border-radius:8px;min-width:185px;margin-bottom:0;">
+                <option value="">🌍 Todas las Regiones</option>
+              </select>
+              <select id="webinar-filter-country" onchange="App.views.admin.setWebinarCountryFilter(this.value)" class="form-select" style="font-size:0.84rem;padding:7px 10px;border-radius:8px;min-width:155px;margin-bottom:0;">
+                <option value="">🏳️ Todos los Países</option>
+              </select>
+              <select id="webinar-filter-agent" onchange="App.views.admin.setWebinarAgentFilter(this.value)" class="form-select" style="font-size:0.84rem;padding:7px 10px;border-radius:8px;min-width:180px;margin-bottom:0;">
+                <option value="">👤 Todos los Agentes</option>
+              </select>
+              <input type="text" id="admin-webinar-search" oninput="App.views.admin.searchWebinarTable(this.value)" placeholder="🔍 Buscar por nombre, email, país..." class="form-input" style="font-size:0.85rem;padding:7px 14px;border-radius:8px;min-width:210px;margin-bottom:0;">
             </div>
           </div>
 
@@ -1228,7 +1344,7 @@
                   <th>Email</th>
                   <th><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></th>
                   <th><span class="lang-en">Agency / Goal</span><span class="lang-es">Agencia / Interés</span></th>
-                  <th><span class="lang-en">Country / State</span><span class="lang-es">País / Estado</span></th>
+                  <th><span class="lang-en">Region &amp; Country</span><span class="lang-es">Región / País</span></th>
                   <th><span class="lang-en">How Heard</span><span class="lang-es">Origen</span></th>
                   <th><span class="lang-en">Referrer Agent</span><span class="lang-es">Agente Referente</span></th>
                   <th><span class="lang-en">Actions</span><span class="lang-es">Acciones</span></th>
@@ -1336,6 +1452,7 @@
           <h1><span class="lang-en">Broker Dashboard</span><span class="lang-es">Panel de Broker</span></h1>
           <p class="dashboard-subtitle" id="broker-welcome"></p>
         </div>
+        <div id="broker-regional-banner" style="display:none; margin-bottom: 1.25rem;"></div>
         <div id="broker-agreement-warning" style="display:none; margin-bottom: 1.5rem;"></div>
         <div class="stat-cards-grid stat-cards-grid--4cols">
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">👥</div><div class="stat-card__body"><div class="stat-card__value" id="broker-stat-realtors">0</div><div class="stat-card__label"><span class="lang-en">My Realtors</span><span class="lang-es">Mis Agentes</span></div></div></div>
@@ -1434,6 +1551,7 @@
           <h1><span class="lang-en">My Dashboard</span><span class="lang-es">Mi Panel</span></h1>
           <p class="dashboard-subtitle" id="realtor-welcome"></p>
         </div>
+        <div id="realtor-regional-banner" style="display:none; margin-bottom: 1.25rem;"></div>
         <div id="realtor-agreement-warning" style="display:none; margin-bottom: 1.5rem;"></div>
         <div class="stat-cards-grid stat-cards-grid--4cols">
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🤝</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Referred Clients</span><span class="lang-es">Clientes Referidos</span></div></div></div>
@@ -1594,9 +1712,10 @@
     <div id="view-agent-dashboard" class="app-view">
       <div class="dashboard-content">
         <div class="dashboard-header">
-          <h1><span class="lang-en">My Dashboard</span><span class="lang-es">Mi Panel</span></h1>
+          <h1><span class="lang-en">RE/MAX MÁS Regional CRM</span><span class="lang-es">Mi Panel Regional RE/MAX MÁS</span></h1>
           <p class="dashboard-subtitle" id="agent-welcome"></p>
         </div>
+        <div id="agent-regional-banner" style="display:none; margin-bottom: 1.5rem;"></div>
         <div class="stat-cards-grid stat-cards-grid--4cols">
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🤝</div><div class="stat-card__body"><div class="stat-card__value" id="agent-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Assigned Clients</span><span class="lang-es">Clientes Asignados</span></div></div></div>
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🔄</div><div class="stat-card__body"><div class="stat-card__value" id="agent-stat-active">0</div><div class="stat-card__label"><span class="lang-en">Active Funnel</span><span class="lang-es">Embudo Activo</span></div></div></div>
@@ -1667,7 +1786,15 @@
     <!-- ==================== VIEW: AGENT CLIENTS (interactive Kanban) ==================== -->
     <div id="view-agent-clients" class="app-view">
       <div class="dashboard-content">
-        <div class="dashboard-header"><h1><span class="lang-en">My Clients</span><span class="lang-es">Mis Clientes</span></h1></div>
+        <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <h1><span class="lang-en">My Clients</span><span class="lang-es">Mis Clientes</span></h1>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <select id="agent-client-filter-region" class="form-select" onchange="App.views.agentInmomas.filterClients()" style="margin-bottom:0; min-width:180px; font-size:0.85rem; padding:7px 10px;">
+              <option value="">🌍 Todas las Regiones</option>
+            </select>
+            <input type="text" id="agent-client-search" class="form-input" oninput="App.views.agentInmomas.filterClients()" placeholder="🔍 Buscar cliente o país..." style="margin-bottom:0; min-width:200px; font-size:0.85rem; padding:7px 12px;">
+          </div>
+        </div>
         <div id="agent-pipeline-board" class="pipeline-board"></div>
       </div>
     </div>
@@ -1707,9 +1834,25 @@
     <!-- ==================== VIEW: AGENT PARTNERS ==================== -->
     <div id="view-agent-partners" class="app-view">
       <div class="dashboard-content">
-        <div class="dashboard-header">
-          <h1>🤝 <span class="lang-en">My Realtors / Partners</span><span class="lang-es">Mis Realtors / Partners</span></h1>
-          <p class="dashboard-subtitle"><span class="lang-en">Brokers and Realtors assigned to you or registered through your link</span><span class="lang-es">Brokers y Realtors bajo tu paraguas o registrados por tu enlace</span></p>
+        <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h1>🤝 <span class="lang-en">My Realtors / Partners</span><span class="lang-es">Mis Realtors / Partners</span></h1>
+            <p class="dashboard-subtitle"><span class="lang-en">Brokers and Realtors assigned to you or registered through your link, segmented by region &amp; country</span><span class="lang-es">Brokers y Realtors bajo tu paraguas o registrados por tu enlace, segmentados por región y país</span></p>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" onclick="App.views.agentInmomas.exportPartnersToExcel()">
+            📥 <span class="lang-en">Export Partners</span><span class="lang-es">Exportar Partners</span>
+          </button>
+        </div>
+
+        <div class="dashboard-filters" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
+          <div class="form-group" style="margin-bottom:0; min-width:190px;">
+            <select id="agent-partners-filter-region" class="form-select" onchange="App.views.agentInmomas.renderPartners()">
+              <option value="">🌍 Todas las Regiones</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0; flex:1; min-width:210px;">
+            <input type="text" id="agent-partners-search" class="form-input" oninput="App.views.agentInmomas.renderPartners()" placeholder="🔍 Buscar por nombre, agencia o país...">
+          </div>
         </div>
 
         <div class="dashboard-section">
@@ -1720,6 +1863,7 @@
                   <th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
                   <th><span class="lang-en">Name</span><span class="lang-es">Nombre</span></th>
                   <th><span class="lang-en">Role</span><span class="lang-es">Rol</span></th>
+                  <th><span class="lang-en">Region &amp; Country</span><span class="lang-es">Región / País</span></th>
                   <th>Email</th>
                   <th><span class="lang-en">Agency</span><span class="lang-es">Agencia</span></th>
                   <th><span class="lang-en">Status</span><span class="lang-es">Estado</span></th>
@@ -1737,12 +1881,35 @@
     <!-- ==================== VIEW: AGENT WEBINAR ==================== -->
     <div id="view-agent-webinar" class="app-view">
       <div class="dashboard-content">
-        <div class="dashboard-header">
-          <h1>🎙️ <span class="lang-en">My Webinar Registrations</span><span class="lang-es">Mis Registrados al Webinar</span></h1>
-          <p class="dashboard-subtitle">
-            <span class="lang-en">Realtors and Brokers who registered to the webinar using your referral link or mentioning your name.</span>
-            <span class="lang-es">Agentes y Brokers registrados al webinar usando tu enlace o mencionando tu nombre.</span>
-          </p>
+        <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h1>🎙️ <span class="lang-en">My Webinar Registrations</span><span class="lang-es">Mis Registrados al Webinar</span></h1>
+            <p class="dashboard-subtitle">
+              <span class="lang-en">Realtors (B2B) and Clients (B2C) registered to webinars across your assigned regions.</span>
+              <span class="lang-es">Realtors (B2B) y Clientes (B2C) inscritos a webinarios en tus regiones asignadas.</span>
+            </p>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" onclick="App.views.agentInmomas.exportWebinarToExcel()">
+            📥 <span class="lang-en">Export Registrations</span><span class="lang-es">Exportar Inscritos</span>
+          </button>
+        </div>
+
+        <div class="dashboard-filters" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
+          <div class="form-group" style="margin-bottom:0; min-width:160px;">
+            <select id="agent-webinar-filter-type" class="form-select" onchange="App.views.agentInmomas.renderWebinarRegistrations()">
+              <option value="all">🎙️ Todos (B2B + B2C)</option>
+              <option value="b2b">🏢 B2B Realtors / Brokers</option>
+              <option value="b2c">🏡 B2C Clientes Finales</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0; min-width:190px;">
+            <select id="agent-webinar-filter-region" class="form-select" onchange="App.views.agentInmomas.renderWebinarRegistrations()">
+              <option value="">🌍 Todas las Regiones</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0; flex:1; min-width:200px;">
+            <input type="text" id="agent-webinar-search" class="form-input" oninput="App.views.agentInmomas.renderWebinarRegistrations()" placeholder="🔍 Buscar por nombre, email o país...">
+          </div>
         </div>
 
         <div class="dashboard-section">
@@ -1751,14 +1918,16 @@
               <thead>
                 <tr>
                   <th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
+                  <th><span class="lang-en">Type</span><span class="lang-es">Tipo</span></th>
                   <th><span class="lang-en">Name</span><span class="lang-es">Nombre</span></th>
+                  <th><span class="lang-en">Region &amp; Country</span><span class="lang-es">Región / País</span></th>
                   <th><span class="lang-en">Email</span><span class="lang-es">Correo</span></th>
-                  <th><span class="lang-en">Agency</span><span class="lang-es">Agencia</span></th>
+                  <th><span class="lang-en">Agency / Goal</span><span class="lang-es">Agencia / Interés</span></th>
                   <th><span class="lang-en">Source</span><span class="lang-es">Origen</span></th>
                 </tr>
               </thead>
               <tbody id="agent-webinar-table-body">
-                <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;"><span class="lang-en">Loading...</span><span class="lang-es">Cargando...</span></td></tr>
+                <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 1.5rem;"><span class="lang-en">Loading...</span><span class="lang-es">Cargando...</span></td></tr>
               </tbody>
             </table>
           </div>
@@ -1876,8 +2045,12 @@
                     <p id="profile-phone" class="profile-value">—</p>
                   </div>
                   <div>
-                    <label class="profile-label">Country</label>
+                    <label class="profile-label"><span class="lang-en">Country / Nationality</span><span class="lang-es">País / Nacionalidad</span></label>
                     <p id="profile-country" class="profile-value">—</p>
+                  </div>
+                  <div style="grid-column: span 2;">
+                    <label class="profile-label"><span class="lang-en">Active Market Region(s)</span><span class="lang-es">Región(es) Comercial(es) Asignada(s)</span></label>
+                    <div id="profile-regions" style="margin-top:4px; display:flex; gap:6px; flex-wrap:wrap;">—</div>
                   </div>
                   <div>
                     <label class="profile-label">Joined Date</label>
@@ -1919,9 +2092,19 @@
                       <input type="text" id="edit-agencyName">
                     </div>
                     <div class="profile-form-group">
-                      <label for="edit-country"><span class="lang-en">Country</span><span class="lang-es">País</span></label>
-                      <input type="text" id="edit-country">
+                      <label for="edit-country"><span class="lang-en">Country of Residence</span><span class="lang-es">País de Residencia / Agencia</span></label>
+                      <select id="edit-country" class="form-select"></select>
                     </div>
+                    <div class="profile-form-group" id="group-edit-nationality" style="display:none;">
+                      <label for="edit-nationality"><span class="lang-en">Nationality / Origin Country (RE/MAX MÁS)</span><span class="lang-es">Nacionalidad / País de Origen (RE/MAX MÁS)</span></label>
+                      <select id="edit-nationality" class="form-select"></select>
+                    </div>
+                  </div>
+                  <div id="group-edit-mas-regions" style="display:none; margin-top:14px; padding:12px 14px; border-radius:10px; background:rgba(0,63,153,0.04); border:1px solid rgba(0,63,153,0.18);">
+                    <label style="font-weight:700; color:#003f99; display:block; margin-bottom:4px; font-size:0.88rem;">
+                      🌍 <span class="lang-en">Target Region(s) You Operate In (RE/MAX MÁS)</span><span class="lang-es">Región(es) Comercial(es) que Trabajas (RE/MAX MÁS)</span>
+                    </label>
+                    <div id="edit-mas-regions-checkboxes"></div>
                   </div>
                   <div class="profile-actions-bar">
                     <button type="submit" class="btn btn-primary" id="profile-btn-save">
@@ -1976,6 +2159,7 @@
           <div id="embajador-dash-add-client-btn"></div>
         </div>
 
+        <div id="embajador-regional-banner" style="display:none; margin-bottom:1.25rem;"></div>
         <div id="embajador-agreement-warning" style="display:none; margin-bottom:1.5rem;"></div>
 
         <!-- Umbrella KPI Cards -->
@@ -2096,6 +2280,11 @@
         <div class="dashboard-filters" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
           <div class="form-group" style="margin-bottom:0; flex:1; min-width:220px;">
             <input type="text" class="form-input" placeholder="🔍 Buscar por nombre, email, agencia, país o código..." oninput="App.views.embajador.searchNetwork(this.value)">
+          </div>
+          <div class="form-group" style="margin-bottom:0; min-width:185px;">
+            <select id="emb-net-region-select" class="form-select" onchange="App.views.embajador.setNetworkRegionFilter(this.value)">
+              <option value="">🌍 Todas las Regiones</option>
+            </select>
           </div>
           <div class="form-group" style="margin-bottom:0; min-width:180px;">
             <select class="form-select" onchange="App.views.embajador.setNetworkStatusFilter(this.value)">
@@ -2227,8 +2416,13 @@
             <button type="button" class="btn btn-outline btn-sm" onclick="App.views.embajador.setWebinarFilter('b2b')">🏢 B2B</button>
             <button type="button" class="btn btn-outline btn-sm" onclick="App.views.embajador.setWebinarFilter('b2c')">🏡 B2C</button>
           </div>
+          <div class="form-group" style="margin-bottom:0; min-width:185px;">
+            <select id="emb-webinar-region-select" class="form-select" onchange="App.views.embajador.setWebinarRegionFilter(this.value)">
+              <option value="">🌍 Todas las Regiones</option>
+            </select>
+          </div>
           <div class="form-group" style="margin-bottom:0; flex:1; min-width:220px;">
-            <input type="text" class="form-input" placeholder="🔍 Buscar asistente por nombre, email o referidor..." oninput="App.views.embajador.searchWebinar(this.value)">
+            <input type="text" class="form-input" placeholder="🔍 Buscar asistente por nombre, email, país o referidor..." oninput="App.views.embajador.searchWebinar(this.value)">
           </div>
         </div>
 

@@ -1552,6 +1552,19 @@
                     </span>
                   </div>
                 </label>
+                <label class="role-card">
+                  <input type="radio" name="register-role" value="agent_inmomas" id="register-role-agent-mas">
+                  <div class="role-card__content">
+                    <span class="role-card__icon">🇪🇸</span>
+                    <span class="role-card__title">Agente RE/MAX MÁS</span>
+                    <span class="role-card__desc">
+                      <span class="lang-en">RE/MAX MÁS team agent</span>
+                      <span class="lang-es">Agente del equipo RE/MAX MÁS</span>
+                      <span class="lang-fr">Agent de l'équipe RE/MAX MÁS</span>
+                      <span class="lang-en-ca">RE/MAX MÁS team agent</span>
+                    </span>
+                  </div>
+                </label>
               </div>
             </div>
             <div class="form-row">
@@ -1614,22 +1627,82 @@
                 <input type="password" id="register-password" placeholder="Min. 6 characters" required>
               </div>
               <div class="form-group">
-                <label for="register-country">
-                  <span class="lang-en">Country</span>
-                  <span class="lang-es">País</span>
-                  <span class="lang-fr">Pays</span>
-                  <span class="lang-en-ca">Country</span>
+                <label for="register-country" id="register-country-label">
+                  <span class="lang-en">Country / Nationality</span>
+                  <span class="lang-es">País / Nacionalidad</span>
+                  <span class="lang-fr">Pays / Nationalité</span>
+                  <span class="lang-en-ca">Country / Nationality</span> *
                 </label>
                 <select id="register-country">
-                  <option value="United States">United States</option>
-                  <option value="Canada">Canada</option>
-                  <option value="United Kingdom">United Kingdom</option>
-                  <option value="Germany">Germany</option>
-                  <option value="France">France</option>
-                  <option value="Netherlands">Netherlands</option>
-                  <option value="Other">Other</option>
+                  <optgroup label="🌎 Norteamérica / North America">
+                    <option value="United States">United States</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Puerto Rico">Puerto Rico</option>
+                  </optgroup>
+                  <optgroup label="🌎 Latinoamérica y Caribe / Latin America">
+                    <option value="Mexico">Mexico</option>
+                    <option value="Colombia">Colombia</option>
+                    <option value="Argentina">Argentina</option>
+                    <option value="Chile">Chile</option>
+                    <option value="Peru">Peru</option>
+                    <option value="Panama">Panama</option>
+                    <option value="Costa Rica">Costa Rica</option>
+                    <option value="Dominican Republic">Dominican Republic</option>
+                    <option value="Uruguay">Uruguay</option>
+                    <option value="Brazil">Brazil</option>
+                  </optgroup>
+                  <optgroup label="🇪🇺 Europa Occidental / Western Europe">
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="Ireland">Ireland</option>
+                    <option value="France">France</option>
+                    <option value="Belgium">Belgium</option>
+                    <option value="Switzerland">Switzerland</option>
+                    <option value="Germany">Germany</option>
+                    <option value="Austria">Austria</option>
+                    <option value="Netherlands">Netherlands</option>
+                    <option value="Sweden">Sweden</option>
+                    <option value="Norway">Norway</option>
+                    <option value="Denmark">Denmark</option>
+                    <option value="Italy">Italy</option>
+                    <option value="Portugal">Portugal</option>
+                    <option value="Spain">Spain</option>
+                  </optgroup>
+                  <optgroup label="🌍 Europa del Este / Eastern Europe">
+                    <option value="Poland">Poland</option>
+                    <option value="Ukraine">Ukraine</option>
+                    <option value="Romania">Romania</option>
+                    <option value="Czech Republic">Czech Republic</option>
+                    <option value="Hungary">Hungary</option>
+                    <option value="Estonia">Estonia</option>
+                    <option value="Lithuania">Lithuania</option>
+                  </optgroup>
+                  <optgroup label="🌍 Oriente Medio / MENA &amp; Otros">
+                    <option value="United Arab Emirates">United Arab Emirates</option>
+                    <option value="Saudi Arabia">Saudi Arabia</option>
+                    <option value="Qatar">Qatar</option>
+                    <option value="Israel">Israel</option>
+                    <option value="Iran">Iran</option>
+                    <option value="Morocco">Morocco</option>
+                    <option value="Other">Other</option>
+                  </optgroup>
                 </select>
               </div>
+            </div>
+            <!-- RE/MAX MÁS Agent Regional Assignment (shown when Agente RE/MAX MÁS is selected) -->
+            <div class="form-group" id="register-mas-regions-group" style="display:none; background:rgba(0,63,153,0.04); border:1px solid rgba(0,63,153,0.18); border-radius:12px; padding:14px 16px; margin-bottom:16px;">
+              <label style="font-weight:700; color:#003f99; display:block; margin-bottom:4px;">
+                🌍 <span class="lang-en">Target Region(s) You Belong To / Operate In (RE/MAX MÁS) *</span>
+                <span class="lang-es">Región(es) a la(s) que Perteneces / Trabajas (RE/MAX MÁS) *</span>
+                <span class="lang-fr">Région(s) Cible(s) (RE/MAX MÁS) *</span>
+                <span class="lang-en-ca">Target Region(s) You Operate In (RE/MAX MÁS) *</span>
+              </label>
+              <small style="color:var(--text-secondary); display:block; margin-bottom:8px;">
+                <span class="lang-en">Select one or more regions so webinars, clients, and CRM databases match your cultural/language market.</span>
+                <span class="lang-es">Selecciona una o varias regiones para agrupar tus webinarios, clientes y bases de datos según tu enfoque cultural e idioma.</span>
+                <span class="lang-fr">Sélectionnez une ou plusieurs régions pour regrouper vos webinaires et clients.</span>
+                <span class="lang-en-ca">Select one or more regions so webinars, clients, and CRM databases match your market.</span>
+              </small>
+              <div id="register-mas-regions-checkboxes"></div>
             </div>
             <!-- Broker selection (for Realtors) -->
             <div class="form-group" id="broker-select-group">
@@ -2047,25 +2120,70 @@
                 </div>
               </div>
             </div>
-            <!-- Professional fields (shown when realtor/broker type is selected) -->
+            <!-- Professional fields (shown when realtor/broker/agent_inmomas/embajador/colaborador type is selected) -->
             <div id="referral-professional-fields" style="display: none;">
-              <div class="form-group">
-                <label>
-                  <span class="lang-en">Agency / Brokerage Name</span>
-                  <span class="lang-es">Nombre de la Agencia</span>
-                  <span class="lang-fr">Nom de l'agence</span>
-                  <span class="lang-en-ca">Agency / Brokerage Name</span>
-                </label>
-                <input type="text" id="referral-agencyName" placeholder="RE/MAX, Keller Williams...">
+              <div class="form-row">
+                <div class="form-group" id="referral-agency-group">
+                  <label>
+                    <span class="lang-en">Agency / Brokerage Name</span>
+                    <span class="lang-es">Nombre de la Agencia</span>
+                    <span class="lang-fr">Nom de l'agence</span>
+                    <span class="lang-en-ca">Agency / Brokerage Name</span>
+                  </label>
+                  <input type="text" id="referral-agencyName" placeholder="RE/MAX, Keller Williams...">
+                </div>
+                <div class="form-group">
+                  <label id="referral-prof-country-label">
+                    <span class="lang-en">Country / Nationality</span>
+                    <span class="lang-es">País / Nacionalidad</span>
+                    <span class="lang-fr">Pays / Nationalité</span>
+                    <span class="lang-en-ca">Country / Nationality</span> *
+                  </label>
+                  <select id="referral-prof-country">
+                    <option value="United States">United States</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Puerto Rico">Puerto Rico</option>
+                    <option value="Mexico">Mexico</option>
+                    <option value="Colombia">Colombia</option>
+                    <option value="Argentina">Argentina</option>
+                    <option value="Chile">Chile</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="France">France</option>
+                    <option value="Belgium">Belgium</option>
+                    <option value="Germany">Germany</option>
+                    <option value="Netherlands">Netherlands</option>
+                    <option value="Poland">Poland</option>
+                    <option value="Ukraine">Ukraine</option>
+                    <option value="United Arab Emirates">United Arab Emirates</option>
+                    <option value="Spain">Spain</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
               </div>
               <div class="form-group">
                 <label>
-                  <span class="lang-en">Zone of Influence</span>
-                  <span class="lang-es">Zona de Influencia</span>
-                  <span class="lang-fr">Zone d'influence</span>
-                  <span class="lang-en-ca">Zone of Influence</span>
+                  <span class="lang-en">City / Zone of Influence</span>
+                  <span class="lang-es">Ciudad / Zona de Influencia</span>
+                  <span class="lang-fr">Ville / Zone d'influence</span>
+                  <span class="lang-en-ca">City / Zone of Influence</span>
                 </label>
-                <input type="text" id="referral-market" placeholder="Miami, FL / New York, NY...">
+                <input type="text" id="referral-market" placeholder="Miami, FL / Bogotá / Paris / London...">
+              </div>
+              <!-- RE/MAX MÁS Agent Regions (shown when agent_inmomas tab is active) -->
+              <div id="referral-agent-mas-regions-wrap" style="display:none; background:rgba(0,63,153,0.04); border:1px solid rgba(0,63,153,0.18); border-radius:12px; padding:14px 16px; margin-bottom:14px;">
+                <label style="font-weight:700; color:#003f99; display:block; margin-bottom:4px;">
+                  🌍 <span class="lang-en">Region(s) You Belong To / Operate In (RE/MAX MÁS) *</span>
+                  <span class="lang-es">Región(es) Comercial(es) a la(s) que Perteneces / Trabajas (RE/MAX MÁS) *</span>
+                  <span class="lang-fr">Région(s) Cible(s) (RE/MAX MÁS) *</span>
+                  <span class="lang-en-ca">Region(s) You Operate In (RE/MAX MÁS) *</span>
+                </label>
+                <small style="color:var(--text-secondary); display:block; margin-bottom:6px;">
+                  <span class="lang-en">Select one or more market regions for your CRM view, webinars, and client assignments.</span>
+                  <span class="lang-es">Selecciona la región o regiones que gestionas para personalizar tu CRM, webinarios y asignación de clientes.</span>
+                  <span class="lang-fr">Sélectionnez vos régions cibles pour personnaliser votre CRM et vos webinaires.</span>
+                  <span class="lang-en-ca">Select one or more market regions for your CRM view.</span>
+                </small>
+                <div id="referral-agent-mas-regions-checkboxes"></div>
               </div>
             </div>
             <!-- Password Field (shown for professional registrations) -->
@@ -2592,10 +2710,53 @@
                       <span class="lang-en">Country *</span><span class="lang-es">Pa&iacute;s *</span><span class="lang-fr">Pays *</span><span class="lang-en-ca">Country *</span>
                     </label>
                     <select id="webinar-country" required class="form-input" style="cursor:pointer;">
-                      <option value="United States">&#x1F1FA;&#x1F1F8; United States</option>
-                      <option value="Canada">&#x1F1E8;&#x1F1E6; Canada</option>
-                      <option value="Puerto Rico">&#x1F1F5;&#x1F1F7; Puerto Rico</option>
-                      <option value="Other">&#x1F30E; Other / International</option>
+                      <optgroup label="🌎 North America / Norteamérica">
+                        <option value="United States">&#x1F1FA;&#x1F1F8; United States</option>
+                        <option value="Canada">&#x1F1E8;&#x1F1E6; Canada</option>
+                        <option value="Puerto Rico">&#x1F1F5;&#x1F1F7; Puerto Rico</option>
+                      </optgroup>
+                      <optgroup label="🌎 Latin America / Latinoamérica">
+                        <option value="Mexico">&#x1F1F2;&#x1F1FD; Mexico</option>
+                        <option value="Colombia">&#x1F1E8;&#x1F1F4; Colombia</option>
+                        <option value="Argentina">&#x1F1E6;&#x1F1F7; Argentina</option>
+                        <option value="Chile">&#x1F1E8;&#x1F1F1; Chile</option>
+                        <option value="Peru">&#x1F1F5;&#x1F1EA; Peru</option>
+                        <option value="Panama">&#x1F1F5;&#x1F1E6; Panama</option>
+                        <option value="Costa Rica">&#x1F1E8;&#x1F1F7; Costa Rica</option>
+                        <option value="Dominican Republic">&#x1F1E9;&#x1F1F4; Dominican Republic</option>
+                        <option value="Uruguay">&#x1F1FA;&#x1F1FE; Uruguay</option>
+                        <option value="Brazil">&#x1F1E7;&#x1F1F7; Brazil</option>
+                      </optgroup>
+                      <optgroup label="🇪🇺 Western Europe / Europa Occidental">
+                        <option value="United Kingdom">&#x1F1EC;&#x1F1E7; United Kingdom</option>
+                        <option value="Ireland">&#x1F1EE;&#x1F1EA; Ireland</option>
+                        <option value="France">&#x1F1EB;&#x1F1F7; France</option>
+                        <option value="Belgium">&#x1F1E7;&#x1F1EA; Belgium</option>
+                        <option value="Switzerland">&#x1F1E8;&#x1F1ED; Switzerland</option>
+                        <option value="Germany">&#x1F1E9;&#x1F1EA; Germany</option>
+                        <option value="Netherlands">&#x1F1F3;&#x1F1F1; Netherlands</option>
+                        <option value="Sweden">&#x1F1F8;&#x1F1EA; Sweden</option>
+                        <option value="Norway">&#x1F1F3;&#x1F1F4; Norway</option>
+                        <option value="Italy">&#x1F1EE;&#x1F1F9; Italy</option>
+                        <option value="Portugal">&#x1F1F5;&#x1F1F9; Portugal</option>
+                        <option value="Spain">&#x1F1EA;&#x1F1F8; Spain</option>
+                      </optgroup>
+                      <optgroup label="🌍 Eastern Europe / Europa del Este">
+                        <option value="Poland">&#x1F1F5;&#x1F1F1; Poland</option>
+                        <option value="Ukraine">&#x1F1FA;&#x1F1E6; Ukraine</option>
+                        <option value="Romania">&#x1F1F7;&#x1F1F4; Romania</option>
+                        <option value="Czech Republic">&#x1F1E8;&#x1F1FF; Czech Republic</option>
+                        <option value="Hungary">&#x1F1ED;&#x1F1FA; Hungary</option>
+                      </optgroup>
+                      <optgroup label="🌍 Middle East / MENA &amp; Other">
+                        <option value="United Arab Emirates">&#x1F1E6;&#x1F1EA; United Arab Emirates</option>
+                        <option value="Saudi Arabia">&#x1F1F8;&#x1F1E6; Saudi Arabia</option>
+                        <option value="Qatar">&#x1F1F6;&#x1F1E6; Qatar</option>
+                        <option value="Israel">&#x1F1EE;&#x1F1F1; Israel</option>
+                        <option value="Iran">&#x1F1EE;&#x1F1F7; Iran</option>
+                        <option value="Morocco">&#x1F1F2;&#x1F1E6; Morocco</option>
+                        <option value="Other">&#x1F30E; Other / International</option>
+                      </optgroup>
                     </select>
                   </div>
                   <div class="form-group">

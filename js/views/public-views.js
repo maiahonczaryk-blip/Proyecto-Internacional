@@ -159,6 +159,28 @@ App.views.public = {
     const requestedType = sessionStorage.getItem('referralType') || 'client';
     let selectedType = requestedType;
 
+    // Populate international country options & RE/MAX MÁS region checkboxes in #referral-professional-fields
+    const profCountrySel = document.getElementById('referral-prof-country');
+    const masRegionsWrap = document.getElementById('referral-agent-mas-regions-wrap');
+    const masRegionsCheckboxes = document.getElementById('referral-agent-mas-regions-checkboxes');
+    const inmomasAgentGroup = document.getElementById('referral-inmomas-agent-group');
+
+    if (profCountrySel && App.utils && App.utils.getCountryOptionsHtml) {
+      profCountrySel.innerHTML = App.utils.getCountryOptionsHtml('United States', false);
+    }
+    if (masRegionsCheckboxes && App.utils && App.utils.getRegionsCheckboxesHtml) {
+      masRegionsCheckboxes.innerHTML = App.utils.getRegionsCheckboxesHtml('referral-mas-region', ['north_america']);
+    }
+    if (profCountrySel && masRegionsCheckboxes && App.utils && App.utils.resolveRegionFromCountry) {
+      profCountrySel.addEventListener('change', () => {
+        const reg = App.utils.resolveRegionFromCountry(profCountrySel.value);
+        if (reg) {
+          const cb = masRegionsCheckboxes.querySelector(`input[value="${reg}"]`);
+          if (cb) cb.checked = true;
+        }
+      });
+    }
+
     // Toggle which field sections are visible and customize titles/banners
     function updateFieldVisibility(type) {
       const cf = document.getElementById('referral-client-fields');
@@ -170,10 +192,16 @@ App.views.public = {
       const formTitle = document.getElementById('referral-form-title');
       const welcomeMsg = document.getElementById('referral-welcome-msg');
       const submitBtn = document.getElementById('referral-submit-btn');
+      const agencyInp = document.getElementById('referral-agencyName');
 
       if (cf) cf.style.display = type === 'client' ? '' : 'none';
       if (pf) pf.style.display = type !== 'client' ? '' : 'none';
       if (pwGroup) pwGroup.style.display = type === 'client' ? 'none' : '';
+      if (masRegionsWrap) masRegionsWrap.style.display = type === 'agent_inmomas' ? 'block' : 'none';
+      if (inmomasAgentGroup) inmomasAgentGroup.style.display = type === 'agent_inmomas' ? 'none' : '';
+      if (type === 'agent_inmomas' && agencyInp && !agencyInp.value) {
+        agencyInp.value = 'RE/MAX MÁS';
+      }
 
       // Webinar Spotlight Banners:
       // Always hide past Realtor webinar banner. Only show Client webinar banner when type === 'client'.
@@ -258,6 +286,16 @@ App.views.public = {
         }
         if (submitBtn) {
           submitBtn.innerHTML = `<span class="lang-en">Apply as Ambassador</span><span class="lang-es">Postularse como Embajador</span><span class="lang-fr">Postuler comme Ambassadeur</span><span class="lang-en-ca">Apply as Ambassador</span>`;
+        }
+      } else if (type === 'agent_inmomas') {
+        if (formTitle) {
+          formTitle.innerHTML = `<span class="lang-en">RE/MAX MÁS Agent Registration</span><span class="lang-es">Registro de Agente RE/MAX MÁS</span><span class="lang-fr">Inscription Agent RE/MAX MÁS</span><span class="lang-en-ca">RE/MAX MÁS Agent Registration</span>`;
+        }
+        if (welcomeMsg) {
+          welcomeMsg.innerHTML = `<span class="lang-en">Select your nationality and target region(s) to activate your regional RE/MAX MÁS CRM</span><span class="lang-es">Indica tu nacionalidad y región(es) de mercado para activar tu panel regional de RE/MAX MÁS</span><span class="lang-fr">Indiquez votre nationalité et vos régions pour activer votre CRM RE/MAX MÁS</span><span class="lang-en-ca">Select your nationality and target region(s) to activate your RE/MAX MÁS CRM</span>`;
+        }
+        if (submitBtn) {
+          submitBtn.innerHTML = `<span class="lang-en">Register RE/MAX MÁS Agent</span><span class="lang-es">Registrar Agente RE/MAX MÁS</span><span class="lang-fr">Inscrire Agent RE/MAX MÁS</span><span class="lang-en-ca">Register RE/MAX MÁS Agent</span>`;
         }
       } else {
         if (formTitle) {
@@ -522,11 +560,11 @@ App.views.public = {
         },
         agent_inmomas: {
           icon: '🇪🇸',
-          badge: '',
-          labelEn: 'Inmomás Agent',
-          labelEs: 'Agente Inmomás',
-          labelFr: 'Agent Inmomás',
-          labelEnCa: 'Inmomás Agent'
+          badge: 'MÁS',
+          labelEn: 'RE/MAX MÁS Agent',
+          labelEs: 'Agente RE/MAX MÁS',
+          labelFr: 'Agent RE/MAX MÁS',
+          labelEnCa: 'RE/MAX MÁS Agent'
         },
         colaborador: {
           icon: '🤝',
@@ -799,12 +837,26 @@ App.views.public = {
             }
 
             agencyName = form.querySelector('#referral-agencyName')?.value.trim() || '';
-            if (!agencyName && referrer && referrer.role === 'broker' && referrer.agencyName) {
+            if (!agencyName && contactType === 'agent_inmomas') {
+              agencyName = 'RE/MAX MÁS';
+            } else if (!agencyName && referrer && referrer.role === 'broker' && referrer.agencyName) {
               agencyName = referrer.agencyName;
             }
             market = form.querySelector('#referral-market')?.value.trim() || '';
+            const profCountryVal = form.querySelector('#referral-prof-country')?.value.trim() || market || 'United States';
             const notes = form.querySelector('#referral-notes')?.value.trim() || '';
             const password = (form.querySelector('#referral-password')?.value || '').trim();
+
+            let selectedRegions = [];
+            if (contactType === 'agent_inmomas' && masRegionsCheckboxes) {
+              selectedRegions = Array.from(masRegionsCheckboxes.querySelectorAll('input[name="referral-mas-region"]:checked')).map(cb => cb.value);
+              if (selectedRegions.length === 0) {
+                throw new Error('Por favor selecciona al menos una Región comercial para tu cuenta RE/MAX MÁS.');
+              }
+            } else if (App.utils && App.utils.resolveRegionFromCountry) {
+              const inferred = App.utils.resolveRegionFromCountry(profCountryVal || market || '');
+              if (inferred) selectedRegions = [inferred];
+            }
 
             if (!password || password.length < 6) {
               throw new Error('Password must be at least 6 characters.');
@@ -815,7 +867,7 @@ App.views.public = {
               (agencyName && referrer.agencyName && agencyName.toLowerCase() === referrer.agencyName.toLowerCase())
             );
 
-            const resolvedEmbajadorId = (referrer && contactType !== 'embajador')
+            const resolvedEmbajadorId = (referrer && contactType !== 'embajador' && contactType !== 'agent_inmomas')
               ? (referrer.role === 'embajador' ? referrer.id : (referrer.embajadorId || null))
               : null;
 
@@ -827,14 +879,18 @@ App.views.public = {
               agencyName,
               agencyLogo: (sameOffice && referrer.agencyLogo) ? referrer.agencyLogo : null,
               phone,
-              country: market || 'United States',
+              country: profCountryVal,
+              nationality: profCountryVal,
+              market: market || '',
+              region: selectedRegions[0] || '',
+              regions: selectedRegions,
               role: contactType,
               brokerId: (referrer && referrer.role === 'broker' && contactType === 'realtor') ? referrer.id : null,
               embajadorId: resolvedEmbajadorId,
               referredByAdmin: Boolean(referrer && referrer.role === 'admin'),
-              referredBy: referrer ? referrer.id : (inmomasAgent || null),
-              inmomasAgentName: inmomasAgent || null,
-              notes: notes || '',
+              referredBy: contactType === 'agent_inmomas' ? null : (referrer ? referrer.id : (inmomasAgent || null)),
+              inmomasAgentName: contactType === 'agent_inmomas' ? null : (inmomasAgent || null),
+              notes: notes || (market ? `Zona: ${market}` : ''),
               termsAccepted: true,
               termsAcceptedAt: new Date().toISOString(),
               source: 'referral'
@@ -894,11 +950,30 @@ App.views.public = {
 
       if (!settings) return;
 
-      const activeType = settings.activeType || 'b2c';
-      const config = settings[activeType] || settings.b2c || {};
-      const dateStr = settings.date || config.date || '2026-09-18';
-      const timeStr = settings.time || config.time || '12:00';
-      const spots = settings.spotsAvailable || config.spots || 25;
+      // Resolve optional ?region= query parameter on #webinar?region=...
+      let requestedRegion = '';
+      try {
+        const hash = window.location.hash || '';
+        const qIdx = hash.indexOf('?');
+        if (qIdx >= 0) {
+          const hp = new URLSearchParams(hash.substring(qIdx + 1));
+          requestedRegion = hp.get('region') || '';
+        }
+        if (!requestedRegion) {
+          const sp = new URLSearchParams(window.location.search || '');
+          requestedRegion = sp.get('region') || '';
+        }
+      } catch (_) {}
+
+      const regionalCfg = (requestedRegion && App.auth && App.auth.getRegionalWebinarConfig)
+        ? App.auth.getRegionalWebinarConfig(settings, requestedRegion)
+        : null;
+
+      const activeType = regionalCfg ? regionalCfg.activeType : (settings.activeType || 'b2c');
+      const config = regionalCfg ? { ...(settings[activeType] || settings.b2c || {}), ...regionalCfg } : (settings[activeType] || settings.b2c || {});
+      const dateStr = regionalCfg ? regionalCfg.date : (settings.date || config.date || '2026-09-18');
+      const timeStr = regionalCfg ? regionalCfg.time : (settings.time || config.time || '12:00');
+      const spots = regionalCfg ? regionalCfg.spots : (settings.spotsAvailable || config.spots || 25);
 
       // ── Date Formatting ──
       const [y, m, d] = dateStr.split('-').map(Number);
@@ -1355,17 +1430,22 @@ App.views.public = {
 
     function populateStates(country) {
       if (!stateSelect) return;
-      if (country === 'Canada') {
+      if (country === 'United States' || !country) {
+        stateSelect.innerHTML = `<option value="">— Select State —</option>` +
+          US_STATES.map(s => `<option value="${s}">${s}</option>`).join('');
+      } else if (country === 'Canada') {
         stateSelect.innerHTML = `<option value="">— Select Province / Territory —</option>` +
           CA_PROVINCES.map(s => `<option value="${s}">${s}</option>`).join('');
       } else if (country === 'Puerto Rico') {
         stateSelect.innerHTML = `<option value="">— Select Region / Municipality —</option>` +
           PR_AREAS.map(s => `<option value="${s}">${s}</option>`).join('');
       } else if (country === 'Other') {
-        stateSelect.innerHTML = `<option value="International">International</option>`;
+        stateSelect.innerHTML = `<option value="International" selected>🌍 International</option>`;
       } else {
-        stateSelect.innerHTML = `<option value="">— Select State —</option>` +
-          US_STATES.map(s => `<option value="${s}">${s}</option>`).join('');
+        stateSelect.innerHTML =
+          `<option value="${country} — General" selected>📍 ${country} (Principal / General)</option>` +
+          `<option value="${country} — Capital / Metro">🏙️ ${country} — Capital / Metro</option>` +
+          `<option value="International">🌍 Otro / Internacional</option>`;
       }
     }
 
@@ -1581,15 +1661,31 @@ App.views.public = {
           }
         }
 
-        // ---- Get Current Active Webinar Settings ----
+        // ---- Get Current Active Webinar Settings (with Regional Parallel Support) ----
         const settings = (App.auth && App.auth.getWebinarSettings)
           ? await App.auth.getWebinarSettings()
           : (App.auth && App.auth.getDefaultWebinarSettings ? App.auth.getDefaultWebinarSettings() : null);
 
-        const activeType = settings?.activeType || 'b2c';
-        const typeConfig = settings ? (settings[activeType] || settings.b2c) : null;
+        let urlRegion = '';
+        try {
+          const hash = window.location.hash || '';
+          const qIdx = hash.indexOf('?');
+          if (qIdx >= 0) urlRegion = new URLSearchParams(hash.substring(qIdx + 1)).get('region') || '';
+        } catch (_) {}
+
+        const resolvedCountryRegion = (App.utils && App.utils.resolveRegionFromCountry)
+          ? App.utils.resolveRegionFromCountry(country)
+          : '';
+        const targetWebinarRegion = urlRegion || resolvedCountryRegion || 'north_america';
+        const regionalCfg = (App.auth && App.auth.getRegionalWebinarConfig && settings)
+          ? App.auth.getRegionalWebinarConfig(settings, targetWebinarRegion)
+          : null;
+
+        const activeType = regionalCfg ? regionalCfg.activeType : (settings?.activeType || 'b2c');
+        const typeConfig = regionalCfg || (settings ? (settings[activeType] || settings.b2c) : null);
         const webinarTitle = typeConfig?.title || (activeType === 'b2b' ? 'Beyond Borders' : 'Spain Unlocked');
-        const webinarDate = settings?.date || typeConfig?.date || '2026-09-18';
+        const webinarDate = typeConfig?.date || settings?.date || '2026-09-18';
+        const webinarLanguage = typeConfig?.language || 'en';
 
         // Determine referrerName for the record
         let finalReferrerName = '';
@@ -1598,6 +1694,9 @@ App.views.public = {
 
         await App.auth.saveWebinarRegistration({
           firstName, lastName, phone, email, agency, country, state,
+          region: resolvedCountryRegion || targetWebinarRegion,
+          webinarRegion: targetWebinarRegion,
+          webinarLanguage: webinarLanguage,
           howHeard,
           referrerName: finalReferrerName,
           webinar: webinarTitle,

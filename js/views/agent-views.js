@@ -17,6 +17,16 @@
   let agentClients = [];
   let agentCommissions = [];
   let allUsers = [];
+  let cachedPartners = [];
+  let cachedWebinarRegs = [];
+
+  function isRegB2B(r) {
+    if (App.views && App.views.admin && typeof App.views.admin.isWebinarB2B === 'function') {
+      return App.views.admin.isWebinarB2B(r);
+    }
+    const t = String(r?.webinarType || '').toLowerCase();
+    return t === 'b2b' || ['realtor', 'broker', 'embajador', 'colaborador'].includes(String(r?.role || '').toLowerCase());
+  }
 
   /* ============================================
      initDashboard()
@@ -40,6 +50,12 @@
       agentClients = await App.auth.getClients(clientFilter);
       agentCommissions = await App.auth.getCommissions({ agentId: currentUser.id });
       allUsers = await App.auth.getAllUsers();
+      const freshMe = allUsers.find(u => u.id === currentUser.id) || currentUser;
+
+      // Render RE/MAX MÁS Regional Hub Banner
+      if (App.utils && App.utils.renderUserRegionalBanner) {
+        await App.utils.renderUserRegionalBanner('agent-regional-banner', freshMe);
+      }
 
       // Calculate metrics
       const activeCount = agentClients.filter(c => !['completed', 'closed'].includes(c.status)).length;
@@ -174,6 +190,10 @@
   async function initWebinar() {
     currentUser = App.auth.getCurrentUser();
     if (!currentUser) return;
+    const regSel = document.getElementById('agent-webinar-filter-region');
+    if (regSel && App.utils && App.utils.getRegionFilterOptionsHtml && regSel.options.length <= 1) {
+      regSel.innerHTML = App.utils.getRegionFilterOptionsHtml('');
+    }
     await renderWebinarRegistrations();
   }
 
@@ -184,6 +204,10 @@
   async function initPartners() {
     currentUser = App.auth.getCurrentUser();
     if (!currentUser) return;
+    const regSel = document.getElementById('agent-partners-filter-region');
+    if (regSel && App.utils && App.utils.getRegionFilterOptionsHtml && regSel.options.length <= 1) {
+      regSel.innerHTML = App.utils.getRegionFilterOptionsHtml('');
+    }
     await renderPartners();
   }
 
@@ -194,12 +218,13 @@
     try {
       const allUsers = await App.auth.getAllUsers();
       const freshCurrentUser = allUsers.find(u => u.id === currentUser.id) || currentUser;
+      const regFilter = document.getElementById('agent-partners-filter-region')?.value || '';
+      const searchQ = (document.getElementById('agent-partners-search')?.value || '').toLowerCase().trim();
       
       // Filter brokers/realtors linked to this agent
-      const linkedPartners = allUsers.filter(u => {
-        if (!['broker', 'realtor'].includes(u.role)) return false;
+      let linkedPartners = allUsers.filter(u => {
+        if (!['broker', 'realtor', 'colaborador'].includes(u.role)) return false;
         
-        // Match referredBy or source
         if (u.referredBy && u.referredBy === freshCurrentUser.id) return true;
         if (u.referredBy && freshCurrentUser.referralCode && u.referredBy.toUpperCase() === freshCurrentUser.referralCode.toUpperCase()) return true;
         if (u.referredBy && u.referredBy.toLowerCase() === freshCurrentUser.email.toLowerCase()) return true;
@@ -208,12 +233,25 @@
         return false;
       });
 
+      if (regFilter && App.utils && App.utils.getUserRegions) {
+        linkedPartners = linkedPartners.filter(p => App.utils.getUserRegions(p).includes(regFilter));
+      }
+
+      if (searchQ) {
+        linkedPartners = linkedPartners.filter(p => {
+          const pool = `${p.firstName || ''} ${p.lastName || ''} ${p.email || ''} ${p.agencyName || ''} ${p.country || ''}`.toLowerCase();
+          return pool.includes(searchQ);
+        });
+      }
+
+      cachedPartners = linkedPartners;
+
       if (linkedPartners.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
-              <span class="lang-en">No partners linked to you yet.</span>
-              <span class="lang-es">Aún no tienes partners asociados.</span>
+            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+              <span class="lang-en">No partners match your filters.</span>
+              <span class="lang-es">No hay partners que coincidan con tus filtros.</span>
             </td>
           </tr>`;
         return;
@@ -222,12 +260,17 @@
       tbody.innerHTML = linkedPartners.map(p => {
         const date = App.utils.formatDate(p.createdAt);
         const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(p.status)}">${App.utils.getStatusLabel(p.status)}</span>`;
-        const roleLabel = p.role === 'broker' ? 'Broker' : 'Realtor';
+        const roleLabel = p.role === 'broker' ? 'Broker' : (p.role === 'colaborador' ? 'Colaborador' : 'Realtor');
+        const regBadge = App.utils.getUserRegionBadgesHtml ? App.utils.getUserRegionBadgesHtml(p) : '';
         return `
           <tr>
             <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem; color: var(--text-secondary);">${date}</td>
             <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.88rem; font-weight: 600;">${App.utils.escapeHtml(p.firstName)} ${App.utils.escapeHtml(p.lastName)}</td>
             <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${roleLabel}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.82rem;">
+              <div>${regBadge}</div>
+              <small style="color:#64748b;">🏳️ ${App.utils.escapeHtml(p.country || '—')}</small>
+            </td>
             <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${App.utils.escapeHtml(p.email)}</td>
             <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${App.utils.escapeHtml(p.agencyName || '—')}</td>
             <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${statusBadge}</td>
@@ -235,7 +278,7 @@
       }).join('');
     } catch (err) {
       console.error('[Agent] renderPartners error:', err);
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 1rem;">Error loading partners.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #ef4444; padding: 1rem;">Error loading partners.</td></tr>';
     }
   }
 
@@ -246,24 +289,20 @@
 
     try {
       const allRegs = await App.auth.getWebinarRegistrations();
-      
       const allUsers = await App.auth.getAllUsers();
       const freshCurrentUser = allUsers.find(u => u.id === currentUser.id) || currentUser;
 
-      // Filter registrations linked to this agent
-      const linkedRegs = allRegs.filter(r => {
-        // Direct ID match
+      const typeFilter = document.getElementById('agent-webinar-filter-type')?.value || 'all';
+      const regFilter = document.getElementById('agent-webinar-filter-region')?.value || '';
+      const searchQ = (document.getElementById('agent-webinar-search')?.value || '').toLowerCase().trim();
+
+      let linkedRegs = allRegs.filter(r => {
         if (r.agentReferrerId === freshCurrentUser.id) return true;
-        
-        // Referral code match
         if (r.referralCode && freshCurrentUser.referralCode && r.referralCode.toUpperCase() === freshCurrentUser.referralCode.toUpperCase()) return true;
-        
-        // Name match (from dropdown or manual mention)
         if (r.howHeard === 'agent' && r.referrerName) {
           const agentFullName = `${freshCurrentUser.firstName || ''} ${freshCurrentUser.lastName || ''}`.toLowerCase();
           const refName = r.referrerName.toLowerCase();
           if (refName.includes(agentFullName) || agentFullName.includes(refName)) return true;
-          // Match split parts
           const parts = refName.split('/').map(p => p.trim());
           for (const p of parts) {
             if (agentFullName.includes(p) || p.includes(agentFullName)) return true;
@@ -272,12 +311,28 @@
         return false;
       });
 
+      if (typeFilter === 'b2b') linkedRegs = linkedRegs.filter(r => isRegB2B(r));
+      else if (typeFilter === 'b2c') linkedRegs = linkedRegs.filter(r => !isRegB2B(r));
+
+      if (regFilter && App.utils && App.utils.getRecordRegion) {
+        linkedRegs = linkedRegs.filter(r => App.utils.getRecordRegion(r, allUsers) === regFilter);
+      }
+
+      if (searchQ) {
+        linkedRegs = linkedRegs.filter(r => {
+          const pool = `${r.firstName || ''} ${r.lastName || ''} ${r.email || ''} ${r.agency || ''} ${r.country || ''}`.toLowerCase();
+          return pool.includes(searchQ);
+        });
+      }
+
+      cachedWebinarRegs = linkedRegs;
+
       if (linkedRegs.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
-              <span class="lang-en">No webinar registrations linked to you yet.</span>
-              <span class="lang-es">Aún no tienes registros al webinar asociados.</span>
+            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+              <span class="lang-en">No webinar registrations match your filters.</span>
+              <span class="lang-es">No hay registros al webinar con los filtros seleccionados.</span>
             </td>
           </tr>`;
         return;
@@ -285,21 +340,32 @@
 
       tbody.innerHTML = linkedRegs.map(r => {
         const date = App.utils.formatDate(r.createdAt);
+        const b2b = isRegB2B(r);
+        const typeBadge = b2b
+          ? `<span style="background:rgba(0,63,153,0.1);color:#003f99;padding:2px 8px;border-radius:12px;font-size:0.73rem;font-weight:700;">🏢 B2B</span>`
+          : `<span style="background:rgba(16,185,129,0.1);color:#059669;padding:2px 8px;border-radius:12px;font-size:0.73rem;font-weight:700;">🏡 B2C</span>`;
+        const recReg = App.utils.getRecordRegion ? App.utils.getRecordRegion(r, allUsers) : '';
+        const regBadge = App.utils.getRegionBadge ? App.utils.getRegionBadge(recReg, true) : '';
         const source = r.referralCode 
           ? `<span class="badge badge--approved" style="background:#d1fae5; color:#065f46; font-size:0.75rem; border-radius:12px; padding:2px 8px;">🔗 Link</span>`
           : `<span class="badge badge--pending" style="background:#fef3c7; color:#92400e; font-size:0.75rem; border-radius:12px; padding:2px 8px;">👤 Dropdown</span>`;
         return `
           <tr>
             <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem; color: var(--text-secondary);">${date}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${typeBadge}</td>
             <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.88rem; font-weight: 600;">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.82rem;">
+              <div>${regBadge}</div>
+              <small style="color:#64748b;">🏳️ ${App.utils.escapeHtml(r.country || '—')}</small>
+            </td>
             <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${App.utils.escapeHtml(r.email)}</td>
-            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${App.utils.escapeHtml(r.agency || '—')}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${App.utils.escapeHtml(r.agency || r.clientInterest || '—')}</td>
             <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${source}</td>
           </tr>`;
       }).join('');
     } catch (err) {
       console.error('[Agent] renderWebinarRegistrations error:', err);
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #ef4444; padding: 1rem;">Error loading registrations.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #ef4444; padding: 1rem;">Error loading registrations.</td></tr>';
     }
   }
 
@@ -376,27 +442,109 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
+      const regSel = document.getElementById('agent-client-filter-region');
+      if (regSel && App.utils && App.utils.getRegionFilterOptionsHtml && regSel.options.length <= 1) {
+        regSel.innerHTML = App.utils.getRegionFilterOptionsHtml('');
+      }
+
       const clientFilter = currentUser.role === 'colaborador' ? { referredBy: currentUser.id } : { localAgentId: currentUser.id };
       agentClients = await App.auth.getClients(clientFilter);
       allUsers = await App.auth.getAllUsers();
 
-      const getRealtorName = (realtorId) => {
-        const realtor = allUsers.find(u => u.id === realtorId);
-        return realtor ? `${realtor.firstName} ${realtor.lastName}` : 'Unknown';
-      };
-
-      App.utils.renderKanbanBoard(
-        'agent-pipeline-board',
-        agentClients,
-        'App.views.agentInmomas.showClientDetail',
-        getRealtorName,
-        'App.views.agentInmomas.handleClientDrop'
-      );
-
+      filterClients();
     } catch (err) {
       console.error('[Agent] initClients error:', err);
       App.utils.showToast('Error loading client pipeline.', 'error');
     }
+  }
+
+  function filterClients() {
+    const regVal = document.getElementById('agent-client-filter-region')?.value || '';
+    const searchVal = (document.getElementById('agent-client-search')?.value || '').toLowerCase().trim();
+
+    let display = [...agentClients];
+    if (regVal && App.utils && App.utils.getRecordRegion) {
+      display = display.filter(c => App.utils.getRecordRegion(c, allUsers) === regVal);
+    }
+    if (searchVal) {
+      display = display.filter(c => {
+        const pool = `${c.firstName || ''} ${c.lastName || ''} ${c.email || ''} ${c.country || ''} ${c.currentLocation || ''} ${c.interestArea || ''}`.toLowerCase();
+        return pool.includes(searchVal);
+      });
+    }
+
+    const getRealtorName = (realtorId) => {
+      const realtor = allUsers.find(u => u.id === realtorId);
+      return realtor ? `${realtor.firstName} ${realtor.lastName}` : 'Unknown';
+    };
+
+    App.utils.renderKanbanBoard(
+      'agent-pipeline-board',
+      display,
+      'App.views.agentInmomas.showClientDetail',
+      getRealtorName,
+      'App.views.agentInmomas.handleClientDrop'
+    );
+  }
+
+  function exportPartnersToExcel() {
+    if (!cachedPartners || cachedPartners.length === 0) {
+      App.utils.showToast('No partners to export.', 'error');
+      return;
+    }
+    const headers = ['Date', 'First Name', 'Last Name', 'Role', 'Region', 'Country', 'Email', 'Agency', 'Status'];
+    const rows = cachedPartners.map(p => {
+      const regs = App.utils.getUserRegions ? App.utils.getUserRegions(p).map(r => App.utils.REGIONS[r]?.shortEs || r).join(', ') : '';
+      return [
+        p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-US') : '',
+        p.firstName || '', p.lastName || '', p.role || '', regs, p.country || '', p.email || '', p.agencyName || '', p.status || ''
+      ];
+    });
+    if (typeof XLSX !== 'undefined') {
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+      XLSX.utils.book_append_sheet(wb, ws, 'Partners');
+      XLSX.writeFile(wb, `My-Partners-Export-${new Date().toISOString().slice(0,10)}.xlsx`);
+      App.utils.showToast(`✅ Exportados ${cachedPartners.length} partners a Excel.`, 'success');
+      return;
+    }
+    const csv = '\uFEFF' + [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `My-Partners-Export-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+  }
+
+  function exportWebinarToExcel() {
+    if (!cachedWebinarRegs || cachedWebinarRegs.length === 0) {
+      App.utils.showToast('No registrations to export.', 'error');
+      return;
+    }
+    const headers = ['Date', 'Type', 'First Name', 'Last Name', 'Region', 'Country', 'Email', 'Phone', 'Agency / Goal'];
+    const rows = cachedWebinarRegs.map(r => {
+      const rId = App.utils.getRecordRegion ? App.utils.getRecordRegion(r, allUsers) : '';
+      const rLabel = (rId && App.utils.REGIONS[rId]) ? App.utils.REGIONS[rId].shortEs : '';
+      return [
+        r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-US') : '',
+        isRegB2B(r) ? 'B2B' : 'B2C',
+        r.firstName || '', r.lastName || '', rLabel, r.country || '', r.email || '', r.phone || '', r.agency || r.clientInterest || ''
+      ];
+    });
+    if (typeof XLSX !== 'undefined') {
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+      XLSX.utils.book_append_sheet(wb, ws, 'Webinar');
+      XLSX.writeFile(wb, `My-Webinar-Export-${new Date().toISOString().slice(0,10)}.xlsx`);
+      App.utils.showToast(`✅ Exportados ${cachedWebinarRegs.length} inscritos a Excel.`, 'success');
+      return;
+    }
+    const csv = '\uFEFF' + [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `My-Webinar-Export-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
   }
 
   async function handleClientDrop(clientId, newStatus) {
@@ -806,9 +954,14 @@
   App.views.agentInmomas = {
     initDashboard,
     initClients,
+    filterClients,
     initFinances,
     initWebinar,
+    renderWebinarRegistrations,
+    exportWebinarToExcel,
     initPartners,
+    renderPartners,
+    exportPartnersToExcel,
     showClientDetail,
     handleClientDrop,
     showAddClientModal,
