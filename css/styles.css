@@ -70,9 +70,9 @@
   --gradient-red: linear-gradient(180deg, #FF9A4D 0%, var(--tsc-sun-orange) 100%);
 
   /* Spacing */
-  --section-padding: 104px 0;
-  --section-padding-sm: 72px 0;
-  --section-padding-lg: 132px 0;
+  --section-padding: 64px 0;
+  --section-padding-sm: 48px 0;
+  --section-padding-lg: 88px 0;
   --section-inner-gap: 56px;
   --container-max: 1200px;
   --container-padding: 0 28px;
