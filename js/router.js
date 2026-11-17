@@ -385,15 +385,21 @@ App.router = (function() {
         const mobileAvatarEl = document.getElementById('mobile-user-avatar');
         
         const roleLabels = {
-          admin: 'Admin · Broker Inmomás',
+          admin: 'Admin · Broker RE/MAX MÁS',
           embajador: '👑 Embajador',
-          agent_inmomas: 'Agente Inmomás',
+          agent_inmomas: '🇪🇸 Agente RE/MAX MÁS',
           colaborador: 'Colaborador',
           broker: 'Broker Portal',
           realtor: 'Realtor Portal',
           partner: 'Partner Portal'
         };
-        const formattedRole = roleLabels[user.role] || (user.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : '');
+        let formattedRole = roleLabels[user.role] || (user.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : '');
+        if (user.role !== 'admin' && App.utils && typeof App.utils.getUserRegions === 'function') {
+          const uRegs = App.utils.getUserRegions(user);
+          if (uRegs.length > 0 && App.utils.REGIONS && App.utils.REGIONS[uRegs[0]]) {
+            formattedRole += ` · ${App.utils.REGIONS[uRegs[0]].shortEs}`;
+          }
+        }
         const initials = App.utils.getInitials(user.firstName, user.lastName);
 
         if (nameEl) nameEl.textContent = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || '—';

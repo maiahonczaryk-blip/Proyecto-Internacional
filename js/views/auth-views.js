@@ -163,6 +163,7 @@ App.views.auth = {
     const statusEl = document.getElementById('profile-status');
     const phoneEl = document.getElementById('profile-phone');
     const countryEl = document.getElementById('profile-country');
+    const regionsEl = document.getElementById('profile-regions');
     const joinedEl = document.getElementById('profile-joined');
     const brokerEl = document.getElementById('profile-broker');
 
@@ -173,6 +174,10 @@ App.views.auth = {
     const editPhone = document.getElementById('edit-phone');
     const editAgencyName = document.getElementById('edit-agencyName');
     const editCountry = document.getElementById('edit-country');
+    const editNationality = document.getElementById('edit-nationality');
+    const groupEditNationality = document.getElementById('group-edit-nationality');
+    const groupEditMasRegions = document.getElementById('group-edit-mas-regions');
+    const editMasRegionsCheckboxes = document.getElementById('edit-mas-regions-checkboxes');
     const editEmail = document.getElementById('edit-email');
     const groupEditEmail = document.getElementById('group-edit-email');
 
@@ -196,13 +201,25 @@ App.views.auth = {
     }
 
     // 2. Populate View Details
+    const userNationality = App.utils.getUserNationality ? App.utils.getUserNationality(user) : (user.nationality || user.country || '');
+    const userRegions = App.utils.getUserRegions ? App.utils.getUserRegions(user) : [];
+
     if (nameEl) nameEl.textContent = `${user.firstName} ${user.lastName}`;
     if (emailEl) emailEl.textContent = user.email;
-    if (roleBadgeEl) roleBadgeEl.textContent = user.role.replace('_', ' ');
-    if (agencyEl) agencyEl.textContent = user.agencyName || '—';
+    if (roleBadgeEl) roleBadgeEl.textContent = user.role === 'agent_inmomas' ? 'Agente RE/MAX MÁS' : user.role.replace('_', ' ');
+    if (agencyEl) agencyEl.textContent = user.agencyName || (user.role === 'agent_inmomas' ? 'RE/MAX MÁS' : '—');
     if (statusEl) statusEl.innerHTML = App.utils.getUserStatusBadge(user.status);
     if (phoneEl) phoneEl.textContent = user.phone || '—';
-    if (countryEl) countryEl.textContent = user.country || '—';
+    if (countryEl) {
+      if (user.role === 'agent_inmomas' && userNationality) {
+        countryEl.textContent = `${userNationality}${user.country && user.country !== userNationality ? ' · ' + user.country : ''}`;
+      } else {
+        countryEl.textContent = user.country || userNationality || '—';
+      }
+    }
+    if (regionsEl && App.utils.getUserRegionBadgesHtml) {
+      regionsEl.innerHTML = App.utils.getUserRegionBadgesHtml(user);
+    }
     if (joinedEl) joinedEl.textContent = App.utils.formatDate(user.createdAt);
 
     // Populate Broker Name if applicable
@@ -223,8 +240,28 @@ App.views.auth = {
     if (editFirstName) editFirstName.value = user.firstName || '';
     if (editLastName) editLastName.value = user.lastName || '';
     if (editPhone) editPhone.value = user.phone || '';
-    if (editAgencyName) editAgencyName.value = user.agencyName || '';
-    if (editCountry) editCountry.value = user.country || '';
+    if (editAgencyName) editAgencyName.value = user.agencyName || (user.role === 'agent_inmomas' ? 'RE/MAX MÁS' : '');
+    if (editCountry) {
+      if (editCountry.tagName === 'SELECT' && App.utils.getCountryOptionsHtml) {
+        editCountry.innerHTML = App.utils.getCountryOptionsHtml(user.country || userNationality || 'United States', true, '— Seleccionar País —');
+      } else {
+        editCountry.value = user.country || '';
+      }
+    }
+    if (groupEditNationality && editNationality) {
+      const showNat = ['agent_inmomas', 'embajador', 'admin'].includes(user.role);
+      groupEditNationality.style.display = showNat ? 'block' : 'none';
+      if (editNationality.tagName === 'SELECT' && App.utils.getCountryOptionsHtml) {
+        editNationality.innerHTML = App.utils.getCountryOptionsHtml(userNationality || user.country || '', true, '— Seleccionar Nacionalidad / País —');
+      } else {
+        editNationality.value = userNationality || '';
+      }
+    }
+    if (groupEditMasRegions && editMasRegionsCheckboxes && App.utils.getRegionsCheckboxesHtml) {
+      const canMultiRegion = ['agent_inmomas', 'embajador', 'admin'].includes(user.role);
+      groupEditMasRegions.style.display = canMultiRegion ? 'block' : 'none';
+      editMasRegionsCheckboxes.innerHTML = App.utils.getRegionsCheckboxesHtml('profile-edit-region', userRegions);
+    }
     
     // Only show email edit for partners
     if (groupEditEmail) {
@@ -257,12 +294,26 @@ App.views.auth = {
     if (editForm) {
       editForm.onsubmit = async (e) => {
         e.preventDefault();
+        const canMultiRegion = ['agent_inmomas', 'embajador', 'admin'].includes(user.role);
+        let selectedRegions = [];
+        if (canMultiRegion && editMasRegionsCheckboxes) {
+          selectedRegions = Array.from(editMasRegionsCheckboxes.querySelectorAll('input[name="profile-edit-region"]:checked')).map(cb => cb.value);
+        }
+        const newNat = (canMultiRegion && editNationality) ? editNationality.value : editCountry.value;
+        if (selectedRegions.length === 0 && App.utils.resolveRegionFromCountry) {
+          const inferred = App.utils.resolveRegionFromCountry(newNat || editCountry.value || '');
+          if (inferred) selectedRegions = [inferred];
+        }
+
         const data = {
           firstName: editFirstName.value,
           lastName: editLastName.value,
           phone: editPhone.value,
           agencyName: editAgencyName.value,
-          country: editCountry.value
+          country: editCountry.value,
+          nationality: newNat,
+          region: selectedRegions[0] || '',
+          regions: selectedRegions
         };
 
         const saveBtn = document.getElementById('profile-btn-save');
@@ -636,19 +687,51 @@ App.views.auth = {
       const brokerSelectGroup = newForm.querySelector('#broker-select-group');
       const agencyNameInput = newForm.querySelector('#register-agencyName');
       const agencyNameGroup = agencyNameInput ? agencyNameInput.parentNode : null;
+      const masRegionsGroup = newForm.querySelector('#register-mas-regions-group');
+      const masRegionsCheckboxes = newForm.querySelector('#register-mas-regions-checkboxes');
+      const inmomasAgentGroup = newForm.querySelector('#register-inmomas-agent-group');
+      const countrySelectEl = newForm.querySelector('#register-country');
+
+      if (masRegionsCheckboxes && App.utils && App.utils.getRegionsCheckboxesHtml) {
+        masRegionsCheckboxes.innerHTML = App.utils.getRegionsCheckboxesHtml('register-mas-region', ['north_america']);
+      }
+
+      if (countrySelectEl && masRegionsCheckboxes && App.utils && App.utils.resolveRegionFromCountry) {
+        countrySelectEl.addEventListener('change', () => {
+          const reg = App.utils.resolveRegionFromCountry(countrySelectEl.value);
+          if (reg) {
+            const cb = masRegionsCheckboxes.querySelector(`input[value="${reg}"]`);
+            if (cb) cb.checked = true;
+          }
+        });
+      }
       
       // Initial state
       if (brokerSelectGroup) brokerSelectGroup.style.display = 'block';
       if (agencyNameGroup) agencyNameGroup.style.display = 'none';
+      if (masRegionsGroup) masRegionsGroup.style.display = 'none';
       
       roleRadios.forEach(r => {
         r.addEventListener('change', (e) => {
-          if (e.target.value === 'broker') {
+          const roleVal = e.target.value;
+          if (roleVal === 'broker') {
             if (brokerSelectGroup) brokerSelectGroup.style.display = 'none';
             if (agencyNameGroup) agencyNameGroup.style.display = 'block';
+            if (masRegionsGroup) masRegionsGroup.style.display = 'none';
+            if (inmomasAgentGroup) inmomasAgentGroup.style.display = 'block';
+          } else if (roleVal === 'agent_inmomas') {
+            if (brokerSelectGroup) brokerSelectGroup.style.display = 'none';
+            if (agencyNameGroup) {
+              agencyNameGroup.style.display = 'block';
+              if (agencyNameInput && !agencyNameInput.value) agencyNameInput.value = 'RE/MAX MÁS';
+            }
+            if (masRegionsGroup) masRegionsGroup.style.display = 'block';
+            if (inmomasAgentGroup) inmomasAgentGroup.style.display = 'none';
           } else {
             if (brokerSelectGroup) brokerSelectGroup.style.display = 'block';
             if (agencyNameGroup) agencyNameGroup.style.display = 'none';
+            if (masRegionsGroup) masRegionsGroup.style.display = 'none';
+            if (inmomasAgentGroup) inmomasAgentGroup.style.display = 'block';
           }
         });
       });
@@ -659,28 +742,46 @@ App.views.auth = {
         const termsChecked = newForm.querySelector('#register-terms').checked;
         if (!termsChecked) return alert('Debes aceptar los Términos y Condiciones para continuar. / Please agree to the Terms & Conditions.');
 
+        const selectedRole = newForm.querySelector('input[name="register-role"]:checked').value;
+        const countryVal = newForm.querySelector('#register-country').value;
+        let selectedRegions = [];
+        if (selectedRole === 'agent_inmomas' && masRegionsCheckboxes) {
+          selectedRegions = Array.from(masRegionsCheckboxes.querySelectorAll('input[name="register-mas-region"]:checked')).map(cb => cb.value);
+          if (selectedRegions.length === 0) {
+            return alert('Por favor, selecciona al menos una Región comercial para tu perfil de Agente RE/MAX MÁS.');
+          }
+        } else if (App.utils && App.utils.resolveRegionFromCountry) {
+          const autoReg = App.utils.resolveRegionFromCountry(countryVal);
+          if (autoReg) selectedRegions = [autoReg];
+        }
+
         const brokerId = brokerSelect ? brokerSelect.value : '';
         const isManualBroker = brokerId === 'other';
         const refCode = sessionStorage.getItem('referralCode') || null;
         const inmomasAgent = (newForm.querySelector('#register-inmomas-agent')?.value || '').trim();
         const data = {
-          role: newForm.querySelector('input[name="register-role"]:checked').value,
+          role: selectedRole,
           firstName: newForm.querySelector('#register-firstName').value,
           lastName: newForm.querySelector('#register-lastName').value,
           email: newForm.querySelector('#register-email').value,
           phone: newForm.querySelector('#register-phone').value,
           password: newForm.querySelector('#register-password').value,
-          country: newForm.querySelector('#register-country').value,
-          agencyName: isManualBroker
-            ? (newForm.querySelector('#register-agency-manual')?.value || '')
-            : (agencyNameInput ? agencyNameInput.value : ''),
-          brokerId: isManualBroker ? '' : brokerId,
+          country: countryVal,
+          nationality: countryVal,
+          region: selectedRegions[0] || '',
+          regions: selectedRegions,
+          agencyName: selectedRole === 'agent_inmomas'
+            ? ((agencyNameInput && agencyNameInput.value) || 'RE/MAX MÁS')
+            : (isManualBroker
+              ? (newForm.querySelector('#register-agency-manual')?.value || '')
+              : (agencyNameInput ? agencyNameInput.value : '')),
+          brokerId: (isManualBroker || selectedRole === 'agent_inmomas') ? '' : brokerId,
           brokerNameManual: isManualBroker ? (newForm.querySelector('#register-broker-manual')?.value || '') : '',
-          inmomasAgentName: inmomasAgent || null,
+          inmomasAgentName: selectedRole === 'agent_inmomas' ? null : (inmomasAgent || null),
           termsAccepted: true,
           termsAcceptedAt: new Date().toISOString(),
           newsletterConsent: newForm.querySelector('#register-newsletter')?.checked || false,
-          referredBy: refCode || inmomasAgent || null,
+          referredBy: refCode || (selectedRole === 'agent_inmomas' ? null : (inmomasAgent || null)),
           source: (refCode || inmomasAgent) ? 'referral' : 'direct',
         };
         
@@ -716,19 +817,32 @@ App.views.auth = {
           const refCode = sessionStorage.getItem('referralCode') || null;
           const inmomasAgent = (newForm.querySelector('#register-inmomas-agent')?.value || '').trim();
 
+          const countryVal = newForm.querySelector('#register-country').value;
+          let selectedRegions = [];
+          if (roleRadio.value === 'agent_inmomas' && masRegionsCheckboxes) {
+            selectedRegions = Array.from(masRegionsCheckboxes.querySelectorAll('input[name="register-mas-region"]:checked')).map(cb => cb.value);
+          }
+          if (selectedRegions.length === 0 && App.utils && App.utils.resolveRegionFromCountry) {
+            const autoReg = App.utils.resolveRegionFromCountry(countryVal);
+            if (autoReg) selectedRegions = [autoReg];
+          }
+
           const data = {
             role: roleRadio.value,
             firstName,
             lastName,
             phone: newForm.querySelector('#register-phone').value,
-            country: newForm.querySelector('#register-country').value,
-            agencyName: agencyNameInput ? agencyNameInput.value : '',
-            brokerId: brokerSelect ? brokerSelect.value : '',
-            inmomasAgentName: inmomasAgent || null,
+            country: countryVal,
+            nationality: countryVal,
+            region: selectedRegions[0] || '',
+            regions: selectedRegions,
+            agencyName: roleRadio.value === 'agent_inmomas' ? ((agencyNameInput && agencyNameInput.value) || 'RE/MAX MÁS') : (agencyNameInput ? agencyNameInput.value : ''),
+            brokerId: roleRadio.value === 'agent_inmomas' ? '' : (brokerSelect ? brokerSelect.value : ''),
+            inmomasAgentName: roleRadio.value === 'agent_inmomas' ? null : (inmomasAgent || null),
             termsAccepted: true,
             termsAcceptedAt: new Date().toISOString(),
             newsletterConsent: newForm.querySelector('#register-newsletter')?.checked || false,
-            referredBy: refCode || inmomasAgent || null,
+            referredBy: refCode || (roleRadio.value === 'agent_inmomas' ? null : (inmomasAgent || null)),
             source: (refCode || inmomasAgent) ? 'referral' : 'direct',
           };
 

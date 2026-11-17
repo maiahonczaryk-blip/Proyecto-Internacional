@@ -28,6 +28,10 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
+      if (App.utils && App.utils.renderUserRegionalBanner) {
+        await App.utils.renderUserRegionalBanner('broker-regional-banner', currentUser);
+      }
+
       // Check agreement status
       const agreementStatus = currentUser.agreementStatus || 'none';
       const warningEl = document.getElementById('broker-agreement-warning');
@@ -268,6 +272,10 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
+      if (App.utils && App.utils.renderUserRegionalBanner) {
+        await App.utils.renderUserRegionalBanner('broker-regional-banner', currentUser);
+      }
+
       teamRealtors      = await App.auth.getAllUsers({ brokerId: currentUser.id, role: 'realtor' });
       brokerClients     = await App.auth.getClients({ brokerId: currentUser.id });
       brokerCommissions = await App.auth.getCommissions({ brokerId: currentUser.id });
@@ -457,6 +465,10 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
+      if (App.utils && App.utils.renderUserRegionalBanner) {
+        await App.utils.renderUserRegionalBanner('broker-regional-banner', currentUser);
+      }
+
       teamRealtors  = await App.auth.getAllUsers({ brokerId: currentUser.id, role: 'realtor' });
       brokerClients = await App.auth.getClients({ brokerId: currentUser.id });
 
@@ -571,6 +583,10 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
+      if (App.utils && App.utils.renderUserRegionalBanner) {
+        await App.utils.renderUserRegionalBanner('broker-regional-banner', currentUser);
+      }
+
       const container = document.getElementById('broker-documents-content');
       if (!container) return;
 
@@ -656,6 +672,10 @@
     try {
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
+
+      if (App.utils && App.utils.renderUserRegionalBanner) {
+        await App.utils.renderUserRegionalBanner('broker-regional-banner', currentUser);
+      }
 
       brokerCommissions = await App.auth.getCommissions({ brokerId: currentUser.id });
 

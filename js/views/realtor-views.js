@@ -31,6 +31,10 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
+      if (App.utils && App.utils.renderUserRegionalBanner) {
+        await App.utils.renderUserRegionalBanner('realtor-regional-banner', currentUser);
+      }
+
       // Check agreement status
       const agreementStatus = currentUser.agreementStatus || 'none';
       const warningEl = document.getElementById('realtor-agreement-warning');
@@ -236,6 +240,10 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
+      if (App.utils && App.utils.renderUserRegionalBanner) {
+        await App.utils.renderUserRegionalBanner('realtor-regional-banner', currentUser);
+      }
+
       realtorClients = await App.auth.getClients({ referredBy: currentUser.id });
       renderPipelineBoard(realtorClients);
 
@@ -354,6 +362,10 @@
     try {
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
+
+      if (App.utils && App.utils.renderUserRegionalBanner) {
+        await App.utils.renderUserRegionalBanner('realtor-regional-banner', currentUser);
+      }
 
       realtorClients = await App.auth.getClients({ referredBy: currentUser.id });
 
@@ -483,6 +495,10 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
+      if (App.utils && App.utils.renderUserRegionalBanner) {
+        await App.utils.renderUserRegionalBanner('realtor-regional-banner', currentUser);
+      }
+
       // If Realtor works under a Broker and doesn't have their own contractCompanyData yet,
       // check if their Broker already provided company fiscal & bank details
       if (!currentUser.contractCompanyData && currentUser.brokerId && App.auth && typeof App.auth.getUser === 'function') {
@@ -569,6 +585,10 @@
     try {
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
+
+      if (App.utils && App.utils.renderUserRegionalBanner) {
+        await App.utils.renderUserRegionalBanner('realtor-regional-banner', currentUser);
+      }
 
       realtorClients     = await App.auth.getClients({ referredBy: currentUser.id });
       realtorCommissions = await App.auth.getCommissions({ realtorId: currentUser.id });

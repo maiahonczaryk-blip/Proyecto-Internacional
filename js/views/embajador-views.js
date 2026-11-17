@@ -27,6 +27,7 @@
   };
 
   let networkRoleFilter = 'all';
+  let networkRegionFilter = '';
   let networkStatusFilter = 'all';
   let networkSearchQuery = '';
 
@@ -35,6 +36,7 @@
   let currentClientViewMode = 'board';
 
   let webinarFilter = 'all';
+  let webinarRegionFilter = '';
   let webinarSearchQuery = '';
 
   function setTextById(id, val) {
@@ -74,6 +76,10 @@
     try {
       const data = await loadUmbrella();
       if (!data || !currentUser) return;
+
+      if (App.utils && App.utils.renderUserRegionalBanner) {
+        await App.utils.renderUserRegionalBanner('embajador-regional-banner', currentUser);
+      }
 
       // Agreement / Fiscal data status banner
       const agreementStatus = currentUser.agreementStatus || (currentUser.agreementSigned ? 'signed' : 'none');
@@ -329,6 +335,11 @@
       setTextById('embajador-net-count-realtor', data.realtors.length);
       setTextById('embajador-net-count-colaborador', data.colaboradores.length);
 
+      const regSel = document.getElementById('emb-net-region-select');
+      if (regSel && App.utils && App.utils.getRegionFilterOptionsHtml && regSel.options.length <= 1) {
+        regSel.innerHTML = App.utils.getRegionFilterOptionsHtml('');
+      }
+
       renderNetworkTable();
       refreshLang();
     } catch (err) {
@@ -349,6 +360,11 @@
     renderNetworkTable();
   }
 
+  function setNetworkRegionFilter(regionId) {
+    networkRegionFilter = regionId || '';
+    renderNetworkTable();
+  }
+
   function setNetworkStatusFilter(status) {
     networkStatusFilter = status || 'all';
     renderNetworkTable();
@@ -365,7 +381,11 @@
 
     const filtered = (umbrella.users || []).filter(u => {
       if (networkRoleFilter !== 'all' && u.role !== networkRoleFilter) return false;
-      if (networkStatusFilter !== 'all' && u.status !== networkStatusFilter) return false;
+      if (networkRegionFilter && App.utils && App.utils.getUserRegions && !App.utils.getUserRegions(u).includes(networkRegionFilter)) return false;
+      if (networkStatusFilter !== 'all') {
+        if (networkStatusFilter === 'approved' && !(u.status === 'active' || u.status === 'approved')) return false;
+        if (networkStatusFilter !== 'approved' && u.status !== networkStatusFilter) return false;
+      }
       if (networkSearchQuery) {
         const hay = `${u.firstName || ''} ${u.lastName || ''} ${u.email || ''} ${u.phone || ''} ${u.agencyName || ''} ${u.country || ''} ${u._umbrellaParentName || ''} ${u.referralCode || ''}`.toLowerCase();
         if (!hay.includes(networkSearchQuery)) return false;
@@ -831,6 +851,11 @@
       setTextById('embajador-webinar-b2b', b2bCount);
       setTextById('embajador-webinar-b2c', b2cCount);
 
+      const regSel = document.getElementById('emb-webinar-region-select');
+      if (regSel && App.utils && App.utils.getRegionFilterOptionsHtml && regSel.options.length <= 1) {
+        regSel.innerHTML = App.utils.getRegionFilterOptionsHtml('');
+      }
+
       renderWebinarTable();
       refreshLang();
     } catch (err) {
@@ -840,6 +865,11 @@
 
   function setWebinarFilter(type) {
     webinarFilter = type || 'all';
+    renderWebinarTable();
+  }
+
+  function setWebinarRegionFilter(regionId) {
+    webinarRegionFilter = regionId || '';
     renderWebinarTable();
   }
 
@@ -858,8 +888,9 @@
         : (r.webinarType === 'b2b');
       if (webinarFilter === 'b2b' && !isB2B) return false;
       if (webinarFilter === 'b2c' && isB2B) return false;
+      if (webinarRegionFilter && App.utils && App.utils.getRecordRegion && App.utils.getRecordRegion(r, umbrella.users) !== webinarRegionFilter) return false;
       if (webinarSearchQuery) {
-        const hay = `${r.firstName || ''} ${r.lastName || ''} ${r.email || ''} ${r.phone || ''} ${r.agency || ''} ${r.agentReferrerName || ''} ${r.referralCode || ''}`.toLowerCase();
+        const hay = `${r.firstName || ''} ${r.lastName || ''} ${r.email || ''} ${r.phone || ''} ${r.agency || ''} ${r.country || ''} ${r.agentReferrerName || ''} ${r.referralCode || ''}`.toLowerCase();
         if (!hay.includes(webinarSearchQuery)) return false;
       }
       return true;
@@ -967,6 +998,7 @@
     initFinances,
     copyVariantLink,
     setNetworkRoleFilter,
+    setNetworkRegionFilter,
     setNetworkStatusFilter,
     searchNetwork,
     showMemberDetail,
@@ -978,6 +1010,7 @@
     showAddClientModal,
     exportClientsToExcel,
     setWebinarFilter,
+    setWebinarRegionFilter,
     searchWebinar
   };
 

@@ -17,6 +17,60 @@
   let allLeads = [];
   let activeClientTag = 'spain_buyer'; // 'spain_buyer' | 'realtor_network' | 'all'
   let clientSearchQuery = '';
+  let clientRegionFilter = '';
+  let clientCountryFilter = '';
+  let clientAgentFilter = '';
+  let pendingAdminRegionFilter = '';
+  let filteredUsersCache = [];
+  let filteredClientsCache = [];
+  let filteredUnifiedCache = [];
+
+  function jumpToRegionView(routeName, regionId) {
+    pendingAdminRegionFilter = regionId || '';
+    if (App.router && typeof App.router.navigateTo === 'function') {
+      App.router.navigateTo(routeName);
+    } else {
+      window.location.hash = routeName;
+    }
+  }
+
+  function buildSmartMasAgentOptions(localAgents, selectedAgentId = '', targetRegionId = '', placeholder = '-- Seleccionar Agente RE/MAX MÁS --') {
+    const formatAgentLabel = (a) => {
+      const nat = App.utils.getUserNationality ? App.utils.getUserNationality(a) : (a.nationality || a.country || '');
+      const regs = App.utils.getUserRegions ? App.utils.getUserRegions(a) : [];
+      const regNames = regs.map(r => (App.utils.REGIONS && App.utils.REGIONS[r]) ? App.utils.REGIONS[r].shortEs : r).filter(Boolean).join(', ');
+      const meta = [nat, regNames].filter(Boolean).join(' · ');
+      return `${App.utils.escapeHtml(a.firstName)} ${App.utils.escapeHtml(a.lastName)}${meta ? ` (${App.utils.escapeHtml(meta)})` : ' (RE/MAX MÁS)'}`;
+    };
+
+    if (!targetRegionId) {
+      return `<option value="">${placeholder}</option>` + localAgents.map(a =>
+        `<option value="${a.id}" ${selectedAgentId === a.id ? 'selected' : ''}>${formatAgentLabel(a)}</option>`
+      ).join('');
+    }
+
+    const matching = [];
+    const others = [];
+    localAgents.forEach(a => {
+      const regs = App.utils.getUserRegions ? App.utils.getUserRegions(a) : [];
+      if (regs.includes(targetRegionId)) matching.push(a);
+      else others.push(a);
+    });
+
+    const regTitle = (App.utils.REGIONS && App.utils.REGIONS[targetRegionId]) ? App.utils.REGIONS[targetRegionId].shortEs : targetRegionId;
+    let html = `<option value="">${placeholder}</option>`;
+    if (matching.length > 0) {
+      html += `<optgroup label="⭐ Recomendados — Región ${App.utils.escapeHtml(regTitle)}">`;
+      html += matching.map(a => `<option value="${a.id}" ${selectedAgentId === a.id ? 'selected' : ''}>⭐ ${formatAgentLabel(a)}</option>`).join('');
+      html += `</optgroup>`;
+    }
+    if (others.length > 0) {
+      html += `<optgroup label="🇪🇸 Otros Agentes RE/MAX MÁS">`;
+      html += others.map(a => `<option value="${a.id}" ${selectedAgentId === a.id ? 'selected' : ''}>${formatAgentLabel(a)}</option>`).join('');
+      html += `</optgroup>`;
+    }
+    return html;
+  }
 
   function isMaiaOrSuperAdmin() {
     let email = '';
@@ -193,6 +247,22 @@
             App.utils.shareEmbajadorWhatsApp(embUrl);
           };
         }
+        const copyMasBtn = document.getElementById('admin-dash-copy-mas-agent-link');
+        if (copyMasBtn) {
+          copyMasBtn.onclick = () => {
+            const masUrl = `${referralLink}&type=agent_inmomas`;
+            App.utils.copyToClipboard(masUrl);
+            App.utils.showToast('🇪🇸 Enlace de registro directo para Agente RE/MAX MÁS copiado al portapapeles', 'success');
+          };
+        }
+      }
+
+      // 7b. Render Global Regional Overview Grid
+      try {
+        const dashWebinars = await App.auth.getWebinarRegistrations();
+        renderRegionalOverviewGrid(allUsers, allClients, dashWebinars);
+      } catch (regErr) {
+        console.warn('[Admin] Regional overview render warning:', regErr);
       }
 
       // 8. Check pending Contract / Fiscal Data notifications for Admin Dashboard alert & sidebar badge
@@ -255,6 +325,60 @@
       console.error('[Admin] initDashboard error:', err);
       App.utils.showToast('Error loading admin dashboard.', 'error');
     }
+  }
+
+  /* ── Global Regional Overview Cards on Admin Dashboard ── */
+  function renderRegionalOverviewGrid(users, clients, webinars) {
+    const grid = document.getElementById('admin-regional-overview-grid');
+    if (!grid || !App.utils || !App.utils.REGION_LIST) return;
+
+    const masAgents = (users || []).filter(u => u.role === 'agent_inmomas' && u.status === 'active');
+    const partners = (users || []).filter(u => ['embajador', 'broker', 'realtor', 'colaborador'].includes(u.role) && u.status !== 'rejected');
+
+    grid.innerHTML = App.utils.REGION_LIST.map(reg => {
+      const regMasAgents = masAgents.filter(a => App.utils.getUserRegions(a).includes(reg.id));
+      const regPartners = partners.filter(p => App.utils.getUserRegions(p).includes(reg.id));
+      const regClients = (clients || []).filter(c => App.utils.getRecordRegion(c, users) === reg.id);
+      const regWebinars = (webinars || []).filter(w => App.utils.getRecordRegion(w, users) === reg.id);
+
+      const agentNamesPreview = regMasAgents.length > 0
+        ? regMasAgents.slice(0, 3).map(a => `${App.utils.escapeHtml(a.firstName)} ${App.utils.escapeHtml((a.lastName || '').charAt(0))}.`).join(', ') + (regMasAgents.length > 3 ? ` +${regMasAgents.length - 3}` : '')
+        : '<span style="color:#94a3b8;font-style:italic;">Sin agente MÁS etiquetado</span>';
+
+      return `
+        <div style="background:#fff; border:1px solid ${reg.border}; border-top:4px solid ${reg.color}; border-radius:12px; padding:14px 16px; box-shadow:0 2px 8px rgba(0,0,0,0.03); display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
+          <div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:6px;">
+              <div style="font-weight:800; font-size:0.92rem; color:#0f172a;">${reg.icon} <span class="lang-en">${reg.shortEn}</span><span class="lang-es">${reg.shortEs}</span></div>
+              <span style="font-size:0.82rem;">${reg.flag}</span>
+            </div>
+            <div style="font-size:0.75rem; color:#475569; margin-bottom:10px; line-height:1.35;">
+              <strong>🇪🇸 RE/MAX MÁS (${regMasAgents.length}):</strong> ${agentNamesPreview}
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px; text-align:center; background:#f8fafc; border-radius:8px; padding:8px 4px; border:1px solid #f1f5f9;">
+              <div>
+                <div style="font-weight:800; font-size:1rem; color:${reg.color};">${regPartners.length}</div>
+                <div style="font-size:0.68rem; color:#64748b; font-weight:600;">Partners</div>
+              </div>
+              <div>
+                <div style="font-weight:800; font-size:1rem; color:#059669;">${regClients.length}</div>
+                <div style="font-size:0.68rem; color:#64748b; font-weight:600;">Clientes</div>
+              </div>
+              <div>
+                <div style="font-weight:800; font-size:1rem; color:#d97706;">${regWebinars.length}</div>
+                <div style="font-size:0.68rem; color:#64748b; font-weight:600;">Webinar</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:5px; flex-wrap:wrap; padding-top:4px; border-top:1px solid #f1f5f9;">
+            <button type="button" class="btn btn-outline btn-xs" style="flex:1; font-size:0.71rem; padding:4px 6px;" onclick="App.views.admin.jumpToRegionView('admin/users', '${reg.id}')">👥 Red</button>
+            <button type="button" class="btn btn-outline btn-xs" style="flex:1; font-size:0.71rem; padding:4px 6px;" onclick="App.views.admin.jumpToRegionView('admin/clients', '${reg.id}')">🏡 Clientes</button>
+            <button type="button" class="btn btn-outline btn-xs" style="flex:1; font-size:0.71rem; padding:4px 6px;" onclick="App.views.admin.jumpToRegionView('admin/webinar', '${reg.id}')">🎙️ Webinar</button>
+            <button type="button" class="btn btn-outline btn-xs" style="flex:1; font-size:0.71rem; padding:4px 6px;" onclick="App.views.admin.jumpToRegionView('admin/unified', '${reg.id}')">📒 BD</button>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 
   /* ── Agreement / Fiscal Data Notifications Banner on Main Admin Dashboard ── */
@@ -536,13 +660,36 @@
         u.isWebinarRegistered = webinarRegs.some(r => r.email.toLowerCase() === u.email.toLowerCase());
       });
 
-      // 2. Render the full table
-      renderUsersTable(allUsers);
+      // Populate Region & Country Filters
+      const regionSelect = document.getElementById('admin-filter-region');
+      if (regionSelect && App.utils && App.utils.getRegionFilterOptionsHtml) {
+        const prevReg = pendingAdminRegionFilter || regionSelect.value || '';
+        regionSelect.innerHTML = App.utils.getRegionFilterOptionsHtml(prevReg);
+        regionSelect.value = prevReg;
+        pendingAdminRegionFilter = '';
+        regionSelect.onchange = handleFilters;
+      }
 
-      // 3. Bind filter and search handlers
+      const countrySelect = document.getElementById('admin-filter-country');
+      if (countrySelect) {
+        const prevCountry = countrySelect.value || '';
+        const countrySet = new Set();
+        allUsers.forEach(u => {
+          const nat = App.utils.getUserNationality ? App.utils.getUserNationality(u) : (u.nationality || '');
+          if (nat && nat !== '—') countrySet.add(nat.trim());
+          if (u.country && u.country !== '—') countrySet.add(u.country.trim());
+        });
+        const sortedCountries = Array.from(countrySet).filter(Boolean).sort((a, b) => a.localeCompare(b));
+        countrySelect.innerHTML = '<option value="">🏳️ Todos los Países / Nacionalidades</option>' +
+          sortedCountries.map(c => `<option value="${App.utils.escapeHtml(c)}" ${c === prevCountry ? 'selected' : ''}>${App.utils.escapeHtml(c)}</option>`).join('');
+        countrySelect.onchange = handleFilters;
+      }
+
+      // 2. Bind filter and search handlers + render (applying any active filter)
       bindFilterRole();
       bindFilterStatus();
       bindSearchInput();
+      handleFilters();
 
       // 4. Role Notification Banner (ONLY for José Martínez, NEVER for Maia / Super Admin)
       const header = document.querySelector('#view-admin-users .dashboard-header');
@@ -589,6 +736,7 @@
 
   /* ── Render Users Table ── */
   function renderUsersTable(users) {
+    filteredUsersCache = users || [];
     const tbody = document.getElementById('admin-users-table-body');
     if (!tbody) return;
 
@@ -600,7 +748,7 @@
     if (users.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="9" style="text-align: center; padding: 2rem;">
+          <td colspan="10" style="text-align: center; padding: 2rem;">
             <div class="empty-state">
               <div class="empty-state__icon">🔍</div>
               <p class="empty-state__text">No users match your filters.</p>
@@ -675,6 +823,12 @@
         ? `<img src="${App.utils.escapeHtml(user.agencyLogo)}" alt="Logo" title="Logo de agencia configurado para el Referral Link" style="height: 22px; max-width: 64px; object-fit: contain; border-radius: 4px; border: 1px solid #e5e7eb; background: #fff; padding: 2px; vertical-align: middle; margin-right: 0.4rem;">`
         : '';
 
+      const userNat = App.utils.getUserNationality ? App.utils.getUserNationality(user) : (user.nationality || user.country || '');
+      const regionBadgesHtml = App.utils.getUserRegionBadgesHtml ? App.utils.getUserRegionBadgesHtml(user) : '';
+      const natSubHtml = userNat
+        ? `<div style="font-size:0.75rem; color:#475569; margin-top:3px; font-weight:600;">🏳️ ${App.utils.escapeHtml(userNat)}${user.country && user.country !== userNat ? ` <span style="color:#94a3b8;">(${App.utils.escapeHtml(user.country)})</span>` : ''}</div>`
+        : '';
+
       return `
         <tr>
           <td>
@@ -686,6 +840,10 @@
           <td>${App.utils.escapeHtml(user.email)}</td>
           <td><div style="display: flex; align-items: center;">${agencyLogoHtml}<span>${App.utils.escapeHtml(user.agencyName || '—')}</span></div></td>
           <td>${roleBadge}</td>
+          <td>
+            <div style="display:flex; flex-wrap:wrap; gap:4px;">${regionBadgesHtml}</div>
+            ${natSubHtml}
+          </td>
           <td>${statusBadge}</td>
           <td>${webinarStr}</td>
           <td>${sourceStr}</td>
@@ -728,13 +886,17 @@
 
   /* ── Apply All Filters ── */
   function handleFilters() {
-    const roleSelect   = document.getElementById('admin-filter-role');
-    const statusSelect = document.getElementById('admin-filter-status');
-    const searchInput  = document.getElementById('admin-search-input');
+    const roleSelect    = document.getElementById('admin-filter-role');
+    const regionSelect  = document.getElementById('admin-filter-region');
+    const countrySelect = document.getElementById('admin-filter-country');
+    const statusSelect  = document.getElementById('admin-filter-status');
+    const searchInput   = document.getElementById('admin-search-input');
 
-    const role   = roleSelect   ? roleSelect.value   : '';
-    const status = statusSelect ? statusSelect.value : '';
-    const search = searchInput  ? searchInput.value.toLowerCase().trim() : '';
+    const role    = roleSelect    ? roleSelect.value    : '';
+    const region  = regionSelect  ? regionSelect.value  : '';
+    const country = countrySelect ? countrySelect.value : '';
+    const status  = statusSelect  ? statusSelect.value  : '';
+    const search  = searchInput   ? searchInput.value.toLowerCase().trim() : '';
 
     let filtered = [...allUsers];
 
@@ -742,16 +904,36 @@
       filtered = filtered.filter(u => u.role === role);
     }
 
+    if (region && App.utils && App.utils.getUserRegions) {
+      filtered = filtered.filter(u => App.utils.getUserRegions(u).includes(region));
+    }
+
+    if (country) {
+      const cLower = country.toLowerCase();
+      filtered = filtered.filter(u => {
+        const nat = (App.utils.getUserNationality ? App.utils.getUserNationality(u) : (u.nationality || '')).toLowerCase();
+        const cnt = (u.country || '').toLowerCase();
+        return nat.includes(cLower) || cnt.includes(cLower);
+      });
+    }
+
     if (status) {
-      filtered = filtered.filter(u => u.status === status);
+      if (status === 'active' || status === 'approved') {
+        filtered = filtered.filter(u => u.status === 'active' || u.status === 'approved');
+      } else {
+        filtered = filtered.filter(u => u.status === status);
+      }
     }
 
     if (search) {
       filtered = filtered.filter(u => {
         const fullName = `${u.firstName || ''} ${u.lastName || ''}`.toLowerCase();
+        const nat = (App.utils.getUserNationality ? App.utils.getUserNationality(u) : (u.nationality || '')).toLowerCase();
         return fullName.includes(search) ||
                (u.email || '').toLowerCase().includes(search) ||
-               (u.agencyName || '').toLowerCase().includes(search);
+               (u.agencyName || '').toLowerCase().includes(search) ||
+               (u.country || '').toLowerCase().includes(search) ||
+               nat.includes(search);
       });
     }
 
@@ -1115,12 +1297,45 @@
                 <option value="broker" ${user.role === 'broker' ? 'selected' : ''}>Broker</option>
                 <option value="realtor" ${user.role === 'realtor' ? 'selected' : ''}>Realtor</option>
                 <option value="colaborador" ${user.role === 'colaborador' ? 'selected' : ''}>Colaborador</option>
-                <option value="agent_inmomas" ${user.role === 'agent_inmomas' ? 'selected' : ''}>Agent Inmomás</option>
+                <option value="agent_inmomas" ${user.role === 'agent_inmomas' ? 'selected' : ''}>🇪🇸 Agente RE/MAX MÁS</option>
               </select>
               <button class="btn btn-primary btn-sm" id="save-user-role-btn">Update Role</button>
             </div>
           </div>
           ` : ''}
+
+          <!-- Nationality & Regional Assignment Section (RE/MAX MÁS & International Segmentation) -->
+          <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem; background: rgba(0, 63, 153, 0.03); border-radius: 0.5rem; padding: 0.9rem; border: 1px solid rgba(0, 63, 153, 0.16);">
+            <label style="font-weight: 700; font-size: 0.88rem; color: #003f99; display: flex; align-items: center; gap: 6px; margin-bottom: 0.35rem;">
+              🌍 Nacionalidad, País y Regiones Asignadas (RE/MAX MÁS)
+            </label>
+            <p style="font-size: 0.76rem; color: #475569; margin: 0 0 0.75rem;">
+              Etiqueta la nacionalidad/país y la(s) región(es) de trabajo para segmentar bases de datos, webinarios paralelos y asignación de clientes.
+            </p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 0.75rem;">
+              <div>
+                <label style="font-weight: 600; font-size: 0.78rem; color: #374151; display: block; margin-bottom: 0.25rem;">Nacionalidad / País Origen</label>
+                <select id="admin-user-nationality-select" class="form-control" style="width: 100%; padding: 0.4rem 0.55rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.82rem; background: #fff;">
+                  ${App.utils.getCountryOptionsHtml ? App.utils.getCountryOptionsHtml(App.utils.getUserNationality ? App.utils.getUserNationality(user) : (user.nationality || user.country || ''), true, '— Seleccionar Nacionalidad —') : ''}
+                </select>
+              </div>
+              <div>
+                <label style="font-weight: 600; font-size: 0.78rem; color: #374151; display: block; margin-bottom: 0.25rem;">País de Agencia / Residencia</label>
+                <select id="admin-user-country-select" class="form-control" style="width: 100%; padding: 0.4rem 0.55rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.82rem; background: #fff;">
+                  ${App.utils.getCountryOptionsHtml ? App.utils.getCountryOptionsHtml(user.country || '', true, '— Seleccionar País —') : ''}
+                </select>
+              </div>
+            </div>
+            <div style="margin-bottom: 0.75rem;">
+              <label style="font-weight: 600; font-size: 0.78rem; color: #374151; display: block; margin-bottom: 0.25rem;">Región(es) Comercial(es) Activa(s)</label>
+              <div id="admin-user-regions-wrap">
+                ${App.utils.getRegionsCheckboxesHtml ? App.utils.getRegionsCheckboxesHtml('admin-user-region-chk', App.utils.getUserRegions ? App.utils.getUserRegions(user) : []) : ''}
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" id="admin-save-user-regions-btn" style="width: 100%; justify-content: center; background: #003f99; border-color: #003f99;">
+              💾 Guardar Nacionalidad y Regiones
+            </button>
+          </div>
 
           ${user.role === 'embajador' && embajadorUmbrellaInfo ? `
           <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
@@ -1338,6 +1553,45 @@
         });
       }
 
+      const saveRegionsBtn = document.getElementById('admin-save-user-regions-btn');
+      if (saveRegionsBtn) {
+        saveRegionsBtn.addEventListener('click', async () => {
+          const natVal = document.getElementById('admin-user-nationality-select')?.value || '';
+          const cntVal = document.getElementById('admin-user-country-select')?.value || '';
+          const checkedRegs = Array.from(document.querySelectorAll('input[name="admin-user-region-chk"]:checked')).map(cb => cb.value);
+
+          if (!isMaiaOrSuperAdmin()) {
+            App.utils.closeModal();
+            await requestChangeApproval(
+              'Actualizar Nacionalidad y Regiones de Usuario',
+              `Etiquetar a "${user.firstName} ${user.lastName}" con Nacionalidad "${natVal}", País "${cntVal}" y Regiones [${checkedRegs.join(', ')}].`
+            );
+            return;
+          }
+
+          saveRegionsBtn.disabled = true;
+          saveRegionsBtn.textContent = 'Guardando...';
+          try {
+            await App.auth.updateUserRegionalProfile(userId, {
+              nationality: natVal,
+              country: cntVal,
+              regions: checkedRegs,
+              region: checkedRegs[0] || ''
+            });
+            App.utils.closeModal();
+            App.utils.showToast('🌍 Nacionalidad y regiones actualizadas correctamente.', 'success');
+            const route = App.router.getCurrentRoute();
+            if (route === 'admin/dashboard') await initDashboard();
+            else if (route === 'admin/users') await initUsers();
+          } catch (err) {
+            console.error('[Admin] Error saving user regions:', err);
+            App.utils.showToast('Error al guardar regiones: ' + err.message, 'error');
+            saveRegionsBtn.disabled = false;
+            saveRegionsBtn.textContent = '💾 Guardar Nacionalidad y Regiones';
+          }
+        });
+      }
+
       const saveRoleBtn = document.getElementById('save-user-role-btn');
       if (saveRoleBtn) {
         saveRoleBtn.addEventListener('click', async () => {
@@ -1472,6 +1726,53 @@
     try {
       allUsers = await App.auth.getAllUsers();
       allClients = await App.auth.getClients();
+
+      // Populate Region Filter
+      const regSel = document.getElementById('admin-client-filter-region');
+      if (regSel && App.utils && App.utils.getRegionFilterOptionsHtml) {
+        const initialReg = pendingAdminRegionFilter || clientRegionFilter || '';
+        clientRegionFilter = initialReg;
+        pendingAdminRegionFilter = '';
+        regSel.innerHTML = App.utils.getRegionFilterOptionsHtml(initialReg);
+        regSel.value = initialReg;
+        regSel.onchange = (e) => {
+          clientRegionFilter = e.target.value || '';
+          renderClientsView();
+        };
+      }
+
+      // Populate Country Filter
+      const countrySel = document.getElementById('admin-client-filter-country');
+      if (countrySel) {
+        const cSet = new Set();
+        allClients.forEach(c => {
+          const val = (c.country || c.currentLocation || '').trim();
+          if (val && val !== '—' && val !== '-') cSet.add(val);
+        });
+        const sortedC = Array.from(cSet).sort((a, b) => a.localeCompare(b));
+        countrySel.innerHTML = '<option value="">🏳️ Todos los Países</option>' +
+          sortedC.map(c => `<option value="${App.utils.escapeHtml(c)}" ${c === clientCountryFilter ? 'selected' : ''}>${App.utils.escapeHtml(c)}</option>`).join('');
+        countrySel.onchange = (e) => {
+          clientCountryFilter = e.target.value || '';
+          renderClientsView();
+        };
+      }
+
+      // Populate RE/MAX MÁS Agent Filter
+      const agentSel = document.getElementById('admin-client-filter-agent');
+      if (agentSel) {
+        const localAgents = allUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
+        agentSel.innerHTML = '<option value="">🇪🇸 Todos los Agentes MÁS</option>' +
+          '<option value="__unassigned__" ' + (clientAgentFilter === '__unassigned__' ? 'selected' : '') + '>⚠️ Sin Agente Asignado</option>' +
+          localAgents.map(a => {
+            const nat = App.utils.getUserNationality ? App.utils.getUserNationality(a) : '';
+            return `<option value="${a.id}" ${clientAgentFilter === a.id ? 'selected' : ''}>${App.utils.escapeHtml(a.firstName)} ${App.utils.escapeHtml(a.lastName)}${nat ? ' (' + App.utils.escapeHtml(nat) + ')' : ''}</option>`;
+          }).join('');
+        agentSel.onchange = (e) => {
+          clientAgentFilter = e.target.value || '';
+          renderClientsView();
+        };
+      }
       
       // Setup Search Input
       const searchInput = document.getElementById('admin-client-search-input');
@@ -1509,14 +1810,33 @@
   }
 
   function renderClientsView() {
-    // 1. Update count badge
-    const badgeEl = document.getElementById('admin-client-count-badge');
-    if (badgeEl) {
-      badgeEl.textContent = `${allClients.length} ${allClients.length === 1 ? 'cliente' : 'clientes'}`;
+    // 1. Filter clients by Region, Country, Agent & Search query
+    let displayClients = [...allClients];
+
+    if (clientRegionFilter && App.utils && App.utils.getRecordRegion) {
+      displayClients = displayClients.filter(c => App.utils.getRecordRegion(c, allUsers) === clientRegionFilter);
     }
 
-    // 2. Filter clients by search query
-    let displayClients = allClients;
+    if (clientCountryFilter) {
+      const cLower = clientCountryFilter.toLowerCase();
+      displayClients = displayClients.filter(c => {
+        const loc = `${c.country || ''} ${c.currentLocation || ''}`.toLowerCase();
+        return loc.includes(cLower);
+      });
+    }
+
+    if (clientAgentFilter) {
+      if (clientAgentFilter === '__unassigned__') {
+        displayClients = displayClients.filter(c => !c.localAgentId && !c.localAgentName);
+      } else {
+        const ag = allUsers.find(u => u.id === clientAgentFilter);
+        const agFull = ag ? `${ag.firstName || ''} ${ag.lastName || ''}`.trim().toLowerCase() : '';
+        displayClients = displayClients.filter(c =>
+          c.localAgentId === clientAgentFilter ||
+          (agFull && (c.localAgentName || '').toLowerCase().includes(agFull))
+        );
+      }
+    }
 
     if (clientSearchQuery) {
       displayClients = displayClients.filter(c => {
@@ -1524,11 +1844,22 @@
         const email = (c.email || '').toLowerCase();
         const phone = (c.phone || '').toLowerCase();
         const area = (c.interestArea || '').toLowerCase();
+        const country = `${c.country || ''} ${c.currentLocation || ''}`.toLowerCase();
         const agentName = (c.localAgentName || '').toLowerCase();
         const realtor = allUsers.find(u => u.id === (c.realtorId || c.referredBy));
         const realtorName = realtor ? `${realtor.firstName || ''} ${realtor.lastName || ''}`.toLowerCase() : '';
-        return fullName.includes(clientSearchQuery) || email.includes(clientSearchQuery) || phone.includes(clientSearchQuery) || area.includes(clientSearchQuery) || agentName.includes(clientSearchQuery) || realtorName.includes(clientSearchQuery);
+        return fullName.includes(clientSearchQuery) || email.includes(clientSearchQuery) || phone.includes(clientSearchQuery) || area.includes(clientSearchQuery) || country.includes(clientSearchQuery) || agentName.includes(clientSearchQuery) || realtorName.includes(clientSearchQuery);
       });
+    }
+
+    filteredClientsCache = displayClients;
+
+    // 2. Update count badge
+    const badgeEl = document.getElementById('admin-client-count-badge');
+    if (badgeEl) {
+      badgeEl.textContent = displayClients.length === allClients.length
+        ? `${allClients.length} ${allClients.length === 1 ? 'cliente' : 'clientes'}`
+        : `${displayClients.length} / ${allClients.length} clientes`;
     }
 
     const getRealtorName = (realtorId) => {
@@ -1646,17 +1977,13 @@
       const realtor = allUsers.find(u => u.id === (client.realtorId || client.referredBy));
       const realtorName = realtor ? `${realtor.firstName} ${realtor.lastName}` : '—';
       
-      // Get all active local agents
+      const clientRegion = App.utils.getRecordRegion ? App.utils.getRecordRegion(client, allUsers) : '';
+      const clientCountryDisplay = client.country && client.country !== '—' ? client.country : (client.currentLocation || '—');
+      const clientRegionBadge = App.utils.getRegionBadge ? App.utils.getRegionBadge(clientRegion, true) : '';
+
+      // Get all active local agents sorted/grouped by Client's Region
       const localAgents = allUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
-      
-      const dropdownOptions = `
-        <option value="">-- Select Local Agent --</option>
-        ${localAgents.map(a => `
-          <option value="${a.id}" ${client.localAgentId === a.id ? 'selected' : ''}>
-            ${a.firstName} ${a.lastName} (Inmomás)
-          </option>
-        `).join('')}
-      `;
+      const dropdownOptions = buildSmartMasAgentOptions(localAgents, client.localAgentId || '', clientRegion, '-- Seleccionar Agente RE/MAX MÁS --');
 
       const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(client.status)}">${App.utils.getStatusLabel(client.status)}</span>`;
 
@@ -1679,7 +2006,11 @@
           <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
               <h3 style="margin: 0 0 0.25rem;">${App.utils.escapeHtml(client.firstName)} ${App.utils.escapeHtml(client.lastName)}</h3>
-              <div style="margin-bottom: 0.5rem;">${statusBadge}</div>
+              <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-bottom: 0.5rem;">
+                ${statusBadge}
+                ${clientRegionBadge}
+                <span style="font-size:0.76rem; color:#475569; font-weight:600;">🏳️ ${App.utils.escapeHtml(clientCountryDisplay)}</span>
+              </div>
             </div>
             <div>
               ${App.utils.getClientTagBadge(clientTag)}
@@ -1910,17 +2241,10 @@
       const lead = allLeads.find(l => l.id === leadId);
       if (!lead) return;
 
-      // Get all active local agents
+      // Get all active local agents with regional grouping
       const localAgents = allUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
-
-      const dropdownOptions = `
-        <option value="">-- Select Local Agent --</option>
-        ${localAgents.map(a => `
-          <option value="${a.id}" ${lead.localAgentId === a.id ? 'selected' : ''}>
-            ${a.firstName} ${a.lastName} (Inmomás)
-          </option>
-        `).join('')}
-      `;
+      const leadRegion = App.utils.getRecordRegion ? App.utils.getRecordRegion(lead, allUsers) : '';
+      const dropdownOptions = buildSmartMasAgentOptions(localAgents, lead.localAgentId || '', leadRegion, '-- Seleccionar Agente RE/MAX MÁS --');
 
       App.utils.showModal({
         title: 'Lead Details & Assignment',
@@ -2104,19 +2428,32 @@
       setTextById('nl-stat-realtors', realtorSubs.length);
       setTextById('nl-stat-sent',    history.length);
 
-      // 3. Init recipient badge
+      // 3. Init recipient & region selectors + badge
       const recipientSelect = document.getElementById('nl-recipients');
+      const regionSelect    = document.getElementById('nl-region');
       const recipientBadge  = document.getElementById('nl-recipient-badge');
 
-      function updateBadge() {
+      if (regionSelect && App.utils && App.utils.getRegionFilterOptionsHtml) {
+        regionSelect.innerHTML = App.utils.getRegionFilterOptionsHtml('', '🌍 Todas las Regiones', '🌍 All Regions');
+      }
+
+      function getFilteredNewsletterRecipients() {
         const role = recipientSelect ? recipientSelect.value : 'all';
-        const count = (subscriberMap[role] || []).length;
+        const reg  = regionSelect    ? regionSelect.value    : '';
+        const base = subscriberMap[role] || [];
+        if (!reg || !App.utils || !App.utils.getUserRegions) return base;
+        return base.filter(u => App.utils.getUserRegions(u).includes(reg));
+      }
+
+      function updateBadge() {
+        const count = getFilteredNewsletterRecipients().length;
         if (recipientBadge) {
           recipientBadge.textContent = count + ' subscriber' + (count !== 1 ? 's' : '');
         }
       }
       updateBadge();
       if (recipientSelect) recipientSelect.addEventListener('change', updateBadge);
+      if (regionSelect) regionSelect.addEventListener('change', updateBadge);
 
       // 4. Preview button
       const previewBtn   = document.getElementById('nl-preview-btn');
@@ -2153,7 +2490,8 @@
           const subject = (document.getElementById('nl-subject') || {}).value || '';
           const body    = (document.getElementById('nl-body') || {}).value || '';
           const recipientRole = recipientSelect ? recipientSelect.value : 'all';
-          const recipients    = subscriberMap[recipientRole] || [];
+          const recipientRegion = regionSelect ? regionSelect.value : '';
+          const recipients    = getFilteredNewsletterRecipients();
 
           if (!subject || !body) {
             App.utils.showToast('Please fill in the subject and body.', 'error');
@@ -2172,7 +2510,7 @@
             await App.auth.saveNewsletter({
               subject,
               body,
-              recipientRole,
+              recipientRole: recipientRegion ? `${recipientRole} (${recipientRegion})` : recipientRole,
               recipientCount: recipients.length,
               recipientEmails: recipients.map(u => u.email),
               sentBy: currentUser ? (currentUser.firstName + ' ' + currentUser.lastName).trim() : 'Admin'
@@ -2260,11 +2598,16 @@
 
   /* ============================================
      WEBINAR MANAGEMENT & SETTINGS
-     B2B / B2C Switch, Date Configurator & Leads
+     Parallel Regional Configurator (B2B / B2C per Region) & Segmented Registrations
      ============================================ */
   let currentWebinarSettings = null;
   let allWebinarRegistrations = [];
+  let filteredWebinarCache = [];
+  let selectedWebinarConfigRegion = 'north_america';
   let currentWebinarFilter = 'all';
+  let currentWebinarRegionFilter = '';
+  let currentWebinarCountryFilter = '';
+  let currentWebinarAgentFilter = '';
   let currentWebinarSearch = '';
 
   async function initWebinar() {
@@ -2284,16 +2627,22 @@
         currentWebinarSettings = App.auth.getDefaultWebinarSettings();
       }
 
-      // 2. Populate Config Form & Switch UI
+      if (pendingAdminRegionFilter) {
+        selectedWebinarConfigRegion = pendingAdminRegionFilter;
+        currentWebinarRegionFilter = pendingAdminRegionFilter;
+        pendingAdminRegionFilter = '';
+      }
+
+      // 2. Populate Parallel Region Tabs & Config Form
       populateWebinarForm(currentWebinarSettings);
 
       // 3. Fetch Registrations
       allWebinarRegistrations = await App.auth.getWebinarRegistrations();
 
-      // 4. Update Stats
-      updateWebinarStats(allWebinarRegistrations);
+      // 4. Populate Table Filter Dropdowns (Region, Country, Agent)
+      populateWebinarTableFilters();
 
-      // 5. Render Table
+      // 5. Render Table & Stats
       renderWebinarTable();
 
       // 6. Fetch & Render Feedback Surveys
@@ -2305,9 +2654,119 @@
     }
   }
 
+  function selectWebinarConfigRegion(regionId) {
+    if (!regionId || !App.utils || !App.utils.REGIONS[regionId]) return;
+    selectedWebinarConfigRegion = regionId;
+    if (!currentWebinarSettings) {
+      currentWebinarSettings = App.auth.getDefaultWebinarSettings();
+    }
+    populateWebinarForm(currentWebinarSettings);
+  }
+
+  function populateWebinarTableFilters() {
+    const regSel = document.getElementById('webinar-filter-region');
+    if (regSel && App.utils && App.utils.getRegionFilterOptionsHtml) {
+      regSel.innerHTML = App.utils.getRegionFilterOptionsHtml(currentWebinarRegionFilter);
+      regSel.value = currentWebinarRegionFilter;
+    }
+
+    const countrySel = document.getElementById('webinar-filter-country');
+    if (countrySel) {
+      const cSet = new Set();
+      (allWebinarRegistrations || []).forEach(r => {
+        if (r.country && r.country !== '—') cSet.add(r.country.trim());
+      });
+      const sortedC = Array.from(cSet).sort((a, b) => a.localeCompare(b));
+      countrySel.innerHTML = '<option value="">🏳️ Todos los Países</option>' +
+        sortedC.map(c => `<option value="${App.utils.escapeHtml(c)}" ${c === currentWebinarCountryFilter ? 'selected' : ''}>${App.utils.escapeHtml(c)}</option>`).join('');
+    }
+
+    const agentSel = document.getElementById('webinar-filter-agent');
+    if (agentSel) {
+      const aSet = new Set();
+      (allWebinarRegistrations || []).forEach(r => {
+        let name = r.agentReferrerName || '';
+        if (!name && r.referralCode && allUsers) {
+          const found = allUsers.find(u => u.referralCode && u.referralCode.toUpperCase() === r.referralCode.toUpperCase());
+          if (found) name = `${found.firstName} ${found.lastName}`.trim();
+        }
+        if (!name && r.howHeard === 'agent' && r.referrerName) name = r.referrerName;
+        if (name) aSet.add(name.trim());
+      });
+      const sortedA = Array.from(aSet).sort((a, b) => a.localeCompare(b));
+      agentSel.innerHTML = '<option value="">👤 Todos los Agentes</option>' +
+        sortedA.map(a => `<option value="${App.utils.escapeHtml(a)}" ${a === currentWebinarAgentFilter ? 'selected' : ''}>${App.utils.escapeHtml(a)}</option>`).join('');
+    }
+  }
+
+  function setWebinarRegionFilter(val) {
+    currentWebinarRegionFilter = val || '';
+    if (val && App.utils && App.utils.REGIONS[val]) {
+      selectedWebinarConfigRegion = val;
+      if (currentWebinarSettings) populateWebinarForm(currentWebinarSettings);
+    }
+    renderWebinarTable();
+  }
+
+  function setWebinarCountryFilter(val) {
+    currentWebinarCountryFilter = val || '';
+    renderWebinarTable();
+  }
+
+  function setWebinarAgentFilter(val) {
+    currentWebinarAgentFilter = val || '';
+    renderWebinarTable();
+  }
+
   function populateWebinarForm(settings) {
-    const activeType = settings.activeType || 'b2c';
-    const typeConfig = settings[activeType] || {};
+    const regObj = (App.utils && App.utils.REGIONS[selectedWebinarConfigRegion]) || { id: 'north_america', icon: '🌎', shortEs: 'Norteamérica', shortEn: 'North America', color: '#003f99', bg: 'rgba(0,63,153,0.1)', border: 'rgba(0,63,153,0.25)' };
+    const regBlock = (settings.regionalConfigs && settings.regionalConfigs[selectedWebinarConfigRegion]) || {};
+    const activeType = regBlock.activeType || settings.activeType || 'b2c';
+    const typeConfig = regBlock[activeType] || settings[activeType] || {};
+    const langVal = typeConfig.language || regBlock.language || regObj.defaultLang || 'en';
+
+    // Render Region Tabs
+    const tabsEl = document.getElementById('admin-webinar-region-tabs');
+    if (tabsEl && App.utils && App.utils.REGION_LIST) {
+      tabsEl.innerHTML = App.utils.REGION_LIST.map(r => {
+        const isSel = r.id === selectedWebinarConfigRegion;
+        return `
+          <button type="button" onclick="App.views.admin.selectWebinarConfigRegion('${r.id}')" class="btn btn-sm" style="border-radius:999px; padding:6px 14px; font-size:0.8rem; font-weight:700; border:1px solid ${isSel ? r.color : '#e2e8f0'}; background:${isSel ? r.color : '#f8fafc'}; color:${isSel ? '#fff' : '#334155'}; cursor:pointer;">
+            ${r.icon} <span class="lang-en">${r.shortEn}</span><span class="lang-es">${r.shortEs}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    // Render Parallel Summary Strip
+    const stripEl = document.getElementById('admin-webinar-parallel-strip');
+    if (stripEl && App.utils && App.utils.REGION_LIST) {
+      const langIcons = { en: '🇬🇧 EN', es: '🇪🇸 ES', fr: '🇫🇷 FR', de: '🇩🇪 DE', nl: '🇳🇱 NL', pl: '🇵🇱 PL', uk: '🇺🇦 UK', ar: '🇦🇪 AR', bilingual: '🌐 ES/EN' };
+      stripEl.innerHTML = App.utils.REGION_LIST.map(r => {
+        const rb = (settings.regionalConfigs && settings.regionalConfigs[r.id]) || {};
+        const rt = rb.activeType || 'b2c';
+        const rc = rb[rt] || {};
+        const rDate = rc.date || '—';
+        const rTime = rc.time || '18:00';
+        const rLang = langIcons[rc.language || rb.language || r.defaultLang || 'en'] || '🌐';
+        const isSel = r.id === selectedWebinarConfigRegion;
+        return `
+          <div onclick="App.views.admin.selectWebinarConfigRegion('${r.id}')" style="cursor:pointer; padding:8px 10px; border-radius:10px; border:1.5px solid ${isSel ? r.color : '#e5e7eb'}; background:${isSel ? r.bg : '#fff'}; font-size:0.75rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:800; color:#0f172a;">
+              <span>${r.icon} ${r.shortEs}</span>
+              <span style="padding:1px 6px; border-radius:999px; font-size:0.66rem; background:${rt === 'b2b' ? '#003f99' : '#059669'}; color:#fff;">${rt.toUpperCase()}</span>
+            </div>
+            <div style="color:#475569; margin-top:3px; font-weight:600;">📅 ${App.utils.escapeHtml(rDate)} · ${App.utils.escapeHtml(rTime)} · ${rLang}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Update Regional Direct Link
+    const regLinkEl = document.getElementById('admin-webinar-regional-link');
+    if (regLinkEl) {
+      regLinkEl.textContent = `https://thespainconnection.com/index.html#webinar?region=${selectedWebinarConfigRegion}`;
+    }
 
     // Update switch buttons UI
     const b2bBtn = document.getElementById('switch-btn-b2b');
@@ -2334,18 +2793,18 @@
     // Update Status Pill
     const statusText = document.getElementById('admin-status-text');
     const statusBadge = document.getElementById('admin-status-badge');
-    const dateVal = settings.date || typeConfig.date || '2026-09-18';
-    const timeVal = settings.time || typeConfig.time || '12:00';
+    const dateVal = typeConfig.date || (selectedWebinarConfigRegion === 'north_america' ? settings.date : '') || '2026-10-29';
+    const timeVal = typeConfig.time || (selectedWebinarConfigRegion === 'north_america' ? settings.time : '') || '18:00';
 
     if (statusText) {
-      const modeName = activeType === 'b2b' 
-        ? 'B2B (Realtors & Brokers de EE.UU., Canadá y Puerto Rico)'
-        : 'B2C (Clientes Finales e Inversores en España)';
-      statusText.textContent = `${modeName} — ${dateVal} (${timeVal} EDT / 18:00 España)`;
+      const modeName = activeType === 'b2b'
+        ? `B2B Realtors & Brokers — ${regObj.shortEs}`
+        : `B2C Clientes e Inversores — ${regObj.shortEs}`;
+      statusText.textContent = `${modeName} — ${dateVal} (${timeVal} España · Idioma: ${langVal.toUpperCase()})`;
     }
 
     if (statusBadge) {
-      statusBadge.textContent = activeType === 'b2b' ? 'B2B ACTIVE' : 'B2C ACTIVE';
+      statusBadge.textContent = `${regObj.shortEs.toUpperCase()} · ${activeType.toUpperCase()}`;
       statusBadge.style.background = activeType === 'b2b' ? '#003f99' : '#059669';
     }
 
@@ -2353,15 +2812,17 @@
     const dateInput = document.getElementById('admin-webinar-date');
     const timeInput = document.getElementById('admin-webinar-time');
     const spotsInput = document.getElementById('admin-webinar-spots');
+    const langInput = document.getElementById('admin-webinar-language');
     const titleInput = document.getElementById('admin-webinar-title');
     const targetInput = document.getElementById('admin-webinar-target');
     const subtitleInput = document.getElementById('admin-webinar-subtitle');
 
     if (dateInput) dateInput.value = dateVal;
     if (timeInput) timeInput.value = timeVal;
-    if (spotsInput) spotsInput.value = settings.spotsAvailable || typeConfig.spots || 25;
-    if (titleInput) titleInput.value = typeConfig.title || (activeType === 'b2b' ? 'Beyond the Borders' : 'Spain Unlocked: Living & Investing');
-    if (targetInput) targetInput.value = typeConfig.targetAudience || (activeType === 'b2b' ? 'US, Canadian & Puerto Rico Realtors' : 'International Buyers, Expats & Investors');
+    if (spotsInput) spotsInput.value = typeConfig.spots || settings.spotsAvailable || 25;
+    if (langInput) langInput.value = langVal;
+    if (titleInput) titleInput.value = typeConfig.title || (activeType === 'b2b' ? `Beyond Borders — ${regObj.shortEn}` : `Spain Unlocked — ${regObj.shortEn}`);
+    if (targetInput) targetInput.value = typeConfig.targetAudience || '';
     if (subtitleInput) subtitleInput.value = typeConfig.subtitle || '';
   }
 
@@ -2369,20 +2830,21 @@
     if (!currentWebinarSettings) {
       currentWebinarSettings = App.auth.getDefaultWebinarSettings();
     }
-    currentWebinarSettings.activeType = newType;
+    if (!currentWebinarSettings.regionalConfigs) currentWebinarSettings.regionalConfigs = {};
+    if (!currentWebinarSettings.regionalConfigs[selectedWebinarConfigRegion]) {
+      currentWebinarSettings.regionalConfigs[selectedWebinarConfigRegion] = {};
+    }
+    currentWebinarSettings.regionalConfigs[selectedWebinarConfigRegion].activeType = newType;
 
-    // Use type-specific default date/time if available
-    if (currentWebinarSettings[newType]) {
-      if (currentWebinarSettings[newType].date) {
-        currentWebinarSettings.date = currentWebinarSettings[newType].date;
-      }
-      if (currentWebinarSettings[newType].time) {
-        currentWebinarSettings.time = currentWebinarSettings[newType].time;
-      }
+    if (selectedWebinarConfigRegion === 'north_america') {
+      currentWebinarSettings.activeType = newType;
+      if (currentWebinarSettings[newType]?.date) currentWebinarSettings.date = currentWebinarSettings[newType].date;
+      if (currentWebinarSettings[newType]?.time) currentWebinarSettings.time = currentWebinarSettings[newType].time;
     }
 
     populateWebinarForm(currentWebinarSettings);
-    App.utils.showToast(`Modo cambiado a ${newType.toUpperCase()}. Haz clic en "Guardar y Publicar" para activarlo en la web.`, 'info');
+    const rName = (App.utils && App.utils.REGIONS[selectedWebinarConfigRegion]) ? App.utils.REGIONS[selectedWebinarConfigRegion].shortEs : selectedWebinarConfigRegion;
+    App.utils.showToast(`Modo cambiado a ${newType.toUpperCase()} para ${rName}. Haz clic en "Guardar y Publicar" para confirmar.`, 'info');
   }
 
   async function saveWebinarConfig(e) {
@@ -2390,8 +2852,8 @@
 
     if (!isMaiaOrSuperAdmin()) {
       await requestChangeApproval(
-        'Actualizar Configuración de Webinar',
-        'Guardar y publicar nueva fecha, hora, cupos o textos del webinario en la web.'
+        'Actualizar Configuración Regional de Webinar',
+        `Guardar nueva configuración de webinario para la región "${selectedWebinarConfigRegion}".`
       );
       return;
     }
@@ -2406,36 +2868,53 @@
       if (!currentWebinarSettings) {
         currentWebinarSettings = App.auth.getDefaultWebinarSettings();
       }
+      if (!currentWebinarSettings.regionalConfigs) currentWebinarSettings.regionalConfigs = {};
+      if (!currentWebinarSettings.regionalConfigs[selectedWebinarConfigRegion]) {
+        currentWebinarSettings.regionalConfigs[selectedWebinarConfigRegion] = { activeType: 'b2c', b2b: {}, b2c: {} };
+      }
 
-      const activeType = currentWebinarSettings.activeType || 'b2c';
+      const regBlock = currentWebinarSettings.regionalConfigs[selectedWebinarConfigRegion];
+      const activeType = regBlock.activeType || currentWebinarSettings.activeType || 'b2c';
       const dateVal = document.getElementById('admin-webinar-date')?.value || currentWebinarSettings.date;
       const timeVal = document.getElementById('admin-webinar-time')?.value || currentWebinarSettings.time;
       const spotsVal = parseInt(document.getElementById('admin-webinar-spots')?.value || '25', 10);
+      const langVal = document.getElementById('admin-webinar-language')?.value || 'en';
       const titleVal = document.getElementById('admin-webinar-title')?.value || '';
       const targetVal = document.getElementById('admin-webinar-target')?.value || '';
       const subtitleVal = document.getElementById('admin-webinar-subtitle')?.value || '';
 
-      // Update active settings
-      currentWebinarSettings.date = dateVal;
-      currentWebinarSettings.time = timeVal;
-      currentWebinarSettings.spotsAvailable = spotsVal;
+      regBlock.activeType = activeType;
+      regBlock.language = langVal;
+      if (!regBlock[activeType]) regBlock[activeType] = {};
+      regBlock[activeType].date = dateVal;
+      regBlock[activeType].time = timeVal;
+      regBlock[activeType].spots = spotsVal;
+      regBlock[activeType].language = langVal;
+      if (titleVal) regBlock[activeType].title = titleVal;
+      if (targetVal) regBlock[activeType].targetAudience = targetVal;
+      if (subtitleVal) regBlock[activeType].subtitle = subtitleVal;
 
-      if (!currentWebinarSettings[activeType]) {
-        currentWebinarSettings[activeType] = {};
+      // Also sync global root settings when saving North America (default landing webinar)
+      if (selectedWebinarConfigRegion === 'north_america') {
+        currentWebinarSettings.activeType = activeType;
+        currentWebinarSettings.date = dateVal;
+        currentWebinarSettings.time = timeVal;
+        currentWebinarSettings.spotsAvailable = spotsVal;
+        if (!currentWebinarSettings[activeType]) currentWebinarSettings[activeType] = {};
+        currentWebinarSettings[activeType].date = dateVal;
+        currentWebinarSettings[activeType].time = timeVal;
+        currentWebinarSettings[activeType].spots = spotsVal;
+        if (titleVal) currentWebinarSettings[activeType].title = titleVal;
+        if (targetVal) currentWebinarSettings[activeType].targetAudience = targetVal;
+        if (subtitleVal) currentWebinarSettings[activeType].subtitle = subtitleVal;
       }
-      currentWebinarSettings[activeType].date = dateVal;
-      currentWebinarSettings[activeType].time = timeVal;
-      currentWebinarSettings[activeType].spots = spotsVal;
-      if (titleVal) currentWebinarSettings[activeType].title = titleVal;
-      if (targetVal) currentWebinarSettings[activeType].targetAudience = targetVal;
-      if (subtitleVal) currentWebinarSettings[activeType].subtitle = subtitleVal;
 
-      // Save via auth service
       const saved = await App.auth.saveWebinarSettings(currentWebinarSettings);
       currentWebinarSettings = saved;
 
       populateWebinarForm(saved);
-      App.utils.showToast('✅ ¡Configuración del webinario guardada y publicada en la web con éxito!', 'success');
+      const rLabel = (App.utils && App.utils.REGIONS[selectedWebinarConfigRegion]) ? App.utils.REGIONS[selectedWebinarConfigRegion].shortEs : selectedWebinarConfigRegion;
+      App.utils.showToast(`✅ ¡Webinario de ${rLabel} (${activeType.toUpperCase()}) guardado y publicado!`, 'success');
 
     } catch (err) {
       console.error('[Admin] Error saving webinar settings:', err);
@@ -2450,11 +2929,9 @@
 
   function resetWebinarDefaults() {
     const defaults = App.auth.getDefaultWebinarSettings();
-    const activeType = currentWebinarSettings?.activeType || 'b2c';
-    defaults.activeType = activeType;
     currentWebinarSettings = defaults;
     populateWebinarForm(currentWebinarSettings);
-    App.utils.showToast('Valores recomendados cargados. Haz clic en "Guardar y Publicar" para confirmar.', 'info');
+    App.utils.showToast('Valores recomendados por región cargados. Haz clic en "Guardar y Publicar" para confirmar.', 'info');
   }
 
   /* ---- Robust categorization helper for Webinar Registrations (B2B vs B2C) ---- */
@@ -2616,13 +3093,34 @@
       if (currentWebinarFilter === 'b2b' && !isB2B) return false;
       if (currentWebinarFilter === 'b2c' && isB2B) return false;
 
+      const recRegion = App.utils.getRecordRegion ? App.utils.getRecordRegion(r, allUsers) : (r.webinarRegion || r.region || '');
+      if (currentWebinarRegionFilter && recRegion !== currentWebinarRegionFilter) return false;
+
+      if (currentWebinarCountryFilter) {
+        const cLower = currentWebinarCountryFilter.toLowerCase();
+        if (!(r.country || '').toLowerCase().includes(cLower)) return false;
+      }
+
+      if (currentWebinarAgentFilter) {
+        let aName = r.agentReferrerName || '';
+        if (!aName && r.referralCode && allUsers) {
+          const found = allUsers.find(u => u.referralCode && u.referralCode.toUpperCase() === r.referralCode.toUpperCase());
+          if (found) aName = `${found.firstName} ${found.lastName}`.trim();
+        }
+        if (!aName && r.howHeard === 'agent' && r.referrerName) aName = r.referrerName;
+        if (aName.trim() !== currentWebinarAgentFilter) return false;
+      }
+
       if (currentWebinarSearch) {
-        const searchPool = `${r.firstName || ''} ${r.lastName || ''} ${r.email || ''} ${r.phone || ''} ${r.agency || ''} ${r.clientInterest || ''} ${r.country || ''} ${r.state || ''} ${r.referrerName || ''} ${r.agentReferrerName || ''}`.toLowerCase();
+        const searchPool = `${r.firstName || ''} ${r.lastName || ''} ${r.email || ''} ${r.phone || ''} ${r.agency || ''} ${r.clientInterest || ''} ${r.country || ''} ${r.state || ''} ${r.referrerName || ''} ${r.agentReferrerName || ''} ${recRegion}`.toLowerCase();
         if (!searchPool.includes(currentWebinarSearch)) return false;
       }
 
       return true;
     });
+
+    filteredWebinarCache = filtered;
+    updateWebinarStats(filtered);
 
     if (filtered.length === 0) {
       tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:2.5rem;color:#6b7280;">No se encontraron registros con los filtros seleccionados.</td></tr>`;
@@ -2675,18 +3173,22 @@
       }
 
       const agencyGoal = isB2B ? (r.agency || '—') : (r.clientInterest || r.agency || 'Inversión / Mudanza');
+      const recRegion = App.utils.getRecordRegion ? App.utils.getRecordRegion(r, allUsers) : (r.webinarRegion || r.region || '');
+      const regBadgeHtml = App.utils.getRegionBadge ? App.utils.getRegionBadge(recRegion, true) : '';
+      const langPill = r.webinarLanguage ? `<span style="font-size:0.7rem;background:#f1f5f9;color:#334155;padding:1px 6px;border-radius:6px;margin-left:4px;font-weight:700;">${App.utils.escapeHtml(r.webinarLanguage.toUpperCase())}</span>` : '';
 
       return `
         <tr>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;color:var(--text-muted);">${date}</td>
-          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">${typeBadge}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">${typeBadge}${langPill}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-weight:600;">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.85rem;">${App.utils.escapeHtml(r.email)}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.85rem;">${App.utils.escapeHtml(r.phone || '—')}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.85rem;">${App.utils.escapeHtml(agencyGoal)}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">
-            <span style="background:rgba(0,67,255,.07);color:var(--primary);border-radius:20px;padding:3px 10px;font-size:.8rem;font-weight:600;">${App.utils.escapeHtml(r.country || '—')}</span>
-            ${r.state ? `<small style="display:block;color:#6b7280;font-size:0.75rem;margin-top:2px;">${App.utils.escapeHtml(r.state)}</small>` : ''}
+            <div style="margin-bottom:3px;">${regBadgeHtml}</div>
+            <span style="background:rgba(0,67,255,.07);color:var(--primary);border-radius:20px;padding:2px 9px;font-size:.78rem;font-weight:600;">${App.utils.escapeHtml(r.country || '—')}</span>
+            ${r.state ? `<small style="display:block;color:#6b7280;font-size:0.73rem;margin-top:2px;">${App.utils.escapeHtml(r.state)}</small>` : ''}
           </td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${how}</td>
           <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">${agentTagCell}</td>
@@ -2700,28 +3202,35 @@
   }
 
   function exportUsersToExcel() {
-    if (!allUsers || allUsers.length === 0) {
+    const targetList = (filteredUsersCache && filteredUsersCache.length > 0) ? filteredUsersCache : allUsers;
+    if (!targetList || targetList.length === 0) {
       App.utils.showToast('No users to export.', 'error');
       return;
     }
 
     const headers = [
-      'Date', 'First Name', 'Last Name', 'Email', 'Phone', 'Agency', 'Role', 'Status', 'Country', 'State', 'Webinar Registered'
+      'Date', 'First Name', 'Last Name', 'Email', 'Phone', 'Agency', 'Role', 'Status', 'Nationality', 'Country', 'Regions', 'State', 'Webinar Registered'
     ];
 
-    const rows = allUsers.map(u => [
-      u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-US') : '',
-      u.firstName || '',
-      u.lastName || '',
-      u.email || '',
-      u.phone || '',
-      u.agency || '',
-      u.role || '',
-      u.status || '',
-      u.country || '',
-      u.state || '',
-      u.isWebinarRegistered ? 'Yes' : 'No'
-    ]);
+    const rows = targetList.map(u => {
+      const nat = App.utils.getUserNationality ? App.utils.getUserNationality(u) : (u.nationality || u.country || '');
+      const regs = App.utils.getUserRegions ? App.utils.getUserRegions(u).map(r => (App.utils.REGIONS[r] ? App.utils.REGIONS[r].shortEs : r)).join(', ') : '';
+      return [
+        u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-US') : '',
+        u.firstName || '',
+        u.lastName || '',
+        u.email || '',
+        u.phone || '',
+        u.agencyName || u.agency || '',
+        u.role || '',
+        u.status || '',
+        nat,
+        u.country || '',
+        regs,
+        u.state || '',
+        u.isWebinarRegistered ? 'Yes' : 'No'
+      ];
+    });
 
     if (typeof XLSX !== 'undefined') {
       const wb = XLSX.utils.book_new();
@@ -2737,7 +3246,7 @@
       });
       XLSX.utils.book_append_sheet(wb, ws, 'Usuarios Registrados');
       XLSX.writeFile(wb, `Users-Export-${new Date().toISOString().slice(0,10)}.xlsx`);
-      App.utils.showToast(`✅ Exported ${allUsers.length} users to Excel (.xlsx).`, 'success');
+      App.utils.showToast(`✅ Exportados ${targetList.length} usuarios a Excel (.xlsx).`, 'success');
       return;
     }
 
@@ -2754,7 +3263,7 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    App.utils.showToast(`✅ Exported ${allUsers.length} users to Excel.`, 'success');
+    App.utils.showToast(`✅ Exportados ${targetList.length} usuarios a Excel.`, 'success');
   }
   function toggleClientView(viewType) {
     const board = document.getElementById('admin-clients-board');
@@ -2792,13 +3301,15 @@
   }
 
   function exportClientsToExcel() {
-    if (!allClients || allClients.length === 0) {
+    const hasFilter = !!(clientRegionFilter || clientCountryFilter || clientAgentFilter || clientSearchQuery);
+    const targetClients = hasFilter ? filteredClientsCache : allClients;
+    if (!targetClients || targetClients.length === 0) {
       App.utils.showToast('No clients to export.', 'error');
       return;
     }
 
     const headers = [
-      'Date', 'First Name', 'Last Name', 'Email', 'Phone', 'Budget', 'Interest Area', 'Status', 'Assigned Inmomas Agent', 'Referring Realtor / Partner'
+      'Date', 'First Name', 'Last Name', 'Email', 'Phone', 'Region', 'Country', 'Budget', 'Interest Area', 'Status', 'Assigned RE/MAX MAS Agent', 'Referring Realtor / Partner'
     ];
 
     const getRealtorName = (realtorId) => {
@@ -2806,19 +3317,27 @@
       return realtor ? `${realtor.firstName || ''} ${realtor.lastName || ''}`.trim() : 'Directo / Sin asignar';
     };
 
-    const rows = allClients.map(c => [
-      c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-US') : '',
-      c.firstName || '',
-      c.lastName || '',
-      c.email || '',
-      c.phone || '',
-      c.budget || '',
-      c.interestArea || '',
-      c.status || '',
-      c.localAgentName || 'Sin asignar',
-      getRealtorName(c.realtorId || c.referredBy)
-    ]);
+    const rows = targetClients.map(c => {
+      const regId = App.utils.getRecordRegion ? App.utils.getRecordRegion(c, allUsers) : '';
+      const regName = (regId && App.utils.REGIONS && App.utils.REGIONS[regId]) ? App.utils.REGIONS[regId].shortEs : '';
+      const cnt = (c.country && c.country !== '—') ? c.country : (c.currentLocation || '');
+      return [
+        c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-US') : '',
+        c.firstName || '',
+        c.lastName || '',
+        c.email || '',
+        c.phone || '',
+        regName,
+        cnt,
+        c.budget || '',
+        c.interestArea || '',
+        c.status || '',
+        c.localAgentName || 'Sin asignar',
+        getRealtorName(c.realtorId || c.referredBy)
+      ];
+    });
 
+    const regSuffix = clientRegionFilter ? `-${clientRegionFilter}` : '';
     if (typeof XLSX !== 'undefined') {
       const wb = XLSX.utils.book_new();
       const wsData = [headers, ...rows];
@@ -2832,8 +3351,8 @@
         return { wch: maxLen + 3 };
       });
       XLSX.utils.book_append_sheet(wb, ws, 'Clientes');
-      XLSX.writeFile(wb, `Clients-Export-${new Date().toISOString().slice(0,10)}.xlsx`);
-      App.utils.showToast(`✅ Exported ${allClients.length} clients to Excel (.xlsx).`, 'success');
+      XLSX.writeFile(wb, `Clients-Export${regSuffix}-${new Date().toISOString().slice(0,10)}.xlsx`);
+      App.utils.showToast(`✅ Exportados ${targetClients.length} clientes a Excel (.xlsx).`, 'success');
       return;
     }
 
@@ -2844,13 +3363,13 @@
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href = url;
-    a.download = `Clients-Export-${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `Clients-Export${regSuffix}-${new Date().toISOString().slice(0,10)}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    App.utils.showToast(`✅ Exported ${allClients.length} clients to Excel.`, 'success');
+    App.utils.showToast(`✅ Exportados ${targetClients.length} clientes a Excel.`, 'success');
   }
 
   async function exportWebinarToExcel() {
@@ -2858,7 +3377,9 @@
       if (!allUsers || allUsers.length === 0) {
         allUsers = await App.auth.getAllUsers();
       }
-      const registrations = await App.auth.getWebinarRegistrations();
+      const hasActiveWebinarFilter = !!(currentWebinarFilter !== 'all' || currentWebinarRegionFilter || currentWebinarCountryFilter || currentWebinarAgentFilter || currentWebinarSearch);
+      const rawRegs = await App.auth.getWebinarRegistrations();
+      const registrations = hasActiveWebinarFilter ? filteredWebinarCache : rawRegs;
       if (!registrations || registrations.length === 0) {
         App.utils.showToast('No registrations to export.', 'error');
         return;
@@ -2896,7 +3417,7 @@
       };
 
       const headersB2C = [
-        'Date', 'Event Type', 'Webinar Theme', 'Target Date', 'First Name', 'Last Name', 'Email', 'Phone',
+        'Date', 'Region', 'Language', 'Event Type', 'Webinar Theme', 'Target Date', 'First Name', 'Last Name', 'Email', 'Phone',
         'Client Goal / Interest', 'Country', 'State / Province',
         'How They Heard', 'Referring Agent (self-reported)',
         'Agent Via Link', 'Referral Code', 'Agent Role',
@@ -2904,7 +3425,7 @@
       ];
 
       const headersB2B = [
-        'Date', 'Event Type', 'Webinar Theme', 'Target Date', 'First Name', 'Last Name', 'Email', 'Phone',
+        'Date', 'Region', 'Language', 'Event Type', 'Webinar Theme', 'Target Date', 'First Name', 'Last Name', 'Email', 'Phone',
         'Agency / Brokerage', 'Country', 'State / Province',
         'How They Heard', 'Referring Agent (self-reported)',
         'Agent Via Link', 'Referral Code', 'Agent Role',
@@ -2912,7 +3433,7 @@
       ];
 
       const headersAll = [
-        'Date', 'Event Type', 'Webinar Theme', 'Target Date', 'First Name', 'Last Name', 'Email', 'Phone',
+        'Date', 'Region', 'Language', 'Event Type', 'Webinar Theme', 'Target Date', 'First Name', 'Last Name', 'Email', 'Phone',
         'Agency / Goal', 'Country', 'State / Province',
         'How They Heard', 'Referring Agent (self-reported)',
         'Agent Via Link', 'Referral Code', 'Agent Role',
@@ -2922,6 +3443,7 @@
       const rowsB2C = [];
       const rowsB2B = [];
       const rowsAll = [];
+      const rowsByRegion = {};
 
       registrations.forEach(r => {
         let mappedAgentName = r.agentReferrerName || '';
@@ -2941,9 +3463,14 @@
 
         const isB2B = isWebinarB2B(r);
         const eventType = isB2B ? 'B2B (Realtors & Brokers)' : 'B2C (Clientes Finales & Inversores)';
+        const recRegId = App.utils.getRecordRegion ? App.utils.getRecordRegion(r, allUsers) : (r.webinarRegion || r.region || '');
+        const recRegLabel = (recRegId && App.utils.REGIONS && App.utils.REGIONS[recRegId]) ? App.utils.REGIONS[recRegId].shortEs : (recRegId || 'Norteamérica');
+        const recLang = (r.webinarLanguage || 'en').toUpperCase();
 
         const baseRowB2C = [
           r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-US') : '',
+          recRegLabel,
+          recLang,
           eventType,
           r.webinar || 'Spain Unlocked: Living & Investing',
           r.webinarDate || '',
@@ -2966,6 +3493,8 @@
 
         const baseRowB2B = [
           r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-US') : '',
+          recRegLabel,
+          recLang,
           eventType,
           r.webinar || 'Beyond Borders',
           r.webinarDate || '',
@@ -2988,6 +3517,8 @@
 
         const baseRowAll = [
           r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-US') : '',
+          recRegLabel,
+          recLang,
           eventType,
           r.webinar || '',
           r.webinarDate || '',
@@ -3009,6 +3540,8 @@
         ];
 
         rowsAll.push(baseRowAll);
+        if (!rowsByRegion[recRegLabel]) rowsByRegion[recRegLabel] = [];
+        rowsByRegion[recRegLabel].push(baseRowAll);
         if (isB2B) {
           rowsB2B.push(baseRowB2B);
         } else {
@@ -3049,7 +3582,19 @@
         wsAll['!cols'] = autoFit(wsAllData);
         XLSX.utils.book_append_sheet(wb, wsAll, 'Todos los Registrados');
 
-        const fileName = `Spain-Connection-Webinar-Registrados-${new Date().toISOString().slice(0, 10)}.xlsx`;
+        // Hojas adicionales por Región
+        Object.keys(rowsByRegion).forEach(regLabel => {
+          const safeSheetName = String(regLabel).replace(/[\\/?*\[\]:]/g, '').slice(0, 28) || 'Region';
+          const regSheetData = [headersAll, ...rowsByRegion[regLabel]];
+          const wsReg = XLSX.utils.aoa_to_sheet(regSheetData);
+          wsReg['!cols'] = autoFit(regSheetData);
+          if (!wb.SheetNames.includes(safeSheetName)) {
+            XLSX.utils.book_append_sheet(wb, wsReg, safeSheetName);
+          }
+        });
+
+        const regFileTag = currentWebinarRegionFilter ? `-${currentWebinarRegionFilter}` : '';
+        const fileName = `Spain-Connection-Webinar-Registrados${regFileTag}-${new Date().toISOString().slice(0, 10)}.xlsx`;
         try {
           XLSX.writeFile(wb, fileName);
         } catch (writeErr) {
@@ -3757,6 +4302,9 @@
         if (referrerName === 'admin-001') referrerName = 'Admin Inmomás';
         if (referrerName === 'N/A' && u.partnerCode) referrerName = u.partnerCode;
 
+        const uRegions = App.utils.getUserRegions ? App.utils.getUserRegions(u) : [];
+        const uNat = App.utils.getUserNationality ? App.utils.getUserNationality(u) : (u.nationality || u.country || '');
+
         unifiedMap.set(email, {
           id: u.id,
           name: userName,
@@ -3767,7 +4315,9 @@
           referrer: referrerName,
           referralCode: u.referralCode || '',
           agency: u.agencyName || '',
-          country: u.country || '',
+          country: u.country || uNat || '',
+          region: uRegions[0] || '',
+          regions: uRegions,
           origin: u.source || 'Plataforma Directa',
           hasPlatform: true,
           hasWebinar: !!u.isWebinarRegistered,
@@ -3797,6 +4347,7 @@
             existing._timestamp = new Date(c.createdAt).getTime();
           }
         } else {
+          const cReg = App.utils.getRecordRegion ? App.utils.getRecordRegion(c, allUsers) : '';
           unifiedMap.set(email, {
             id: c.id,
             name: userName,
@@ -3807,7 +4358,9 @@
             referrer: referrerName,
             referralCode: '',
             agency: '',
-            country: c.country || '',
+            country: (c.country && c.country !== '—') ? c.country : (c.currentLocation || ''),
+            region: cReg,
+            regions: cReg ? [cReg] : [],
             origin: c.source || 'Referido / Intake',
             hasPlatform: false,
             hasWebinar: false,
@@ -3852,6 +4405,7 @@
           if (!existing.country && w.country) existing.country = w.country;
           if (existing.origin === 'Plataforma Directa' && origin !== 'direct') existing.origin = origin;
         } else {
+          const wReg = App.utils.getRecordRegion ? App.utils.getRecordRegion(w, allUsers) : (w.webinarRegion || w.region || '');
           unifiedMap.set(email, {
             id: w.id,
             name: userName,
@@ -3863,6 +4417,8 @@
             referralCode: w.referralCode || '',
             agency: w.agency || '',
             country: w.country || '',
+            region: wReg,
+            regions: wReg ? [wReg] : [],
             origin: origin,
             hasPlatform: false,
             hasWebinar: true,
@@ -3878,6 +4434,28 @@
       unifiedArray.sort((a, b) => (b._timestamp || 0) - (a._timestamp || 0));
       
       currentUnifiedData = unifiedArray;
+      filteredUnifiedCache = unifiedArray;
+
+      // Populate Region & Country filter options dynamically
+      const regionFilterSelect = document.getElementById('admin-unified-filter-region');
+      if (regionFilterSelect && App.utils && App.utils.getRegionFilterOptionsHtml) {
+        const initReg = pendingAdminRegionFilter || regionFilterSelect.value || '';
+        pendingAdminRegionFilter = '';
+        regionFilterSelect.innerHTML = App.utils.getRegionFilterOptionsHtml(initReg);
+        regionFilterSelect.value = initReg;
+      }
+
+      const countryFilterSelect = document.getElementById('admin-unified-filter-country');
+      if (countryFilterSelect) {
+        const prevC = countryFilterSelect.value || '';
+        const cSet = new Set();
+        unifiedArray.forEach(it => {
+          if (it.country && it.country !== '—' && it.country !== 'N/A') cSet.add(it.country.trim());
+        });
+        const sortedC = Array.from(cSet).sort((a, b) => a.localeCompare(b));
+        countryFilterSelect.innerHTML = '<option value="">🏳️ Todos los Países</option>' +
+          sortedC.map(c => `<option value="${App.utils.escapeHtml(c)}" ${c === prevC ? 'selected' : ''}>${App.utils.escapeHtml(c)}</option>`).join('');
+      }
 
       // Populate Agent filter options dynamically with counts
       const agentFilterSelect = document.getElementById('admin-unified-filter-agent');
@@ -3917,13 +4495,23 @@
       
       // Search and Filter Events
       const searchInput = document.getElementById('admin-unified-search');
+      const regionSelect = document.getElementById('admin-unified-filter-region');
+      const countrySelect = document.getElementById('admin-unified-filter-country');
       const statusSelect = document.getElementById('admin-unified-filter-status');
       const agentSelect = document.getElementById('admin-unified-filter-agent');
       
       const filterData = () => {
-        const term = (searchInput?.value || '').toLowerCase().trim();
-        const stat = statusSelect?.value || '';
-        const selectedAgent = agentSelect?.value || '';
+        const curSearchEl = document.getElementById('admin-unified-search');
+        const curRegEl = document.getElementById('admin-unified-filter-region');
+        const curCntEl = document.getElementById('admin-unified-filter-country');
+        const curStatEl = document.getElementById('admin-unified-filter-status');
+        const curAgentEl = document.getElementById('admin-unified-filter-agent');
+
+        const term = (curSearchEl?.value || '').toLowerCase().trim();
+        const selectedRegion = curRegEl?.value || '';
+        const selectedCountry = (curCntEl?.value || '').toLowerCase();
+        const stat = curStatEl?.value || '';
+        const selectedAgent = curAgentEl?.value || '';
 
         const filtered = unifiedArray.filter(item => {
           const matchTerm = !term || 
@@ -3936,6 +4524,15 @@
             (item.country || '').toLowerCase().includes(term) || 
             (item.origin || '').toLowerCase().includes(term) || 
             (item.role || '').toLowerCase().includes(term);
+
+          let matchRegion = true;
+          if (selectedRegion) {
+            const itemRegs = Array.isArray(item.regions) && item.regions.length > 0 ? item.regions : (item.region ? [item.region] : []);
+            const fallbackReg = (!itemRegs.length && item.country && App.utils.resolveRegionFromCountry) ? App.utils.resolveRegionFromCountry(item.country) : '';
+            matchRegion = itemRegs.includes(selectedRegion) || fallbackReg === selectedRegion;
+          }
+
+          const matchCountry = !selectedCountry || (item.country || '').toLowerCase().includes(selectedCountry);
 
           let matchStat = true;
           if (stat) {
@@ -3950,9 +4547,10 @@
 
           const matchAgent = !selectedAgent || item.referrer === selectedAgent;
 
-          return matchTerm && matchStat && matchAgent;
+          return matchTerm && matchRegion && matchCountry && matchStat && matchAgent;
         });
 
+        filteredUnifiedCache = filtered;
         updateCountBadge(filtered.length, unifiedArray.length);
         renderUnifiedTable(filtered);
       };
@@ -3961,6 +4559,16 @@
         const newSearch = searchInput.cloneNode(true);
         searchInput.parentNode.replaceChild(newSearch, searchInput);
         newSearch.addEventListener('input', filterData);
+      }
+      if (regionSelect) {
+        const newReg = regionSelect.cloneNode(true);
+        regionSelect.parentNode.replaceChild(newReg, regionSelect);
+        newReg.addEventListener('change', filterData);
+      }
+      if (countrySelect) {
+        const newCnt = countrySelect.cloneNode(true);
+        countrySelect.parentNode.replaceChild(newCnt, countrySelect);
+        newCnt.addEventListener('change', filterData);
       }
       if (statusSelect) {
         const newSelect = statusSelect.cloneNode(true);
@@ -3972,6 +4580,9 @@
         agentSelect.parentNode.replaceChild(newAgent, agentSelect);
         newAgent.addEventListener('change', filterData);
       }
+
+      // Run initial filter (in case a Region jump filter was applied)
+      filterData();
       
     } catch (err) {
       console.error('[Admin] initUnified error:', err);
@@ -4009,15 +4620,17 @@
         
         const dateStr = item.createdAt ? App.utils.formatDate(item.createdAt) : '—';
         const agencyPill = item.agency ? `<div style="font-size:0.75rem;color:#6b7280;margin-top:2px;">🏢 ${App.utils.escapeHtml(item.agency)}</div>` : '';
-        const countryPill = item.country ? `<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:0.75rem;background:#f3f4f6;color:#4b5563;margin-left:4px;">${App.utils.escapeHtml(item.country)}</span>` : '';
+        const itemReg = item.region || (item.country && App.utils.resolveRegionFromCountry ? App.utils.resolveRegionFromCountry(item.country) : '');
+        const regPill = itemReg && App.utils.getRegionBadge ? App.utils.getRegionBadge(itemReg, true) : '';
+        const countryPill = item.country ? `<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:0.75rem;background:#f3f4f6;color:#4b5563;margin-left:2px;">🏳️ ${App.utils.escapeHtml(item.country)}</span>` : '';
 
         html += `
           <tr>
             <td>
               <div style="font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
                 ${App.utils.escapeHtml(item.name || '')}
-                ${countryPill}
               </div>
+              <div style="display:flex; gap:4px; flex-wrap:wrap; align-items:center; margin-top:3px;">${regPill}${countryPill}</div>
               ${agencyPill}
             </td>
             <td>
@@ -4045,29 +4658,37 @@
     tbody.innerHTML = html;
   }
 
-  /* ── Export Unified Directory to Excel ── */
+  /* ── Export Unified Directory to Excel (Filtered by Region / Country / Agent / Status) ── */
   function exportUnifiedToExcel() {
     try {
-      if (!currentUnifiedData || currentUnifiedData.length === 0) {
+      const targetData = (filteredUnifiedCache && filteredUnifiedCache.length > 0) ? filteredUnifiedCache : currentUnifiedData;
+      if (!targetData || targetData.length === 0) {
         App.utils.showToast('No records to export.', 'error');
         return;
       }
 
-      const headers = ['Nombre', 'Email', 'Telefono', 'Agencia', 'Pais', 'Estado', 'Rol', 'Referido Por', 'Codigo Referido', 'Origen', 'Fecha Registro'];
-      const rows = currentUnifiedData.map(item => [
-        item.name || '',
-        item.email || '',
-        item.phone || '',
-        item.agency || '',
-        item.country || '',
-        item.status || '',
-        item.role || '',
-        item.referrer || '',
-        item.referralCode || '',
-        item.origin || '',
-        item.createdAt || ''
-      ]);
+      const activeReg = document.getElementById('admin-unified-filter-region')?.value || '';
+      const headers = ['Nombre', 'Email', 'Telefono', 'Agencia', 'Region', 'Pais', 'Estado', 'Rol', 'Referido Por', 'Codigo Referido', 'Origen', 'Fecha Registro'];
+      const rows = targetData.map(item => {
+        const rId = item.region || (item.country && App.utils.resolveRegionFromCountry ? App.utils.resolveRegionFromCountry(item.country) : '');
+        const rLabel = (rId && App.utils.REGIONS && App.utils.REGIONS[rId]) ? App.utils.REGIONS[rId].shortEs : '';
+        return [
+          item.name || '',
+          item.email || '',
+          item.phone || '',
+          item.agency || '',
+          rLabel,
+          item.country || '',
+          item.status || '',
+          item.role || '',
+          item.referrer || '',
+          item.referralCode || '',
+          item.origin || '',
+          item.createdAt || ''
+        ];
+      });
 
+      const regTag = activeReg ? `-${activeReg}` : '';
       if (typeof XLSX !== 'undefined') {
         const wb = XLSX.utils.book_new();
         const wsData = [headers, ...rows];
@@ -4081,8 +4702,8 @@
           return { wch: maxLen + 3 };
         });
         XLSX.utils.book_append_sheet(wb, ws, 'Directorio Unificado');
-        XLSX.writeFile(wb, `Directorio-Unificado-${new Date().toISOString().slice(0, 10)}.xlsx`);
-        App.utils.showToast(`✅ Exportados ${currentUnifiedData.length} contactos a Excel (.xlsx).`, 'success');
+        XLSX.writeFile(wb, `Directorio-Unificado${regTag}-${new Date().toISOString().slice(0, 10)}.xlsx`);
+        App.utils.showToast(`✅ Exportados ${targetData.length} contactos a Excel (.xlsx).`, 'success');
         return;
       }
 
@@ -4094,13 +4715,13 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Directorio-Unificado-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.download = `Directorio-Unificado${regTag}-${new Date().toISOString().slice(0, 10)}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      App.utils.showToast(`✅ Exportados ${currentUnifiedData.length} contactos del Directorio Unificado.`, 'success');
+      App.utils.showToast(`✅ Exportados ${targetData.length} contactos del Directorio Unificado.`, 'success');
     } catch (err) {
       console.error('[Admin] exportUnified error:', err);
       App.utils.showToast('Error exporting directory.', 'error');
@@ -4116,6 +4737,11 @@
     initClients,
     initNewsletter,
     initWebinar,
+    jumpToRegionView,
+    selectWebinarConfigRegion,
+    setWebinarRegionFilter,
+    setWebinarCountryFilter,
+    setWebinarAgentFilter,
     exportUsersToExcel,
     exportClientsToExcel,
     toggleClientView,

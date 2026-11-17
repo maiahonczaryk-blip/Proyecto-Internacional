@@ -397,7 +397,7 @@ App.utils.getRoleBadge = function(role) {
   };
   let displayName = safeRole.charAt(0).toUpperCase() + safeRole.slice(1);
   if (safeRole === 'embajador') displayName = '👑 Embajador';
-  if (safeRole === 'agent_inmomas') displayName = 'Agente Inmomás';
+  if (safeRole === 'agent_inmomas') displayName = '🇪🇸 Agente RE/MAX MÁS';
   if (safeRole === 'colaborador') displayName = 'Colaborador';
   return `<span class="badge ${classes[safeRole] || ''}">${displayName}</span>`;
 };
@@ -1131,6 +1131,351 @@ App.utils.handleSaveContractData = async function(user, prefix, onDone) {
     }
   }
 };
+
+/* ============================================
+   MULTI-REGION & NATIONALITY TAXONOMY (RE/MAX MÁS)
+   ============================================ */
+
+App.utils.REGIONS = {
+  north_america: {
+    id: 'north_america',
+    icon: '🌎',
+    flag: '🇺🇸🇨🇦🇵🇷',
+    labelEs: 'Norteamérica (EE.UU., Canadá y PR)',
+    labelEn: 'North America (US, Canada & PR)',
+    shortEs: 'Norteamérica',
+    shortEn: 'North America',
+    color: '#003f99',
+    bg: 'rgba(0, 63, 153, 0.10)',
+    border: 'rgba(0, 63, 153, 0.25)',
+    defaultLang: 'en',
+    countries: ['United States', 'Canada', 'Puerto Rico']
+  },
+  latam: {
+    id: 'latam',
+    icon: '🌎',
+    flag: '🇲🇽🇨🇴🇦🇷',
+    labelEs: 'Latinoamérica y Caribe',
+    labelEn: 'Latin America & Caribbean',
+    shortEs: 'Latinoamérica',
+    shortEn: 'Latin America',
+    color: '#059669',
+    bg: 'rgba(5, 150, 105, 0.10)',
+    border: 'rgba(5, 150, 105, 0.25)',
+    defaultLang: 'es',
+    countries: [
+      'Mexico', 'Colombia', 'Argentina', 'Chile', 'Peru', 'Panama',
+      'Costa Rica', 'Dominican Republic', 'Uruguay', 'Ecuador',
+      'Venezuela', 'Brazil', 'Guatemala', 'Paraguay', 'Bolivia'
+    ]
+  },
+  western_europe: {
+    id: 'western_europe',
+    icon: '🇪🇺',
+    flag: '🇬🇧🇫🇷🇩🇪',
+    labelEs: 'Europa Occidental (UK, FR, DE, Benelux, Nórdicos)',
+    labelEn: 'Western Europe (UK, FR, DE, Benelux, Nordics)',
+    shortEs: 'Europa Occidental',
+    shortEn: 'Western Europe',
+    color: '#7c3aed',
+    bg: 'rgba(124, 58, 237, 0.10)',
+    border: 'rgba(124, 58, 237, 0.25)',
+    defaultLang: 'en',
+    countries: [
+      'United Kingdom', 'Ireland', 'France', 'Belgium', 'Switzerland',
+      'Germany', 'Austria', 'Netherlands', 'Luxembourg', 'Sweden',
+      'Norway', 'Denmark', 'Finland', 'Italy', 'Portugal', 'Spain'
+    ]
+  },
+  eastern_europe: {
+    id: 'eastern_europe',
+    icon: '🌍',
+    flag: '🇵🇱🇺🇦🇷🇴',
+    labelEs: 'Europa del Este y Bálticos',
+    labelEn: 'Eastern Europe & Baltics',
+    shortEs: 'Europa del Este',
+    shortEn: 'Eastern Europe',
+    color: '#d97706',
+    bg: 'rgba(217, 119, 6, 0.12)',
+    border: 'rgba(217, 119, 6, 0.28)',
+    defaultLang: 'en',
+    countries: [
+      'Poland', 'Ukraine', 'Romania', 'Czech Republic', 'Hungary',
+      'Slovakia', 'Bulgaria', 'Estonia', 'Latvia', 'Lithuania',
+      'Croatia', 'Slovenia', 'Serbia'
+    ]
+  },
+  mena: {
+    id: 'mena',
+    icon: '🌍',
+    flag: '🇦🇪🇸🇦🌍',
+    labelEs: 'Oriente Medio / MENA y Otros Mercados',
+    labelEn: 'Middle East / MENA & Other Markets',
+    shortEs: 'MENA / Otros',
+    shortEn: 'MENA / Other',
+    color: '#be123c',
+    bg: 'rgba(190, 18, 60, 0.10)',
+    border: 'rgba(190, 18, 60, 0.25)',
+    defaultLang: 'en',
+    countries: [
+      'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Kuwait', 'Bahrain',
+      'Oman', 'Israel', 'Lebanon', 'Jordan', 'Iran', 'Morocco', 'Egypt',
+      'Turkey', 'South Africa', 'Australia', 'Singapore', 'Other'
+    ]
+  }
+};
+
+App.utils.REGION_LIST = Object.values(App.utils.REGIONS);
+
+App.utils.WEBINAR_LANGUAGES = [
+  { code: 'en', labelEs: '🇬🇧 Inglés (English)', labelEn: '🇬🇧 English' },
+  { code: 'es', labelEs: '🇪🇸 Español (Spanish)', labelEn: '🇪🇸 Spanish' },
+  { code: 'fr', labelEs: '🇫🇷 Francés (Français)', labelEn: '🇫🇷 French' },
+  { code: 'de', labelEs: '🇩🇪 Alemán (Deutsch)', labelEn: '🇩🇪 German' },
+  { code: 'nl', labelEs: '🇳🇱 Neerlandés (Nederlands)', labelEn: '🇳🇱 Dutch' },
+  { code: 'pl', labelEs: '🇵🇱 Polaco (Polski)', labelEn: '🇵🇱 Polish' },
+  { code: 'uk', labelEs: '🇺🇦 Ucraniano / Ruso', labelEn: '🇺🇦 Ukrainian / Russian' },
+  { code: 'ar', labelEs: '🇦🇪 Árabe / Persa (MENA)', labelEn: '🇦🇪 Arabic / Farsi (MENA)' },
+  { code: 'bilingual', labelEs: '🌐 Bilingüe (ES / EN)', labelEn: '🌐 Bilingual (EN / ES)' }
+];
+
+// Known RE/MAX MÁS Agent fallback profiles when Firestore doc hasn't been explicitly tagged yet
+App.utils.KNOWN_MAS_AGENT_REGIONS = [
+  { match: ['james', 'lavoie', 'jamisa'], nationality: 'Canada', regions: ['north_america', 'western_europe'], languages: ['en', 'fr', 'es'] },
+  { match: ['angel luis', 'ángel luis', 'ángel luís', 'debra nadal'], nationality: 'Puerto Rico', regions: ['north_america', 'latam'], languages: ['es', 'en'] },
+  { match: ['sepehr', 'hosseini'], nationality: 'Canada / Iran', regions: ['north_america', 'mena'], languages: ['en', 'ar', 'es'] },
+  { match: ['denise', 'mcneal'], nationality: 'United States', regions: ['north_america'], languages: ['en', 'es'] },
+  { match: ['giancarlo', 'agudelo'], nationality: 'Colombia', regions: ['latam', 'north_america'], languages: ['es', 'en'] },
+  { match: ['ozzie', 'lleras'], nationality: 'United States', regions: ['north_america', 'latam'], languages: ['en', 'es'] },
+  { match: ['maia', 'honczaryk'], nationality: 'Argentina / Ukraine', regions: ['north_america', 'latam', 'western_europe', 'eastern_europe'], languages: ['es', 'en'] },
+  { match: ['josé martínez', 'jose martinez', 'dionisio', 'ana martínez', 'ana martinez', 'carlos garcía', 'carlos garcia'], nationality: 'Spain', regions: ['north_america', 'western_europe', 'latam'], languages: ['es', 'en'] }
+];
+
+App.utils.resolveRegionFromCountry = function(countryInput) {
+  if (!countryInput) return '';
+  const raw = String(countryInput).trim().toLowerCase();
+  if (!raw || raw === '—' || raw === '-' || raw === 'n/a') return '';
+
+  // Direct region id match
+  if (App.utils.REGIONS[raw]) return raw;
+
+  // Exact / substring checks across regions
+  const naKeywords = ['united states', 'estados unidos', 'ee.uu', 'eeuu', 'usa', 'u.s.', 'miami', 'florida', 'new york', 'texas', 'california', 'chicago', 'phoenix', 'dallas', 'canada', 'canadá', 'toronto', 'ontario', 'quebec', 'québec', 'vancouver', 'montreal', 'puerto rico', 'san juan', 'dorado', 'bayamon', 'bayamón'];
+  if (naKeywords.some(k => raw === k || raw.includes(k))) return 'north_america';
+
+  const latamKeywords = ['mexico', 'méxico', 'colombia', 'bogota', 'bogotá', 'medellin', 'medellín', 'argentina', 'buenos aires', 'chile', 'santiago', 'peru', 'perú', 'lima', 'panama', 'panamá', 'costa rica', 'dominican', 'dominicana', 'santo domingo', 'punta cana', 'uruguay', 'ecuador', 'venezuela', 'brazil', 'brasil', 'guatemala', 'paraguay', 'bolivia', 'latam', 'latinoamerica', 'latinoamérica'];
+  if (latamKeywords.some(k => raw === k || raw.includes(k))) return 'latam';
+
+  const eastEuKeywords = ['poland', 'polonia', 'ukraine', 'ucrania', 'romania', 'rumania', 'rumanía', 'czech', 'checa', 'hungary', 'hungría', 'hungria', 'slovakia', 'eslovaquia', 'bulgaria', 'estonia', 'latvia', 'letonia', 'lithuania', 'lituania', 'croatia', 'croacia', 'slovenia', 'eslovenia', 'serbia'];
+  if (eastEuKeywords.some(k => raw === k || raw.includes(k))) return 'eastern_europe';
+
+  const westEuKeywords = ['united kingdom', 'reino unido', 'uk', 'england', 'inglaterra', 'london', 'scotland', 'ireland', 'irlanda', 'france', 'francia', 'paris', 'belgium', 'bélgica', 'belgica', 'switzerland', 'suiza', 'germany', 'alemania', 'austria', 'netherlands', 'países bajos', 'paises bajos', 'holanda', 'holland', 'luxembourg', 'luxemburgo', 'sweden', 'suecia', 'norway', 'noruega', 'denmark', 'dinamarca', 'finland', 'finlandia', 'italy', 'italia', 'portugal', 'spain', 'españa', 'espana'];
+  if (westEuKeywords.some(k => raw === k || raw.includes(k))) return 'western_europe';
+
+  const menaKeywords = ['emirates', 'emiratos', 'dubai', 'dubái', 'abu dhabi', 'uae', 'saudi', 'arabia', 'qatar', 'catar', 'kuwait', 'bahrain', 'oman', 'israel', 'lebanon', 'líbano', 'libano', 'jordan', 'jordania', 'iran', 'irán', 'morocco', 'marruecos', 'egypt', 'egipto', 'turkey', 'turquía', 'turquia', 'south africa', 'sudáfrica', 'australia', 'singapore', 'singapur', 'mena', 'other', 'otro', 'international'];
+  if (menaKeywords.some(k => raw === k || raw.includes(k))) return 'mena';
+
+  return 'mena';
+};
+
+App.utils.getUserNationality = function(user) {
+  if (!user) return '';
+  if (user.nationality && String(user.nationality).trim()) return String(user.nationality).trim();
+  if (user.role === 'agent_inmomas') {
+    const fullName = `${user.firstName || ''} ${user.lastName || ''} ${user.name || ''}`.toLowerCase();
+    const known = App.utils.KNOWN_MAS_AGENT_REGIONS.find(k => k.match.some(m => fullName.includes(m)));
+    if (known && known.nationality) return known.nationality;
+  }
+  return user.country || '';
+};
+
+App.utils.getUserRegions = function(user) {
+  if (!user) return [];
+  if (Array.isArray(user.regions) && user.regions.length > 0) {
+    return user.regions.filter(r => App.utils.REGIONS[r]);
+  }
+  if (user.region && App.utils.REGIONS[user.region]) {
+    return [user.region];
+  }
+  if (user.role === 'agent_inmomas') {
+    const fullName = `${user.firstName || ''} ${user.lastName || ''} ${user.name || ''}`.toLowerCase();
+    const known = App.utils.KNOWN_MAS_AGENT_REGIONS.find(k => k.match.some(m => fullName.includes(m)));
+    if (known) return [...known.regions];
+  }
+  const resolved = App.utils.resolveRegionFromCountry(user.nationality || user.country || '');
+  return resolved ? [resolved] : [];
+};
+
+App.utils.getRecordRegion = function(record, allUsers) {
+  if (!record) return '';
+  if (record.region && App.utils.REGIONS[record.region]) return record.region;
+  if (record.webinarRegion && App.utils.REGIONS[record.webinarRegion]) return record.webinarRegion;
+
+  const countryCandidate = record.country || record.currentLocation || '';
+  const fromCountry = App.utils.resolveRegionFromCountry(countryCandidate);
+  if (fromCountry) return fromCountry;
+
+  // Fallback to referring user or assigned agent primary region
+  if (Array.isArray(allUsers) && allUsers.length > 0) {
+    const refKey = record.realtorId || record.referredBy || record.agentReferrerId || record.referrerId || record.referralCode || '';
+    if (refKey) {
+      const refStr = String(refKey).trim().toUpperCase();
+      const refUser = allUsers.find(u =>
+        u.id === refKey ||
+        (u.referralCode && u.referralCode.toUpperCase() === refStr) ||
+        `${u.firstName || ''} ${u.lastName || ''}`.trim().toUpperCase() === refStr
+      );
+      if (refUser) {
+        const uRegs = App.utils.getUserRegions(refUser);
+        if (uRegs.length > 0) return uRegs[0];
+      }
+    }
+  }
+  return '';
+};
+
+App.utils.getRegionLabel = function(regionId, short = false) {
+  const reg = App.utils.REGIONS[regionId];
+  if (!reg) return regionId || 'Sin región';
+  const isEs = App.utils.getCurrentLanguage ? (App.utils.getCurrentLanguage() === 'es') : true;
+  if (short) return isEs ? reg.shortEs : reg.shortEn;
+  return isEs ? reg.labelEs : reg.labelEn;
+};
+
+App.utils.getRegionBadge = function(regionId, compact = true) {
+  const reg = App.utils.REGIONS[regionId];
+  if (!reg) return `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:0.73rem;font-weight:600;background:#f3f4f6;color:#6b7280;">🌍 —</span>`;
+  const textEs = compact ? reg.shortEs : reg.labelEs;
+  const textEn = compact ? reg.shortEn : reg.labelEn;
+  return `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:0.73rem;font-weight:700;background:${reg.bg};color:${reg.color};border:1px solid ${reg.border};white-space:nowrap;">${reg.icon} <span class="lang-en">${App.utils.escapeHtml(textEn)}</span><span class="lang-es">${App.utils.escapeHtml(textEs)}</span></span>`;
+};
+
+App.utils.getUserRegionBadgesHtml = function(user) {
+  const regions = App.utils.getUserRegions(user);
+  if (!regions.length) return App.utils.getRegionBadge('', true);
+  return regions.map(r => App.utils.getRegionBadge(r, true)).join(' ');
+};
+
+App.utils.getRegionFilterOptionsHtml = function(selectedVal = '', allLabelEs = '🌍 Todas las Regiones', allLabelEn = '🌍 All Regions') {
+  const isEs = App.utils.getCurrentLanguage ? (App.utils.getCurrentLanguage() === 'es') : true;
+  let html = `<option value="">${isEs ? allLabelEs : allLabelEn}</option>`;
+  App.utils.REGION_LIST.forEach(r => {
+    const sel = r.id === selectedVal ? 'selected' : '';
+    const label = isEs ? `${r.icon} ${r.labelEs}` : `${r.icon} ${r.labelEn}`;
+    html += `<option value="${r.id}" ${sel}>${label}</option>`;
+  });
+  return html;
+};
+
+App.utils.getCountryOptionsHtml = function(selectedVal = '', includeEmpty = false, emptyLabel = '— Seleccionar País / Nacionalidad —') {
+  const cleanSelected = String(selectedVal || '').trim();
+  let foundSelected = false;
+  let html = includeEmpty ? `<option value="">${App.utils.escapeHtml(emptyLabel)}</option>` : '';
+
+  App.utils.REGION_LIST.forEach(reg => {
+    html += `<optgroup label="${reg.icon} ${reg.shortEs} / ${reg.shortEn}">`;
+    reg.countries.forEach(c => {
+      const isSel = cleanSelected.toLowerCase() === c.toLowerCase();
+      if (isSel) foundSelected = true;
+      html += `<option value="${App.utils.escapeHtml(c)}" data-region="${reg.id}" ${isSel ? 'selected' : ''}>${App.utils.escapeHtml(c)}</option>`;
+    });
+    html += `</optgroup>`;
+  });
+
+  if (cleanSelected && !foundSelected) {
+    html += `<option value="${App.utils.escapeHtml(cleanSelected)}" selected>${App.utils.escapeHtml(cleanSelected)}</option>`;
+  }
+  return html;
+};
+
+App.utils.getRegionsCheckboxesHtml = function(inputName, selectedRegions = []) {
+  const selectedSet = new Set(Array.isArray(selectedRegions) ? selectedRegions : (selectedRegions ? [selectedRegions] : []));
+  return `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:8px;margin-top:6px;">
+      ${App.utils.REGION_LIST.map(reg => {
+        const checked = selectedSet.has(reg.id) ? 'checked' : '';
+        return `
+          <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;border:1px solid ${reg.border};background:${reg.bg};cursor:pointer;font-size:0.82rem;font-weight:600;color:#1e293b;">
+            <input type="checkbox" name="${inputName}" value="${reg.id}" ${checked} style="width:16px;height:16px;accent-color:${reg.color};cursor:pointer;">
+            <span>${reg.icon} <span class="lang-en">${reg.shortEn}</span><span class="lang-es">${reg.shortEs}</span></span>
+          </label>
+        `;
+      }).join('')}
+    </div>
+  `;
+};
+
+App.utils.renderUserRegionalBanner = async function(containerId, user) {
+  const el = document.getElementById(containerId);
+  if (!el || !user) return;
+
+  try {
+    const freshUser = user;
+    const nat = App.utils.getUserNationality ? App.utils.getUserNationality(freshUser) : (freshUser.nationality || freshUser.country || '');
+    const userRegions = App.utils.getUserRegions ? App.utils.getUserRegions(freshUser) : [];
+    const displayRegions = userRegions.length > 0 ? userRegions : ['north_america'];
+
+    const settings = (App.auth && App.auth.getWebinarSettings)
+      ? await App.auth.getWebinarSettings()
+      : (App.auth && App.auth.getDefaultWebinarSettings ? App.auth.getDefaultWebinarSettings() : null);
+
+    const langLabels = { en: '🇬🇧 EN', es: '🇪🇸 ES', fr: '🇫🇷 FR', de: '🇩🇪 DE', nl: '🇳🇱 NL', pl: '🇵🇱 PL', uk: '🇺🇦 UK', ar: '🇦🇪 AR', bilingual: '🌐 ES/EN' };
+
+    const webinarCardsHtml = displayRegions.map(rId => {
+      const regMeta = App.utils.REGIONS[rId] || App.utils.REGIONS.north_america;
+      const wCfg = (App.auth && App.auth.getRegionalWebinarConfig && settings)
+        ? App.auth.getRegionalWebinarConfig(settings, rId)
+        : { activeType: 'b2c', title: 'Spain Unlocked', date: '2026-10-29', time: '18:00', language: regMeta.defaultLang || 'en' };
+      const refParam = freshUser.referralCode ? `&ref=${encodeURIComponent(freshUser.referralCode)}` : '';
+      const regWebinarUrl = `https://thespainconnection.com/index.html#webinar?region=${encodeURIComponent(rId)}${refParam}`;
+      const langBadge = langLabels[wCfg.language || 'en'] || '🌐';
+
+      return `
+        <div style="background:#fff; border:1px solid ${regMeta.border}; border-left:4px solid ${regMeta.color}; border-radius:10px; padding:10px 12px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <div style="min-width:180px; flex:1;">
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:0.78rem; font-weight:800; color:${regMeta.color};">
+              <span>${regMeta.icon} ${App.utils.escapeHtml(regMeta.shortEs)}</span>
+              <span style="background:${wCfg.activeType === 'b2b' ? '#003f99' : '#059669'}; color:#fff; padding:1px 7px; border-radius:999px; font-size:0.68rem;">${(wCfg.activeType || 'b2c').toUpperCase()}</span>
+              <span style="background:#f1f5f9; color:#334155; padding:1px 6px; border-radius:6px; font-size:0.68rem;">${langBadge}</span>
+            </div>
+            <div style="font-weight:700; font-size:0.86rem; color:#0f172a; margin-top:3px;">🎙️ ${App.utils.escapeHtml(wCfg.title || 'Webinar')}</div>
+            <div style="font-size:0.76rem; color:#64748b; margin-top:1px;">📅 ${App.utils.escapeHtml(wCfg.date || '')} · ⏰ ${App.utils.escapeHtml(wCfg.time || '18:00')} CET (España)</div>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" style="font-size:0.75rem; padding:5px 10px; white-space:nowrap;" onclick="App.utils.copyToClipboard('${regWebinarUrl}')">
+            📋 <span class="lang-en">Copy Region Webinar Link</span><span class="lang-es">Link Webinar Región</span>
+          </button>
+        </div>
+      `;
+    }).join('');
+
+    const isMasAgent = freshUser.role === 'agent_inmomas';
+    const titleEs = isMasAgent ? '🇪🇸 Tu Visión Regional RE/MAX MÁS' : '🌍 Tu Mercado Regional y Webinario Activo';
+    const titleEn = isMasAgent ? '🇪🇸 Your RE/MAX MÁS Regional Hub' : '🌍 Your Regional Market & Active Webinar';
+
+    el.style.display = 'block';
+    el.innerHTML = `
+      <div style="background:linear-gradient(135deg, rgba(0,63,153,0.05) 0%, rgba(16,185,129,0.05) 100%); border:1px solid rgba(0,63,153,0.18); border-radius:14px; padding:16px 18px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <strong style="font-size:0.95rem; color:#0f172a;"><span class="lang-en">${titleEn}</span><span class="lang-es">${titleEs}</span></strong>
+            ${nat ? `<span style="background:#fff; border:1px solid #cbd5e1; color:#334155; padding:2px 9px; border-radius:999px; font-size:0.76rem; font-weight:700;">🏳️ ${App.utils.escapeHtml(nat)}</span>` : ''}
+            ${App.utils.getUserRegionBadgesHtml(freshUser)}
+          </div>
+          <a href="#profile" class="btn btn-outline btn-sm" style="font-size:0.76rem; padding:4px 10px;">
+            ⚙️ <span class="lang-en">Edit Country / Region</span><span class="lang-es">Editar País / Región</span>
+          </a>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:10px;">
+          ${webinarCardsHtml}
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    console.warn('[RegionalBanner] Render warning:', err);
+  }
+};
+
+
 
 
 
