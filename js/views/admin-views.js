@@ -1402,6 +1402,10 @@
           </div>
           `}
 
+          ${user.role === 'agent_inmomas' ? `
+          <div id="admin-buyer-guide-editor" style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;"></div>
+          ` : ''}
+
           <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
             <label style="font-weight: 700; font-size: 0.9rem; color: #111827; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem;">
               🏢 Agencia Inmobiliaria y Logo (Referral Link Personalizado)
@@ -1443,6 +1447,12 @@
         footer: `<button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Close</button>`,
         onClose: () => {}
       });
+
+      // Personalized Buyer Guide editor (RE/MAX Inmomás agents)
+      const adminGuideEl = document.getElementById('admin-buyer-guide-editor');
+      if (adminGuideEl && App.buyerGuide) {
+        App.buyerGuide.renderEditor(adminGuideEl, user, { admin: true });
+      }
 
       // Agency Logo upload & save handlers
       let currentAgencyLogoData = user.agencyLogo || null;
