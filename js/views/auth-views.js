@@ -405,6 +405,14 @@ App.views.auth = {
       };
     }
 
+    // 7b. Personalized Buyer Guide (RE/MAX Inmomás agents + admins)
+    const guideSection = document.getElementById('profile-buyer-guide-section');
+    if (guideSection) {
+      const canUseGuide = ['agent_inmomas', 'admin'].includes(user.role) && App.buyerGuide;
+      guideSection.style.display = canUseGuide ? 'block' : 'none';
+      if (canUseGuide) App.buyerGuide.renderEditor(guideSection, user);
+    }
+
     // 8. Calculate and Display Dynamic Statistics
     const statsSection = document.getElementById('profile-stats-section');
     const statsContainer = document.getElementById('profile-stats-container');

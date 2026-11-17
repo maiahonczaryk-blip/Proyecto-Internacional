@@ -940,6 +940,42 @@ App.auth = (function() {
     }
   }
 
+  /* ---- Update Personalized Buyer Guide data (self or Admin action) ---- */
+  async function updateBuyerGuideProfile(userId, guideData = {}) {
+    if (!userId) throw new Error('User ID is required.');
+    const clean = (v) => (typeof v === 'string' ? v.trim() : '');
+    const buyerGuide = {
+      title: clean(guideData.title),
+      mobile: clean(guideData.mobile),
+      email: clean(guideData.email),
+      website: clean(guideData.website),
+      photo: guideData.photo || null,
+      updatedAt: new Date().toISOString()
+    };
+
+    if (App.demoMode) {
+      const u = App.demoData.users.find(usr => usr.id === userId);
+      if (!u) throw new Error('User not found.');
+      u.buyerGuide = buyerGuide;
+      u.updatedAt = buyerGuide.updatedAt;
+      saveDemoData();
+    } else {
+      await App.db.collection('users').doc(userId).update({
+        buyerGuide,
+        updatedAt: buyerGuide.updatedAt
+      });
+    }
+
+    if (currentUser && currentUser.id === userId) {
+      currentUser.buyerGuide = buyerGuide;
+      if (App.demoMode) {
+        try { localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser)); } catch (e) { /* quota */ }
+      }
+      notifyAuthChange();
+    }
+    return buyerGuide;
+  }
+
   /* ---- Update User Nationality & Regions (Admin action) ---- */
   async function updateUserRegionalProfile(userId, regionalData = {}) {
     if (!userId) throw new Error('User ID is required.');
@@ -3042,6 +3078,7 @@ App.auth = (function() {
     updateUserEmbajador,
     updateUserRegionalProfile,
     updateUserAgencyBranding,
+    updateBuyerGuideProfile,
     getUmbrellaData,
     updateProfile,
     updateAuthEmail,
