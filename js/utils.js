@@ -926,15 +926,247 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
   `;
 };
 
-/* ---- Shared Contract Fiscal & Bank Data Section (Broker & Realtor) ---- */
+/* ---- Role-Based Agreement Variant Metadata (Embajador, Colaborador, Broker, Direct Agent vs Agency Agent) ---- */
+App.utils.getPartnerSharePctForUser = function(user) {
+  if (!user || !user.role) return 25;
+  const r = String(user.role).toLowerCase().trim();
+  if (r === 'colaborador') return 10;
+  if (r === 'broker') return 25;
+  if (r === 'embajador') return 15;
+  if (r === 'realtor') {
+    return (user.brokerId || user.brokerNameManual) ? 25 : 15;
+  }
+  return 0;
+};
+
+App.utils.getDefaultReferralSharePct = function(client, allUsers = []) {
+  if (!client) return 25;
+  if (typeof client.referralSharePct === 'number' && client.referralSharePct >= 0) {
+    return client.referralSharePct;
+  }
+  const byId = new Map();
+  const byCode = new Map();
+  (allUsers || []).forEach(u => {
+    if (!u) return;
+    if (u.id) byId.set(u.id, u);
+    if (u.referralCode) byCode.set(String(u.referralCode).toUpperCase().trim(), u);
+  });
+  const lookup = (val) => {
+    if (!val) return null;
+    const s = String(val).trim();
+    return byId.get(s) || byCode.get(s.toUpperCase()) || null;
+  };
+  const refUser = lookup(client.referredBy) || lookup(client.realtorId) || lookup(client.brokerId) || lookup(client.embajadorId);
+  if (!refUser) {
+    if (client.brokerId) return 25;
+    if (client.realtorId) return 15;
+    if (client.embajadorId) return 25;
+    return 0;
+  }
+  if (refUser.role === 'colaborador') return 10;
+  if (refUser.role === 'broker') return 25;
+  if (refUser.role === 'realtor') {
+    return (refUser.brokerId || refUser.brokerNameManual || client.brokerId) ? 25 : 15;
+  }
+  if (refUser.role === 'embajador') return 25;
+  return 0;
+};
+
+App.utils.getAgreementVariantMeta = function(rawRole, userObj = null) {
+  const role = String(rawRole || (userObj && userObj.role) || 'broker').trim().toLowerCase();
+  const hasBroker = Boolean(userObj && (userObj.brokerId || userObj.brokerNameManual));
+  const variants = {
+    embajador: {
+      role: 'embajador',
+      isDirectSigner: true,
+      pct: 15,
+      icon: '👑',
+      roleLabelEs: 'Embajador (+15 % Red)',
+      roleLabelEn: 'Ambassador (+15% Umbrella)',
+      docNameEs: 'Acuerdo Marco de Embajador (+15 % Red Paraguas)',
+      docNameEn: 'Ambassador Umbrella & Referral Agreement (+15%)',
+      shortDocEs: 'Acuerdo de Embajador (+15 %)',
+      shortDocEn: 'Ambassador Agreement (+15%)',
+      templateBtnEs: 'Descargar Plantilla de Embajador (Word .doc)',
+      templateBtnEn: 'Download Ambassador Template (Word .doc)',
+      exportBtnEs: 'Exportar Acuerdo de Embajador (Word .doc)',
+      exportBtnEn: 'Export Ambassador Agreement (Word .doc)',
+      partyDescEs: 'el Embajador (o representante legal de su sociedad)',
+      partyDescEn: 'the Ambassador (or their legal entity representative)',
+      presentationTargetEs: 'al Embajador',
+      presentationTargetEn: 'to the Ambassador',
+      block1TitleEs: '1. Datos de Empresa / Profesionales y Fiscales (Embajador · +15 %)',
+      block1TitleEn: '1. Company / Professional & Tax Details (Ambassador · +15%)',
+      legalNameLabelEs: 'Razón Social / Nombre Fiscal del Embajador o Sociedad *',
+      legalNameLabelEn: 'Legal Entity / Ambassador Registered Name *',
+      licenseLabelEs: 'Nº de Licencia / Asociación Representada (Opcional)',
+      licenseLabelEn: 'Association / Professional Registration (Optional)',
+      signerNameLabelEs: 'Nombre Completo del Embajador / Representante Legal *',
+      signerNameLabelEn: 'Ambassador / Legal Representative Full Name *',
+      signerEmailLabelEs: 'Email del Embajador *',
+      signerEmailLabelEn: 'Ambassador Email *',
+      signerPhoneLabelEs: 'Teléfono del Embajador *',
+      signerPhoneLabelEn: 'Ambassador Phone *',
+      accentColor: '#92400e',
+      accentBg: '#fffbeb',
+      accentBorder: '#f59e0b'
+    },
+    colaborador: {
+      role: 'colaborador',
+      isDirectSigner: true,
+      pct: 10,
+      icon: '🤝',
+      roleLabelEs: 'Colaborador (10 % a éxito)',
+      roleLabelEn: 'Collaborator (10% Success Fee)',
+      docNameEs: 'Acuerdo Mercantil de Colaborador (10 % a Éxito)',
+      docNameEn: 'Collaborator Commercial Introduction Agreement (10% Success Fee)',
+      shortDocEs: 'Acuerdo de Colaborador (10 %)',
+      shortDocEn: 'Collaborator Agreement (10%)',
+      templateBtnEs: 'Descargar Plantilla de Colaborador 10 % (Word .doc)',
+      templateBtnEn: 'Download Collaborator 10% Template (Word .doc)',
+      exportBtnEs: 'Exportar Acuerdo de Colaborador 10 % (Word .doc)',
+      exportBtnEn: 'Export Collaborator 10% Agreement (Word .doc)',
+      partyDescEs: 'el Colaborador (persona física profesional o empresa, 10 % a éxito)',
+      partyDescEn: 'the Collaborator (individual professional or firm, 10% success fee)',
+      presentationTargetEs: 'al Colaborador',
+      presentationTargetEn: 'to the Collaborator',
+      block1TitleEs: '1. Datos Profesionales / de Empresa y Fiscales (Colaborador · 10 % a éxito)',
+      block1TitleEn: '1. Professional / Company & Tax Details (Collaborator · 10% Success Fee)',
+      legalNameLabelEs: 'Razón Social / Nombre Fiscal del Colaborador o Despacho *',
+      legalNameLabelEn: 'Legal Firm / Collaborator Registered Name *',
+      licenseLabelEs: 'Nº Colegiado / Actividad con Nexo Mudanza (Opcional)',
+      licenseLabelEn: 'Professional Registration / Activity (Optional)',
+      signerNameLabelEs: 'Nombre Completo del Colaborador / Representante Legal *',
+      signerNameLabelEn: 'Collaborator / Legal Representative Full Name *',
+      signerEmailLabelEs: 'Email del Colaborador *',
+      signerEmailLabelEn: 'Collaborator Email *',
+      signerPhoneLabelEs: 'Teléfono del Colaborador *',
+      signerPhoneLabelEn: 'Collaborator Phone *',
+      accentColor: '#5b21b6',
+      accentBg: '#f5f3ff',
+      accentBorder: '#8b5cf6'
+    },
+    broker: {
+      role: 'broker',
+      isDirectSigner: true,
+      pct: 25,
+      icon: '🏢',
+      roleLabelEs: 'Broker (25 % Agencia)',
+      roleLabelEn: 'Broker (25% Brokerage)',
+      docNameEs: 'Acuerdo Marco de Broker (25 % Agencia)',
+      docNameEn: 'Brokerage Master Referral Agreement (25%)',
+      shortDocEs: 'Acuerdo de Broker (25 %)',
+      shortDocEn: 'Broker Agreement (25%)',
+      templateBtnEs: 'Descargar Plantilla de Broker 25 % (Word .doc)',
+      templateBtnEn: 'Download Broker 25% Template (Word .doc)',
+      exportBtnEs: 'Exportar Acuerdo de Broker 25 % (Word .doc)',
+      exportBtnEn: 'Export Broker 25% Agreement (Word .doc)',
+      partyDescEs: 'el Broker / representante de la agencia inmobiliaria (25 % agencia)',
+      partyDescEn: 'the Managing Broker of the real estate brokerage (25% office)',
+      presentationTargetEs: 'al Broker de la agencia',
+      presentationTargetEn: 'to the Managing Broker',
+      block1TitleEs: '1. Datos de la Agencia Inmobiliaria y Fiscales (Broker · 25 %)',
+      block1TitleEn: '1. Brokerage Company & Tax Details (Broker · 25%)',
+      legalNameLabelEs: 'Razón Social / Nombre Legal de la Agencia (Brokerage) *',
+      legalNameLabelEn: 'Legal Brokerage Company Name (Razón Social) *',
+      licenseLabelEs: 'Nº de Licencia Inmobiliaria (Brokerage License)',
+      licenseLabelEn: 'Brokerage License Number',
+      signerNameLabelEs: 'Nombre Completo del Broker / Representante Legal *',
+      signerNameLabelEn: 'Managing Broker / Legal Representative Name *',
+      signerEmailLabelEs: 'Email del Broker *',
+      signerEmailLabelEn: 'Broker Email *',
+      signerPhoneLabelEs: 'Teléfono del Broker *',
+      signerPhoneLabelEn: 'Broker Phone *',
+      accentColor: '#1e3a8a',
+      accentBg: '#eff6ff',
+      accentBorder: '#3b82f6'
+    },
+    realtor_direct: {
+      role: 'realtor',
+      isDirectSigner: true,
+      pct: 15,
+      icon: '🏠',
+      roleLabelEs: 'Agente Directo (15 % Directo)',
+      roleLabelEn: 'Direct Agent (15% Direct)',
+      docNameEs: 'Acuerdo Directo de Agente / Realtor (15 % Pago Directo)',
+      docNameEn: 'Direct Real Estate Agent Referral Agreement (15% Direct Payout)',
+      shortDocEs: 'Acuerdo Directo de Agente (15 %)',
+      shortDocEn: 'Direct Agent Agreement (15%)',
+      templateBtnEs: 'Descargar Plantilla de Agente Directo 15 % (Word .doc)',
+      templateBtnEn: 'Download Direct Agent 15% Template (Word .doc)',
+      exportBtnEs: 'Exportar Acuerdo Directo de Agente 15 % (Word .doc)',
+      exportBtnEn: 'Export Direct Agent 15% Agreement (Word .doc)',
+      partyDescEs: 'el Agente / Realtor (acuerdo directo con pago del 15 % al Agente)',
+      partyDescEn: 'the Real Estate Agent / Realtor (direct agreement with 15% paid directly to the Agent)',
+      presentationTargetEs: 'al Agente / Realtor',
+      presentationTargetEn: 'to the Agent / Realtor',
+      block1TitleEs: '1. Datos Profesionales y Fiscales del Agente (Acuerdo Directo · 15 %)',
+      block1TitleEn: '1. Agent Professional & Tax Details (Direct Agreement · 15%)',
+      legalNameLabelEs: 'Nombre Fiscal Completo del Agente o Sociedad *',
+      legalNameLabelEn: 'Agent Full Tax Name or Legal Entity *',
+      licenseLabelEs: 'Nº de Licencia / Registro Inmobiliario (Si aplica)',
+      licenseLabelEn: 'Real Estate License / Registration (If applicable)',
+      signerNameLabelEs: 'Nombre Completo del Agente Firmante *',
+      signerNameLabelEn: 'Signing Agent Full Name *',
+      signerEmailLabelEs: 'Email Profesional del Agente *',
+      signerEmailLabelEn: 'Agent Professional Email *',
+      signerPhoneLabelEs: 'Teléfono del Agente *',
+      signerPhoneLabelEn: 'Agent Phone *',
+      accentColor: '#047857',
+      accentBg: '#ecfdf5',
+      accentBorder: '#10b981'
+    },
+    realtor_broker: {
+      role: 'realtor',
+      isDirectSigner: false,
+      pct: 25,
+      icon: '🏠',
+      roleLabelEs: 'Agente bajo Broker (25 % Agencia)',
+      roleLabelEn: 'Brokerage-Affiliated Agent (25% Office)',
+      docNameEs: 'Acuerdo Marco vía Agencia / Broker (25 % Agencia)',
+      docNameEn: 'Brokerage-Backed Agent Referral Agreement (25% Office)',
+      shortDocEs: 'Acuerdo vía Broker (25 %)',
+      shortDocEn: 'Brokerage Agreement (25%)',
+      templateBtnEs: 'Descargar Plantilla Agencia-Agente (Word .doc)',
+      templateBtnEn: 'Download Brokerage-Agent Template (Word .doc)',
+      exportBtnEs: 'Exportar Acuerdo vía Broker (Word .doc)',
+      exportBtnEn: 'Export Brokerage Agreement (Word .doc)',
+      partyDescEs: 'la Agencia / Broker del Agente (25 % abonado al Broker según reparto interno)',
+      partyDescEn: 'the Agent’s Brokerage (25% paid Broker-to-Broker per internal split)',
+      presentationTargetEs: 'al Broker y al Agente / Realtor',
+      presentationTargetEn: 'to the Broker and the Realtor / Agent',
+      block1TitleEs: '1. Datos de la Agencia (Brokerage · 25 %) y Agente Asociado',
+      block1TitleEn: '1. Brokerage (25%) & Associated Realtor Tax Details',
+      legalNameLabelEs: 'Razón Social / Nombre Legal de la Agencia *',
+      legalNameLabelEn: 'Legal Brokerage Company Name *',
+      licenseLabelEs: 'Nº de Licencia Inmobiliaria de la Agencia',
+      licenseLabelEn: 'Brokerage Real Estate License Number',
+      signerNameLabelEs: 'Nombre Completo del Broker Responsable (Firmante) *',
+      signerNameLabelEn: 'Managing Broker / Signer Full Name *',
+      signerEmailLabelEs: 'Email del Broker *',
+      signerEmailLabelEn: 'Broker Email *',
+      signerPhoneLabelEs: 'Teléfono del Broker *',
+      signerPhoneLabelEn: 'Broker Phone *',
+      accentColor: '#047857',
+      accentBg: '#ecfdf5',
+      accentBorder: '#10b981'
+    }
+  };
+  if (role === 'realtor') {
+    return hasBroker ? variants.realtor_broker : variants.realtor_direct;
+  }
+  return variants[role] || variants.broker;
+};
+
+/* ---- Shared Contract Fiscal & Bank Data Section (Embajador, Colaborador, Broker & Realtor) ---- */
 App.utils.renderContractDataSection = function(containerEl, user, prefix = 'contract', onSuccessCallback = null) {
   if (!containerEl || !user) return;
 
   const status = user.agreementStatus || 'none'; // 'none' | 'data_submitted' | 'uploaded' | 'signed'
   const saved = user.contractCompanyData || {};
-  const isEmbajador = user.role === 'embajador';
-  const isBroker = user.role === 'broker' || isEmbajador;
-  const defaultBrokerName = isBroker
+  const variant = App.utils.getAgreementVariantMeta(user.role, user);
+  const isDirectSigner = Boolean(variant.isDirectSigner);
+  const defaultSignerName = isDirectSigner
     ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
     : (user.brokerNameManual || '');
 
@@ -945,21 +1177,21 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
         <span style="font-size:2rem;">✅</span>
         <div>
           <div style="font-weight:700; color:#065f46; font-size:1rem;">
-            <span class="lang-en">Collaboration Agreement — Signed &amp; Active</span>
-            <span class="lang-es">Acuerdo de Colaboración — Firmado y Activo</span>
-            <span class="lang-fr">Accord de Collaboration — Signé et Actif</span>
-            <span class="lang-en-ca">Collaboration Agreement — Signed &amp; Active</span>
+            <span class="lang-en">${App.utils.escapeHtml(variant.docNameEn)} — Signed &amp; Active</span>
+            <span class="lang-es">${App.utils.escapeHtml(variant.docNameEs)} — Firmado y Activo</span>
+            <span class="lang-fr">${App.utils.escapeHtml(variant.docNameEn)} — Signé et Actif</span>
+            <span class="lang-en-ca">${App.utils.escapeHtml(variant.docNameEn)} — Signed &amp; Active</span>
           </div>
           <div style="font-size:0.85rem; color:#047857; margin-top:4px;">
-            <span class="lang-en">Your partnership agreement has been formalized. Signed on ${App.utils.formatDate(user.agreementSignedAt)}.</span>
-            <span class="lang-es">Tu acuerdo de colaboración conjunta está formalizado y activo. Fecha: ${App.utils.formatDate(user.agreementSignedAt)}.</span>
-            <span class="lang-fr">Votre accord de partenariat est actif. Signé le ${App.utils.formatDate(user.agreementSignedAt)}.</span>
-            <span class="lang-en-ca">Your partnership agreement has been formalized. Signed on ${App.utils.formatDate(user.agreementSignedAt)}.</span>
+            <span class="lang-en">Your ${App.utils.escapeHtml(variant.shortDocEn)} has been formalized. Signed on ${App.utils.formatDate(user.agreementSignedAt)}.</span>
+            <span class="lang-es">Tu ${App.utils.escapeHtml(variant.shortDocEs)} está formalizado y activo. Fecha: ${App.utils.formatDate(user.agreementSignedAt)}.</span>
+            <span class="lang-fr">Votre accord est actif. Signé le ${App.utils.formatDate(user.agreementSignedAt)}.</span>
+            <span class="lang-en-ca">Your ${App.utils.escapeHtml(variant.shortDocEn)} has been formalized. Signed on ${App.utils.formatDate(user.agreementSignedAt)}.</span>
           </div>
           ${user.agreementFinalUrl ? `
             <div style="margin-top:10px;">
               <a href="${App.utils.escapeHtml(user.agreementFinalUrl)}" target="_blank" class="btn btn-primary btn-sm" style="padding:5px 12px;font-size:0.8rem;color:white;">
-                📥 <span class="lang-en">Download Signed Agreement</span><span class="lang-es">Descargar Acuerdo Firmado</span>
+                📥 <span class="lang-en">Download Signed ${App.utils.escapeHtml(variant.shortDocEn)}</span><span class="lang-es">Descargar ${App.utils.escapeHtml(variant.shortDocEs)} Firmado</span>
               </a>
             </div>
           ` : ''}
@@ -971,16 +1203,16 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
         <span style="font-size:2rem;">📋</span>
         <div>
           <div style="font-weight:700; color:#065f46; font-size:1rem;">
-            <span class="lang-en">Company &amp; Bank Details Received — Preparing Your Contract</span>
-            <span class="lang-es">Datos Fiscales y Bancarios Recibidos — Contrato en Preparación</span>
+            <span class="lang-en">Fiscal &amp; Bank Details Received — Preparing Your ${App.utils.escapeHtml(variant.shortDocEn)}</span>
+            <span class="lang-es">Datos Fiscales y Bancarios Recibidos — Preparando tu ${App.utils.escapeHtml(variant.shortDocEs)}</span>
             <span class="lang-fr">Données Fiscales et Bancaires Reçues — Contrat en Préparation</span>
-            <span class="lang-en-ca">Company &amp; Bank Details Received — Preparing Your Contract</span>
+            <span class="lang-en-ca">Fiscal &amp; Bank Details Received — Preparing Your ${App.utils.escapeHtml(variant.shortDocEn)}</span>
           </div>
           <div style="font-size:0.85rem; color:#047857; margin-top:4px; line-height:1.5;">
-            <span class="lang-en">Our administration team has been notified and is preparing your custom Collaboration Agreement externally. We will present it directly to the Broker and Agent for signature. You may update your details below at any time.</span>
-            <span class="lang-es">Nuestro equipo de administración ya ha recibido la notificación con tus datos y está preparando vuestro Acuerdo de Colaboración de forma externa. Os lo presentaremos directamente al Broker y al Agente para su firma. Si necesitas actualizar algún dato, puedes modificarlo y guardarlo abajo.</span>
-            <span class="lang-fr">Notre équipe administrative a été notifiée et prépare votre accord de collaboration. Nous le présenterons au Broker et à l'Agent pour signature.</span>
-            <span class="lang-en-ca">Our administration team has been notified and is preparing your custom Collaboration Agreement externally. We will present it directly to the Broker and Agent for signature.</span>
+            <span class="lang-en">Our administration team has been notified and is preparing your custom ${App.utils.escapeHtml(variant.docNameEn)} externally. We will present it directly ${App.utils.escapeHtml(variant.presentationTargetEn)} for signature. You may update your details below at any time.</span>
+            <span class="lang-es">Nuestro equipo de administración ya ha recibido la notificación con tus datos y está preparando tu ${App.utils.escapeHtml(variant.docNameEs)} de forma externa. Lo presentaremos directamente ${App.utils.escapeHtml(variant.presentationTargetEs)} para su firma. Si necesitas actualizar algún dato, puedes modificarlo y guardarlo abajo.</span>
+            <span class="lang-fr">Notre équipe administrative a été notifiée et prépare votre accord de collaboration personnalisé.</span>
+            <span class="lang-en-ca">Our administration team has been notified and is preparing your custom ${App.utils.escapeHtml(variant.docNameEn)} externally.</span>
           </div>
         </div>
       </div>`;
@@ -990,17 +1222,17 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
           <span style="font-size:1.5rem;">📝</span>
           <div style="font-weight:700; color:#92400e; font-size:1rem;">
-            <span class="lang-en">Step Required: Provide Company Tax &amp; Banking Information for Your Agreement</span>
-            <span class="lang-es">Paso Requerido: Facilitar Datos Fiscales y Bancarios para el Acuerdo de Colaboración</span>
+            <span class="lang-en">Step Required: Provide Fiscal &amp; Banking Information for Your ${App.utils.escapeHtml(variant.shortDocEn)}</span>
+            <span class="lang-es">Paso Requerido: Facilitar Datos Fiscales y Bancarios para tu ${App.utils.escapeHtml(variant.shortDocEs)}</span>
             <span class="lang-fr">Étape Requise : Fournir les Informations Fiscales et Bancaires pour l'Accord</span>
-            <span class="lang-en-ca">Step Required: Provide Company Tax &amp; Banking Information for Your Agreement</span>
+            <span class="lang-en-ca">Step Required: Provide Fiscal &amp; Banking Information for Your ${App.utils.escapeHtml(variant.shortDocEn)}</span>
           </div>
         </div>
         <p style="font-size:0.85rem; color:#78350f; margin:0; line-height:1.5;">
-          <span class="lang-en">To formalize the joint Collaboration Agreement between your Brokerage and RE/MAX Inmomás, please complete and save the form below with your company's tax and banking details. We prepare the contract externally and present it directly to the Broker and Agent.</span>
-          <span class="lang-es">Para formalizar el documento de colaboración conjunta con los Brokers y Agentes, necesitamos que rellenes y guardes el siguiente formulario con los datos fiscales de la empresa y la cuenta bancaria. Con esta información nosotros armaremos el contrato de forma externa a la plataforma y os lo presentaremos al Broker y al Agente.</span>
-          <span class="lang-fr">Pour formaliser l'accord de collaboration conjointe, veuillez remplir et enregistrer le formulaire ci-dessous avec les coordonnées fiscales et bancaires de l'entreprise.</span>
-          <span class="lang-en-ca">To formalize the joint Collaboration Agreement between your Brokerage and RE/MAX Inmomás, please complete and save the form below with your company's tax and banking details.</span>
+          <span class="lang-en">To formalize your ${App.utils.escapeHtml(variant.docNameEn)} with RE/MAX Inmomás, please complete and save the form below with your fiscal and banking details. We prepare the contract externally and present it directly ${App.utils.escapeHtml(variant.presentationTargetEn)}.</span>
+          <span class="lang-es">Para formalizar tu <strong>${App.utils.escapeHtml(variant.docNameEs)}</strong> con RE/MAX Inmomás, rellena y guarda el siguiente formulario con tus datos fiscales y cuenta bancaria. Con esta información armaremos el contrato correspondiente a tu rol de <strong>${App.utils.escapeHtml(variant.roleLabelEs)}</strong> y lo presentaremos directamente ${App.utils.escapeHtml(variant.presentationTargetEs)}.</span>
+          <span class="lang-fr">Pour formaliser l'accord de collaboration, veuillez remplir et enregistrer le formulaire ci-dessous avec vos coordonnées fiscales et bancaires.</span>
+          <span class="lang-en-ca">To formalize your ${App.utils.escapeHtml(variant.docNameEn)} with RE/MAX Inmomás, please complete and save the form below with your fiscal and banking details.</span>
         </p>
       </div>`;
   }
@@ -1014,17 +1246,17 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
         <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.5rem;">
           <span style="font-size:1.3rem;">1️⃣</span>
           <div style="font-weight:700; color:#1e40af; font-size:0.92rem;">
-            <span class="lang-en">Fill Out Company &amp; Tax Data</span>
-            <span class="lang-es">Rellenar Datos de Empresa y Fiscales</span>
+            <span class="lang-en">Fill Out Tax &amp; Entity Data</span>
+            <span class="lang-es">Rellenar Datos Fiscales (${App.utils.escapeHtml(variant.roleLabelEs)})</span>
             <span class="lang-fr">Remplir les Données Fiscales</span>
-            <span class="lang-en-ca">Fill Out Company &amp; Tax Data</span>
+            <span class="lang-en-ca">Fill Out Tax &amp; Entity Data</span>
           </div>
         </div>
         <p style="font-size:0.82rem; color:#374151; margin:0; line-height:1.45;">
-          <span class="lang-en">The Broker (or the Agent with data provided by their Broker) completes the company's legal, tax (EIN/Tax ID), and corporate bank account details below and saves them.</span>
-          <span class="lang-es">El Broker (o el Agente con los datos facilitados por su Broker) completa los datos legales, fiscales de la empresa y la cuenta bancaria para el cobro de comisiones, y los guarda en este formulario.</span>
-          <span class="lang-fr">Le Broker (ou l'Agent avec les informations de son Broker) complète les données fiscales et bancaires de l'entreprise ci-dessous.</span>
-          <span class="lang-en-ca">The Broker (or the Agent with data provided by their Broker) completes the company's legal, tax, and corporate bank account details below and saves them.</span>
+          <span class="lang-en">Here ${App.utils.escapeHtml(variant.partyDescEn)} completes the legal, tax (EIN/Tax ID/NIF), and bank account details below and saves them.</span>
+          <span class="lang-es">Aquí ${App.utils.escapeHtml(variant.partyDescEs)} completa los datos legales, fiscales y la cuenta bancaria para el cobro de comisiones, y los guarda en este formulario.</span>
+          <span class="lang-fr">Complétez les données fiscales et bancaires ci-dessous et enregistrez-les.</span>
+          <span class="lang-en-ca">Here ${App.utils.escapeHtml(variant.partyDescEn)} completes the legal, tax, and bank account details below and saves them.</span>
         </p>
       </div>
 
@@ -1032,17 +1264,17 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
         <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.5rem;">
           <span style="font-size:1.3rem;">2️⃣</span>
           <div style="font-weight:700; color:#1d4ed8; font-size:0.92rem;">
-            <span class="lang-en">We Draft the Contract Externally</span>
-            <span class="lang-es">Armamos el Contrato de Forma Externa</span>
+            <span class="lang-en">We Draft Your ${App.utils.escapeHtml(variant.shortDocEn)}</span>
+            <span class="lang-es">Armamos tu ${App.utils.escapeHtml(variant.shortDocEs)}</span>
             <span class="lang-fr">Préparation Externe du Contrat</span>
-            <span class="lang-en-ca">We Draft the Contract Externally</span>
+            <span class="lang-en-ca">We Draft Your ${App.utils.escapeHtml(variant.shortDocEn)}</span>
           </div>
         </div>
         <p style="font-size:0.82rem; color:#374151; margin:0; line-height:1.45;">
-          <span class="lang-en">As soon as you save these details, our administration panel receives an automatic notification and our team prepares your tailored Collaboration Agreement outside the platform.</span>
-          <span class="lang-es">Al guardar los datos, nuestro panel de administración recibe una notificación automática y nuestro equipo arma el contrato personalizado de forma externa a la plataforma.</span>
-          <span class="lang-fr">Dès l'enregistrement, notre administration reçoit une notification et prépare votre contrat personnalisé en externe.</span>
-          <span class="lang-en-ca">As soon as you save these details, our administration panel receives an automatic notification and our team prepares your tailored Collaboration Agreement outside the platform.</span>
+          <span class="lang-en">As soon as you save these details, our administration panel receives an automatic notification and prepares your tailored ${App.utils.escapeHtml(variant.docNameEn)}.</span>
+          <span class="lang-es">Al guardar los datos, administración recibe aviso automático y prepara tu <strong>${App.utils.escapeHtml(variant.docNameEs)}</strong> específico para tu perfil de ${App.utils.escapeHtml(variant.roleLabelEs)}.</span>
+          <span class="lang-fr">Dès l'enregistrement, notre administration reçoit une notification et prépare votre contrat personnalisé.</span>
+          <span class="lang-en-ca">As soon as you save these details, our administration panel prepares your tailored ${App.utils.escapeHtml(variant.docNameEn)}.</span>
         </p>
       </div>
 
@@ -1050,17 +1282,17 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
         <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.5rem;">
           <span style="font-size:1.3rem;">3️⃣</span>
           <div style="font-weight:700; color:#166534; font-size:0.92rem;">
-            <span class="lang-en">Personal Presentation &amp; Signature</span>
-            <span class="lang-es">Presentación y Firma con Broker y Agente</span>
+            <span class="lang-en">Presentation &amp; Signature</span>
+            <span class="lang-es">Presentación y Firma (${App.utils.escapeHtml(variant.roleLabelEs)})</span>
             <span class="lang-fr">Présentation et Signature</span>
-            <span class="lang-en-ca">Personal Presentation &amp; Signature</span>
+            <span class="lang-en-ca">Presentation &amp; Signature</span>
           </div>
         </div>
         <p style="font-size:0.82rem; color:#374151; margin:0; line-height:1.45;">
-          <span class="lang-en">Once drafted, we present the agreement directly to the Broker and the Agent to review it together, answer any questions, and complete the signature seamlessly.</span>
-          <span class="lang-es">Una vez preparado el documento, os lo presentamos directamente al Broker y al Agente para revisarlo juntos con total claridad y proceder a la firma.</span>
-          <span class="lang-fr">Une fois prêt, nous présentons le contrat directement au Broker et à l'Agent pour signature.</span>
-          <span class="lang-en-ca">Once drafted, we present the agreement directly to the Broker and the Agent to review it together and complete the signature seamlessly.</span>
+          <span class="lang-en">Once drafted, we present the agreement directly ${App.utils.escapeHtml(variant.presentationTargetEn)} to review it together and complete the signature seamlessly.</span>
+          <span class="lang-es">Una vez preparado el documento, lo presentamos directamente ${App.utils.escapeHtml(variant.presentationTargetEs)} para revisarlo juntos con total claridad y proceder a la firma.</span>
+          <span class="lang-fr">Une fois prêt, nous présentons le contrat directement pour révision et signature.</span>
+          <span class="lang-en-ca">Once drafted, we present the agreement directly ${App.utils.escapeHtml(variant.presentationTargetEn)} to complete the signature seamlessly.</span>
         </p>
       </div>
     </div>
@@ -1069,53 +1301,56 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
     <div style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:0.875rem; padding:1.5rem; box-shadow:0 4px 12px rgba(15,23,42,0.04); text-align:left;">
       <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem; padding-bottom:1rem; border-bottom:1px solid #f1f5f9;">
         <div>
+          <div style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:999px; font-size:0.75rem; font-weight:800; background:${variant.accentBg}; color:${variant.accentColor}; border:1px solid ${variant.accentBorder}; margin-bottom:8px;">
+            ${variant.icon} <span class="lang-en">Document Variant: ${App.utils.escapeHtml(variant.docNameEn)}</span><span class="lang-es">Variante de Documento: ${App.utils.escapeHtml(variant.docNameEs)}</span>
+          </div>
           <h3 style="margin:0 0 0.35rem; font-size:1.05rem; color:#0f172a; display:flex; align-items:center; gap:0.5rem;">
-            🏢 <span class="lang-en">Company Tax &amp; Banking Information Form</span>
-            <span class="lang-es">Formulario de Datos Fiscales de la Empresa y Cuenta Bancaria</span>
-            <span class="lang-fr">Formulaire de Données Fiscales et Bancaires de l'Entreprise</span>
-            <span class="lang-en-ca">Company Tax &amp; Banking Information Form</span>
+            🏢 <span class="lang-en">Fiscal &amp; Banking Information Form (${App.utils.escapeHtml(variant.roleLabelEn)})</span>
+            <span class="lang-es">Formulario de Datos Fiscales y Cuenta Bancaria (${App.utils.escapeHtml(variant.roleLabelEs)})</span>
+            <span class="lang-fr">Formulaire de Données Fiscales et Bancaires</span>
+            <span class="lang-en-ca">Fiscal &amp; Banking Information Form (${App.utils.escapeHtml(variant.roleLabelEn)})</span>
           </h3>
           <p style="font-size:0.82rem; color:#64748b; margin:0;">
-            <span class="lang-en">Please complete these details accurately so our team can prepare your Collaboration Agreement, or export the Master Referral Agreement in Word (.doc).</span>
-            <span class="lang-es">Completa estos datos para redactar el Acuerdo de Colaboración Conjunta o exporta directamente el Master Referral Agreement en documento Word (.doc).</span>
-            <span class="lang-fr">Veuillez remplir ces informations ou exporter le Master Referral Agreement au format Word (.doc).</span>
-            <span class="lang-en-ca">Please complete these details accurately or export the Master Referral Agreement in Word (.doc).</span>
+            <span class="lang-en">Complete these details accurately so our team can prepare your ${App.utils.escapeHtml(variant.docNameEn)}, or export it directly in Word (.doc).</span>
+            <span class="lang-es">Completa estos datos para redactar tu <strong>${App.utils.escapeHtml(variant.docNameEs)}</strong> o descárgalo directamente pre-rellenado en Word (.doc).</span>
+            <span class="lang-fr">Veuillez remplir ces informations ou exporter votre accord au format Word (.doc).</span>
+            <span class="lang-en-ca">Complete these details accurately or export your ${App.utils.escapeHtml(variant.docNameEn)} in Word (.doc).</span>
           </p>
         </div>
-        <button type="button" class="btn btn-outline" onclick="App.utils.exportCurrentContractToWord('${prefix}')" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.65rem 1.15rem; font-weight:700; font-size:0.85rem; border-radius:0.6rem; border:1.5px solid #003da5; color:#003da5; background:#eff6ff; white-space:nowrap; cursor:pointer;">
-          📄 <span class="lang-en">Export Master Referral Agreement (Word .doc)</span>
-          <span class="lang-es">Exportar Master Referral Agreement (Word .doc)</span>
+        <button type="button" class="btn btn-outline" onclick="App.utils.exportCurrentContractToWord('${prefix}')" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.65rem 1.15rem; font-weight:700; font-size:0.85rem; border-radius:0.6rem; border:1.5px solid ${variant.accentBorder}; color:${variant.accentColor}; background:${variant.accentBg}; white-space:nowrap; cursor:pointer;">
+          ${variant.icon} <span class="lang-en">${App.utils.escapeHtml(variant.exportBtnEn)}</span>
+          <span class="lang-es">${App.utils.escapeHtml(variant.exportBtnEs)}</span>
           <span class="lang-fr">Exporter l'Accord en Word (.doc)</span>
-          <span class="lang-en-ca">Export Master Referral Agreement (Word .doc)</span>
+          <span class="lang-en-ca">${App.utils.escapeHtml(variant.exportBtnEn)}</span>
         </button>
       </div>
 
       <form id="${prefix}-company-data-form" style="display:grid; gap:1.25rem;">
-        <!-- Block 1: Datos Fiscales de la Empresa -->
+        <!-- Block 1: Datos Fiscales -->
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:0.65rem; padding:1.15rem;">
           <h4 style="margin:0 0 0.85rem; font-size:0.9rem; color:#1e3a8a; text-transform:uppercase; letter-spacing:0.03em;">
-            📑 <span class="lang-en">${isEmbajador ? '1. Company / Professional &amp; Tax Details (Ambassador)' : '1. Company &amp; Tax Details (Brokerage)'}</span>
-            <span class="lang-es">${isEmbajador ? '1. Datos de Empresa / Profesionales y Fiscales (Embajador)' : '1. Datos de la Empresa y Datos Fiscales (Brokerage)'}</span>
+            📑 <span class="lang-en">${App.utils.escapeHtml(variant.block1TitleEn)}</span>
+            <span class="lang-es">${App.utils.escapeHtml(variant.block1TitleEs)}</span>
           </h4>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:0.85rem;">
             <div>
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
-                <span class="lang-en">Legal Company / Entity Name (Razón Social) *</span>
-                <span class="lang-es">Razón Social / Nombre Legal de la Empresa *</span>
+                <span class="lang-en">${App.utils.escapeHtml(variant.legalNameLabelEn)}</span>
+                <span class="lang-es">${App.utils.escapeHtml(variant.legalNameLabelEs)}</span>
               </label>
-              <input type="text" id="${prefix}-legal-name" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="Ej. RE/MAX Premier Realty LLC" value="${App.utils.escapeHtml(saved.companyLegalName || user.agencyName || '')}">
+              <input type="text" id="${prefix}-legal-name" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="${isDirectSigner && variant.role !== 'broker' ? 'Ej. Sociedad / Despacho o Nombre Fiscal Completo' : 'Ej. RE/MAX Premier Realty LLC'}" value="${App.utils.escapeHtml(saved.companyLegalName || user.agencyName || (isDirectSigner && variant.role !== 'broker' ? defaultSignerName : ''))}">
             </div>
             <div>
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
-                <span class="lang-en">Tax ID / EIN / CIF / Corporate ID *</span>
+                <span class="lang-en">Tax ID / EIN / CIF / NIF *</span>
                 <span class="lang-es">NIF / CIF / Tax ID / EIN Fiscal *</span>
               </label>
               <input type="text" id="${prefix}-tax-id" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="Ej. 12-3456789 / B-12345678" value="${App.utils.escapeHtml(saved.taxId || '')}">
             </div>
             <div>
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
-                <span class="lang-en">${isEmbajador ? 'Professional / Real Estate License (Optional)' : 'Brokerage License Number'}</span>
-                <span class="lang-es">${isEmbajador ? 'Nº de Licencia Profesional (Opcional)' : 'Nº de Licencia Inmobiliaria (Brokerage License)'}</span>
+                <span class="lang-en">${App.utils.escapeHtml(variant.licenseLabelEn)}</span>
+                <span class="lang-es">${App.utils.escapeHtml(variant.licenseLabelEs)}</span>
               </label>
               <input type="text" id="${prefix}-license-number" class="form-input" style="margin-bottom:0; width:100%;" placeholder="Ej. CQ1056789" value="${App.utils.escapeHtml(saved.licenseNumber || '')}">
             </div>
@@ -1135,24 +1370,24 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
             </div>
             <div>
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
-                <span class="lang-en">${isEmbajador ? 'Ambassador / Legal Representative Name *' : 'Managing Broker / Legal Representative Name *'}</span>
-                <span class="lang-es">${isEmbajador ? 'Nombre Completo del Embajador / Representante Legal *' : 'Nombre Completo del Broker / Representante Legal *'}</span>
+                <span class="lang-en">${App.utils.escapeHtml(variant.signerNameLabelEn)}</span>
+                <span class="lang-es">${App.utils.escapeHtml(variant.signerNameLabelEs)}</span>
               </label>
-              <input type="text" id="${prefix}-broker-name" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="${isEmbajador ? 'Nombre y Apellidos del Embajador' : 'Nombre y Apellidos del Broker'}" value="${App.utils.escapeHtml(saved.brokerFullName || saved.brokerSignerName || defaultBrokerName)}">
+              <input type="text" id="${prefix}-broker-name" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="Nombre y Apellidos" value="${App.utils.escapeHtml(saved.brokerFullName || saved.brokerSignerName || defaultSignerName)}">
             </div>
             <div>
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
-                <span class="lang-en">${isEmbajador ? 'Ambassador Email *' : 'Broker Email *'}</span>
-                <span class="lang-es">${isEmbajador ? 'Email del Embajador *' : 'Email del Broker *'}</span>
+                <span class="lang-en">${App.utils.escapeHtml(variant.signerEmailLabelEn)}</span>
+                <span class="lang-es">${App.utils.escapeHtml(variant.signerEmailLabelEs)}</span>
               </label>
-              <input type="email" id="${prefix}-broker-email" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="${isEmbajador ? 'embajador@empresa.com' : 'broker@agency.com'}" value="${App.utils.escapeHtml(saved.brokerEmail || saved.brokerSignerEmail || (isBroker ? user.email : ''))}">
+              <input type="email" id="${prefix}-broker-email" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="contacto@empresa.com" value="${App.utils.escapeHtml(saved.brokerEmail || saved.brokerSignerEmail || (isDirectSigner ? user.email : ''))}">
             </div>
             <div>
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
-                <span class="lang-en">${isEmbajador ? 'Ambassador Phone *' : 'Broker Phone *'}</span>
-                <span class="lang-es">${isEmbajador ? 'Teléfono del Embajador *' : 'Teléfono del Broker *'}</span>
+                <span class="lang-en">${App.utils.escapeHtml(variant.signerPhoneLabelEn)}</span>
+                <span class="lang-es">${App.utils.escapeHtml(variant.signerPhoneLabelEs)}</span>
               </label>
-              <input type="tel" id="${prefix}-broker-phone" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="+1 555 000 0000" value="${App.utils.escapeHtml(saved.brokerPhone || saved.brokerSignerPhone || (isBroker ? user.phone : ''))}">
+              <input type="tel" id="${prefix}-broker-phone" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="+1 555 000 0000" value="${App.utils.escapeHtml(saved.brokerPhone || saved.brokerSignerPhone || (isDirectSigner ? user.phone : ''))}">
             </div>
           </div>
         </div>
@@ -1160,16 +1395,16 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
         <!-- Block 2: Datos Bancarios -->
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:0.65rem; padding:1.15rem;">
           <h4 style="margin:0 0 0.85rem; font-size:0.9rem; color:#065f46; text-transform:uppercase; letter-spacing:0.03em;">
-            🏦 <span class="lang-en">2. Corporate Bank Account Details (For Commission Payments)</span>
+            🏦 <span class="lang-en">2. Bank Account Details (For Commission Payments)</span>
             <span class="lang-es">2. Datos de Cuenta Bancaria (Para Pago de Comisiones)</span>
           </h4>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:0.85rem;">
             <div>
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
-                <span class="lang-en">Account Holder Name (Beneficiary Company) *</span>
-                <span class="lang-es">Titular de la Cuenta Bancaria (Empresa) *</span>
+                <span class="lang-en">Account Holder Name (Beneficiary) *</span>
+                <span class="lang-es">Titular de la Cuenta Bancaria (Beneficiario) *</span>
               </label>
-              <input type="text" id="${prefix}-bank-holder" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="Ej. RE/MAX Premier Realty LLC" value="${App.utils.escapeHtml(saved.bankAccountHolder || saved.companyLegalName || user.agencyName || '')}">
+              <input type="text" id="${prefix}-bank-holder" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="Ej. RE/MAX Premier Realty LLC" value="${App.utils.escapeHtml(saved.bankAccountHolder || saved.companyLegalName || user.agencyName || (isDirectSigner && variant.role !== 'broker' ? defaultSignerName : ''))}">
             </div>
             <div>
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
@@ -1201,8 +1436,8 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
             </div>
             <div style="grid-column: 1 / -1;">
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
-                <span class="lang-en">Additional Notes / Referring Agent Details (Optional)</span>
-                <span class="lang-es">Notas Adicionales o Datos del Agente Asociado (Opcional)</span>
+                <span class="lang-en">Additional Notes (Optional)</span>
+                <span class="lang-es">Notas Adicionales para el Contrato (Opcional)</span>
               </label>
               <textarea id="${prefix}-notes" class="form-input" rows="2" style="margin-bottom:0; width:100%; resize:vertical;" placeholder="Cualquier observación adicional para la redacción del contrato...">${App.utils.escapeHtml(saved.additionalNotes || saved.notes || '')}</textarea>
             </div>
@@ -1214,8 +1449,8 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
             ${saved.submittedAt ? `✅ <span class="lang-en">Last saved:</span><span class="lang-es">Última actualización:</span> ${App.utils.formatDate(saved.submittedAt)}` : ''}
           </div>
           <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
-            <button type="button" class="btn btn-outline" onclick="App.utils.exportCurrentContractToWord('${prefix}')" style="padding:0.75rem 1.25rem; font-weight:700; border-radius:0.6rem; border:1.5px solid #003da5; color:#003da5; background:#fff; cursor:pointer;">
-              📄 <span class="lang-en">Export to Word (.doc)</span><span class="lang-es">Exportar a Word (.doc)</span><span class="lang-fr">Exporter en Word (.doc)</span><span class="lang-en-ca">Export to Word (.doc)</span>
+            <button type="button" class="btn btn-outline" onclick="App.utils.exportCurrentContractToWord('${prefix}')" style="padding:0.75rem 1.25rem; font-weight:700; border-radius:0.6rem; border:1.5px solid ${variant.accentBorder}; color:${variant.accentColor}; background:#fff; cursor:pointer;">
+              ${variant.icon} <span class="lang-en">${App.utils.escapeHtml(variant.exportBtnEn)}</span><span class="lang-es">${App.utils.escapeHtml(variant.exportBtnEs)}</span><span class="lang-fr">Exporter en Word (.doc)</span><span class="lang-en-ca">${App.utils.escapeHtml(variant.exportBtnEn)}</span>
             </button>
             <button type="submit" class="btn btn-primary" id="${prefix}-submit-btn" style="padding:0.75rem 1.75rem; font-weight:700; border-radius:0.6rem;">
               💾 <span class="lang-en">Save Details &amp; Notify Administration</span>
@@ -2127,6 +2362,10 @@ App.utils.resolveUserUmbrellaParents = function(user, allUsers = [], maps = null
     depth++;
     let parent = findRefUser(cursor.referredBy);
     if (parent && parent.role === 'agent_inmomas') {
+      parent = null;
+    }
+    // Business rule: a Colaborador can be under a Broker or an Embajador, NEVER under a Realtor/Agent
+    if (parent && user.role === 'colaborador' && parent.role === 'realtor') {
       parent = null;
     }
     if (!parent && cursor.brokerId && lk.byId.has(cursor.brokerId)) {

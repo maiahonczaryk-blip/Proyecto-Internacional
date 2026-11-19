@@ -563,9 +563,11 @@
 
     bannerEl.style.display = 'block';
     const itemsPreview = notifications.slice(0, 3).map(n => {
-      const roleLabel = n.userRole === 'embajador' ? '👑 Embajador' : (n.userRole === 'broker' ? '🏢 Broker' : '👤 Realtor');
+      const uMatch = (allUsers || []).find(usr => usr.id === n.userId);
+      const effRole = (uMatch && uMatch.role) || n.userRole || 'realtor';
+      const vMeta = (App.utils && App.utils.getAgreementVariantMeta) ? App.utils.getAgreementVariantMeta(effRole) : { icon: '📄', roleLabelEs: effRole, shortDocEs: 'Acuerdo' };
       const companyName = (n.contractCompanyData && n.contractCompanyData.companyLegalName) || n.agencyName || '—';
-      return `<li style="margin-bottom:4px;"><strong>${App.utils.escapeHtml(n.userName)}</strong> (${roleLabel} — ${App.utils.escapeHtml(companyName)}) · <span style="color:#4b5563;">${App.utils.escapeHtml(n.email)}</span></li>`;
+      return `<li style="margin-bottom:4px;"><strong>${App.utils.escapeHtml(n.userName)}</strong> (${vMeta.icon} ${App.utils.escapeHtml(vMeta.roleLabelEs)} · <em>${App.utils.escapeHtml(vMeta.shortDocEs)}</em> — ${App.utils.escapeHtml(companyName)}) · <span style="color:#4b5563;">${App.utils.escapeHtml(n.email)}</span></li>`;
     }).join('');
 
     bannerEl.innerHTML = `
@@ -2195,26 +2197,33 @@
             </div>
           </div>
 
-          ${user.contractCompanyData ? `
-          <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:0.5rem; padding:0.9rem; margin-top:1rem; font-size:0.82rem;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-              <strong style="color:#1e3a8a;">🏢 Datos Fiscales y Bancarios (Para Contrato Externo)</strong>
-              <button type="button" class="btn btn-outline btn-xs" style="padding:2px 8px; font-size:0.75rem;" onclick="App.views.admin.copyContractData('${user.id}')">📋 Copiar Datos</button>
-            </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem; color:#334155;">
-              <div><strong>Razón Social:</strong> ${App.utils.escapeHtml(user.contractCompanyData.companyLegalName || '—')}</div>
-              <div><strong>NIF / Tax ID:</strong> ${App.utils.escapeHtml(user.contractCompanyData.taxId || '—')}</div>
-              <div><strong>Licencia:</strong> ${App.utils.escapeHtml(user.contractCompanyData.licenseNumber || '—')}</div>
-              <div><strong>País:</strong> ${App.utils.escapeHtml(user.contractCompanyData.fiscalCountry || '—')}</div>
-              <div style="grid-column:span 2;"><strong>Domicilio Fiscal:</strong> ${App.utils.escapeHtml(user.contractCompanyData.fiscalAddress || '—')}</div>
-              <div><strong>Broker Resp.:</strong> ${App.utils.escapeHtml(user.contractCompanyData.brokerSignerName || '—')}</div>
-              <div><strong>Email Broker:</strong> ${App.utils.escapeHtml(user.contractCompanyData.brokerSignerEmail || '—')}</div>
-              <div><strong>Banco / Titular:</strong> ${App.utils.escapeHtml(user.contractCompanyData.bankName || '—')} (${App.utils.escapeHtml(user.contractCompanyData.bankAccountHolder || '—')})</div>
-              <div><strong>IBAN / Cuenta:</strong> <code style="background:#fff; padding:1px 4px; border-radius:3px;">${App.utils.escapeHtml(user.contractCompanyData.bankAccountNumber || '—')}</code></div>
-              <div style="grid-column:span 2;"><strong>SWIFT / Routing:</strong> <code style="background:#fff; padding:1px 4px; border-radius:3px;">${App.utils.escapeHtml(user.contractCompanyData.bankSwiftRouting || '—')}</code></div>
-            </div>
-          </div>
-          ` : ''}
+          ${['embajador', 'colaborador', 'broker', 'realtor'].includes(user.role) ? (() => {
+            const uVar = (App.utils && App.utils.getAgreementVariantMeta) ? App.utils.getAgreementVariantMeta(user.role) : { icon: '📄', docNameEs: 'Acuerdo de Colaboración', exportBtnEs: 'Exportar Acuerdo (Word .doc)', roleLabelEs: user.role, accentColor: '#1e3a8a', accentBg: '#eff6ff', accentBorder: '#93c5fd' };
+            return `
+            <div style="background:${uVar.accentBg}; border:1px solid ${uVar.accentBorder}; border-radius:0.5rem; padding:0.9rem; margin-top:1rem; font-size:0.82rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:${user.contractCompanyData ? '0.6rem' : '0'};">
+                <strong style="color:${uVar.accentColor};">${uVar.icon} ${App.utils.escapeHtml(uVar.docNameEs)} (${App.utils.escapeHtml(uVar.roleLabelEs)})</strong>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                  <button type="button" class="btn btn-outline btn-xs" style="padding:3px 9px; font-size:0.75rem; border-color:${uVar.accentBorder}; color:${uVar.accentColor}; background:#fff; font-weight:700;" onclick="App.views.admin.exportUserAgreementToWord('${user.id}')">${uVar.icon} ${App.utils.escapeHtml(uVar.exportBtnEs)}</button>
+                  ${user.contractCompanyData ? `<button type="button" class="btn btn-outline btn-xs" style="padding:3px 8px; font-size:0.75rem; background:#fff;" onclick="App.views.admin.copyContractData('${user.id}')">📋 Copiar Datos</button>` : ''}
+                </div>
+              </div>
+              ${user.contractCompanyData ? `
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem; color:#334155; background:#fff; border:1px solid #e2e8f0; border-radius:6px; padding:0.65rem;">
+                <div><strong>Razón Social:</strong> ${App.utils.escapeHtml(user.contractCompanyData.companyLegalName || '—')}</div>
+                <div><strong>NIF / Tax ID:</strong> ${App.utils.escapeHtml(user.contractCompanyData.taxId || '—')}</div>
+                <div><strong>Licencia:</strong> ${App.utils.escapeHtml(user.contractCompanyData.licenseNumber || '—')}</div>
+                <div><strong>País:</strong> ${App.utils.escapeHtml(user.contractCompanyData.fiscalCountry || '—')}</div>
+                <div style="grid-column:span 2;"><strong>Domicilio Fiscal:</strong> ${App.utils.escapeHtml(user.contractCompanyData.fiscalAddress || '—')}</div>
+                <div><strong>Firmante (${App.utils.escapeHtml(uVar.roleLabelEs)}):</strong> ${App.utils.escapeHtml(user.contractCompanyData.brokerSignerName || '—')}</div>
+                <div><strong>Email Firmante:</strong> ${App.utils.escapeHtml(user.contractCompanyData.brokerSignerEmail || '—')}</div>
+                <div><strong>Banco / Titular:</strong> ${App.utils.escapeHtml(user.contractCompanyData.bankName || '—')} (${App.utils.escapeHtml(user.contractCompanyData.bankAccountHolder || '—')})</div>
+                <div><strong>IBAN / Cuenta:</strong> <code style="background:#f8fafc; padding:1px 4px; border-radius:3px;">${App.utils.escapeHtml(user.contractCompanyData.bankAccountNumber || '—')}</code></div>
+                <div style="grid-column:span 2;"><strong>SWIFT / Routing:</strong> <code style="background:#f8fafc; padding:1px 4px; border-radius:3px;">${App.utils.escapeHtml(user.contractCompanyData.bankSwiftRouting || '—')}</code></div>
+              </div>
+              ` : ''}
+            </div>`;
+          })() : ''}
           
           ${user.role !== 'admin' ? `
           <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1.5rem;">
@@ -5011,9 +5020,145 @@
   }
 
   /* ── Dedicated Agreements View ── */
+  function getAdminAgreementVariant(role) {
+    if (App.utils && typeof App.utils.getAgreementVariantMeta === 'function') {
+      return App.utils.getAgreementVariantMeta(role);
+    }
+    return {
+      role: role || 'broker',
+      icon: '📄',
+      roleLabelEs: role || 'Broker',
+      roleLabelEn: role || 'Broker',
+      docNameEs: 'Acuerdo de Colaboración',
+      docNameEn: 'Collaboration Agreement',
+      shortDocEs: 'Acuerdo',
+      shortDocEn: 'Agreement',
+      templateBtnEs: 'Descargar Plantilla (Word .doc)',
+      templateBtnEn: 'Download Template (Word .doc)',
+      exportBtnEs: 'Exportar Acuerdo (Word .doc)',
+      exportBtnEn: 'Export Agreement (Word .doc)',
+      accentColor: '#1e3a8a',
+      accentBg: '#eff6ff',
+      accentBorder: '#93c5fd'
+    };
+  }
+
+  function populateAgreementDocSelector(usersList, pendingNotifs = []) {
+    const sel = document.getElementById('admin-agreements-doc-selector');
+    if (!sel) return;
+
+    const prevVal = sel.value || '';
+    const contractRoles = ['embajador', 'colaborador', 'broker', 'realtor'];
+    const groupLabels = {
+      embajador: '👑 Usuarios Registrados — Embajadores',
+      colaborador: '🤝 Usuarios Registrados — Colaboradores',
+      broker: '🏢 Usuarios Registrados — Brokers',
+      realtor: '🏠 Usuarios Registrados — Agentes / Realtors'
+    };
+
+    let userGroupsHtml = '';
+    contractRoles.forEach(rKey => {
+      const rUsers = (usersList || [])
+        .filter(u => u && String(u.role || '').toLowerCase() === rKey && u.status !== 'rejected')
+        .sort((a, b) => `${a.firstName || ''} ${a.lastName || ''}`.localeCompare(`${b.firstName || ''} ${b.lastName || ''}`));
+      if (rUsers.length === 0) return;
+      const vMeta = getAdminAgreementVariant(rKey);
+      userGroupsHtml += `<optgroup label="${App.utils.escapeHtml(groupLabels[rKey])}">`;
+      rUsers.forEach(u => {
+        const uName = `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email || u.id;
+        const agencySuffix = (u.contractCompanyData && u.contractCompanyData.companyLegalName) || u.agencyName;
+        const statusHint = u.agreementSigned || u.agreementStatus === 'signed'
+          ? ' · ✅ Firmado'
+          : ((u.agreementStatus === 'data_submitted' || u.agreementStatus === 'uploaded') ? ' · 🔔 Datos recibidos' : '');
+        userGroupsHtml += `<option value="${App.utils.escapeHtml(u.id)}">${vMeta.icon} [${App.utils.escapeHtml(vMeta.roleLabelEs)}] ${App.utils.escapeHtml(uName)}${agencySuffix ? ' — ' + App.utils.escapeHtml(agencySuffix) : ''}${statusHint}</option>`;
+      });
+      userGroupsHtml += `</optgroup>`;
+    });
+
+    const templatesHtml = `
+      <optgroup label="📄 Plantillas en Blanco según Rol">
+        <option value="template:embajador">👑 Plantilla en Blanco — Acuerdo de Embajador</option>
+        <option value="template:colaborador">🤝 Plantilla en Blanco — Acuerdo de Colaborador</option>
+        <option value="template:broker">🏢 Plantilla en Blanco — Acuerdo Marco de Broker</option>
+        <option value="template:realtor">🏠 Plantilla en Blanco — Acuerdo de Agente / Realtor</option>
+      </optgroup>
+    `;
+
+    sel.innerHTML = userGroupsHtml + templatesHtml;
+
+    // Default selection priority: 1) keep valid previous value, 2) first pending user, 3) first registered partner, 4) template:embajador
+    const hasOption = (v) => Boolean(v && Array.from(sel.options).some(o => o.value === v));
+    let nextVal = 'template:embajador';
+    if (hasOption(prevVal) && !prevVal.startsWith('template:')) {
+      nextVal = prevVal;
+    } else if (pendingNotifs.length > 0 && hasOption(pendingNotifs[0].userId)) {
+      nextVal = pendingNotifs[0].userId;
+    } else if (hasOption(prevVal)) {
+      nextVal = prevVal;
+    } else {
+      const firstUserOpt = Array.from(sel.options).find(o => !o.value.startsWith('template:'));
+      if (firstUserOpt) nextVal = firstUserOpt.value;
+    }
+
+    sel.value = nextVal;
+    onAgreementDocSelectorChange(nextVal);
+  }
+
+  function onAgreementDocSelectorChange(selectedVal) {
+    const val = String(selectedVal || 'template:embajador');
+    const badgeEl = document.getElementById('admin-agreements-variant-badge');
+    const btnEl = document.getElementById('admin-agreements-download-btn');
+
+    let isTpl = val === 'template' || val.startsWith('template:');
+    let role = 'embajador';
+    let targetUser = null;
+
+    if (isTpl) {
+      role = val.includes(':') ? val.split(':')[1] : 'broker';
+    } else {
+      targetUser = (allUsers || []).find(u => u.id === val) ||
+        (App.demoData && App.demoData.users ? App.demoData.users.find(u => u.id === val) : null);
+      if (targetUser) {
+        role = targetUser.role || 'broker';
+      } else {
+        isTpl = true;
+      }
+    }
+
+    const vMeta = getAdminAgreementVariant(role);
+
+    if (badgeEl) {
+      badgeEl.style.background = vMeta.accentBg;
+      badgeEl.style.color = vMeta.accentColor;
+      badgeEl.style.borderColor = vMeta.accentBorder;
+      badgeEl.innerHTML = `${vMeta.icon} <span class="lang-en">Variant: ${App.utils.escapeHtml(vMeta.shortDocEn)}</span><span class="lang-es">Variante: ${App.utils.escapeHtml(vMeta.shortDocEs)}</span>`;
+    }
+
+    if (btnEl) {
+      btnEl.style.background = vMeta.accentColor;
+      btnEl.style.borderColor = vMeta.accentColor;
+      if (isTpl) {
+        btnEl.innerHTML = `${vMeta.icon} <span class="lang-en">${App.utils.escapeHtml(vMeta.templateBtnEn)}</span><span class="lang-es">${App.utils.escapeHtml(vMeta.templateBtnEs)}</span>`;
+      } else {
+        const shortUserName = `${targetUser.firstName || ''} ${targetUser.lastName || ''}`.trim() || targetUser.email || '';
+        btnEl.innerHTML = `${vMeta.icon} <span class="lang-en">Download ${App.utils.escapeHtml(vMeta.shortDocEn)} — ${App.utils.escapeHtml(shortUserName)} (.doc)</span><span class="lang-es">Descargar ${App.utils.escapeHtml(vMeta.shortDocEs)} — ${App.utils.escapeHtml(shortUserName)} (.doc)</span>`;
+      }
+    }
+
+    if (window.App && typeof window.App.updateLangDisplay === 'function') {
+      window.App.updateLangDisplay();
+    }
+  }
+
+  function downloadSelectedAgreementDoc() {
+    const sel = document.getElementById('admin-agreements-doc-selector');
+    const val = sel ? sel.value : 'template:embajador';
+    exportUserAgreementToWord(val);
+  }
+
   async function initAgreementsView() {
     try {
-      // Load all users so we can enrich notifications with contractCompanyData
+      // Load all users so we can enrich notifications with contractCompanyData & live user role
       const usersList = await App.auth.getAllUsers();
       allUsers = usersList;
 
@@ -5030,11 +5175,13 @@
           .filter(n => n.status === 'pending_admin');
       }
 
-      // Enrich notifications with user's latest contractCompanyData & include any user with agreementStatus === 'data_submitted' / 'uploaded'
+      // Enrich notifications with user's latest role & contractCompanyData & include any user with agreementStatus === 'data_submitted' / 'uploaded'
       pendingNotifs = pendingNotifs.map(n => {
         const u = usersList.find(usr => usr.id === n.userId);
         return {
           ...n,
+          userRole: (u && u.role) || n.userRole || 'realtor',
+          userName: (u ? `${u.firstName || ''} ${u.lastName || ''}`.trim() : '') || n.userName || '—',
           contractCompanyData: n.contractCompanyData || (u && u.contractCompanyData) || null
         };
       });
@@ -5055,6 +5202,9 @@
           });
         }
       });
+
+      // Populate top header user/role document selector so the right document variant appears automatically
+      populateAgreementDocSelector(usersList, pendingNotifs);
 
       // Render pending agreements in tab
       renderPendingAgreementsTab(pendingNotifs);
@@ -5097,41 +5247,49 @@
     }
 
     list.innerHTML = notifications.map(n => {
+      const matchedUser = (allUsers || []).find(usr => usr.id === n.userId);
+      const effectiveRole = (matchedUser && matchedUser.role) || n.userRole || 'realtor';
+      const vMeta = getAdminAgreementVariant(effectiveRole);
       const cd = n.contractCompanyData || {};
       const hasFiscalData = Boolean(cd.companyLegalName || cd.taxId || cd.bankAccountNumber);
       const isVirtualNotif = String(n.id || '').startsWith('user_notif_');
       const realNotifId = isVirtualNotif ? '' : n.id;
 
       return `
-      <div class="pending-card glass-card" id="agreement-card-${n.id}" style="padding:1.35rem; margin-bottom:1rem; text-align:left; border-left:4px solid #003f99;">
+      <div class="pending-card glass-card" id="agreement-card-${n.id}" style="padding:1.35rem; margin-bottom:1rem; text-align:left; border-left:4px solid ${vMeta.accentBorder};">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.75rem; margin-bottom:1rem;">
           <div>
-            <div style="font-weight:800; font-size:1.05rem; color:#111827;">${App.utils.escapeHtml(n.userName)}</div>
-            <div style="font-size:0.84rem; color:#4b5563; margin-top:2px;">
-              ${n.userRole === 'embajador' ? '👑 Embajador' : (n.userRole === 'broker' ? '🏢 Broker' : '👤 Realtor')} &nbsp;·&nbsp; <strong>${App.utils.escapeHtml(cd.companyLegalName || n.agencyName || '—')}</strong> &nbsp;·&nbsp; ${App.utils.escapeHtml(n.email)}
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <div style="font-weight:800; font-size:1.05rem; color:#111827;">${App.utils.escapeHtml(n.userName)}</div>
+              <span style="display:inline-flex; align-items:center; gap:4px; padding:2px 9px; border-radius:999px; font-size:0.74rem; font-weight:800; background:${vMeta.accentBg}; color:${vMeta.accentColor}; border:1px solid ${vMeta.accentBorder};">
+                ${vMeta.icon} ${App.utils.escapeHtml(vMeta.docNameEs)}
+              </span>
+            </div>
+            <div style="font-size:0.84rem; color:#4b5563; margin-top:4px;">
+              ${vMeta.icon} <strong>${App.utils.escapeHtml(vMeta.roleLabelEs)}</strong> &nbsp;·&nbsp; <strong>${App.utils.escapeHtml(cd.companyLegalName || n.agencyName || '—')}</strong> &nbsp;·&nbsp; ${App.utils.escapeHtml(n.email)}
             </div>
             <div style="font-size:0.78rem; color:#6b7280; margin-top:4px;">
               🕒 Enviado el: ${App.utils.formatDate(n.uploadedAt)}
             </div>
           </div>
           <span class="badge badge--pending" style="background:#dbeafe; color:#1e40af; font-weight:700; white-space:nowrap;">
-            🔔 Datos Recibidos — Preparar Contrato Externo
+            🔔 Datos Recibidos — Preparar ${App.utils.escapeHtml(vMeta.shortDocEs)}
           </span>
         </div>
 
         ${hasFiscalData ? `
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1rem; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:1rem; margin-bottom:1rem; font-size:0.83rem;">
           <div>
-            <div style="font-weight:700; color:#1e3a8a; margin-bottom:6px; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">🏢 Datos Fiscales de la Empresa</div>
+            <div style="font-weight:700; color:#1e3a8a; margin-bottom:6px; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">🏢 Datos Fiscales (${App.utils.escapeHtml(vMeta.roleLabelEs)})</div>
             <div style="margin-bottom:3px;"><strong>Razón Social:</strong> ${App.utils.escapeHtml(cd.companyLegalName || '—')}</div>
             <div style="margin-bottom:3px;"><strong>Tax ID / EIN / CIF:</strong> ${App.utils.escapeHtml(cd.taxId || '—')}</div>
-            <div style="margin-bottom:3px;"><strong>Nº Licencia:</strong> ${App.utils.escapeHtml(cd.licenseNumber || '—')}</div>
+            <div style="margin-bottom:3px;"><strong>Nº Licencia / Reg.:</strong> ${App.utils.escapeHtml(cd.licenseNumber || '—')}</div>
             <div style="margin-bottom:3px;"><strong>Domicilio Fiscal:</strong> ${App.utils.escapeHtml(cd.fiscalAddress || '—')} (${App.utils.escapeHtml(cd.country || cd.fiscalCountry || '—')})</div>
-            <div style="margin-bottom:3px;"><strong>Broker Firmante:</strong> ${App.utils.escapeHtml(cd.brokerFullName || cd.brokerSignerName || '—')}</div>
-            <div><strong>Contacto Broker:</strong> ${App.utils.escapeHtml(cd.brokerEmail || cd.brokerSignerEmail || '—')} · ${App.utils.escapeHtml(cd.brokerPhone || cd.brokerSignerPhone || '—')}</div>
+            <div style="margin-bottom:3px;"><strong>Firmante (${App.utils.escapeHtml(effectiveRole === 'realtor' ? 'Broker' : vMeta.roleLabelEs)}):</strong> ${App.utils.escapeHtml(cd.brokerFullName || cd.brokerSignerName || '—')}</div>
+            <div><strong>Contacto Firmante:</strong> ${App.utils.escapeHtml(cd.brokerEmail || cd.brokerSignerEmail || '—')} · ${App.utils.escapeHtml(cd.brokerPhone || cd.brokerSignerPhone || '—')}</div>
           </div>
           <div>
-            <div style="font-weight:700; color:#166534; margin-bottom:6px; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">🏦 Datos Bancarios Corporativos</div>
+            <div style="font-weight:700; color:#166534; margin-bottom:6px; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">🏦 Datos Bancarios para Comisiones</div>
             <div style="margin-bottom:3px;"><strong>Titular de la Cuenta:</strong> ${App.utils.escapeHtml(cd.bankAccountHolder || '—')}</div>
             <div style="margin-bottom:3px;"><strong>Banco:</strong> ${App.utils.escapeHtml(cd.bankName || '—')}</div>
             <div style="margin-bottom:3px;"><strong>IBAN / Nº Cuenta:</strong> <code style="background:#fff; padding:2px 6px; border:1px solid #cbd5e1; border-radius:4px; font-weight:700;">${App.utils.escapeHtml(cd.bankAccountNumber || '—')}</code></div>
@@ -5144,8 +5302,8 @@
 
         <div style="display:flex; flex-direction:column; gap:0.75rem;">
           <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
-            <button type="button" class="btn btn-outline btn-sm" style="border-color:#003da5; color:#003da5; background:#eff6ff; font-weight:700;" onclick="App.views.admin.exportUserAgreementToWord('${n.userId}')">
-              📄 Exportar Master Referral Agreement (Word .doc)
+            <button type="button" class="btn btn-outline btn-sm" style="border-color:${vMeta.accentBorder}; color:${vMeta.accentColor}; background:${vMeta.accentBg}; font-weight:700;" onclick="App.views.admin.exportUserAgreementToWord('${n.userId}')">
+              ${vMeta.icon} ${App.utils.escapeHtml(vMeta.exportBtnEs)}
             </button>
             ${hasFiscalData ? `
               <button type="button" class="btn btn-outline btn-sm" onclick="App.views.admin.copyContractData('${n.userId}')">
@@ -5182,6 +5340,7 @@
     }
 
     tbody.innerHTML = users.map(u => {
+      const vMeta = getAdminAgreementVariant(u.role);
       const cd = u.contractCompanyData || {};
       const companySummary = cd.companyLegalName
         ? `<div><strong>${App.utils.escapeHtml(cd.companyLegalName)}</strong></div><div style="font-size:0.75rem;color:#6b7280;">ID: ${App.utils.escapeHtml(cd.taxId || '—')} · ${App.utils.escapeHtml(cd.country || cd.fiscalCountry || '')}</div>`
@@ -5193,7 +5352,7 @@
       return `
       <tr>
         <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.85rem;font-weight:600;">${App.utils.escapeHtml(u.firstName)} ${App.utils.escapeHtml(u.lastName)}</td>
-        <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${u.role === 'embajador' ? '👑 Embajador' : (u.role === 'broker' ? '🏢 Broker' : '👤 Realtor')}</td>
+        <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;white-space:nowrap;">${vMeta.icon} ${App.utils.escapeHtml(vMeta.roleLabelEs)}</td>
         <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${companySummary}</td>
         <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${bankSummary}</td>
         <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);font-size:.82rem;">${App.utils.escapeHtml(u.email)}</td>
@@ -5203,7 +5362,7 @@
         </td>
         <td style="padding:12px 14px;border-bottom:1px solid var(--border-light);">
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button class="btn btn-outline btn-xs" onclick="App.views.admin.exportUserAgreementToWord('${u.id}')" style="padding:2px 8px;font-size:0.75rem;border-color:#003da5;color:#003da5;background:#eff6ff;font-weight:700;">📄 Word (.doc)</button>
+            <button class="btn btn-outline btn-xs" onclick="App.views.admin.exportUserAgreementToWord('${u.id}')" style="padding:2px 8px;font-size:0.75rem;border-color:${vMeta.accentBorder};color:${vMeta.accentColor};background:${vMeta.accentBg};font-weight:700;">${vMeta.icon} ${App.utils.escapeHtml(vMeta.shortDocEs)} (.doc)</button>
             ${cd.companyLegalName ? `<button class="btn btn-outline btn-xs" onclick="App.views.admin.copyContractData('${u.id}')" style="padding:2px 8px;font-size:0.75rem;">📋 Copiar Datos</button>` : ''}
             <button class="btn btn-outline btn-xs" onclick="document.getElementById('admin-reupload-file-input-${u.id}').click()" style="padding:2px 8px;font-size:0.75rem;">
               📎 Adjuntar PDF
@@ -5217,18 +5376,20 @@
     }).join('');
   }
 
-  function exportUserAgreementToWord(userId) {
+  function exportUserAgreementToWord(userIdOrTemplate) {
     if (typeof App.generateReferralAgreementDoc !== 'function') {
       App.utils.showToast('El generador de documento Word no está disponible.', 'error');
       return;
     }
-    if (!userId || userId === 'template') {
-      App.generateReferralAgreementDoc({ isTemplate: true });
+    const raw = String(userIdOrTemplate || 'template:broker');
+    if (raw === 'template' || raw.startsWith('template:')) {
+      const tplRole = raw.includes(':') ? raw.split(':')[1] : 'broker';
+      App.generateReferralAgreementDoc({ isTemplate: true, templateRole: tplRole });
       return;
     }
-    const user = (allUsers || []).find(u => u.id === userId) || (App.demoData && App.demoData.users ? App.demoData.users.find(u => u.id === userId) : null);
+    const user = (allUsers || []).find(u => u.id === raw) || (App.demoData && App.demoData.users ? App.demoData.users.find(u => u.id === raw) : null);
     if (!user) {
-      App.generateReferralAgreementDoc({ isTemplate: true });
+      App.generateReferralAgreementDoc({ isTemplate: true, templateRole: 'broker' });
       return;
     }
     App.generateReferralAgreementDoc(user);
@@ -5240,23 +5401,25 @@
       App.utils.showToast('No hay datos fiscales registrados para este usuario.', 'error');
       return;
     }
+    const vMeta = getAdminAgreementVariant(user.role);
     const cd = user.contractCompanyData;
     const text = [
-      `=== DATOS PARA CONTRATO DE COLABORACIÓN ===`,
-      `Colaborador: ${user.firstName || ''} ${user.lastName || ''} (${user.role === 'embajador' ? 'Embajador' : (user.role === 'broker' ? 'Broker' : 'Realtor')})`,
+      `=== DATOS PARA ${vMeta.docNameEs.toUpperCase()} ===`,
+      `Usuario Registrado: ${user.firstName || ''} ${user.lastName || ''} (${vMeta.roleLabelEs})`,
+      `Variante de Contrato: ${vMeta.docNameEs}`,
       `Email usuario: ${user.email || '—'}`,
       ``,
-      `-- DATOS FISCALES DE LA EMPRESA --`,
-      `Razón Social / Empresa: ${cd.companyLegalName || '—'}`,
+      `-- DATOS FISCALES --`,
+      `Razón Social / Entidad: ${cd.companyLegalName || '—'}`,
       `NIF / Tax ID / EIN / CIF: ${cd.taxId || '—'}`,
-      `Nº Licencia Inmobiliaria: ${cd.licenseNumber || '—'}`,
+      `Nº Licencia / Registro: ${cd.licenseNumber || '—'}`,
       `Domicilio Fiscal: ${cd.fiscalAddress || '—'}`,
       `País Fiscal: ${cd.country || cd.fiscalCountry || '—'}`,
-      `Broker Responsable (Firmante): ${cd.brokerFullName || cd.brokerSignerName || '—'}`,
-      `Email del Broker: ${cd.brokerEmail || cd.brokerSignerEmail || '—'}`,
-      `Teléfono del Broker: ${cd.brokerPhone || cd.brokerSignerPhone || '—'}`,
+      `Representante / Firmante: ${cd.brokerFullName || cd.brokerSignerName || '—'}`,
+      `Email Firmante: ${cd.brokerEmail || cd.brokerSignerEmail || '—'}`,
+      `Teléfono Firmante: ${cd.brokerPhone || cd.brokerSignerPhone || '—'}`,
       ``,
-      `-- DATOS BANCARIOS CORPORATIVOS --`,
+      `-- DATOS BANCARIOS --`,
       `Titular de la Cuenta: ${cd.bankAccountHolder || '—'}`,
       `Nombre del Banco: ${cd.bankName || '—'}`,
       `IBAN / Número de Cuenta: ${cd.bankAccountNumber || '—'}`,
@@ -5266,7 +5429,7 @@
     ].join('\n');
 
     App.utils.copyToClipboard(text);
-    App.utils.showToast('📋 Datos fiscales y bancarios copiados al portapapeles.', 'success');
+    App.utils.showToast(`📋 Datos fiscales copiados (${vMeta.shortDocEs}).`, 'success');
   }
 
   async function markAgreementSigned(notifId, userId) {
@@ -5965,6 +6128,8 @@
     handleDeleteLead,
     confirmDeleteLead,
     initAgreementsView,
+    onAgreementDocSelectorChange,
+    downloadSelectedAgreementDoc,
     handleAdminAgreementUpload,
     copyContractData,
     exportUserAgreementToWord,
