@@ -1051,23 +1051,65 @@ App.auth = (function() {
   }
 
 
-  /* ---- Update User Referral (Admin action) ---- */
+  /* ---- Update User Referral / Assigned RE/MAX Inmomás Agent (Admin action) ---- */
   async function updateUserReferral(userId, referrerCode) {
+    const cleanCode = referrerCode ? String(referrerCode).trim() : null;
+    const allSysUsers = await getAllUsers();
+    const findByCodeOrId = (val) => {
+      if (!val) return null;
+      const raw = String(val).trim();
+      const upper = raw.toUpperCase();
+      return allSysUsers.find(x =>
+        x.id === raw ||
+        (x.referralCode && String(x.referralCode).toUpperCase().trim() === upper) ||
+        (x.email && String(x.email).toLowerCase().trim() === raw.toLowerCase())
+      ) || null;
+    };
+
+    const assignedAgent = cleanCode ? findByCodeOrId(cleanCode) : null;
+    const isInmomasAgent = Boolean(assignedAgent && assignedAgent.role === 'agent_inmomas');
+    const agentFullName = isInmomasAgent
+      ? `${assignedAgent.firstName || ''} ${assignedAgent.lastName || ''}`.trim()
+      : (cleanCode || null);
+
+    const buildPatch = (existingUser) => {
+      const prevRef = existingUser && existingUser.referredBy ? findByCodeOrId(existingUser.referredBy) : null;
+      const patch = {
+        inmomasAgentId: isInmomasAgent ? assignedAgent.id : null,
+        inmomasAgentCode: cleanCode || null,
+        inmomasAgentName: cleanCode ? agentFullName : null,
+        updatedAt: new Date().toISOString()
+      };
+
+      // Preserve existing Broker / Embajador umbrella links if referredBy pointed to them
+      if (prevRef && prevRef.role === 'broker' && !existingUser.brokerId && existingUser.role !== 'broker' && existingUser.role !== 'embajador') {
+        patch.brokerId = prevRef.id;
+      }
+      if (prevRef && prevRef.role === 'embajador' && !existingUser.embajadorId && existingUser.role !== 'embajador') {
+        patch.embajadorId = prevRef.id;
+      }
+
+      // Only overwrite referredBy if it was empty or pointed to an agent_inmomas
+      const prevWasPartnerUmbrella = Boolean(prevRef && prevRef.role !== 'agent_inmomas');
+      if (!prevWasPartnerUmbrella) {
+        patch.referredBy = cleanCode;
+        patch.source = cleanCode ? 'Admin Assigned Referral' : (existingUser.source || null);
+      }
+
+      return patch;
+    };
+
     if (App.demoMode) {
-      const u = App.demoData.users.find(u => u.id === userId);
+      const u = App.demoData.users.find(usr => usr.id === userId);
       if (!u) throw new Error('User not found.');
-      u.referredBy = referrerCode;
-      u.source = referrerCode ? 'Admin Assigned Referral' : null;
-      u.updatedAt = new Date().toISOString();
+      Object.assign(u, buildPatch(u));
       saveDemoData();
       return true;
     } else {
       const userRef = App.db.collection('users').doc(userId);
-      await userRef.update({
-        referredBy: referrerCode,
-        source: referrerCode ? 'Admin Assigned Referral' : null,
-        updatedAt: new Date().toISOString()
-      });
+      const snap = await userRef.get();
+      const existingData = snap.exists ? snap.data() : {};
+      await userRef.update(buildPatch(existingData));
       return true;
     }
   }
@@ -2470,7 +2512,33 @@ App.auth = (function() {
   }
 
   /* ---- Add Client via Referral (public, no auth required) ---- */
-  async function addReferralClient(clientData) {
+  async function addReferralClient(clientData, options = {}) {
+    const emailNorm = (clientData.email || '').toLowerCase().trim();
+
+    // Prevent duplicate CRM client records for the same email
+    if (emailNorm) {
+      if (App.demoMode) {
+        if (!App.demoData.clients) App.demoData.clients = [];
+        const existingDemo = App.demoData.clients.find(c => (c.email || '').toLowerCase().trim() === emailNorm);
+        if (existingDemo) return existingDemo;
+      } else if (App.db) {
+        try {
+          const dupSnap = await App.db.collection('clients').where('email', '==', clientData.email.trim()).limit(1).get();
+          if (!dupSnap.empty) {
+            return { id: dupSnap.docs[0].id, ...dupSnap.docs[0].data() };
+          }
+          if (emailNorm !== clientData.email.trim()) {
+            const dupSnapLower = await App.db.collection('clients').where('email', '==', emailNorm).limit(1).get();
+            if (!dupSnapLower.empty) {
+              return { id: dupSnapLower.docs[0].id, ...dupSnapLower.docs[0].data() };
+            }
+          }
+        } catch (dupErr) {
+          console.warn('[Auth] Duplicate client check warning:', dupErr);
+        }
+      }
+    }
+
     const newClient = {
       id: 'client_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
       firstName: clientData.firstName,
@@ -2500,13 +2568,13 @@ App.auth = (function() {
       inmomasAgentName: clientData.inmomasAgentName || null,
       termsAccepted: clientData.termsAccepted !== undefined ? clientData.termsAccepted : true,
       termsAcceptedAt: clientData.termsAcceptedAt || new Date().toISOString(),
-      source: 'referral',
+      source: clientData.source || 'referral',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       statusHistory: [{
         status: 'contacted',
         date: new Date().toISOString(),
-        note: 'Registered via referral link'
+        note: clientData.historyNote || 'Registered via referral link'
       }]
     };
 
@@ -2519,7 +2587,7 @@ App.auth = (function() {
     }
 
     // Notify referring agent and admins of new client registration
-    if (window.App && window.App.notifications) {
+    if (!options.silentNotifications && window.App && window.App.notifications) {
       const clientForNotif = {
         ...newClient,
         role: 'client',
@@ -2527,11 +2595,11 @@ App.auth = (function() {
         agencyName: newClient.objective || newClient.interestArea || 'Cliente / Comprador'
       };
 
-      // 1. Notify referring realtor/agent FIRST
-      if (newClient.referredBy || newClient.realtorId || newClient.localAgentId || newClient.brokerId) {
+      // 1. Notify referring realtor/agent/embajador FIRST
+      if (newClient.referredBy || newClient.realtorId || newClient.localAgentId || newClient.brokerId || newClient.embajadorId) {
         try {
           const allUsers = await getAllUsers();
-          const refKey = (newClient.referredBy || newClient.realtorId || newClient.localAgentId || newClient.brokerId || '').toString();
+          const refKey = (newClient.referredBy || newClient.realtorId || newClient.localAgentId || newClient.brokerId || newClient.embajadorId || '').toString();
           const referrerAgent = allUsers.find(u =>
             u.id === refKey ||
             (u.referralCode && u.referralCode.toUpperCase() === refKey.toUpperCase())
@@ -2549,13 +2617,15 @@ App.auth = (function() {
     }
 
     // Auto-enroll client in B2C client webinar (silent since onNewUserRegistration already notified)
-    await autoEnrollClientWebinar(newClient, {
-      howHeard: 'Referral Link',
-      referrerId: clientData.referredBy || null,
-      agentReferrerId: clientData.localAgentId || clientData.realtorId || null,
-      agentReferrerName: clientData.localAgentName || clientData.realtorName || clientData.inmomasAgentName || null,
-      silent: true
-    });
+    if (!options.skipWebinarAutoEnroll) {
+      await autoEnrollClientWebinar(newClient, {
+        howHeard: 'Referral Link',
+        referrerId: clientData.referredBy || null,
+        agentReferrerId: clientData.localAgentId || clientData.realtorId || null,
+        agentReferrerName: clientData.localAgentName || clientData.realtorName || clientData.inmomasAgentName || null,
+        silent: true
+      });
+    }
 
     return newClient;
   }
@@ -2986,8 +3056,30 @@ App.auth = (function() {
       }
     }
 
+    const lookupMaps = (App.utils && App.utils._buildUserLookupMaps)
+      ? App.utils._buildUserLookupMaps(allUsers)
+      : null;
+
+    const enrichWithInmomas = (u) => {
+      if (!u) return u;
+      if (App.utils && App.utils.resolveAssignedInmomasAgent) {
+        const res = App.utils.resolveAssignedInmomasAgent(u, allUsers, lookupMaps);
+        return {
+          ...u,
+          _inmomasAgentId: res.id || null,
+          _inmomasAgentName: res.name || '',
+          _inmomasAgentInherited: Boolean(res.inherited),
+          _inmomasAgentInheritedFrom: res.inheritedFrom || null
+        };
+      }
+      return u;
+    };
+
     const umbrellaUsers = Array.from(umbrellaMembersMap.values())
+      .map(enrichWithInmomas)
       .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+    const enrichedEmbajador = enrichWithInmomas(embajadorUser);
 
     // Resolve all clients generated anywhere under the Embajador's umbrella
     const umbrellaClients = [];
@@ -3051,7 +3143,8 @@ App.auth = (function() {
     });
 
     return {
-      embajador: embajadorUser,
+      embajador: enrichedEmbajador,
+      allUsers,
       users: umbrellaUsers,
       brokers: umbrellaUsers.filter(u => u.role === 'broker'),
       realtors: umbrellaUsers.filter(u => u.role === 'realtor'),

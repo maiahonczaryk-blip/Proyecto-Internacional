@@ -172,20 +172,48 @@ App.utils.copyToClipboard = async function(text) {
 
 /* ---- Referral Links ---- */
 App.utils.generateReferralLink = function(referralCode) {
-  // Always use the production URL so referral links are publicly accessible
+  // Strictly for Professional / Partner network invitations
   const prodUrl = 'https://thespainconnection.com';
   return `${prodUrl}/index.html#referral?ref=${encodeURIComponent(referralCode || '')}`;
+};
+
+App.utils.generateClientWebinarLink = function(referralCode) {
+  // Strictly for End Clients to sign up for the B2C Webinar & be protected in CRM
+  const prodUrl = 'https://thespainconnection.com';
+  return `${prodUrl}/index.html#webinar?ref=${encodeURIComponent(referralCode || '')}`;
 };
 
 /* ---- Share Webinar & Partner Helpers ---- */
 App.utils.getClientWebinarShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
-  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#webinar');
+  const link = referralLink || (user?.referralCode ? App.utils.generateClientWebinarLink(user.referralCode) : 'https://thespainconnection.com/index.html#webinar');
   const lang = (document.documentElement.lang || 'en').toLowerCase();
   if (lang.startsWith('es')) {
-    return `🇪🇸 ¡Hola! Te comparto mi enlace personalizado de The Spain Connection para recibir asesoría integral sobre cómo comprar, mudarse e invertir con total seguridad en España.\n\n📌 Respaldo legal, fiscal, hipotecario e inmobiliario completo en destino.\n\n🔗 Solicita información o regístrate aquí: ${link}`;
+    return `🇪🇸 ¡Hola! Te comparto mi invitación exclusiva y gratuita al próximo webinario de The Spain Connection sobre cómo comprar propiedad, mudarse e invertir con total seguridad en España.\n\n📌 Respaldo legal, fiscal, hipotecario e inmobiliario completo en destino.\n\n🎙️ Reserva tu plaza gratuita en el webinario aquí: ${link}`;
   }
-  return `🇪🇸 Hello! Here is my personalized link with The Spain Connection for turnkey advisory on buying property, relocating, and investing safely in Spain.\n\n📌 Full legal, tax, mortgage, and real estate destination support.\n\n🔗 Request information or register here: ${link}`;
+  return `🇪🇸 Hello! Here is my complimentary VIP invitation to our upcoming live webinar with The Spain Connection on how to safely buy property, relocate, and invest in Spain.\n\n📌 Full legal, tax, mortgage, and real estate destination support.\n\n🎙️ Reserve your free webinar spot here: ${link}`;
+};
+
+App.utils.getPartnerNetworkShareMessage = function(referralLink) {
+  const user = App.auth ? App.auth.getCurrentUser() : null;
+  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#referral');
+  const lang = (document.documentElement.lang || 'en').toLowerCase();
+  if (lang.startsWith('es')) {
+    return `🤝 ¡Hola! Te invito a unirte a nuestra red internacional de profesionales inmobiliarios (Brokers, Agentes/Realtors y Colaboradores) en España a través de The Spain Connection · RE/MAX Inmomás, con soporte legal, fiscal e inmobiliario integral para tus clientes.\n\n🔗 Regístrate como profesional colaborador aquí: ${link}`;
+  }
+  return `🤝 Hello! You're invited to join our international network of Brokers, Realtors, and Strategic Collaborators in Spain through The Spain Connection · RE/MAX Inmomás, with full turnkey legal, tax, and real estate backing for your clients.\n\n🔗 Register as a professional partner here: ${link}`;
+};
+
+App.utils.sharePartnerNetworkWhatsApp = function(customLink) {
+  const message = App.utils.getPartnerNetworkShareMessage(customLink);
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+  window.open(whatsappUrl, '_blank');
+};
+
+App.utils.copyPartnerNetworkInviteText = function(customLink) {
+  const message = App.utils.getPartnerNetworkShareMessage(customLink);
+  App.utils.copyToClipboard(message);
+  App.utils.showToast('¡Texto de invitación profesional copiado al portapapeles!', 'success');
 };
 
 App.utils.getRealtorPartnerShareMessage = function(referralLink) {
@@ -1474,6 +1502,204 @@ App.utils.renderUserRegionalBanner = async function(containerId, user) {
     console.warn('[RegionalBanner] Render warning:', err);
   }
 };
+
+/* ============================================
+   Umbrella Hierarchy & RE/MAX Inmomás Agent Resolvers
+   ============================================ */
+App.utils._buildUserLookupMaps = function(allUsers = []) {
+  const byId = new Map();
+  const byCode = new Map();
+  const byEmail = new Map();
+  const inmomasAgents = [];
+
+  (allUsers || []).forEach(u => {
+    if (!u) return;
+    if (u.id) byId.set(u.id, u);
+    if (u.referralCode) byCode.set(String(u.referralCode).toUpperCase().trim(), u);
+    if (u.email) byEmail.set(String(u.email).toLowerCase().trim(), u);
+    if (u.role === 'agent_inmomas') inmomasAgents.push(u);
+  });
+
+  return { byId, byCode, byEmail, inmomasAgents };
+};
+
+App.utils.resolveUserUmbrellaParents = function(user, allUsers = [], maps = null) {
+  if (!user) return { embajador: null, broker: null, directParent: null };
+  const lk = maps || App.utils._buildUserLookupMaps(allUsers);
+
+  const findRefUser = (refVal) => {
+    if (!refVal) return null;
+    const raw = String(refVal).trim();
+    return lk.byId.get(raw) || lk.byCode.get(raw.toUpperCase()) || lk.byEmail.get(raw.toLowerCase()) || null;
+  };
+
+  let broker = (user.brokerId && lk.byId.get(user.brokerId)) || null;
+  let embajador = (user.embajadorId && lk.byId.get(user.embajadorId)) || null;
+  let directParent = null;
+
+  const visited = new Set([user.id]);
+  let cursor = user;
+  let depth = 0;
+
+  while (cursor && depth < 6) {
+    depth++;
+    let parent = findRefUser(cursor.referredBy);
+    if (parent && parent.role === 'agent_inmomas') {
+      parent = null;
+    }
+    if (!parent && cursor.brokerId && lk.byId.has(cursor.brokerId)) {
+      parent = lk.byId.get(cursor.brokerId);
+    }
+    if (!parent && cursor.embajadorId && lk.byId.has(cursor.embajadorId)) {
+      parent = lk.byId.get(cursor.embajadorId);
+    }
+
+    if (!parent || visited.has(parent.id)) break;
+    visited.add(parent.id);
+
+    if (!directParent) directParent = parent;
+    if (parent.role === 'broker' && !broker && user.role !== 'broker' && user.role !== 'embajador') {
+      broker = parent;
+    }
+    if (parent.role === 'embajador' && !embajador && user.role !== 'embajador') {
+      embajador = parent;
+    }
+    if (!embajador && parent.embajadorId && lk.byId.has(parent.embajadorId) && user.role !== 'embajador') {
+      embajador = lk.byId.get(parent.embajadorId);
+    }
+
+    cursor = parent;
+  }
+
+  if (broker && !embajador && broker.embajadorId && lk.byId.has(broker.embajadorId)) {
+    embajador = lk.byId.get(broker.embajadorId);
+  }
+
+  return { embajador, broker, directParent };
+};
+
+App.utils.resolveAssignedInmomasAgent = function(user, allUsers = [], maps = null) {
+  if (!user) return { agent: null, name: '', id: null, inherited: false, inheritedFrom: null };
+  if (user.role === 'agent_inmomas') {
+    const selfName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+    return { agent: user, name: selfName, id: user.id, inherited: false, inheritedFrom: null };
+  }
+
+  const lk = maps || App.utils._buildUserLookupMaps(allUsers);
+
+  const matchDirectAgent = (u) => {
+    if (!u) return null;
+    if (u.inmomasAgentId && lk.byId.has(u.inmomasAgentId)) {
+      const a = lk.byId.get(u.inmomasAgentId);
+      if (a && a.role === 'agent_inmomas') {
+        return { agent: a, name: `${a.firstName || ''} ${a.lastName || ''}`.trim() };
+      }
+    }
+    if (u.inmomasAgentCode) {
+      const codeKey = String(u.inmomasAgentCode).toUpperCase().trim();
+      const a = lk.byCode.get(codeKey) || lk.byId.get(String(u.inmomasAgentCode).trim());
+      if (a && a.role === 'agent_inmomas') {
+        return { agent: a, name: `${a.firstName || ''} ${a.lastName || ''}`.trim() };
+      }
+    }
+    if (u.referredBy) {
+      const raw = String(u.referredBy).trim();
+      const refU = lk.byId.get(raw) || lk.byCode.get(raw.toUpperCase()) || lk.byEmail.get(raw.toLowerCase());
+      if (refU && refU.role === 'agent_inmomas') {
+        return { agent: refU, name: `${refU.firstName || ''} ${refU.lastName || ''}`.trim() };
+      }
+    }
+    if (u.inmomasAgentName) {
+      const rawName = String(u.inmomasAgentName).trim();
+      if (rawName) {
+        const lower = rawName.toLowerCase();
+        const found = lk.inmomasAgents.find(a => {
+          const full = `${a.firstName || ''} ${a.lastName || ''}`.trim().toLowerCase();
+          return full === lower || (a.referralCode && a.referralCode.toLowerCase() === lower) || (a.email && a.email.toLowerCase() === lower);
+        });
+        if (found) {
+          return { agent: found, name: `${found.firstName || ''} ${found.lastName || ''}`.trim() };
+        }
+        return { agent: null, name: rawName };
+      }
+    }
+    return null;
+  };
+
+  const direct = matchDirectAgent(user);
+  if (direct) {
+    return {
+      agent: direct.agent,
+      name: direct.name,
+      id: direct.agent ? direct.agent.id : null,
+      inherited: false,
+      inheritedFrom: null
+    };
+  }
+
+  // Check pre-enriched field if passed from getUmbrellaData
+  if (user._inmomasAgentName) {
+    return {
+      agent: null,
+      name: user._inmomasAgentName,
+      id: user._inmomasAgentId || null,
+      inherited: Boolean(user._inmomasAgentInherited),
+      inheritedFrom: user._inmomasAgentInheritedFrom || null
+    };
+  }
+
+  // Walk up Broker -> Embajador to inherit office/umbrella RE/MAX Inmomás agent
+  const { broker, embajador } = App.utils.resolveUserUmbrellaParents(user, allUsers, lk);
+  if (broker) {
+    const fromBroker = matchDirectAgent(broker);
+    if (fromBroker) {
+      return {
+        agent: fromBroker.agent,
+        name: fromBroker.name,
+        id: fromBroker.agent ? fromBroker.agent.id : null,
+        inherited: true,
+        inheritedFrom: 'Broker'
+      };
+    }
+  }
+  if (embajador) {
+    const fromEmb = matchDirectAgent(embajador);
+    if (fromEmb) {
+      return {
+        agent: fromEmb.agent,
+        name: fromEmb.name,
+        id: fromEmb.agent ? fromEmb.agent.id : null,
+        inherited: true,
+        inheritedFrom: 'Embajador'
+      };
+    }
+  }
+
+  return { agent: null, name: '', id: null, inherited: false, inheritedFrom: null };
+};
+
+App.utils.renderInmomasAgentBadge = function(user, allUsers = [], opts = {}) {
+  const { showUnassigned = true, compact = false, maps = null } = opts;
+  const res = App.utils.resolveAssignedInmomasAgent(user, allUsers, maps);
+
+  if (!res.name) {
+    if (!showUnassigned) return '';
+    return `<span class="inmomas-agent-pill inmomas-agent-pill--unassigned" title="Sin Agente RE/MAX Inmomás asignado">🇪🇸 <span class="lang-en">No Inmomás Agent</span><span class="lang-es">Sin Agente Inmomás</span></span>`;
+  }
+
+  const escapedName = App.utils.escapeHtml(res.name);
+  const viaSuffix = res.inherited && res.inheritedFrom
+    ? ` <span style="opacity:0.78; font-weight:600; font-size:0.68rem;">(${res.inheritedFrom === 'Broker' ? 'vía Broker' : 'vía Embajador'})</span>`
+    : '';
+  const prefix = compact ? '🇪🇸' : '🇪🇸 Inmomás:';
+  const cls = res.inherited ? 'inmomas-agent-pill inmomas-agent-pill--inherited' : 'inmomas-agent-pill';
+  const titleText = res.inherited
+    ? `Agente RE/MAX Inmomás asignado vía ${res.inheritedFrom}: ${escapedName}`
+    : `Agente RE/MAX Inmomás asignado: ${escapedName}`;
+
+  return `<span class="${cls}" title="${titleText}">${prefix} ${escapedName}${viaSuffix}</span>`;
+};
+
 
 
 

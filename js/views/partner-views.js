@@ -33,9 +33,14 @@ App.views.partner = (function() {
       else if (partnerType === 'needsHolidays') partnerRef = 'Inmomás Holidays';
 
       const referralLink = App.utils.generateReferralLink(partnerRef);
+      const clientWebinarLink = App.utils.generateClientWebinarLink(partnerRef);
       const linkInput = document.getElementById('partner-dash-referral-link');
       if (linkInput) {
         linkInput.value = referralLink;
+      }
+      const clientLinkInput = document.getElementById('partner-dash-client-webinar-link');
+      if (clientLinkInput) {
+        clientLinkInput.value = clientWebinarLink;
       }
 
       // Account Settings / Email Logic

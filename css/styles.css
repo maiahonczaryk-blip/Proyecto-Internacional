@@ -9354,4 +9354,383 @@ textarea:focus-visible {
   }
 }
 
+/* ============================================
+   Hierarchical Umbrella Accordion (Embajadores, Brokers & RE/MAX Inmomás)
+   ============================================ */
+.umbrella-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.umbrella-view-switch {
+  display: inline-flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  gap: 4px;
+}
+
+.umbrella-view-switch__btn {
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+}
+
+.umbrella-view-switch__btn.active {
+  background: #ffffff;
+  color: #003da5;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+}
+
+.umbrella-expand-controls {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.umbrella-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.umbrella-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.umbrella-group__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #334155;
+  padding: 4px 2px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.umbrella-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #94a3b8;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.umbrella-card:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.07);
+}
+
+.umbrella-card--embajador {
+  border-left-color: #d97706;
+}
+
+.umbrella-card--broker {
+  border-left-color: #0043ff;
+}
+
+.umbrella-card--direct {
+  border-left-color: #059669;
+}
+
+.umbrella-card--inmomas {
+  border-left-color: #003f99;
+}
+
+.umbrella-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 16px;
+  cursor: pointer;
+  user-select: none;
+  background: #ffffff;
+  transition: background 0.15s ease;
+  flex-wrap: wrap;
+}
+
+.umbrella-card__header:hover {
+  background: #f8fafc;
+}
+
+.umbrella-card__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+  flex: 1;
+}
+
+.umbrella-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.7rem;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.umbrella-card.is-open > .umbrella-card__header .umbrella-chevron,
+.umbrella-subcard.is-open > .umbrella-subcard__header .umbrella-chevron {
+  transform: rotate(90deg);
+  background: #dbeafe;
+  color: #003da5;
+}
+
+.umbrella-card__identity {
+  min-width: 0;
+  flex: 1;
+}
+
+.umbrella-card__title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.umbrella-card__name {
+  font-weight: 700;
+  font-size: 0.96rem;
+  color: #0f172a;
+}
+
+.umbrella-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 3px;
+}
+
+.umbrella-card__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.umbrella-kpi-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.umbrella-kpi-pill--clients {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+.umbrella-card__body {
+  display: none;
+  padding: 12px 16px 16px 22px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.umbrella-card.is-open > .umbrella-card__body {
+  display: block;
+}
+
+.umbrella-branch {
+  margin-left: 10px;
+  padding-left: 16px;
+  border-left: 2px solid #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.umbrella-card--embajador > .umbrella-card__body > .umbrella-branch {
+  border-left-color: rgba(217, 119, 6, 0.45);
+}
+
+.umbrella-card--broker > .umbrella-card__body > .umbrella-branch {
+  border-left-color: rgba(0, 67, 255, 0.35);
+}
+
+.umbrella-subcard {
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-left: 3px solid #0043ff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.umbrella-subcard__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  flex-wrap: wrap;
+  transition: background 0.15s ease;
+}
+
+.umbrella-subcard__header:hover {
+  background: #f8fafc;
+}
+
+.umbrella-subcard__body {
+  display: none;
+  padding: 10px 14px 12px 18px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.umbrella-subcard.is-open > .umbrella-subcard__body {
+  display: block;
+}
+
+.umbrella-leaf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 8px;
+}
+
+.umbrella-leaf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #10b981;
+  border-radius: 9px;
+  font-size: 0.82rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.umbrella-leaf--colaborador {
+  border-left-color: #f59e0b;
+}
+
+.umbrella-leaf:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+}
+
+.inmomas-agent-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  color: #003f99;
+  border: 1px solid #93c5fd;
+  white-space: nowrap;
+}
+
+.inmomas-agent-pill--inherited {
+  background: #f0f9ff;
+  color: #0369a1;
+  border-style: dashed;
+  border-color: #7dd3fc;
+}
+
+.inmomas-agent-pill--unassigned {
+  background: #f8fafc;
+  color: #94a3b8;
+  border: 1px dashed #cbd5e1;
+  font-weight: 600;
+}
+
+.umbrella-chain-pills {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.umbrella-chain-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.umbrella-chain-pill--embajador {
+  background: rgba(245, 158, 11, 0.14);
+  color: #92400e;
+  border: 1px solid rgba(217, 119, 6, 0.3);
+}
+
+.umbrella-chain-pill--broker {
+  background: rgba(0, 67, 255, 0.1);
+  color: #002dae;
+  border: 1px solid rgba(0, 67, 255, 0.22);
+}
+
+@media (max-width: 768px) {
+  .umbrella-card__header,
+  .umbrella-subcard__header {
+    padding: 11px 12px;
+    align-items: flex-start;
+  }
+  .umbrella-card__right {
+    width: 100%;
+    padding-left: 32px;
+    margin-top: 4px;
+  }
+  .umbrella-card__body {
+    padding: 10px 10px 12px 12px;
+  }
+  .umbrella-branch {
+    margin-left: 4px;
+    padding-left: 10px;
+  }
+  .umbrella-leaf-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 
