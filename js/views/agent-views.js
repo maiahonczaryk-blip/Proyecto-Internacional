@@ -1039,6 +1039,24 @@
     }
   }
 
+  /* ── Documents & Collaborator Agreement (#colaborador/documents) ── */
+  async function initDocuments() {
+    currentUser = App.auth.getCurrentUser();
+    if (!currentUser) return;
+
+    const docsGuideEl = document.getElementById('colaborador-docs-buyer-guide');
+    if (docsGuideEl && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
+      App.buyerGuide.renderEditor(docsGuideEl, currentUser);
+    }
+
+    const contractContainer = document.getElementById('colaborador-contract-section');
+    if (contractContainer && App.utils && typeof App.utils.renderContractDataSection === 'function') {
+      App.utils.renderContractDataSection(contractContainer, currentUser, 'colaborador-contract', () => {
+        initDocuments();
+      });
+    }
+  }
+
   /* ── Utility ── */
   function setTextById(id, text) {
     const el = document.getElementById(id);
@@ -1052,6 +1070,7 @@
     initDashboard,
     initClients,
     filterClients,
+    initDocuments,
     initFinances,
     initWebinar,
     renderWebinarRegistrations,

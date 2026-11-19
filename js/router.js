@@ -66,11 +66,12 @@ App.router = (function() {
     'agent_inmomas/partners':  { view: 'view-agent-partners',  role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'My Partners' },
 
     // Colaborador routes
-    'colaborador/dashboard': { view: 'view-agent-dashboard', role: 'colaborador', sidebar: 'colaborador', title: 'Dashboard' },
-    'colaborador/clients':   { view: 'view-agent-clients',   role: 'colaborador', sidebar: 'colaborador', title: 'Clients' },
-    'colaborador/finances':  { view: 'view-agent-finances',  role: 'colaborador', sidebar: 'colaborador', title: 'Finances' },
-    'colaborador/webinar':   { view: 'view-agent-webinar',   role: 'colaborador', sidebar: 'colaborador', title: 'Webinar Registrations' },
-    'colaborador/partners':  { view: 'view-agent-partners',  role: 'colaborador', sidebar: 'colaborador', title: 'My Partners' },
+    'colaborador/dashboard': { view: 'view-agent-dashboard',       role: 'colaborador', sidebar: 'colaborador', title: 'Dashboard' },
+    'colaborador/clients':   { view: 'view-agent-clients',         role: 'colaborador', sidebar: 'colaborador', title: 'Clients' },
+    'colaborador/documents': { view: 'view-colaborador-documents', role: 'colaborador', sidebar: 'colaborador', title: 'Documents & Agreement' },
+    'colaborador/finances':  { view: 'view-agent-finances',        role: 'colaborador', sidebar: 'colaborador', title: 'Finances' },
+    'colaborador/webinar':   { view: 'view-agent-webinar',         role: 'colaborador', sidebar: 'colaborador', title: 'Webinar Registrations' },
+    'colaborador/partners':  { view: 'view-agent-partners',        role: 'colaborador', sidebar: 'colaborador', title: 'My Partners' },
 
     // Partner routes
     'partner/dashboard': { view: 'view-partner-dashboard', role: 'partner', sidebar: 'partner', title: 'Partner Dashboard' }
@@ -603,6 +604,7 @@ App.router = (function() {
       'agent_inmomas/partners':  () => App.views.agentInmomas && App.views.agentInmomas.initPartners(),
       'colaborador/dashboard': () => App.views.agentInmomas && App.views.agentInmomas.initDashboard(),
       'colaborador/clients':   () => App.views.agentInmomas && App.views.agentInmomas.initClients(),
+      'colaborador/documents': () => App.views.agentInmomas && App.views.agentInmomas.initDocuments(),
       'colaborador/finances':  () => App.views.agentInmomas && App.views.agentInmomas.initFinances(),
       'colaborador/webinar':   () => App.views.agentInmomas && App.views.agentInmomas.initWebinar(),
       'colaborador/partners':  () => App.views.agentInmomas && App.views.agentInmomas.initPartners(),

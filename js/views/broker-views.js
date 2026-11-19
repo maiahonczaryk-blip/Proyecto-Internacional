@@ -973,11 +973,11 @@
                    ${badge}
                  </div>
                  <div style="font-size:0.85rem; color:#374151;">
-                   <p style="margin:0 0 0.5rem;"><strong>Contrato:</strong> Acuerdo de Colaboración Conjunta (25%)</p>
+                   <p style="margin:0 0 0.5rem;"><strong>Contrato:</strong> Acuerdo de Colaboración de Agente / Realtor (25%)</p>
                    ${detail}
                    <div style="margin-top:0.85rem; padding-top:0.75rem; border-top:1px solid #e5e7eb;">
-                     <button type="button" class="btn btn-outline btn-sm" style="width:100%; border-color:#1e3a8a; color:#1e3a8a; font-weight:700;" onclick="App.views.broker.exportRealtorAgreement('${r.id}')">
-                       📄 <span class="lang-en">Export Master Referral Agreement (Word .doc)</span><span class="lang-es">Exportar Master Referral Agreement (Word .doc)</span><span class="lang-fr">Exporter Accord-Cadre (Word .doc)</span><span class="lang-en-ca">Export Master Referral Agreement (Word .doc)</span>
+                     <button type="button" class="btn btn-outline btn-sm" style="width:100%; border-color:#047857; color:#047857; background:#ecfdf5; font-weight:700;" onclick="App.views.broker.exportRealtorAgreement('${r.id}')">
+                       🏠 <span class="lang-en">Export Realtor Agreement (Word .doc)</span><span class="lang-es">Exportar Acuerdo de Agente / Realtor (Word .doc)</span><span class="lang-fr">Exporter Accord Agent (Word .doc)</span><span class="lang-en-ca">Export Realtor Agreement (Word .doc)</span>
                      </button>
                    </div>
                  </div>
