@@ -30,6 +30,9 @@
   let networkRegionFilter = '';
   let networkStatusFilter = 'all';
   let networkSearchQuery = '';
+  let networkViewMode = 'umbrella'; // 'umbrella' | 'table'
+  let expandedEmbNodes = new Set();
+  let embUmbrellaInitialized = false;
 
   let clientMemberFilter = 'all';
   let clientSearchQuery = '';
@@ -329,12 +332,84 @@
         regSel.innerHTML = App.utils.getRegionFilterOptionsHtml('');
       }
 
-      renderNetworkTable();
+      renderEmbajadorRootBanner(data);
+      setNetworkViewMode(networkViewMode, false);
+      renderNetworkView();
       refreshLang();
     } catch (err) {
       console.error('[Embajador] initNetwork error:', err);
       App.utils.showToast('Error loading umbrella network.', 'error');
     }
+  }
+
+  function renderEmbajadorRootBanner(data) {
+    const bannerEl = document.getElementById('embajador-network-root-banner');
+    if (!bannerEl || !currentUser) return;
+    const embObj = (data && data.embajador) || currentUser;
+    const allRefUsers = (data && data.allUsers) || [];
+    const inmomasBadge = App.utils.renderInmomasAgentBadge
+      ? App.utils.renderInmomasAgentBadge(embObj, allRefUsers, { showUnassigned: true })
+      : '';
+    bannerEl.innerHTML = `
+      <div style="background:linear-gradient(135deg, rgba(245,158,11,0.10) 0%, rgba(0,63,153,0.05) 100%); border:1px solid rgba(217,119,6,0.3); border-left:4px solid #d97706; border-radius:12px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <span class="umbrella-chain-pill umbrella-chain-pill--embajador">👑 <span class="lang-en">Root Umbrella</span><span class="lang-es">Paraguas Raíz</span></span>
+          <strong style="font-size:0.95rem; color:#0f172a;">${App.utils.escapeHtml(embObj.firstName || '')} ${App.utils.escapeHtml(embObj.lastName || '')}</strong>
+          ${embObj.agencyName ? `<span style="font-size:0.82rem; color:#475569;">· ${App.utils.escapeHtml(embObj.agencyName)}</span>` : ''}
+          ${inmomasBadge}
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          <span class="umbrella-kpi-pill">🏢 ${data.brokers.length} Brokers</span>
+          <span class="umbrella-kpi-pill">🏠 ${data.realtors.length} <span class="lang-en">Agents</span><span class="lang-es">Agentes</span></span>
+          <span class="umbrella-kpi-pill">🤝 ${data.colaboradores.length} Colab.</span>
+          <span class="umbrella-kpi-pill umbrella-kpi-pill--clients">🏡 ${data.clients.length} <span class="lang-en">Clients</span><span class="lang-es">Clientes</span></span>
+        </div>
+      </div>
+    `;
+  }
+
+  function setNetworkViewMode(mode, reRender = true) {
+    networkViewMode = mode === 'table' ? 'table' : 'umbrella';
+    const accEl = document.getElementById('embajador-network-accordion');
+    const tblEl = document.getElementById('embajador-network-table-wrap');
+    const expEl = document.getElementById('emb-net-expand-controls');
+    const btnUmb = document.getElementById('btn-emb-net-mode-umbrella');
+    const btnTbl = document.getElementById('btn-emb-net-mode-table');
+
+    if (accEl) accEl.style.display = networkViewMode === 'umbrella' ? 'flex' : 'none';
+    if (tblEl) tblEl.style.display = networkViewMode === 'table' ? 'block' : 'none';
+    if (expEl) expEl.style.display = networkViewMode === 'umbrella' ? 'inline-flex' : 'none';
+    if (btnUmb) btnUmb.classList.toggle('active', networkViewMode === 'umbrella');
+    if (btnTbl) btnTbl.classList.toggle('active', networkViewMode === 'table');
+
+    if (reRender) renderNetworkView();
+  }
+
+  function toggleEmbNode(nodeId) {
+    if (!nodeId) return;
+    const el = document.getElementById(`emb-umb-node-${nodeId}`);
+    if (expandedEmbNodes.has(nodeId)) {
+      expandedEmbNodes.delete(nodeId);
+      if (el) el.classList.remove('is-open');
+    } else {
+      expandedEmbNodes.add(nodeId);
+      if (el) el.classList.add('is-open');
+    }
+  }
+
+  function expandAllUmbrellaNodes(expand) {
+    const container = document.getElementById('embajador-network-accordion');
+    if (!container) return;
+    container.querySelectorAll('[data-emb-node]').forEach(el => {
+      const id = el.getAttribute('data-emb-node');
+      if (expand) {
+        expandedEmbNodes.add(id);
+        el.classList.add('is-open');
+      } else {
+        expandedEmbNodes.delete(id);
+        el.classList.remove('is-open');
+      }
+    });
   }
 
   function setNetworkRoleFilter(role) {
@@ -346,29 +421,26 @@
         btn.className = active ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm';
       }
     });
-    renderNetworkTable();
+    renderNetworkView();
   }
 
   function setNetworkRegionFilter(regionId) {
     networkRegionFilter = regionId || '';
-    renderNetworkTable();
+    renderNetworkView();
   }
 
   function setNetworkStatusFilter(status) {
     networkStatusFilter = status || 'all';
-    renderNetworkTable();
+    renderNetworkView();
   }
 
   function searchNetwork(query) {
     networkSearchQuery = (query || '').toLowerCase().trim();
-    renderNetworkTable();
+    renderNetworkView();
   }
 
-  function renderNetworkTable() {
-    const tbody = document.getElementById('embajador-network-tbody');
-    if (!tbody) return;
-
-    const filtered = (umbrella.users || []).filter(u => {
+  function getFilteredUmbrellaMembers() {
+    return (umbrella.users || []).filter(u => {
       if (networkRoleFilter !== 'all' && u.role !== networkRoleFilter) return false;
       if (networkRegionFilter && App.utils && App.utils.getUserRegions && !App.utils.getUserRegions(u).includes(networkRegionFilter)) return false;
       if (networkStatusFilter !== 'all') {
@@ -376,32 +448,267 @@
         if (networkStatusFilter !== 'approved' && u.status !== networkStatusFilter) return false;
       }
       if (networkSearchQuery) {
-        const hay = `${u.firstName || ''} ${u.lastName || ''} ${u.email || ''} ${u.phone || ''} ${u.agencyName || ''} ${u.country || ''} ${u._umbrellaParentName || ''} ${u.referralCode || ''}`.toLowerCase();
+        const hay = `${u.firstName || ''} ${u.lastName || ''} ${u.email || ''} ${u.phone || ''} ${u.agencyName || ''} ${u.country || ''} ${u._umbrellaParentName || ''} ${u._inmomasAgentName || ''} ${u.referralCode || ''}`.toLowerCase();
         if (!hay.includes(networkSearchQuery)) return false;
       }
       return true;
     });
+  }
+
+  function countMemberClients(u) {
+    return (umbrella.clients || []).filter(c =>
+      c._originMemberId === u.id || c.referredBy === u.id || c.realtorId === u.id || c.brokerId === u.id
+    ).length;
+  }
+
+  function renderEmbLeaf(u) {
+    const allRefUsers = umbrella.allUsers || [];
+    const clientCnt = countMemberClients(u);
+    const isColab = u.role === 'colaborador';
+    const inmomasBadge = App.utils.renderInmomasAgentBadge
+      ? App.utils.renderInmomasAgentBadge(u, allRefUsers, { showUnassigned: true, compact: true })
+      : '';
+
+    return `
+      <div class="umbrella-leaf ${isColab ? 'umbrella-leaf--colaborador' : ''}">
+        <div style="min-width:0; flex:1;">
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <strong>${isColab ? '🤝' : '🏠'} ${App.utils.escapeHtml(u.firstName || '')} ${App.utils.escapeHtml(u.lastName || '')}</strong>
+            ${getRolePill(u.role)}
+            ${App.utils.getUserStatusBadge(u.status)}
+          </div>
+          <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">
+            ${App.utils.escapeHtml(u.email || '—')}${u.agencyName ? ` · ${App.utils.escapeHtml(u.agencyName)}` : ''}${u.country ? ` · 🌍 ${App.utils.escapeHtml(u.country)}` : ''}
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:5px;">
+            ${inmomasBadge}
+            ${clientCnt > 0 ? `<span class="umbrella-kpi-pill umbrella-kpi-pill--clients" style="font-size:0.7rem; padding:1px 7px;">🏡 ${clientCnt} clientes</span>` : ''}
+          </div>
+        </div>
+        <div style="flex-shrink:0;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); App.views.embajador.showMemberDetail('${u.id}')">
+            👁️ <span class="lang-en">Details</span><span class="lang-es">Ficha</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderNetworkAccordion(filtered) {
+    const container = document.getElementById('embajador-network-accordion');
+    if (!container) return;
+
+    const hasActiveFilter = Boolean(networkRoleFilter !== 'all' || networkRegionFilter || networkStatusFilter !== 'all' || networkSearchQuery);
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center;padding:2.5rem;background:#fff;border:1px solid #e2e8f0;border-radius:12px;color:#64748b;">
+          <div style="font-size:1.8rem;margin-bottom:6px;">🌐</div>
+          <span class="lang-en">No umbrella members match the current filters.</span>
+          <span class="lang-es">No hay miembros en tu paraguas con los filtros seleccionados.</span>
+        </div>`;
+      return;
+    }
+
+    const allMembers = umbrella.users || [];
+    const allRefUsers = umbrella.allUsers || [];
+    const filteredIds = new Set(filtered.map(u => u.id));
+    const allBrokers = allMembers.filter(u => u.role === 'broker');
+
+    // Determine which members belong under a Broker in this umbrella
+    const getBrokerForMember = (m) => {
+      if (!m || m.role === 'broker') return null;
+      if (m.brokerId) {
+        const b = allBrokers.find(x => x.id === m.brokerId);
+        if (b) return b;
+      }
+      if (m._umbrellaParentId) {
+        const b = allBrokers.find(x => x.id === m._umbrellaParentId);
+        if (b) return b;
+      }
+      return null;
+    };
+
+    const brokerCards = [];
+    allBrokers.forEach(brk => {
+      const fullSubTeam = allMembers.filter(m => {
+        const b = getBrokerForMember(m);
+        return b && b.id === brk.id;
+      });
+      const matchingSubTeam = fullSubTeam.filter(m => filteredIds.has(m.id));
+      const brkMatches = filteredIds.has(brk.id);
+
+      if (!brkMatches && matchingSubTeam.length === 0) return;
+
+      const shownSubTeam = (hasActiveFilter && !brkMatches) ? matchingSubTeam : (hasActiveFilter ? matchingSubTeam : fullSubTeam);
+      const totalClients = countMemberClients(brk) + fullSubTeam.reduce((sum, m) => sum + countMemberClients(m), 0);
+      const nodeId = `brk-${brk.id}`;
+      if (!embUmbrellaInitialized && brokerCards.length < 3) {
+        expandedEmbNodes.add(nodeId);
+      }
+      const isOpen = hasActiveFilter ? true : expandedEmbNodes.has(nodeId);
+      const inmomasBadge = App.utils.renderInmomasAgentBadge
+        ? App.utils.renderInmomasAgentBadge(brk, allRefUsers, { showUnassigned: true })
+        : '';
+
+      brokerCards.push(`
+        <div class="umbrella-card umbrella-card--broker ${isOpen ? 'is-open' : ''}" id="emb-umb-node-${nodeId}" data-emb-node="${nodeId}">
+          <div class="umbrella-card__header" onclick="App.views.embajador.toggleEmbNode('${nodeId}')">
+            <div class="umbrella-card__left">
+              <span class="umbrella-chevron">▶</span>
+              ${App.utils.generateAvatar(brk.firstName, brk.lastName, 'sm')}
+              <div class="umbrella-card__identity">
+                <div class="umbrella-card__title-row">
+                  <span class="umbrella-chain-pill umbrella-chain-pill--broker">🏢 Broker</span>
+                  <span class="umbrella-card__name">${App.utils.escapeHtml(brk.firstName || '')} ${App.utils.escapeHtml(brk.lastName || '')}</span>
+                  ${brk.agencyName ? `<span style="font-weight:700; color:#003da5; font-size:0.86rem;">— ${App.utils.escapeHtml(brk.agencyName)}</span>` : ''}
+                  ${App.utils.getUserStatusBadge(brk.status)}
+                </div>
+                <div class="umbrella-card__meta">
+                  <span>✉️ ${App.utils.escapeHtml(brk.email || '—')}</span>
+                  ${brk.country ? `<span>· 🌍 ${App.utils.escapeHtml(brk.country)}</span>` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="umbrella-card__right">
+              ${inmomasBadge}
+              <span class="umbrella-kpi-pill">🏠 ${fullSubTeam.length} <span class="lang-en">Sub-Agents</span><span class="lang-es">Sub-Agentes</span></span>
+              <span class="umbrella-kpi-pill umbrella-kpi-pill--clients">🏡 ${totalClients} <span class="lang-en">Clients</span><span class="lang-es">Clientes</span></span>
+              <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); App.views.embajador.showMemberDetail('${brk.id}')">
+                👁️ <span class="lang-en">Details</span><span class="lang-es">Ficha</span>
+              </button>
+            </div>
+          </div>
+          <div class="umbrella-card__body">
+            <div class="umbrella-branch">
+              ${shownSubTeam.length > 0
+                ? `<div class="umbrella-leaf-grid">${shownSubTeam.map(m => renderEmbLeaf(m)).join('')}</div>`
+                : `<div style="font-size:0.82rem; color:#64748b;"><span class="lang-en">No agents registered under this Broker yet.</span><span class="lang-es">Aún no hay agentes registrados bajo este Broker.</span></div>`
+              }
+            </div>
+          </div>
+        </div>
+      `);
+    });
+
+    const directRealtors = filtered.filter(u => u.role === 'realtor' && !getBrokerForMember(u));
+    const directColabs = filtered.filter(u => u.role === 'colaborador' && !getBrokerForMember(u));
+
+    let html = '';
+    if (brokerCards.length > 0) {
+      html += `
+        <div class="umbrella-group">
+          <div class="umbrella-group__title">
+            <span>🏢 <span class="lang-en">Brokers &amp; Their Teams in Your Umbrella</span><span class="lang-es">Brokers y sus Equipos en tu Paraguas</span></span>
+            <span class="umbrella-kpi-pill">${brokerCards.length} Brokers</span>
+          </div>
+          ${brokerCards.join('')}
+        </div>
+      `;
+    }
+
+    if (directRealtors.length > 0) {
+      const nodeId = 'direct-realtors';
+      if (!embUmbrellaInitialized) expandedEmbNodes.add(nodeId);
+      const isOpen = hasActiveFilter ? true : expandedEmbNodes.has(nodeId);
+      const dirClients = directRealtors.reduce((s, r) => s + countMemberClients(r), 0);
+      html += `
+        <div class="umbrella-group">
+          <div class="umbrella-group__title">
+            <span>🏠 <span class="lang-en">Direct Realtors / Agents (Level 1 — No Broker)</span><span class="lang-es">Agentes / Realtors Directos (Nivel 1 — Sin Broker intermedio)</span></span>
+            <span class="umbrella-kpi-pill">${directRealtors.length}</span>
+          </div>
+          <div class="umbrella-card umbrella-card--direct ${isOpen ? 'is-open' : ''}" id="emb-umb-node-${nodeId}" data-emb-node="${nodeId}">
+            <div class="umbrella-card__header" onclick="App.views.embajador.toggleEmbNode('${nodeId}')">
+              <div class="umbrella-card__left">
+                <span class="umbrella-chevron">▶</span>
+                <div class="umbrella-card__identity">
+                  <span class="umbrella-card__name">👑 ➔ 🏠 <span class="lang-en">Invited Directly by You</span><span class="lang-es">Invitados Directamente en tu Paraguas</span></span>
+                </div>
+              </div>
+              <div class="umbrella-card__right">
+                <span class="umbrella-kpi-pill">🏠 ${directRealtors.length} Agentes</span>
+                <span class="umbrella-kpi-pill umbrella-kpi-pill--clients">🏡 ${dirClients} Clientes</span>
+              </div>
+            </div>
+            <div class="umbrella-card__body">
+              <div class="umbrella-leaf-grid">${directRealtors.map(r => renderEmbLeaf(r)).join('')}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (directColabs.length > 0) {
+      const nodeId = 'direct-colabs';
+      if (!embUmbrellaInitialized) expandedEmbNodes.add(nodeId);
+      const isOpen = hasActiveFilter ? true : expandedEmbNodes.has(nodeId);
+      const colClients = directColabs.reduce((s, r) => s + countMemberClients(r), 0);
+      html += `
+        <div class="umbrella-group">
+          <div class="umbrella-group__title">
+            <span>🤝 <span class="lang-en">Collaborators in Your Umbrella</span><span class="lang-es">Colaboradores en tu Paraguas</span></span>
+            <span class="umbrella-kpi-pill">${directColabs.length}</span>
+          </div>
+          <div class="umbrella-card umbrella-card--embajador ${isOpen ? 'is-open' : ''}" id="emb-umb-node-${nodeId}" data-emb-node="${nodeId}">
+            <div class="umbrella-card__header" onclick="App.views.embajador.toggleEmbNode('${nodeId}')">
+              <div class="umbrella-card__left">
+                <span class="umbrella-chevron">▶</span>
+                <div class="umbrella-card__identity">
+                  <span class="umbrella-card__name">👑 ➔ 🤝 <span class="lang-en">Direct Strategic Collaborators</span><span class="lang-es">Colaboradores Directos del Paraguas</span></span>
+                </div>
+              </div>
+              <div class="umbrella-card__right">
+                <span class="umbrella-kpi-pill">🤝 ${directColabs.length} Colaboradores</span>
+                <span class="umbrella-kpi-pill umbrella-kpi-pill--clients">🏡 ${colClients} Clientes</span>
+              </div>
+            </div>
+            <div class="umbrella-card__body">
+              <div class="umbrella-leaf-grid">${directColabs.map(c => renderEmbLeaf(c)).join('')}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    embUmbrellaInitialized = true;
+    container.innerHTML = html;
+  }
+
+  function renderNetworkView() {
+    const filtered = getFilteredUmbrellaMembers();
+    renderNetworkAccordion(filtered);
+    renderNetworkTable(filtered);
+    refreshLang();
+  }
+
+  function renderNetworkTable(filteredInput) {
+    const tbody = document.getElementById('embajador-network-tbody');
+    if (!tbody) return;
+
+    const filtered = filteredInput || getFilteredUmbrellaMembers();
+    const allRefUsers = umbrella.allUsers || [];
 
     if (filtered.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="8" style="text-align:center;padding:2.5rem;color:#64748b;">
+          <td colspan="9" style="text-align:center;padding:2.5rem;color:#64748b;">
             <span class="lang-en">No umbrella members match the current filters.</span>
             <span class="lang-es">No hay miembros en tu paraguas con los filtros seleccionados.</span>
           </td>
         </tr>`;
-      refreshLang();
       return;
     }
 
     tbody.innerHTML = filtered.map(u => {
-      const memberClients = (umbrella.clients || []).filter(c =>
-        c._originMemberId === u.id || c.referredBy === u.id || c.realtorId === u.id || c.brokerId === u.id
-      ).length;
+      const memberClients = countMemberClients(u);
       const subMembers = (umbrella.users || []).filter(sub => sub._umbrellaParentId === u.id).length;
       const originHtml = u._isDirectFromEmbajador
         ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.78rem;font-weight:700;color:#b45309;">👑 <span class="lang-en">Direct (Level 1)</span><span class="lang-es">Directo (Nivel 1)</span></span>`
         : `<div style="font-size:0.78rem;color:#1e40af;font-weight:600;">↳ ${App.utils.escapeHtml(u._umbrellaParentName)}</div><div style="font-size:0.7rem;color:#64748b;">Nivel ${u._umbrellaLevel}</div>`;
+      const inmomasBadge = App.utils.renderInmomasAgentBadge
+        ? App.utils.renderInmomasAgentBadge(u, allRefUsers, { showUnassigned: true, compact: true })
+        : '—';
 
       return `
         <tr>
@@ -416,6 +723,7 @@
             <div style="font-size:0.75rem;color:#64748b;">🌍 ${App.utils.escapeHtml(u.country || '—')}</div>
           </td>
           <td>${originHtml}</td>
+          <td>${inmomasBadge}</td>
           <td style="text-align:center;">
             <span style="font-weight:700;color:#003da5;">${memberClients}</span>
             ${subMembers > 0 ? `<div style="font-size:0.72rem;color:#059669;font-weight:600;">+${subMembers} sub-red</div>` : ''}
@@ -429,8 +737,6 @@
           </td>
         </tr>`;
     }).join('');
-
-    refreshLang();
   }
 
   function showMemberDetail(memberId) {
@@ -478,6 +784,7 @@
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
             ${getRolePill(member.role)}
             ${App.utils.getUserStatusBadge(member.status)}
+            ${App.utils.renderInmomasAgentBadge ? App.utils.renderInmomasAgentBadge(member, umbrella.allUsers || [], { showUnassigned: true }) : ''}
             <span style="font-size:0.78rem;color:#64748b;font-family:monospace;background:#f8fafc;padding:3px 8px;border-radius:6px;border:1px solid #e2e8f0;">
               ${App.utils.escapeHtml(member.referralCode || '—')}
             </span>
@@ -504,7 +811,7 @@
       App.utils.showToast('No hay miembros en tu red para exportar.', 'info');
       return;
     }
-    const headers = ['Fecha', 'Nombre', 'Apellido', 'Rol', 'Estado', 'Email', 'Teléfono', 'Agencia', 'País', 'Origen en Paraguas', 'Nivel', 'Código Referido'];
+    const headers = ['Fecha', 'Nombre', 'Apellido', 'Rol', 'Estado', 'Email', 'Teléfono', 'Agencia', 'País', 'Origen en Paraguas', 'Nivel', 'Agente RE/MAX Inmomás', 'Código Referido'];
     const rows = umbrella.users.map(u => [
       u.createdAt ? new Date(u.createdAt).toLocaleDateString('es-ES') : '',
       u.firstName || '',
@@ -517,6 +824,7 @@
       u.country || '',
       u._umbrellaParentName || 'Directo',
       u._umbrellaLevel || 1,
+      u._inmomasAgentName ? (u._inmomasAgentInherited ? `${u._inmomasAgentName} (vía ${u._inmomasAgentInheritedFrom})` : u._inmomasAgentName) : '',
       u.referralCode || ''
     ]);
 
@@ -981,6 +1289,9 @@
   App.views.embajador = {
     initDashboard,
     initNetwork,
+    setNetworkViewMode,
+    toggleEmbNode,
+    expandAllUmbrellaNodes,
     initClients,
     initWebinar,
     initDocuments,

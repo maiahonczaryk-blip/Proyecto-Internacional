@@ -255,14 +255,23 @@
       const regFilter = document.getElementById('agent-partners-filter-region')?.value || '';
       const searchQ = (document.getElementById('agent-partners-search')?.value || '').toLowerCase().trim();
       
-      // Filter brokers/realtors linked to this agent
+      // Filter embajadores/brokers/realtors/colaboradores linked to this RE/MAX Inmomás agent
+      const lookupMaps = App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(allUsers) : null;
+      const agentFullLower = `${freshCurrentUser.firstName || ''} ${freshCurrentUser.lastName || ''}`.trim().toLowerCase();
+
       let linkedPartners = allUsers.filter(u => {
-        if (!['broker', 'realtor', 'colaborador'].includes(u.role)) return false;
-        
+        if (!['embajador', 'broker', 'realtor', 'colaborador'].includes(u.role)) return false;
+
+        if (App.utils && App.utils.resolveAssignedInmomasAgent) {
+          const res = App.utils.resolveAssignedInmomasAgent(u, allUsers, lookupMaps);
+          if (res.id === freshCurrentUser.id || (res.name && res.name.toLowerCase() === agentFullLower)) {
+            return true;
+          }
+        }
         if (u.referredBy && u.referredBy === freshCurrentUser.id) return true;
         if (u.referredBy && freshCurrentUser.referralCode && u.referredBy.toUpperCase() === freshCurrentUser.referralCode.toUpperCase()) return true;
-        if (u.referredBy && u.referredBy.toLowerCase() === freshCurrentUser.email.toLowerCase()) return true;
-        if (u.source && u.source.toLowerCase() === freshCurrentUser.email.toLowerCase()) return true;
+        if (u.referredBy && freshCurrentUser.email && u.referredBy.toLowerCase() === freshCurrentUser.email.toLowerCase()) return true;
+        if (u.source && freshCurrentUser.email && u.source.toLowerCase() === freshCurrentUser.email.toLowerCase()) return true;
 
         return false;
       });
@@ -294,8 +303,17 @@
       tbody.innerHTML = linkedPartners.map(p => {
         const date = App.utils.formatDate(p.createdAt);
         const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(p.status)}">${App.utils.getStatusLabel(p.status)}</span>`;
-        const roleLabel = p.role === 'broker' ? 'Broker' : (p.role === 'colaborador' ? 'Colaborador' : 'Realtor');
+        const roleLabel = p.role === 'embajador' ? '👑 Embajador' : (p.role === 'broker' ? '🏢 Broker' : (p.role === 'colaborador' ? '🤝 Colaborador' : '🏠 Realtor'));
         const regBadge = App.utils.getUserRegionBadgesHtml ? App.utils.getUserRegionBadgesHtml(p) : '';
+        const parents = App.utils.resolveUserUmbrellaParents ? App.utils.resolveUserUmbrellaParents(p, allUsers, lookupMaps) : {};
+        const chainBits = [];
+        if (parents.embajador && parents.embajador.id !== p.id) {
+          chainBits.push(`<span class="umbrella-chain-pill umbrella-chain-pill--embajador">👑 ${App.utils.escapeHtml(parents.embajador.firstName || '')} ${App.utils.escapeHtml(parents.embajador.lastName || '')}</span>`);
+        }
+        if (parents.broker && parents.broker.id !== p.id) {
+          chainBits.push(`<span class="umbrella-chain-pill umbrella-chain-pill--broker">🏢 ${App.utils.escapeHtml(parents.broker.agencyName || `${parents.broker.firstName || ''} ${parents.broker.lastName || ''}`.trim())}</span>`);
+        }
+        const chainHtml = chainBits.length > 0 ? `<div class="umbrella-chain-pills" style="margin-top:4px;">${chainBits.join('<span style="color:#94a3b8;font-size:0.7rem;">➔</span>')}</div>` : '';
         return `
           <tr>
             <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem; color: var(--text-secondary);">${date}</td>
@@ -306,7 +324,10 @@
               <small style="color:#64748b;">🏳️ ${App.utils.escapeHtml(p.country || '—')}</small>
             </td>
             <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${App.utils.escapeHtml(p.email)}</td>
-            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${App.utils.escapeHtml(p.agencyName || '—')}</td>
+            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">
+              <div>${App.utils.escapeHtml(p.agencyName || '—')}</div>
+              ${chainHtml}
+            </td>
             <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;">${statusBadge}</td>
           </tr>`;
       }).join('');

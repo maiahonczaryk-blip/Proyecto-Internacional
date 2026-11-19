@@ -14,9 +14,13 @@
 
   /* ── Cached data ── */
   let currentUser  = null;
+  let allSysUsers  = [];
   let teamRealtors = [];
   let brokerClients = [];
   let brokerCommissions = [];
+  let teamViewMode = 'umbrella'; // 'umbrella' | 'cards'
+  let teamSearchQuery = '';
+  let expandedBrokerNodes = new Set(['brk-active-group', 'brk-pending-group']);
 
   /* ============================================
      initDashboard()
@@ -310,16 +314,283 @@
         await App.utils.renderUserRegionalBanner('broker-regional-banner', currentUser);
       }
 
-      teamRealtors      = await App.auth.getAllUsers({ brokerId: currentUser.id, role: 'realtor' });
-      brokerClients     = await App.auth.getClients({ brokerId: currentUser.id });
-      brokerCommissions = await App.auth.getCommissions({ brokerId: currentUser.id });
+      const [loadedAllUsers, loadedClients, loadedComms] = await Promise.all([
+        App.auth.getAllUsers(),
+        App.auth.getClients({ brokerId: currentUser.id }),
+        App.auth.getCommissions({ brokerId: currentUser.id })
+      ]);
 
-      renderTeamGrid(teamRealtors);
+      allSysUsers = loadedAllUsers || [];
+      const freshBroker = allSysUsers.find(u => u.id === currentUser.id) || currentUser;
+      currentUser = freshBroker;
+
+      const lookupMaps = App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(allSysUsers) : null;
+      teamRealtors = allSysUsers.filter(u => {
+        if (u.id === currentUser.id || u.role !== 'realtor') return false;
+        if (u.brokerId === currentUser.id) return true;
+        if (App.utils.resolveUserUmbrellaParents) {
+          const p = App.utils.resolveUserUmbrellaParents(u, allSysUsers, lookupMaps);
+          return Boolean(p.broker && p.broker.id === currentUser.id);
+        }
+        return false;
+      });
+      brokerClients = loadedClients || [];
+      brokerCommissions = loadedComms || [];
+
+      renderBrokerContextBanner(lookupMaps);
+      setTeamViewMode(teamViewMode, false);
+      renderTeamViews();
 
     } catch (err) {
       console.error('[Broker] initTeam error:', err);
       App.utils.showToast('Error loading team data.', 'error');
     }
+  }
+
+  function renderBrokerContextBanner(lookupMaps) {
+    const bannerEl = document.getElementById('broker-umbrella-context-banner');
+    if (!bannerEl || !currentUser) return;
+    const parents = App.utils.resolveUserUmbrellaParents
+      ? App.utils.resolveUserUmbrellaParents(currentUser, allSysUsers, lookupMaps)
+      : { embajador: null };
+    const embHtml = parents.embajador
+      ? `<span class="umbrella-chain-pill umbrella-chain-pill--embajador">👑 Embajador: ${App.utils.escapeHtml(parents.embajador.firstName || '')} ${App.utils.escapeHtml(parents.embajador.lastName || '')}</span><span style="color:#94a3b8;font-weight:700;">➔</span>`
+      : '';
+    const inmomasBadge = App.utils.renderInmomasAgentBadge
+      ? App.utils.renderInmomasAgentBadge(currentUser, allSysUsers, { showUnassigned: true, maps: lookupMaps })
+      : '';
+    const logoHtml = currentUser.agencyLogo
+      ? `<img src="${App.utils.escapeHtml(currentUser.agencyLogo)}" alt="" style="height:24px; max-width:72px; object-fit:contain; border-radius:4px; border:1px solid #e2e8f0; background:#fff; padding:2px;">`
+      : '';
+
+    bannerEl.innerHTML = `
+      <div style="background:linear-gradient(135deg, rgba(0,67,255,0.08) 0%, rgba(16,185,129,0.04) 100%); border:1px solid rgba(0,67,255,0.22); border-left:4px solid #0043ff; border-radius:12px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          ${embHtml}
+          <span class="umbrella-chain-pill umbrella-chain-pill--broker">🏢 <span class="lang-en">Your Broker Umbrella</span><span class="lang-es">Tu Paraguas Broker</span></span>
+          ${logoHtml}
+          <strong style="font-size:0.95rem; color:#0f172a;">${App.utils.escapeHtml(currentUser.agencyName || `${currentUser.firstName || ''} ${currentUser.lastName || ''}`)}</strong>
+          ${inmomasBadge}
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          <span class="umbrella-kpi-pill">🏠 ${teamRealtors.length} Realtors</span>
+          <span class="umbrella-kpi-pill umbrella-kpi-pill--clients">🏡 ${brokerClients.length} <span class="lang-en">Clients</span><span class="lang-es">Clientes</span></span>
+        </div>
+      </div>
+    `;
+  }
+
+  function setTeamViewMode(mode, reRender = true) {
+    teamViewMode = mode === 'cards' ? 'cards' : 'umbrella';
+    const accEl = document.getElementById('broker-team-accordion');
+    const gridEl = document.getElementById('broker-team-grid');
+    const expEl = document.getElementById('broker-umbrella-expand-controls');
+    const btnUmb = document.getElementById('btn-broker-team-mode-umbrella');
+    const btnCards = document.getElementById('btn-broker-team-mode-cards');
+
+    if (accEl) accEl.style.display = teamViewMode === 'umbrella' ? 'flex' : 'none';
+    if (gridEl) gridEl.style.display = teamViewMode === 'cards' ? 'block' : 'none';
+    if (expEl) expEl.style.display = teamViewMode === 'umbrella' ? 'inline-flex' : 'none';
+    if (btnUmb) btnUmb.classList.toggle('active', teamViewMode === 'umbrella');
+    if (btnCards) btnCards.classList.toggle('active', teamViewMode === 'cards');
+
+    if (reRender) renderTeamViews();
+  }
+
+  function searchTeam(query) {
+    teamSearchQuery = (query || '').toLowerCase().trim();
+    renderTeamViews();
+  }
+
+  function toggleBrokerNode(nodeId) {
+    if (!nodeId) return;
+    const el = document.getElementById(`brk-umb-node-${nodeId}`);
+    if (expandedBrokerNodes.has(nodeId)) {
+      expandedBrokerNodes.delete(nodeId);
+      if (el) el.classList.remove('is-open');
+    } else {
+      expandedBrokerNodes.add(nodeId);
+      if (el) el.classList.add('is-open');
+    }
+  }
+
+  function expandAllBrokerNodes(expand) {
+    const container = document.getElementById('broker-team-accordion');
+    if (!container) return;
+    container.querySelectorAll('[data-brk-node]').forEach(el => {
+      const id = el.getAttribute('data-brk-node');
+      if (expand) {
+        expandedBrokerNodes.add(id);
+        el.classList.add('is-open');
+      } else {
+        expandedBrokerNodes.delete(id);
+        el.classList.remove('is-open');
+      }
+    });
+  }
+
+  function getFilteredTeamRealtors() {
+    const lookupMaps = App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(allSysUsers) : null;
+    if (!teamSearchQuery) return teamRealtors;
+    return teamRealtors.filter(r => {
+      const inmomasRes = App.utils.resolveAssignedInmomasAgent ? App.utils.resolveAssignedInmomasAgent(r, allSysUsers, lookupMaps) : { name: '' };
+      const hay = `${r.firstName || ''} ${r.lastName || ''} ${r.email || ''} ${r.agencyName || ''} ${r.country || ''} ${inmomasRes.name || ''}`.toLowerCase();
+      return hay.includes(teamSearchQuery);
+    });
+  }
+
+  function renderTeamViews() {
+    const filtered = getFilteredTeamRealtors();
+    renderTeamAccordion(filtered);
+    renderTeamGrid(filtered);
+    if (window.App && typeof window.App.updateLangDisplay === 'function') {
+      window.App.updateLangDisplay();
+    }
+  }
+
+  function renderBrokerRealtorAccordionItem(r, isPending, lookupMaps) {
+    const nodeId = `realtor-${r.id}`;
+    const isOpen = teamSearchQuery ? true : expandedBrokerNodes.has(nodeId);
+    const rClients = brokerClients.filter(c => c.referredBy === r.id || c.realtorId === r.id);
+    const rComms = brokerCommissions.filter(c => c.realtorId === r.id);
+    const commTotal = rComms.reduce((sum, c) => sum + (c.realtorAmount || 0), 0);
+    const inmomasBadge = App.utils.renderInmomasAgentBadge
+      ? App.utils.renderInmomasAgentBadge(r, allSysUsers, { showUnassigned: true, compact: true, maps: lookupMaps })
+      : '';
+    const agreementBadge = r.agreementSigned
+      ? '<span class="badge badge--approved">✓ Acuerdo</span>'
+      : '<span class="badge badge--pending">⏳ Acuerdo</span>';
+
+    const actionsHtml = isPending
+      ? `
+        <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation(); App.views.broker.approveRealtor('${r.id}')">✓ Approve</button>
+        <button type="button" class="btn btn-outline btn-sm" style="border-color:#ef4444;color:#ef4444;" onclick="event.stopPropagation(); App.views.broker.rejectRealtor('${r.id}')">✕ Reject</button>
+      `
+      : `
+        <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); App.views.broker.showRealtorDetail('${r.id}')">
+          👁️ <span class="lang-en">Details</span><span class="lang-es">Ficha</span>
+        </button>
+      `;
+
+    return `
+      <div class="umbrella-subcard ${isOpen ? 'is-open' : ''}" id="brk-umb-node-${nodeId}" data-brk-node="${nodeId}" style="border-left-color:${isPending ? '#f59e0b' : '#10b981'};">
+        <div class="umbrella-subcard__header" onclick="App.views.broker.toggleBrokerNode('${nodeId}')">
+          <div style="display:flex; align-items:center; gap:10px; min-width:210px; flex:1; flex-wrap:wrap;">
+            <span class="umbrella-chevron">▶</span>
+            ${App.utils.generateAvatar(r.firstName, r.lastName, 'sm')}
+            <div style="min-width:0;">
+              <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <strong style="font-size:0.9rem; color:#0f172a;">🏠 ${App.utils.escapeHtml(r.firstName || '')} ${App.utils.escapeHtml(r.lastName || '')}</strong>
+                ${agreementBadge}
+              </div>
+              <div style="font-size:0.76rem; color:#64748b; margin-top:2px;">
+                ✉️ ${App.utils.escapeHtml(r.email || '—')}${r.country ? ` · 🌍 ${App.utils.escapeHtml(r.country)}` : ''}
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            ${inmomasBadge}
+            <span class="umbrella-kpi-pill umbrella-kpi-pill--clients">🏡 ${rClients.length} <span class="lang-en">Clients</span><span class="lang-es">Clientes</span></span>
+            ${!isPending ? `<span class="umbrella-kpi-pill">💰 ${App.utils.formatCurrency(commTotal)}</span>` : ''}
+            ${actionsHtml}
+          </div>
+        </div>
+        <div class="umbrella-subcard__body">
+          ${rClients.length > 0 ? `
+            <div style="font-size:0.76rem; font-weight:700; color:#047857; margin-bottom:6px;">
+              ↳ <span class="lang-en">Buyers Referred by ${App.utils.escapeHtml(r.firstName || '')} (${rClients.length})</span><span class="lang-es">Clientes Referidos por ${App.utils.escapeHtml(r.firstName || '')} (${rClients.length})</span>
+            </div>
+            <div class="umbrella-leaf-grid">
+              ${rClients.map(c => `
+                <div class="umbrella-leaf" style="cursor:pointer;" onclick="App.views.broker.showClientDetail('${c.id}')">
+                  <div>
+                    <strong>🏡 ${App.utils.escapeHtml(c.firstName || '')} ${App.utils.escapeHtml(c.lastName || '')}</strong>
+                    <div style="font-size:0.74rem; color:#64748b;">📍 ${App.utils.escapeHtml(c.interestArea || c.budget || 'España')} · ${App.utils.formatDate(c.createdAt)}</div>
+                  </div>
+                  <span class="badge ${App.utils.getStatusBadgeClass(c.status)}">${App.utils.getStatusLabel(c.status)}</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : `
+            <div style="font-size:0.8rem; color:#64748b;">
+              <span class="lang-en">No clients referred by this Realtor yet.</span>
+              <span class="lang-es">Este Realtor aún no ha registrado clientes compradores.</span>
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderTeamAccordion(realtors) {
+    const container = document.getElementById('broker-team-accordion');
+    if (!container) return;
+
+    if (!realtors || realtors.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:2.5rem 1.5rem; background:#fff; border:1px solid #e2e8f0; border-radius:12px; color:#64748b;">
+          <div style="font-size:2rem; margin-bottom:8px;">👥</div>
+          <span class="lang-en">No realtors in your umbrella match the current search.</span>
+          <span class="lang-es">No hay realtors en tu paraguas con la búsqueda actual.</span>
+        </div>
+      `;
+      return;
+    }
+
+    const lookupMaps = App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(allSysUsers) : null;
+    const pending = realtors.filter(r => r.status === 'pending_broker' || r.status === 'pending');
+    const active = realtors.filter(r => r.status === 'active' || r.status === 'approved');
+
+    let html = '';
+    if (pending.length > 0) {
+      const pNode = 'brk-pending-group';
+      const pOpen = expandedBrokerNodes.has(pNode);
+      html += `
+        <div class="umbrella-card umbrella-card--embajador ${pOpen ? 'is-open' : ''}" id="brk-umb-node-${pNode}" data-brk-node="${pNode}">
+          <div class="umbrella-card__header" onclick="App.views.broker.toggleBrokerNode('${pNode}')">
+            <div class="umbrella-card__left">
+              <span class="umbrella-chevron">▶</span>
+              <div class="umbrella-card__identity">
+                <span class="umbrella-card__name">⏳ <span class="lang-en">Pending Realtor Approvals</span><span class="lang-es">Solicitudes Pendientes de Aprobación</span> (${pending.length})</span>
+              </div>
+            </div>
+          </div>
+          <div class="umbrella-card__body">
+            <div class="umbrella-branch">
+              ${pending.map(r => renderBrokerRealtorAccordionItem(r, true, lookupMaps)).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (active.length > 0) {
+      const aNode = 'brk-active-group';
+      const aOpen = expandedBrokerNodes.has(aNode);
+      html += `
+        <div class="umbrella-card umbrella-card--broker ${aOpen ? 'is-open' : ''}" id="brk-umb-node-${aNode}" data-brk-node="${aNode}">
+          <div class="umbrella-card__header" onclick="App.views.broker.toggleBrokerNode('${aNode}')">
+            <div class="umbrella-card__left">
+              <span class="umbrella-chevron">▶</span>
+              <div class="umbrella-card__identity">
+                <span class="umbrella-card__name">🏢 ➔ 🏠 <span class="lang-en">Active Realtors Under Your Broker Umbrella</span><span class="lang-es">Equipo de Realtors Activos bajo tu Paraguas</span> (${active.length})</span>
+                <div class="umbrella-card__meta">
+                  <span class="lang-en">Click any Realtor to expand their referred clients &amp; assigned RE/MAX Inmomás Agent</span>
+                  <span class="lang-es">Haz clic en cualquier Realtor para desplegar sus clientes y ver su Agente RE/MAX Inmomás</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="umbrella-card__body">
+            <div class="umbrella-branch">
+              ${active.map(r => renderBrokerRealtorAccordionItem(r, false, lookupMaps)).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    container.innerHTML = html;
   }
 
   /* ── Team Grid ── */
@@ -387,8 +658,11 @@
           <h4 style="margin: 0.75rem 0 0.25rem; color: var(--text-primary); font-size: 1.1rem;">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}</h4>
           <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">${App.utils.escapeHtml(r.agencyName || '—')}</p>
         </div>
-        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; text-align: center;">
+        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; text-align: center;">
           ✉️ ${App.utils.escapeHtml(r.email)}
+        </div>
+        <div style="text-align: center; margin-bottom: 10px;">
+          ${App.utils.renderInmomasAgentBadge ? App.utils.renderInmomasAgentBadge(r, allSysUsers, { showUnassigned: true, compact: true }) : ''}
         </div>
         ${!isPending ? `
         <div style="display: flex; justify-content: space-between; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-subtle); font-size: 0.85rem; color: var(--text-primary);">
@@ -456,7 +730,8 @@
           <div style="text-align: center; margin-bottom: 1.5rem;">
             ${avatar}
             <h3 style="margin: 1rem 0 0.25rem;">${App.utils.escapeHtml(realtor.firstName)} ${App.utils.escapeHtml(realtor.lastName)}</h3>
-            <p style="font-size: 0.85rem; color: #6b7280; margin: 0;">${App.utils.escapeHtml(realtor.agencyName || '—')} · ${App.utils.escapeHtml(realtor.country || '—')}</p>
+            <p style="font-size: 0.85rem; color: #6b7280; margin: 0 0 8px;">${App.utils.escapeHtml(realtor.agencyName || '—')} · ${App.utils.escapeHtml(realtor.country || '—')}</p>
+            <div>${App.utils.renderInmomasAgentBadge ? App.utils.renderInmomasAgentBadge(realtor, allSysUsers, { showUnassigned: true }) : ''}</div>
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; text-align: center; margin-bottom: 1.5rem;">
             <div class="stat-card" style="padding: 1rem;">
@@ -928,6 +1203,10 @@
   App.views.broker = {
     initDashboard,
     initTeam,
+    setTeamViewMode,
+    searchTeam,
+    toggleBrokerNode,
+    expandAllBrokerNodes,
     initClients,
     initDocuments,
     initFinances,
