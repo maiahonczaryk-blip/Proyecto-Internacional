@@ -160,6 +160,12 @@
         `;
       }
 
+      // Personalized Buyer Guide (RE/MAX Inmomás Agents & Collaborators)
+      const agentDashGuide = document.getElementById('agent-dash-buyer-guide');
+      if (agentDashGuide && App.buyerGuide && App.buyerGuide.canUse(freshMe || currentUser)) {
+        App.buyerGuide.renderEditor(agentDashGuide, freshMe || currentUser);
+      }
+
     } catch (err) {
       console.error('[Agent] initDashboard error:', err);
       App.utils.showToast('Error loading dashboard.', 'error');

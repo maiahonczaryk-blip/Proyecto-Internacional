@@ -79,12 +79,15 @@
     return `CLI-${clean.length >= 4 ? clean.slice(-4) : '0001'}`;
   }
 
+  function getClientDisplayName(c) {
+    if (!c) return '—';
+    const full = String(c._displayName || `${c.firstName || ''} ${c.lastName || ''}`.trim() || c.name || c.clientName || '').trim();
+    return full || getClientAnonCode(c);
+  }
+
   function renderClientAnonLabel(c) {
-    if (!c) return '🔒 <span class="lang-en">Protected Buyer</span><span class="lang-es">Cliente Protegido</span>';
-    const code = getClientAnonCode(c);
-    const labelEn = c._labelEn || `Protected Client (${code})`;
-    const labelEs = c._labelEs || `Cliente Protegido (${code})`;
-    return `🔒 <span class="lang-en">${App.utils.escapeHtml(labelEn)}</span><span class="lang-es">${App.utils.escapeHtml(labelEs)}</span>`;
+    if (!c) return '🏡 <span class="lang-en">Client</span><span class="lang-es">Cliente</span>';
+    return `🏡 ${App.utils.escapeHtml(getClientDisplayName(c))}`;
   }
 
   /* ============================================
@@ -221,6 +224,11 @@
         `;
       }
 
+      const dashGuideEl = document.getElementById('embajador-dash-buyer-guide');
+      if (dashGuideEl && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
+        App.buyerGuide.renderEditor(dashGuideEl, currentUser);
+      }
+
       renderDashPipeline(data.clients);
       renderDashRecentMembers(data.users);
       renderDashRecentClients(data.clients);
@@ -311,21 +319,28 @@
       return;
     }
 
-    container.innerHTML = recent.map(c => `
+    container.innerHTML = recent.map(c => {
+      const cleanZone = [c.interestArea, c.country].map(v => String(v || '').trim()).find(v => v && v !== '—' && v !== '-') || 'España';
+      return `
       <div onclick="App.views.embajador.showClientDetail('${c.id}')" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-bottom:1px solid var(--border-subtle);cursor:pointer;">
         <div style="min-width:0;">
-          <div style="font-weight:700;color:var(--text-primary);font-size:0.9rem;">
+          <div style="font-weight:700;color:var(--text-primary);font-size:0.92rem;">
             ${renderClientAnonLabel(c)}
           </div>
-          <div style="font-size:0.76rem;color:var(--text-secondary);margin-top:2px;">
-            📍 ${App.utils.escapeHtml(c.interestArea || c.country || 'España')} · 🤝 ${App.utils.escapeHtml(c._originMemberName || 'Directo')}
+          <div style="font-size:0.76rem;color:var(--text-secondary);margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span>📍 ${App.utils.escapeHtml(cleanZone)}</span>
+            <span>·</span>
+            <span>🤝 ${App.utils.escapeHtml(c._originMemberName || 'Directo')}</span>
+            <span>·</span>
+            <span style="color:#94a3b8;">🔒 <span class="lang-en">Email &amp; phone protected</span><span class="lang-es">Email y tel. protegidos</span></span>
           </div>
         </div>
         <div style="flex-shrink:0;">
           <span class="badge ${App.utils.getStatusBadgeClass(c.status)}">${App.utils.getStatusLabel(c.status)}</span>
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
 
   /* ============================================
@@ -506,16 +521,14 @@
     return `
       <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:6px;">
         ${clientsList.map(c => {
-          const code = getClientAnonCode(c);
-          const labelEn = c._labelEn || `Client (${code})`;
-          const labelEs = c._labelEs || `Cliente (${code})`;
+          const clientName = getClientDisplayName(c);
           const statusLbl = App.utils.getStatusLabel ? App.utils.getStatusLabel(c.status) : App.utils.escapeHtml(c.status || 'Nuevo');
           return `
             <button type="button"
               onclick="event.stopPropagation(); App.views.embajador.showClientDetail('${c.id}')"
-              title="Ver seguimiento del expediente (datos personales protegidos)"
+              title="Ver seguimiento del cliente (email y teléfono protegidos)"
               style="display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; background:#f5f3ff; border:1px solid #ddd6fe; color:#5b21b6; font-size:0.74rem; font-weight:700; cursor:pointer; transition:background 0.15s;">
-              <span>🔒 <span class="lang-en">${App.utils.escapeHtml(labelEn)}</span><span class="lang-es">${App.utils.escapeHtml(labelEs)}</span></span>
+              <span>🏡 ${App.utils.escapeHtml(clientName)}</span>
               <span style="font-weight:600; color:#7c3aed; opacity:0.85;">· ${statusLbl}</span>
             </button>
           `;
@@ -533,8 +546,8 @@
         if (networkStatusFilter !== 'approved' && u.status !== networkStatusFilter) return false;
       }
       if (networkSearchQuery) {
-        const directClientsCodes = getDirectClientsForMember(u).map(c => getClientAnonCode(c)).join(' ');
-        const hay = `${u.firstName || ''} ${u.lastName || ''} ${u.agencyName || ''} ${u.country || ''} ${u._umbrellaParentName || ''} ${u._inmomasAgentName || ''} ${directClientsCodes} ${u.referralCode || ''}`.toLowerCase();
+        const directClientsNames = getDirectClientsForMember(u).map(c => `${getClientDisplayName(c)} ${getClientAnonCode(c)}`).join(' ');
+        const hay = `${u.firstName || ''} ${u.lastName || ''} ${u.agencyName || ''} ${u.country || ''} ${u._umbrellaParentName || ''} ${u._inmomasAgentName || ''} ${directClientsNames} ${u.referralCode || ''}`.toLowerCase();
         if (!hay.includes(networkSearchQuery)) return false;
       }
       return true;
@@ -641,7 +654,7 @@
         : '';
 
       const agentNamesPreview = fullSubTeam.map(a => `${a.firstName || ''} ${a.lastName || ''}`.trim()).filter(Boolean).join(', ');
-      const clientCodesPreview = allGroupClients.map(c => getClientAnonCode(c)).filter(Boolean).join(', ');
+      const clientNamesPreview = allGroupClients.map(c => getClientDisplayName(c)).filter(Boolean).join(', ');
 
       brokerCards.push(`
         <div class="umbrella-card umbrella-card--broker ${isOpen ? 'is-open' : ''}" id="emb-umb-node-${nodeId}" data-emb-node="${nodeId}">
@@ -660,7 +673,7 @@
                   ${brk.country ? `<span>🌍 ${App.utils.escapeHtml(brk.country)}</span><span>·</span>` : ''}
                   <span style="color:#94a3b8;">🔒 <span class="lang-en">Protected contact</span><span class="lang-es">Contacto protegido</span></span>
                   ${agentNamesPreview ? `<span>· <strong style="color:#047857;">🏠 ${App.utils.escapeHtml(agentNamesPreview)}</strong></span>` : ''}
-                  ${clientCodesPreview ? `<span>· <strong style="color:#6d28d9;">🔒 ${App.utils.escapeHtml(clientCodesPreview)}</strong></span>` : ''}
+                  ${clientNamesPreview ? `<span>· <strong style="color:#6d28d9;">🏡 ${App.utils.escapeHtml(clientNamesPreview)}</strong></span>` : ''}
                 </div>
               </div>
             </div>
@@ -701,7 +714,7 @@
     const directEmbClients = (networkRoleFilter === 'all' ? (umbrella.clients || []) : []).filter(c => {
       if (!c || !c._isDirectFromEmbajador) return false;
       if (!networkSearchQuery) return true;
-      const hay = `${getClientAnonCode(c)} ${c.interestArea || ''} ${c.country || ''}`.toLowerCase();
+      const hay = `${getClientDisplayName(c)} ${getClientAnonCode(c)} ${c.interestArea || ''} ${c.country || ''}`.toLowerCase();
       return hay.includes(networkSearchQuery);
     });
 
@@ -871,7 +884,7 @@
         ? `<div style="font-size:0.73rem;color:#047857;font-weight:600;margin-top:3px;">🏠 ${subMembers.map(s => App.utils.escapeHtml(`${s.firstName || ''} ${s.lastName || ''}`.trim())).join(', ')}</div>`
         : '';
       const clientCodesHtml = memberClients.length > 0
-        ? `<div style="font-size:0.73rem;color:#6d28d9;font-weight:600;margin-top:2px;">🔒 ${memberClients.map(c => App.utils.escapeHtml(getClientAnonCode(c))).join(', ')}</div>`
+        ? `<div style="font-size:0.73rem;color:#6d28d9;font-weight:600;margin-top:2px;">🏡 ${memberClients.map(c => App.utils.escapeHtml(getClientDisplayName(c))).join(', ')}</div>`
         : '';
 
       return `
@@ -972,7 +985,7 @@
       App.utils.showToast('No hay miembros en tu red para exportar.', 'info');
       return;
     }
-    const headers = ['Fecha', 'Nombre', 'Apellido', 'Rol', 'Estado', 'Agencia', 'País', 'Origen en Paraguas', 'Nivel', 'Sub-Agentes', 'Expedientes Clientes (Protegidos)', 'Agente RE/MAX Inmomás'];
+    const headers = ['Fecha', 'Nombre', 'Apellido', 'Rol', 'Estado', 'Agencia', 'País', 'Origen en Paraguas', 'Nivel', 'Sub-Agentes', 'Clientes Referidos', 'Agente RE/MAX Inmomás'];
     const rows = umbrella.users.map(u => {
       const subMembers = (umbrella.users || []).filter(sub => sub._umbrellaParentId === u.id || (u.role === 'broker' && sub.brokerId === u.id));
       const memberClients = u.role === 'broker' ? getUniqueClientsForGroup(u, subMembers) : getDirectClientsForMember(u);
@@ -987,7 +1000,7 @@
         u._umbrellaParentName || 'Directo',
         u._umbrellaLevel || 1,
         subMembers.map(s => `${s.firstName || ''} ${s.lastName || ''}`.trim()).join(', '),
-        memberClients.length > 0 ? `${memberClients.length} (${memberClients.map(c => getClientAnonCode(c)).join(', ')})` : '0',
+        memberClients.length > 0 ? `${memberClients.length} (${memberClients.map(c => getClientDisplayName(c)).join(', ')})` : '0',
         u._inmomasAgentName ? (u._inmomasAgentInherited ? `${u._inmomasAgentName} (vía ${u._inmomasAgentInheritedFrom})` : u._inmomasAgentName) : ''
       ];
     });
@@ -1055,7 +1068,7 @@
         }
       }
       if (clientSearchQuery) {
-        const hay = `${getClientAnonCode(c)} ${c._labelEs || ''} ${c._labelEn || ''} ${c.interestArea || ''} ${c.budget || ''} ${c.country || ''} ${c._originMemberName || ''} ${c.localAgentName || ''}`.toLowerCase();
+        const hay = `${getClientDisplayName(c)} ${getClientAnonCode(c)} ${c.firstName || ''} ${c.lastName || ''} ${c.interestArea || ''} ${c.budget || ''} ${c.country || ''} ${c._originMemberName || ''} ${c.localAgentName || ''}`.toLowerCase();
         if (!hay.includes(clientSearchQuery)) return false;
       }
       return true;
@@ -1110,7 +1123,7 @@
           <tr>
             <td>
               <div style="font-weight:700;color:var(--text-primary);">${renderClientAnonLabel(c)}</div>
-              <div style="font-size:0.75rem;color:#94a3b8;">${c.country ? `🌍 ${App.utils.escapeHtml(c.country)} · ` : ''}<span class="lang-en">Personal data protected</span><span class="lang-es">Datos personales protegidos</span></div>
+              <div style="font-size:0.75rem;color:#94a3b8;">${c.country ? `🌍 ${App.utils.escapeHtml(c.country)} · ` : ''}🔒 <span class="lang-en">Email &amp; phone protected</span><span class="lang-es">Email y teléfono protegidos</span></div>
             </td>
             <td>
               <div style="font-weight:600;font-size:0.84rem;color:#003da5;">${App.utils.escapeHtml(c._originMemberName || 'Directo')}</div>
@@ -1137,7 +1150,7 @@
       return;
     }
 
-    const code = getClientAnonCode(client);
+    const clientName = getClientDisplayName(client);
     const timeline = (client.statusHistory || []).map((entry, idx) => {
       const isLast = idx === client.statusHistory.length - 1;
       return `
@@ -1154,14 +1167,14 @@
     }).join('');
 
     App.utils.showModal({
-      title: `🔒 Expediente Protegido — ${code}`,
+      title: `🏡 ${clientName}`,
       body: `
         <div style="text-align:left;">
           <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;margin-bottom:1rem;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;font-size:0.8rem;color:#1e40af;">
             <span style="font-size:1.1rem;line-height:1.2;">🛡️</span>
             <div>
-              <span class="lang-en"><strong>End-Client Privacy Protection:</strong> Personal identity and contact details of buyers are strictly confidential and managed directly by RE/MAX Inmomás.</span>
-              <span class="lang-es"><strong>Protección de Datos del Cliente Final:</strong> La identidad y los datos personales del comprador son estrictamente confidenciales y gestionados directamente por RE/MAX Inmomás.</span>
+              <span class="lang-en"><strong>Contact Privacy Protection:</strong> Direct contact details (email and phone number) are strictly confidential and managed directly by RE/MAX Inmomás.</span>
+              <span class="lang-es"><strong>Protección de Contacto:</strong> El correo electrónico y el teléfono del cliente son confidenciales y están gestionados directamente por RE/MAX Inmomás.</span>
             </div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
@@ -1170,12 +1183,13 @@
             <span style="font-size:0.82rem;font-weight:600;color:#003da5;"><span class="lang-en">Origin:</span><span class="lang-es">Origen:</span> ${App.utils.escapeHtml(client._originMemberName || 'Directo')}</span>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;background:#f8fafc;padding:1rem;border-radius:10px;border:1px solid #e2e8f0;font-size:0.85rem;margin-bottom:1rem;">
-            <div><strong><span class="lang-en">Reference Code:</span><span class="lang-es">Código Expediente:</span></strong><br>${App.utils.escapeHtml(code)}</div>
+            <div><strong><span class="lang-en">Client:</span><span class="lang-es">Cliente:</span></strong><br>${App.utils.escapeHtml(clientName)}</div>
+            <div><strong><span class="lang-en">Contact Details:</span><span class="lang-es">Email / Teléfono:</span></strong><br><span style="color:#64748b;font-size:0.8rem;">🔒 <span class="lang-en">Protected</span><span class="lang-es">Protegidos</span></span></div>
             <div><strong><span class="lang-en">Country / Market:</span><span class="lang-es">País de Residencia:</span></strong><br>${App.utils.escapeHtml(client.country || '—')}</div>
             <div><strong><span class="lang-en">Area of Interest:</span><span class="lang-es">Zona de Interés:</span></strong><br>${App.utils.escapeHtml(client.interestArea || '—')}</div>
             <div><strong><span class="lang-en">Estimated Budget:</span><span class="lang-es">Presupuesto:</span></strong><br>${App.utils.escapeHtml(client.budget || '—')}</div>
             <div><strong><span class="lang-en">Timeline / Goal:</span><span class="lang-es">Plazo / Objetivo:</span></strong><br>${App.utils.escapeHtml(client.timeline || '—')} · ${App.utils.escapeHtml(client.objective || '—')}</div>
-            <div><strong><span class="lang-en">Assigned Spain Agent:</span><span class="lang-es">Agente España Asignado:</span></strong><br>${App.utils.escapeHtml(client.localAgentName || 'En asignación por Admin')}</div>
+            <div style="grid-column:span 2;"><strong><span class="lang-en">Assigned Spain Agent:</span><span class="lang-es">Agente España Asignado:</span></strong><br>${App.utils.escapeHtml(client.localAgentName || 'En asignación por Admin')}</div>
           </div>
           <h4 style="margin:0 0 0.6rem;font-size:0.9rem;color:#0f172a;">📅 <span class="lang-en">Pipeline Status History</span><span class="lang-es">Historial de Estados</span></h4>
           <div>${timeline || '<p style="font-size:0.82rem;color:#64748b;"><span class="lang-en">No additional history.</span><span class="lang-es">Sin historial adicional.</span></p>'}</div>
@@ -1278,10 +1292,10 @@
       App.utils.showToast('No hay clientes para exportar.', 'info');
       return;
     }
-    const headers = ['Fecha', 'Código Expediente', 'País', 'Zona Interés', 'Presupuesto', 'Estado', 'Origen en Paraguas', 'Rol Origen', 'Agente España'];
+    const headers = ['Fecha', 'Cliente', 'País', 'Zona Interés', 'Presupuesto', 'Estado', 'Origen en Paraguas', 'Rol Origen', 'Agente España'];
     const rows = list.map(c => [
       c.createdAt ? new Date(c.createdAt).toLocaleDateString('es-ES') : '',
-      getClientAnonCode(c),
+      getClientDisplayName(c),
       c.country || '',
       c.interestArea || '',
       c.budget || '',
@@ -1367,7 +1381,7 @@
       if (webinarFilter === 'b2c' && isB2B) return false;
       if (webinarRegionFilter && App.utils && App.utils.getRecordRegion && App.utils.getRecordRegion(r, umbrella.users) !== webinarRegionFilter) return false;
       if (webinarSearchQuery) {
-        const namePart = isB2B ? `${r.firstName || ''} ${r.lastName || ''} ${r.agency || ''}` : `${r._anonCode || ''} ${r._labelEs || ''} ${r._labelEn || ''}`;
+        const namePart = `${r.firstName || ''} ${r.lastName || ''} ${r._displayName || ''} ${r.agency || ''}`;
         const hay = `${namePart} ${r.country || ''} ${r.agentReferrerName || ''} ${r.referrerName || ''} ${r.referralCode || ''}`.toLowerCase();
         if (!hay.includes(webinarSearchQuery)) return false;
       }
@@ -1387,11 +1401,10 @@
         ? `<span style="background:rgba(0,63,153,0.1);color:#003f99;padding:3px 8px;border-radius:999px;font-size:0.74rem;font-weight:700;">🏢 B2B Profesional</span>`
         : `<span style="background:rgba(16,185,129,0.1);color:#059669;padding:3px 8px;border-radius:999px;font-size:0.74rem;font-weight:700;">🏡 B2C Cliente</span>`;
 
-      const attendeeHtml = isB2B
-        ? `<div style="font-weight:700;">${App.utils.escapeHtml(r.firstName || '')} ${App.utils.escapeHtml(r.lastName || '')}</div>
-           <div style="font-size:0.73rem;color:#94a3b8;">🔒 <span class="lang-en">Protected contact</span><span class="lang-es">Contacto protegido</span></div>`
-        : `<div style="font-weight:700;">🔒 <span class="lang-en">${App.utils.escapeHtml(r._labelEn || 'Protected End Client')}</span><span class="lang-es">${App.utils.escapeHtml(r._labelEs || 'Cliente Final Protegido')}</span></div>
-           <div style="font-size:0.73rem;color:#94a3b8;"><span class="lang-en">End-client identity protected</span><span class="lang-es">Identidad del cliente protegida</span></div>`;
+      const attendeeFullName = String(r._displayName || `${r.firstName || ''} ${r.lastName || ''}`.trim() || r.name || '—');
+      const attendeeHtml = `
+        <div style="font-weight:700;">${App.utils.escapeHtml(attendeeFullName)}</div>
+        <div style="font-size:0.73rem;color:#94a3b8;">🔒 <span class="lang-en">Email &amp; phone protected</span><span class="lang-es">Email y teléfono protegidos</span></div>`;
 
       return `
         <tr>
@@ -1412,6 +1425,10 @@
   async function initDocuments() {
     currentUser = App.auth.getCurrentUser();
     if (!currentUser) return;
+    const docsGuideEl = document.getElementById('embajador-docs-buyer-guide');
+    if (docsGuideEl && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
+      App.buyerGuide.renderEditor(docsGuideEl, currentUser);
+    }
     const container = document.getElementById('embajador-contract-section');
     if (container && App.utils && typeof App.utils.renderContractDataSection === 'function') {
       App.utils.renderContractDataSection(container, currentUser, 'embajador-contract');

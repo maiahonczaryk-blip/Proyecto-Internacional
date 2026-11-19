@@ -422,10 +422,10 @@ App.views.auth = {
       };
     }
 
-    // 7b. Personalized Buyer Guide (RE/MAX Inmomás agents + admins)
+    // 7b. Personalized Buyer Guide (All Professionals + Admins)
     const guideSection = document.getElementById('profile-buyer-guide-section');
     if (guideSection) {
-      const canUseGuide = ['agent_inmomas', 'admin'].includes(user.role) && App.buyerGuide;
+      const canUseGuide = App.buyerGuide && App.buyerGuide.canUse(user);
       guideSection.style.display = canUseGuide ? 'block' : 'none';
       if (canUseGuide) App.buyerGuide.renderEditor(guideSection, user);
     }

@@ -3278,8 +3278,8 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
   width: 20px;
 }
 .dashboard-body .sidebar-user {
-  border-top: 0.5px solid rgba(255, 255, 255, 0.07);
-  padding: 16px;
+  border-top: 0.5px solid rgba(255, 255, 255, 0.08);
+  padding: 14px 16px;
 }
 
 /* ── Dashboard Header (Warm Frosted Bar, No Harsh Bottom Strip) ── */
@@ -4730,37 +4730,57 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
 
 /* Sidebar User Info */
 .sidebar-user {
-  padding: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 14px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sidebar-user__top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
 }
 
 .sidebar-user__avatar {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  background-size: cover;
+  background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.875rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: var(--sidebar-text-active);
+  color: #ffffff;
   flex-shrink: 0;
 }
 
 .sidebar-user__info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
 }
 
 .sidebar-user__name {
-  font-size: 0.8125rem;
+  width: 100%;
+  font-size: 0.86rem;
   font-weight: 600;
-  color: var(--sidebar-text-active);
+  color: #ffffff;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4768,38 +4788,105 @@ body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .lang-flag-svg .flag-en { disp
 
 .sidebar-user__role {
   display: inline-block;
-  font-size: 0.6875rem;
+  max-width: 100%;
+  font-size: 0.68rem;
   font-weight: 600;
+  line-height: 1.25;
   padding: 2px 8px;
-  border-radius: var(--radius-full);
-  margin-top: 2px;
+  border-radius: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+}
+
+.sidebar-user__actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+}
+
+.sidebar-user__profile-btn {
+  flex: 1;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.18s ease;
+}
+
+.sidebar-user__profile-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+.sidebar-logout-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.95rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: all 0.18s ease;
+}
+
+.sidebar-logout-btn:hover {
+  background: rgba(239, 68, 68, 0.22);
+  border-color: rgba(248, 113, 113, 0.45);
+  color: #fca5a5;
 }
 
 .sidebar-user__role--admin {
-  background: rgba(139, 92, 246, 0.15);
-  color: #A78BFA;
+  background: rgba(139, 92, 246, 0.2);
+  color: #C4B5FD;
+  border: 1px solid rgba(167, 139, 250, 0.3);
 }
 
 .sidebar-user__role--broker {
-  background: rgba(0, 67, 255, 0.15);
-  color: #60A5FA;
+  background: rgba(59, 130, 246, 0.2);
+  color: #93C5FD;
+  border: 1px solid rgba(96, 165, 250, 0.3);
 }
 
 .sidebar-user__role--realtor {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34D399;
+  background: rgba(16, 185, 129, 0.18);
+  color: #6EE7B7;
+  border: 1px solid rgba(52, 211, 153, 0.3);
 }
 
 .sidebar-user__role--agent_inmomas,
 .sidebar-user__role--colaborador {
-  background: rgba(245, 158, 11, 0.15);
-  color: #FBBF24;
+  background: rgba(245, 158, 11, 0.18);
+  color: #FCD34D;
+  border: 1px solid rgba(251, 191, 36, 0.3);
 }
 
 .sidebar-user__role--embajador {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.25));
-  color: #FCD34D;
-  border: 1px solid rgba(251, 191, 36, 0.35);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(217, 119, 6, 0.22));
+  color: #FDE68A;
+  border: 1px solid rgba(251, 191, 36, 0.38);
 }
 
 /* Dashboard Main Area */

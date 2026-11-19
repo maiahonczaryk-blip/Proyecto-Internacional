@@ -639,12 +639,10 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
             <div>${tagBadge}</div>
           </div>
           ${agentLabel}
-          <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-primary);">
-            ${c._isRedactedClient
-              ? `🔒 <span class="lang-en">${App.utils.escapeHtml(c._labelEn || c._anonCode || 'Protected Client')}</span><span class="lang-es">${App.utils.escapeHtml(c._labelEs || c._anonCode || 'Cliente Protegido')}</span>`
-              : `${App.utils.escapeHtml(c.firstName)} ${App.utils.escapeHtml(c.lastName)}`
-            }
+          <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.35rem; color: var(--text-primary);">
+            ${App.utils.escapeHtml(c._displayName || `${c.firstName || ''} ${c.lastName || ''}`.trim() || c.name || c._anonCode || '—')}
           </div>
+          ${c._isRedactedClient ? `<div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 0.3rem;">🔒 <span class="lang-en">Email &amp; phone protected</span><span class="lang-es">Email y tel. protegidos</span></div>` : ''}
           ${c._isRedactedClient && c.country ? `<div style="font-size: 0.76rem; color: #64748b; margin-bottom: 0.25rem;">🌍 ${App.utils.escapeHtml(c.country)}</div>` : ''}
           <div style="font-size: 0.8rem; color: #6b7280; margin-bottom: 0.25rem;">
             📍 ${App.utils.escapeHtml(c.interestArea || '—')}

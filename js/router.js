@@ -430,13 +430,13 @@ App.router = (function() {
         const mobileAvatarEl = document.getElementById('mobile-user-avatar');
         
         const roleLabelsHtml = {
-          admin: 'Admin · Broker RE/MAX Inmomás',
-          embajador: '👑 <span class="lang-en">Ambassador Dashboard</span><span class="lang-es">Dashboard de Embajador</span>',
-          agent_inmomas: '🇪🇸 <span class="lang-en">RE/MAX Inmomás Agent</span><span class="lang-es">Agente RE/MAX Inmomás</span>',
-          colaborador: '<span class="lang-en">Collaborator</span><span class="lang-es">Colaborador</span>',
-          broker: '<span class="lang-en">Broker Portal</span><span class="lang-es">Portal Broker</span>',
-          realtor: '<span class="lang-en">Realtor Portal</span><span class="lang-es">Portal Realtor</span>',
-          partner: '<span class="lang-en">Partner Portal</span><span class="lang-es">Portal Partner</span>'
+          admin: '🛡️ Admin · RE/MAX Inmomás',
+          embajador: '👑 <span class="lang-en">Ambassador</span><span class="lang-es">Embajador</span>',
+          agent_inmomas: '🇪🇸 <span class="lang-en">Inmomás Agent</span><span class="lang-es">Agente Inmomás</span>',
+          colaborador: '🤝 <span class="lang-en">Collaborator</span><span class="lang-es">Colaborador</span>',
+          broker: '🏢 Broker',
+          realtor: '🏠 Realtor',
+          partner: '🤝 Partner'
         };
         let formattedRoleHtml = roleLabelsHtml[user.role] || App.utils.escapeHtml(user.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : '');
         if (user.role !== 'admin' && App.utils && typeof App.utils.getUserRegions === 'function') {
@@ -447,15 +447,34 @@ App.router = (function() {
           }
         }
         const initials = App.utils.getInitials(user.firstName, user.lastName);
+        const avatarPhoto = user.profileImage || (user.buyerGuide && user.buyerGuide.photo) || '';
 
         if (nameEl) nameEl.textContent = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || '—';
         if (roleEl) {
           roleEl.innerHTML = formattedRoleHtml;
           roleEl.className = `sidebar-user__role sidebar-user__role--${user.role}`;
         }
-        if (avatarEl) avatarEl.innerHTML = initials;
+        if (avatarEl) {
+          if (avatarPhoto) {
+            avatarEl.innerHTML = '';
+            avatarEl.style.backgroundImage = `url("${avatarPhoto}")`;
+          } else {
+            avatarEl.style.backgroundImage = 'none';
+            avatarEl.innerHTML = initials;
+          }
+        }
         if (mobileRoleEl) mobileRoleEl.innerHTML = formattedRoleHtml;
-        if (mobileAvatarEl) mobileAvatarEl.innerHTML = initials;
+        if (mobileAvatarEl) {
+          if (avatarPhoto) {
+            mobileAvatarEl.innerHTML = '';
+            mobileAvatarEl.style.backgroundImage = `url("${avatarPhoto}")`;
+            mobileAvatarEl.style.backgroundSize = 'cover';
+            mobileAvatarEl.style.backgroundPosition = 'center';
+          } else {
+            mobileAvatarEl.style.backgroundImage = 'none';
+            mobileAvatarEl.innerHTML = initials;
+          }
+        }
         
         sidebar.classList.remove('sidebar--admin', 'sidebar--embajador', 'sidebar--broker', 'sidebar--realtor', 'sidebar--agent_inmomas', 'sidebar--colaborador');
         sidebar.classList.add(`sidebar--${user.role}`);
