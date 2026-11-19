@@ -110,7 +110,7 @@ App.buyerGuide = (function() {
     return pdfLibPromise;
   }
 
-  const TEMPLATE_VERSION = '20261119_v2';
+  const TEMPLATE_VERSION = '20261119_v4';
 
   function loadTemplate(lang) {
     const cfg = LANGS[lang] || LANGS.es;
