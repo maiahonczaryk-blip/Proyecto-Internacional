@@ -20,7 +20,11 @@
   let clientRegionFilter = '';
   let clientCountryFilter = '';
   let clientAgentFilter = '';
+  let dashRegionFilter = '';
+  let dashCountryFilter = '';
+  let dashWebinarsCache = [];
   let pendingAdminRegionFilter = '';
+  let pendingAdminCountryFilter = '';
   let filteredUsersCache = [];
   let filteredClientsCache = [];
   let filteredUnifiedCache = [];
@@ -28,13 +32,18 @@
   let expandedAdminNodes = new Set();
   let adminUmbrellaInitialized = false;
 
-  function jumpToRegionView(routeName, regionId) {
+  function jumpToRegionView(routeName, regionId, countryVal = '') {
     pendingAdminRegionFilter = regionId || '';
+    pendingAdminCountryFilter = countryVal || '';
     if (App.router && typeof App.router.navigateTo === 'function') {
       App.router.navigateTo(routeName);
     } else {
       window.location.hash = routeName;
     }
+  }
+
+  function jumpFromDashFilter(routeName) {
+    jumpToRegionView(routeName, dashRegionFilter, dashCountryFilter);
   }
 
   function buildSmartMasAgentOptions(localAgents, selectedAgentId = '', targetRegionId = '', placeholder = '-- Seleccionar Agente RE/MAX Inmomás --') {
@@ -181,38 +190,23 @@
      ============================================ */
   async function initDashboard() {
     try {
-      // 1. Load all users and clients
-      allUsers = await App.auth.getAllUsers();
-      allClients = await App.auth.getClients();
+      // 1. Load all users, clients, leads, and webinar registrations
+      const [loadedUsers, loadedClients, loadedLeads, loadedWebinars] = await Promise.all([
+        App.auth.getAllUsers(),
+        App.auth.getClients(),
+        App.auth.getDossierLeads().catch(() => []),
+        App.auth.getWebinarRegistrations().catch(() => [])
+      ]);
+      allUsers = loadedUsers || [];
+      allClients = loadedClients || [];
+      allLeads = loadedLeads || [];
+      dashWebinarsCache = loadedWebinars || [];
 
-      // 2. Count users by status and role
-      const pendingUsers     = allUsers.filter(u => u.status === 'pending');
-      const approvedBrokers  = allUsers.filter(u => u.status === 'active' && u.role === 'broker');
-      const approvedRealtors = allUsers.filter(u => u.status === 'active' && u.role === 'realtor');
+      // 2. Setup Compact Region & Country Filter Bar + Apply Metrics
+      setupDashboardGeoFilters();
+      applyDashboardGeoFilters();
 
-      // 3. Update stat cards
-      setTextById('admin-stat-pending',  pendingUsers.length);
-      setTextById('admin-stat-brokers',  approvedBrokers.length);
-      setTextById('admin-stat-realtors', approvedRealtors.length);
-      setTextById('admin-stat-clients',  allClients.length);
-
-      // 4. Render pending applications
-      renderPendingList(pendingUsers);
-
-      // 5. Render recent activity (latest 5 non-pending users, sorted newest first)
-      const recentActivity = allUsers
-         .filter(u => u.status === 'active' || u.status === 'rejected')
-         .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
-         .slice(0, 5);
-      renderRecentActivity(recentActivity);
-
-      // 6. Render dossier downloads (leads)
-      const leads = await App.auth.getDossierLeads();
-      allLeads = leads;
-      setTextById('admin-stat-leads', leads.length);
-      renderDossierLeads(leads);
-
-      // 7. Setup Admin Referral Link
+      // 3. Setup Admin Referral Link
       const currentUser = App.auth.getCurrentUser();
       if (currentUser) {
         if (isMaiaOrSuperAdmin() && (!currentUser.referralCode || currentUser.referralCode.startsWith('BRK-') || currentUser.referralCode.startsWith('REA-'))) {
@@ -266,14 +260,6 @@
             App.utils.showToast('🇪🇸 Enlace de registro interno para Agente RE/MAX Inmomás copiado al portapapeles', 'success');
           };
         }
-      }
-
-      // 7b. Render Global Regional Overview Grid
-      try {
-        const dashWebinars = await App.auth.getWebinarRegistrations();
-        renderRegionalOverviewGrid(allUsers, allClients, dashWebinars);
-      } catch (regErr) {
-        console.warn('[Admin] Regional overview render warning:', regErr);
       }
 
       // 8. Check pending Contract / Fiscal Data notifications for Admin Dashboard alert & sidebar badge
@@ -338,58 +324,160 @@
     }
   }
 
-  /* ── Global Regional Overview Cards on Admin Dashboard ── */
-  function renderRegionalOverviewGrid(users, clients, webinars) {
-    const grid = document.getElementById('admin-regional-overview-grid');
-    if (!grid || !App.utils || !App.utils.REGION_LIST) return;
+  /* ── Compact Region & Country Filter Bar on Admin Dashboard ── */
+  function collectAllRawCountries() {
+    const raw = [];
+    (allUsers || []).forEach(u => {
+      if (u.nationality) raw.push(u.nationality);
+      if (u.country) raw.push(u.country);
+    });
+    (allClients || []).forEach(c => {
+      if (c.country) raw.push(c.country);
+      if (c.currentLocation) raw.push(c.currentLocation);
+    });
+    (dashWebinarsCache || []).forEach(w => {
+      if (w.country) raw.push(w.country);
+    });
+    return raw;
+  }
 
-    const masAgents = (users || []).filter(u => u.role === 'agent_inmomas' && u.status === 'active');
-    const partners = (users || []).filter(u => ['embajador', 'broker', 'realtor', 'colaborador'].includes(u.role) && u.status !== 'rejected');
+  function setupDashboardGeoFilters() {
+    const regSel = document.getElementById('admin-dash-filter-region');
+    const cntSel = document.getElementById('admin-dash-filter-country');
+    const resetBtn = document.getElementById('admin-dash-filter-reset');
+    const rawCountries = collectAllRawCountries();
 
-    grid.innerHTML = App.utils.REGION_LIST.map(reg => {
-      const regMasAgents = masAgents.filter(a => App.utils.getUserRegions(a).includes(reg.id));
-      const regPartners = partners.filter(p => App.utils.getUserRegions(p).includes(reg.id));
-      const regClients = (clients || []).filter(c => App.utils.getRecordRegion(c, users) === reg.id);
-      const regWebinars = (webinars || []).filter(w => App.utils.getRecordRegion(w, users) === reg.id);
+    if (regSel && App.utils && App.utils.getRegionFilterOptionsHtml) {
+      regSel.innerHTML = App.utils.getRegionFilterOptionsHtml(dashRegionFilter, '🌍 Todas las Regiones', '🌍 All Regions');
+      regSel.value = dashRegionFilter;
+      regSel.onchange = () => {
+        dashRegionFilter = regSel.value || '';
+        if (dashRegionFilter && dashCountryFilter) {
+          const cntReg = App.utils.resolveRegionFromCountry ? App.utils.resolveRegionFromCountry(dashCountryFilter) : '';
+          if (cntReg && cntReg !== dashRegionFilter) {
+            dashCountryFilter = '';
+          }
+        }
+        if (cntSel && App.utils.getCountryFilterOptionsHtml) {
+          cntSel.innerHTML = App.utils.getCountryFilterOptionsHtml(dashCountryFilter, dashRegionFilter, rawCountries);
+          cntSel.value = dashCountryFilter;
+        }
+        applyDashboardGeoFilters();
+      };
+    }
 
-      const agentNamesPreview = regMasAgents.length > 0
-        ? regMasAgents.slice(0, 3).map(a => `${App.utils.escapeHtml(a.firstName)} ${App.utils.escapeHtml((a.lastName || '').charAt(0))}.`).join(', ') + (regMasAgents.length > 3 ? ` +${regMasAgents.length - 3}` : '')
-        : '<span style="color:#94a3b8;font-style:italic;">Sin agente Inmomás etiquetado</span>';
+    if (cntSel && App.utils && App.utils.getCountryFilterOptionsHtml) {
+      cntSel.innerHTML = App.utils.getCountryFilterOptionsHtml(dashCountryFilter, dashRegionFilter, rawCountries);
+      cntSel.value = dashCountryFilter;
+      cntSel.onchange = () => {
+        dashCountryFilter = cntSel.value || '';
+        applyDashboardGeoFilters();
+      };
+    }
 
-      return `
-        <div style="background:#fff; border:1px solid ${reg.border}; border-top:4px solid ${reg.color}; border-radius:12px; padding:14px 16px; box-shadow:0 2px 8px rgba(0,0,0,0.03); display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
-          <div>
-            <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:6px;">
-              <div style="font-weight:800; font-size:0.92rem; color:#0f172a;">${reg.icon} <span class="lang-en">${reg.shortEn}</span><span class="lang-es">${reg.shortEs}</span></div>
-              <span style="font-size:0.82rem;">${reg.flag}</span>
-            </div>
-            <div style="font-size:0.75rem; color:#475569; margin-bottom:10px; line-height:1.35;">
-              <strong>🇪🇸 RE/MAX Inmomás (${regMasAgents.length}):</strong> ${agentNamesPreview}
-            </div>
-            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px; text-align:center; background:#f8fafc; border-radius:8px; padding:8px 4px; border:1px solid #f1f5f9;">
-              <div>
-                <div style="font-weight:800; font-size:1rem; color:${reg.color};">${regPartners.length}</div>
-                <div style="font-size:0.68rem; color:#64748b; font-weight:600;">Partners</div>
-              </div>
-              <div>
-                <div style="font-weight:800; font-size:1rem; color:#059669;">${regClients.length}</div>
-                <div style="font-size:0.68rem; color:#64748b; font-weight:600;">Clientes</div>
-              </div>
-              <div>
-                <div style="font-weight:800; font-size:1rem; color:#d97706;">${regWebinars.length}</div>
-                <div style="font-size:0.68rem; color:#64748b; font-weight:600;">Webinar</div>
-              </div>
-            </div>
-          </div>
-          <div style="display:flex; gap:5px; flex-wrap:wrap; padding-top:4px; border-top:1px solid #f1f5f9;">
-            <button type="button" class="btn btn-outline btn-xs" style="flex:1; font-size:0.71rem; padding:4px 6px;" onclick="App.views.admin.jumpToRegionView('admin/users', '${reg.id}')">👥 Red</button>
-            <button type="button" class="btn btn-outline btn-xs" style="flex:1; font-size:0.71rem; padding:4px 6px;" onclick="App.views.admin.jumpToRegionView('admin/clients', '${reg.id}')">🏡 Clientes</button>
-            <button type="button" class="btn btn-outline btn-xs" style="flex:1; font-size:0.71rem; padding:4px 6px;" onclick="App.views.admin.jumpToRegionView('admin/webinar', '${reg.id}')">🎙️ Webinar</button>
-            <button type="button" class="btn btn-outline btn-xs" style="flex:1; font-size:0.71rem; padding:4px 6px;" onclick="App.views.admin.jumpToRegionView('admin/unified', '${reg.id}')">📒 BD</button>
-          </div>
-        </div>
-      `;
-    }).join('');
+    if (resetBtn) {
+      resetBtn.onclick = () => {
+        dashRegionFilter = '';
+        dashCountryFilter = '';
+        if (regSel) regSel.value = '';
+        if (cntSel && App.utils && App.utils.getCountryFilterOptionsHtml) {
+          cntSel.innerHTML = App.utils.getCountryFilterOptionsHtml('', '', rawCountries);
+          cntSel.value = '';
+        }
+        applyDashboardGeoFilters();
+      };
+    }
+  }
+
+  function applyDashboardGeoFilters() {
+    const reg = dashRegionFilter || '';
+    const cnt = dashCountryFilter || '';
+    const effectiveRegForMas = reg || (cnt && App.utils.resolveRegionFromCountry ? App.utils.resolveRegionFromCountry(cnt) : '');
+
+    const userMatches = (u) => {
+      if (reg && App.utils && App.utils.getUserRegions) {
+        if (!App.utils.getUserRegions(u).includes(reg)) return false;
+      }
+      if (cnt && App.utils && App.utils.matchesCountryFilter) {
+        const nat = App.utils.getUserNationality ? App.utils.getUserNationality(u) : (u.nationality || '');
+        const pool = [nat, u.country || ''].filter(Boolean).join(' / ');
+        if (!App.utils.matchesCountryFilter(pool, cnt)) return false;
+      }
+      return true;
+    };
+
+    const recordMatches = (rec) => {
+      if (reg && App.utils && App.utils.getRecordRegion) {
+        if (App.utils.getRecordRegion(rec, allUsers) !== reg) return false;
+      }
+      if (cnt && App.utils && App.utils.matchesCountryFilter) {
+        const pool = [rec.country || '', rec.currentLocation || '', rec.state || ''].filter(Boolean).join(' / ');
+        if (!App.utils.matchesCountryFilter(pool, cnt)) return false;
+      }
+      return true;
+    };
+
+    const filteredUsers = (allUsers || []).filter(userMatches);
+    const filteredClients = (allClients || []).filter(recordMatches);
+    const filteredWebinars = (dashWebinarsCache || []).filter(recordMatches);
+    const filteredLeads = (!reg && !cnt)
+      ? (allLeads || [])
+      : (allLeads || []).filter(l => {
+          if (l.country || l.currentLocation || l.region) return recordMatches(l);
+          return false;
+        });
+
+    const pendingUsers = filteredUsers.filter(u => u.status === 'pending');
+    const activePartners = filteredUsers.filter(u =>
+      ['embajador', 'broker', 'realtor', 'colaborador'].includes(u.role) &&
+      (u.status === 'active' || u.status === 'approved')
+    );
+    const approvedBrokers = activePartners.filter(u => u.role === 'broker');
+    const approvedRealtors = activePartners.filter(u => u.role === 'realtor');
+    const extraRolesCount = activePartners.filter(u => u.role === 'embajador' || u.role === 'colaborador').length;
+
+    setTextById('admin-stat-pending', pendingUsers.length);
+    setTextById('admin-stat-partners', activePartners.length);
+    setTextById('admin-stat-brokers', approvedBrokers.length);
+    setTextById('admin-stat-realtors', approvedRealtors.length);
+    setTextById('admin-stat-other-partners', extraRolesCount > 0 ? ` · +${extraRolesCount} Emb./Colab.` : '');
+    setTextById('admin-stat-clients', filteredClients.length);
+    setTextById('admin-stat-dash-webinar', filteredWebinars.length);
+    setTextById('admin-stat-leads', filteredLeads.length);
+
+    // Compact meta pill + reset button visibility
+    const resetBtn = document.getElementById('admin-dash-filter-reset');
+    if (resetBtn) {
+      resetBtn.style.display = (reg || cnt) ? 'inline-flex' : 'none';
+    }
+
+    const metaEl = document.getElementById('admin-dash-geo-meta');
+    if (metaEl) {
+      const activeMas = (allUsers || []).filter(u => u.role === 'agent_inmomas' && (u.status === 'active' || u.status === 'approved'));
+      if (!reg && !cnt) {
+        metaEl.innerHTML = `🌐 <span class="lang-en">Global View</span><span class="lang-es">Vista Global</span> · 🇪🇸 ${activeMas.length} Inmomás`;
+      } else {
+        const regMas = effectiveRegForMas
+          ? activeMas.filter(a => App.utils.getUserRegions && App.utils.getUserRegions(a).includes(effectiveRegForMas))
+          : activeMas;
+        const masPreview = regMas.length > 0
+          ? regMas.slice(0, 3).map(a => `${App.utils.escapeHtml(a.firstName)} ${App.utils.escapeHtml((a.lastName || '').charAt(0))}.`).join(', ') + (regMas.length > 3 ? ` +${regMas.length - 3}` : '')
+          : '0';
+        const scopeLabel = cnt
+          ? (App.utils.getCountryDisplayLabel ? App.utils.getCountryDisplayLabel(cnt, true) : cnt)
+          : (App.utils.getRegionLabel ? App.utils.getRegionLabel(reg, true) : reg);
+        metaEl.innerHTML = `📍 <strong>${App.utils.escapeHtml(scopeLabel)}</strong> · 🇪🇸 Inmomás: ${masPreview}`;
+      }
+    }
+
+    // Update dashboard lists dynamically for the active scope
+    renderPendingList(pendingUsers);
+    renderDossierLeads(filteredLeads);
+    const recentActivity = filteredUsers
+      .filter(u => u.status === 'active' || u.status === 'approved' || u.status === 'rejected')
+      .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
+      .slice(0, 5);
+    renderRecentActivity(recentActivity);
   }
 
   /* ── Agreement / Fiscal Data Notifications Banner on Main Admin Dashboard ── */
@@ -694,26 +782,39 @@
 
       // Populate Region & Country Filters
       const regionSelect = document.getElementById('admin-filter-region');
+      const countrySelect = document.getElementById('admin-filter-country');
+      const rawUserCountries = [];
+      allUsers.forEach(u => {
+        const nat = App.utils.getUserNationality ? App.utils.getUserNationality(u) : (u.nationality || '');
+        if (nat && nat !== '—') rawUserCountries.push(nat.trim());
+        if (u.country && u.country !== '—') rawUserCountries.push(u.country.trim());
+      });
+
+      const initRegVal = pendingAdminRegionFilter || (regionSelect ? regionSelect.value : '') || '';
+      const initCountryVal = pendingAdminCountryFilter || (countrySelect ? countrySelect.value : '') || '';
+      pendingAdminRegionFilter = '';
+      pendingAdminCountryFilter = '';
+
       if (regionSelect && App.utils && App.utils.getRegionFilterOptionsHtml) {
-        const prevReg = pendingAdminRegionFilter || regionSelect.value || '';
-        regionSelect.innerHTML = App.utils.getRegionFilterOptionsHtml(prevReg);
-        regionSelect.value = prevReg;
-        pendingAdminRegionFilter = '';
-        regionSelect.onchange = handleFilters;
+        regionSelect.innerHTML = App.utils.getRegionFilterOptionsHtml(initRegVal);
+        regionSelect.value = initRegVal;
+        regionSelect.onchange = () => {
+          const newReg = regionSelect.value || '';
+          if (countrySelect && App.utils.getCountryFilterOptionsHtml) {
+            let curCnt = countrySelect.value || '';
+            if (newReg && curCnt && App.utils.resolveRegionFromCountry && App.utils.resolveRegionFromCountry(curCnt) !== newReg) {
+              curCnt = '';
+            }
+            countrySelect.innerHTML = App.utils.getCountryFilterOptionsHtml(curCnt, newReg, rawUserCountries, '🏳️ Todos los Países / Nacionalidades', '🏳️ All Countries / Nationalities');
+            countrySelect.value = curCnt;
+          }
+          handleFilters();
+        };
       }
 
-      const countrySelect = document.getElementById('admin-filter-country');
-      if (countrySelect) {
-        const prevCountry = countrySelect.value || '';
-        const countrySet = new Set();
-        allUsers.forEach(u => {
-          const nat = App.utils.getUserNationality ? App.utils.getUserNationality(u) : (u.nationality || '');
-          if (nat && nat !== '—') countrySet.add(nat.trim());
-          if (u.country && u.country !== '—') countrySet.add(u.country.trim());
-        });
-        const sortedCountries = Array.from(countrySet).filter(Boolean).sort((a, b) => a.localeCompare(b));
-        countrySelect.innerHTML = '<option value="">🏳️ Todos los Países / Nacionalidades</option>' +
-          sortedCountries.map(c => `<option value="${App.utils.escapeHtml(c)}" ${c === prevCountry ? 'selected' : ''}>${App.utils.escapeHtml(c)}</option>`).join('');
+      if (countrySelect && App.utils && App.utils.getCountryFilterOptionsHtml) {
+        countrySelect.innerHTML = App.utils.getCountryFilterOptionsHtml(initCountryVal, initRegVal, rawUserCountries, '🏳️ Todos los Países / Nacionalidades', '🏳️ All Countries / Nationalities');
+        countrySelect.value = initCountryVal;
         countrySelect.onchange = handleFilters;
       }
 
@@ -1533,11 +1634,12 @@
     }
 
     if (country) {
-      const cLower = country.toLowerCase();
       filtered = filtered.filter(u => {
-        const nat = (App.utils.getUserNationality ? App.utils.getUserNationality(u) : (u.nationality || '')).toLowerCase();
-        const cnt = (u.country || '').toLowerCase();
-        return nat.includes(cLower) || cnt.includes(cLower);
+        const nat = App.utils.getUserNationality ? App.utils.getUserNationality(u) : (u.nationality || '');
+        const pool = [nat, u.country || ''].filter(Boolean).join(' / ');
+        return App.utils.matchesCountryFilter
+          ? App.utils.matchesCountryFilter(pool, country)
+          : pool.toLowerCase().includes(country.toLowerCase());
       });
     }
 
@@ -1846,16 +1948,31 @@
         ? await App.auth.getUmbrellaData(user.id)
         : null;
       const activeEmbajadores = allSysUsers.filter(u => u.role === 'embajador' && u.status === 'active');
+      const modalLookup = App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(allSysUsers) : null;
+      const userParents = App.utils.resolveUserUmbrellaParents
+        ? App.utils.resolveUserUmbrellaParents(user, allSysUsers, modalLookup)
+        : { embajador: null, broker: null };
+      const currentEmbId = user.embajadorId || (userParents.embajador ? userParents.embajador.id : '');
+      const currentBrkId = user.brokerId || (userParents.broker ? userParents.broker.id : '');
+
       const embajadorOptions = `
         <option value="">-- Sin Embajador (Directo) --</option>
         ${activeEmbajadores.map(e => `
-          <option value="${e.id}" ${user.embajadorId === e.id || user.referredBy === e.id || (e.referralCode && user.referredBy === e.referralCode) ? 'selected' : ''}>
+          <option value="${e.id}" ${currentEmbId === e.id ? 'selected' : ''}>
             👑 ${App.utils.escapeHtml(e.firstName)} ${App.utils.escapeHtml(e.lastName)} (${App.utils.escapeHtml(e.referralCode || e.id)})
           </option>
         `).join('')}
       `;
+      const availableBrokers = allSysUsers.filter(u => u.role === 'broker' && u.status !== 'rejected' && u.id !== user.id);
+      const brokerOptions = `
+        <option value="">-- Sin Broker (Agente Directo / Independiente) --</option>
+        ${availableBrokers.map(b => `
+          <option value="${b.id}" ${currentBrkId === b.id ? 'selected' : ''}>
+            🏢 ${App.utils.escapeHtml(b.firstName)} ${App.utils.escapeHtml(b.lastName)}${b.agencyName ? ' — ' + App.utils.escapeHtml(b.agencyName) : ''}
+          </option>
+        `).join('')}
+      `;
       const localAgents = allSysUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
-      const modalLookup = App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(allSysUsers) : null;
       const resolvedInmomas = App.utils.resolveAssignedInmomasAgent
         ? App.utils.resolveAssignedInmomasAgent(user, allSysUsers, modalLookup)
         : { id: null, name: '', inherited: false };
@@ -2011,18 +2128,41 @@
                 const p = App.utils.resolveUserUmbrellaParents ? App.utils.resolveUserUmbrellaParents(u, allSysUsers, modalLookup) : {};
                 return p.broker && p.broker.id === user.id;
               });
+              const candidateRealtors = allSysUsers.filter(u => u.role === 'realtor' && u.status !== 'rejected' && u.brokerId !== user.id);
               return `
                 <label style="font-weight: 700; font-size: 0.875rem; color: #003da5; display: block; margin-bottom: 0.5rem;">
                   🏢 Equipo bajo este Paraguas de Broker (${brkTeam.length} profesionales)
                 </label>
-                <div style="max-height: 130px; overflow-y: auto; font-size: 0.82rem; border: 1px solid #bfdbfe; border-radius: 0.45rem; padding: 0.55rem; background: #eff6ff;">
+                <div style="max-height: 130px; overflow-y: auto; font-size: 0.82rem; border: 1px solid #bfdbfe; border-radius: 0.45rem; padding: 0.55rem; background: #eff6ff; margin-bottom: 0.75rem;">
                   ${brkTeam.length === 0
                     ? '<div style="color:#1e40af; text-align:center;">Aún no hay realtors registrados bajo este Broker.</div>'
                     : '<ul style="margin:0; padding-left:1.1rem; color:#1e293b;">' + brkTeam.map(m => `<li><strong>${App.utils.escapeHtml(m.firstName)} ${App.utils.escapeHtml(m.lastName)}</strong> (${m.role}) — <span style="color:#64748b;">${App.utils.escapeHtml(m.email || '')}</span></li>`).join('') + '</ul>'
                   }
                 </div>
+                <label style="font-weight: 600; font-size: 0.82rem; color: #1e3a8a; display: block; margin-bottom: 0.4rem;">Añadir Agente / Realtor a este Broker</label>
+                <div style="display: flex; gap: 0.5rem;">
+                  <select id="broker-assign-realtor-select" class="form-control" style="flex: 1; padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.84rem; background-color: white;">
+                    <option value="">-- Seleccionar Agente / Realtor --</option>
+                    ${candidateRealtors.map(r => `<option value="${r.id}">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}${r.agencyName ? ' · ' + App.utils.escapeHtml(r.agencyName) : ''} (${App.utils.escapeHtml(r.email)})</option>`).join('')}
+                  </select>
+                  <button type="button" class="btn btn-primary btn-sm" id="broker-save-realtor-btn">Vincular</button>
+                </div>
+                <p style="font-size: 0.74rem; color: #64748b; margin-top: 0.35rem;">Si el agente ya estaba en el paraguas de un Embajador, este Broker se adjuntará automáticamente a ese mismo paraguas.</p>
               `;
             })()}
+          </div>
+          ` : ''}
+
+          ${user.role === 'realtor' ? `
+          <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
+            <label style="font-weight: 600; font-size: 0.875rem; color: #003da5; display: block; margin-bottom: 0.5rem;">🏢 Asignar Oficina / Paraguas de Broker</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <select id="user-broker-select" class="form-control" style="flex: 1; padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; background-color: white;">
+                ${brokerOptions}
+              </select>
+              <button type="button" class="btn btn-primary btn-sm" id="save-user-broker-btn">Vincular Broker</button>
+            </div>
+            <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.4rem;">Si este agente entró con link de Embajador y luego se registra su Broker, al asignarlo aquí el Broker queda adjunto al paraguas del Embajador.</p>
           </div>
           ` : ''}
 
@@ -2339,6 +2479,68 @@
         });
       }
 
+      const saveBrokerBtn = document.getElementById('save-user-broker-btn');
+      if (saveBrokerBtn) {
+        saveBrokerBtn.addEventListener('click', async () => {
+          const selectedBrkId = document.getElementById('user-broker-select').value;
+          App.utils.closeModal();
+
+          if (!isMaiaOrSuperAdmin()) {
+            await requestChangeApproval(
+              'Asignación de Paraguas de Broker',
+              `Asignar Broker "${selectedBrkId || 'Ninguno'}" al agente "${user.firstName} ${user.lastName}" (${user.email}).`
+            );
+            return;
+          }
+
+          try {
+            const res = await App.auth.updateUserBroker(userId, selectedBrkId || null);
+            const msg = res && res.attachedBrokerToEmbajador
+              ? '🏢 Broker vinculado al agente y adjuntado automáticamente al Paraguas del Embajador.'
+              : '🏢 Paraguas de Broker actualizado correctamente.';
+            App.utils.showToast(msg, 'success');
+            const route = App.router.getCurrentRoute();
+            if (route === 'admin/users') await initUsers();
+          } catch (err) {
+            console.error('[Admin] Error updating user broker:', err);
+            App.utils.showToast('Error actualizando Broker: ' + err.message, 'error');
+          }
+        });
+      }
+
+      const brokerSaveRealtorBtn = document.getElementById('broker-save-realtor-btn');
+      if (brokerSaveRealtorBtn) {
+        brokerSaveRealtorBtn.addEventListener('click', async () => {
+          const selectedRealtorId = document.getElementById('broker-assign-realtor-select').value;
+          if (!selectedRealtorId) {
+            App.utils.showToast('Selecciona un Agente / Realtor para vincular.', 'error');
+            return;
+          }
+          App.utils.closeModal();
+
+          if (!isMaiaOrSuperAdmin()) {
+            await requestChangeApproval(
+              'Vincular Agente a Broker',
+              `Vincular al Agente (${selectedRealtorId}) bajo el Broker "${user.firstName} ${user.lastName}" (${user.email}).`
+            );
+            return;
+          }
+
+          try {
+            const res = await App.auth.updateUserBroker(selectedRealtorId, user.id);
+            const msg = res && res.attachedBrokerToEmbajador
+              ? '🏢 Agente vinculado y Broker adjuntado automáticamente al Paraguas del Embajador.'
+              : '🏢 Agente vinculado al paraguas del Broker correctamente.';
+            App.utils.showToast(msg, 'success');
+            const route = App.router.getCurrentRoute();
+            if (route === 'admin/users') await initUsers();
+          } catch (err) {
+            console.error('[Admin] Error linking realtor to broker:', err);
+            App.utils.showToast('Error vinculando agente al Broker: ' + err.message, 'error');
+          }
+        });
+      }
+
       const saveEmbajadorBtn = document.getElementById('save-user-embajador-btn');
       if (saveEmbajadorBtn) {
         saveEmbajadorBtn.addEventListener('click', async () => {
@@ -2412,31 +2614,41 @@
       allUsers = await App.auth.getAllUsers();
       allClients = await App.auth.getClients();
 
-      // Populate Region Filter
+      // Populate Region & Country Filters
       const regSel = document.getElementById('admin-client-filter-region');
+      const countrySel = document.getElementById('admin-client-filter-country');
+      const rawClientCountries = [];
+      allClients.forEach(c => {
+        if (c.country && c.country !== '—') rawClientCountries.push(c.country.trim());
+        if (c.currentLocation && c.currentLocation !== '—') rawClientCountries.push(c.currentLocation.trim());
+      });
+
+      const initialReg = pendingAdminRegionFilter || clientRegionFilter || '';
+      const initialCountry = pendingAdminCountryFilter || clientCountryFilter || '';
+      clientRegionFilter = initialReg;
+      clientCountryFilter = initialCountry;
+      pendingAdminRegionFilter = '';
+      pendingAdminCountryFilter = '';
+
       if (regSel && App.utils && App.utils.getRegionFilterOptionsHtml) {
-        const initialReg = pendingAdminRegionFilter || clientRegionFilter || '';
-        clientRegionFilter = initialReg;
-        pendingAdminRegionFilter = '';
         regSel.innerHTML = App.utils.getRegionFilterOptionsHtml(initialReg);
         regSel.value = initialReg;
         regSel.onchange = (e) => {
           clientRegionFilter = e.target.value || '';
+          if (clientRegionFilter && clientCountryFilter && App.utils.resolveRegionFromCountry && App.utils.resolveRegionFromCountry(clientCountryFilter) !== clientRegionFilter) {
+            clientCountryFilter = '';
+          }
+          if (countrySel && App.utils.getCountryFilterOptionsHtml) {
+            countrySel.innerHTML = App.utils.getCountryFilterOptionsHtml(clientCountryFilter, clientRegionFilter, rawClientCountries);
+            countrySel.value = clientCountryFilter;
+          }
           renderClientsView();
         };
       }
 
-      // Populate Country Filter
-      const countrySel = document.getElementById('admin-client-filter-country');
-      if (countrySel) {
-        const cSet = new Set();
-        allClients.forEach(c => {
-          const val = (c.country || c.currentLocation || '').trim();
-          if (val && val !== '—' && val !== '-') cSet.add(val);
-        });
-        const sortedC = Array.from(cSet).sort((a, b) => a.localeCompare(b));
-        countrySel.innerHTML = '<option value="">🏳️ Todos los Países</option>' +
-          sortedC.map(c => `<option value="${App.utils.escapeHtml(c)}" ${c === clientCountryFilter ? 'selected' : ''}>${App.utils.escapeHtml(c)}</option>`).join('');
+      if (countrySel && App.utils && App.utils.getCountryFilterOptionsHtml) {
+        countrySel.innerHTML = App.utils.getCountryFilterOptionsHtml(initialCountry, initialReg, rawClientCountries);
+        countrySel.value = initialCountry;
         countrySel.onchange = (e) => {
           clientCountryFilter = e.target.value || '';
           renderClientsView();
@@ -2503,10 +2715,11 @@
     }
 
     if (clientCountryFilter) {
-      const cLower = clientCountryFilter.toLowerCase();
       displayClients = displayClients.filter(c => {
-        const loc = `${c.country || ''} ${c.currentLocation || ''}`.toLowerCase();
-        return loc.includes(cLower);
+        const pool = [c.country || '', c.currentLocation || ''].filter(Boolean).join(' / ');
+        return App.utils.matchesCountryFilter
+          ? App.utils.matchesCountryFilter(pool, clientCountryFilter)
+          : pool.toLowerCase().includes(clientCountryFilter.toLowerCase());
       });
     }
 
@@ -3040,8 +3253,7 @@
 
       await App.auth.deleteDossierLead(leadId);
       allLeads = allLeads.filter(l => l.id !== leadId);
-      setTextById('admin-stat-leads', allLeads.length);
-      renderDossierLeads(allLeads);
+      applyDashboardGeoFilters();
       App.utils.closeModal();
       App.utils.showToast('Lead deleted successfully.', 'success');
     } catch (err) {
@@ -3317,6 +3529,16 @@
         currentWebinarRegionFilter = pendingAdminRegionFilter;
         pendingAdminRegionFilter = '';
       }
+      if (pendingAdminCountryFilter) {
+        currentWebinarCountryFilter = pendingAdminCountryFilter;
+        if (!currentWebinarRegionFilter && App.utils && App.utils.resolveRegionFromCountry) {
+          const inferredReg = App.utils.resolveRegionFromCountry(currentWebinarCountryFilter);
+          if (inferredReg && App.utils.REGIONS[inferredReg]) {
+            selectedWebinarConfigRegion = inferredReg;
+          }
+        }
+        pendingAdminCountryFilter = '';
+      }
 
       // 2. Populate Parallel Region Tabs & Config Form
       populateWebinarForm(currentWebinarSettings);
@@ -3356,14 +3578,13 @@
     }
 
     const countrySel = document.getElementById('webinar-filter-country');
-    if (countrySel) {
-      const cSet = new Set();
+    if (countrySel && App.utils && App.utils.getCountryFilterOptionsHtml) {
+      const rawWebCountries = [];
       (allWebinarRegistrations || []).forEach(r => {
-        if (r.country && r.country !== '—') cSet.add(r.country.trim());
+        if (r.country && r.country !== '—') rawWebCountries.push(r.country.trim());
       });
-      const sortedC = Array.from(cSet).sort((a, b) => a.localeCompare(b));
-      countrySel.innerHTML = '<option value="">🏳️ Todos los Países</option>' +
-        sortedC.map(c => `<option value="${App.utils.escapeHtml(c)}" ${c === currentWebinarCountryFilter ? 'selected' : ''}>${App.utils.escapeHtml(c)}</option>`).join('');
+      countrySel.innerHTML = App.utils.getCountryFilterOptionsHtml(currentWebinarCountryFilter, currentWebinarRegionFilter, rawWebCountries);
+      countrySel.value = currentWebinarCountryFilter;
     }
 
     const agentSel = document.getElementById('webinar-filter-agent');
@@ -3386,6 +3607,17 @@
 
   function setWebinarRegionFilter(val) {
     currentWebinarRegionFilter = val || '';
+    if (currentWebinarRegionFilter && currentWebinarCountryFilter && App.utils && App.utils.resolveRegionFromCountry) {
+      if (App.utils.resolveRegionFromCountry(currentWebinarCountryFilter) !== currentWebinarRegionFilter) {
+        currentWebinarCountryFilter = '';
+      }
+    }
+    const countrySel = document.getElementById('webinar-filter-country');
+    if (countrySel && App.utils && App.utils.getCountryFilterOptionsHtml) {
+      const rawWebCountries = (allWebinarRegistrations || []).map(r => r.country || '').filter(Boolean);
+      countrySel.innerHTML = App.utils.getCountryFilterOptionsHtml(currentWebinarCountryFilter, currentWebinarRegionFilter, rawWebCountries);
+      countrySel.value = currentWebinarCountryFilter;
+    }
     if (val && App.utils && App.utils.REGIONS[val]) {
       selectedWebinarConfigRegion = val;
       if (currentWebinarSettings) populateWebinarForm(currentWebinarSettings);
@@ -3426,22 +3658,29 @@
     // Render Parallel Summary Strip
     const stripEl = document.getElementById('admin-webinar-parallel-strip');
     if (stripEl && App.utils && App.utils.REGION_LIST) {
-      const langIcons = { en: '🇬🇧 EN', es: '🇪🇸 ES', fr: '🇫🇷 FR', de: '🇩🇪 DE', nl: '🇳🇱 NL', pl: '🇵🇱 PL', uk: '🇺🇦 UK', ar: '🇦🇪 AR', bilingual: '🌐 ES/EN' };
+      const langIcons = { en: '🇬🇧 EN', es: '🇪🇸 ES', fr: '🇫🇷 FR', de: '🇩🇪 DE', nl: '🇳🇱 NL', sv: '🇸🇪 SV', it: '🇮🇹 IT', pl: '🇵🇱 PL', uk: '🇺🇦 UK/BG', ar: '🇦🇪 AR', bilingual: '🌐 ES/EN' };
       stripEl.innerHTML = App.utils.REGION_LIST.map(r => {
         const rb = (settings.regionalConfigs && settings.regionalConfigs[r.id]) || {};
         const rt = rb.activeType || 'b2c';
         const rc = rb[rt] || {};
-        const rDate = rc.date || '—';
-        const rTime = rc.time || '18:00';
+        const resolvedCfg = (App.auth && App.auth.getRegionalWebinarConfig)
+          ? App.auth.getRegionalWebinarConfig(settings, r.id)
+          : { ...rc, activeType: rt, date: rc.date || '', time: rc.time || '18:00', scheduled: rc.scheduled !== false && Boolean(rc.date) };
+        const isSched = App.utils.isWebinarScheduled ? App.utils.isWebinarScheduled(resolvedCfg) : Boolean(resolvedCfg.date);
+        const rDate = resolvedCfg.date || '';
+        const rTime = resolvedCfg.time || '18:00';
         const rLang = langIcons[rc.language || rb.language || r.defaultLang || 'en'] || '🌐';
         const isSel = r.id === selectedWebinarConfigRegion;
+        const scheduleLine = isSched
+          ? `<div style="color:#047857; margin-top:3px; font-weight:700;">📅 ${App.utils.escapeHtml(rDate)} · ${App.utils.escapeHtml(rTime)} · ${rLang}</div>`
+          : `<div style="color:#94a3b8; margin-top:3px; font-weight:600;"><span class="lang-en">⏸️ No scheduled webinar</span><span class="lang-es">⏸️ Sin webinario programado</span></div>`;
         return `
           <div onclick="App.views.admin.selectWebinarConfigRegion('${r.id}')" style="cursor:pointer; padding:8px 10px; border-radius:10px; border:1.5px solid ${isSel ? r.color : '#e5e7eb'}; background:${isSel ? r.bg : '#fff'}; font-size:0.75rem;">
             <div style="display:flex; justify-content:space-between; align-items:center; font-weight:800; color:#0f172a;">
-              <span>${r.icon} ${r.shortEs}</span>
-              <span style="padding:1px 6px; border-radius:999px; font-size:0.66rem; background:${rt === 'b2b' ? '#003f99' : '#059669'}; color:#fff;">${rt.toUpperCase()}</span>
+              <span>${r.icon} <span class="lang-en">${r.shortEn}</span><span class="lang-es">${r.shortEs}</span></span>
+              <span style="padding:1px 6px; border-radius:999px; font-size:0.66rem; background:${isSched ? (rt === 'b2b' ? '#003f99' : '#059669') : '#94a3b8'}; color:#fff;">${isSched ? rt.toUpperCase() : 'OFF'}</span>
             </div>
-            <div style="color:#475569; margin-top:3px; font-weight:600;">📅 ${App.utils.escapeHtml(rDate)} · ${App.utils.escapeHtml(rTime)} · ${rLang}</div>
+            ${scheduleLine}
           </div>
         `;
       }).join('');
@@ -3478,19 +3717,34 @@
     // Update Status Pill
     const statusText = document.getElementById('admin-status-text');
     const statusBadge = document.getElementById('admin-status-badge');
-    const dateVal = typeConfig.date || (selectedWebinarConfigRegion === 'north_america' ? settings.date : '') || '2026-10-29';
+    const resolvedCurrentCfg = (App.auth && App.auth.getRegionalWebinarConfig)
+      ? App.auth.getRegionalWebinarConfig(settings, selectedWebinarConfigRegion)
+      : { ...typeConfig, activeType, date: typeConfig.date || '', time: typeConfig.time || '18:00', scheduled: typeConfig.scheduled !== false && Boolean(typeConfig.date) };
+    const isCurrentlyScheduled = App.utils && App.utils.isWebinarScheduled
+      ? App.utils.isWebinarScheduled(resolvedCurrentCfg)
+      : Boolean(resolvedCurrentCfg.date);
+    const dateVal = typeConfig.scheduled === false ? '' : (typeConfig.date || '');
     const timeVal = typeConfig.time || (selectedWebinarConfigRegion === 'north_america' ? settings.time : '') || '18:00';
 
     if (statusText) {
       const modeName = activeType === 'b2b'
         ? `B2B Realtors & Brokers — ${regObj.shortEs}`
         : `B2C Clientes e Inversores — ${regObj.shortEs}`;
-      statusText.textContent = `${modeName} — ${dateVal} (${timeVal} España · Idioma: ${langVal.toUpperCase()})`;
+      if (isCurrentlyScheduled && dateVal) {
+        statusText.textContent = `${modeName} — ${dateVal} (${timeVal} España · Idioma: ${langVal.toUpperCase()})`;
+      } else {
+        statusText.innerHTML = `<span class="lang-en">No upcoming webinar scheduled for ${App.utils.escapeHtml(regObj.shortEn)} (hidden in Partner Dashboards)</span><span class="lang-es">Sin webinario próximo programado para ${App.utils.escapeHtml(regObj.shortEs)} (oculto en los paneles de Broker, Agente y Embajador)</span>`;
+      }
     }
 
     if (statusBadge) {
-      statusBadge.textContent = `${regObj.shortEs.toUpperCase()} · ${activeType.toUpperCase()}`;
-      statusBadge.style.background = activeType === 'b2b' ? '#003f99' : '#059669';
+      if (isCurrentlyScheduled && dateVal) {
+        statusBadge.textContent = `${regObj.shortEs.toUpperCase()} · ${activeType.toUpperCase()}`;
+        statusBadge.style.background = activeType === 'b2b' ? '#003f99' : '#059669';
+      } else {
+        statusBadge.innerHTML = `<span class="lang-en">UNSCHEDULED</span><span class="lang-es">SIN PROGRAMAR</span>`;
+        statusBadge.style.background = '#64748b';
+      }
     }
 
     // Populate Form Inputs
@@ -3560,18 +3814,21 @@
 
       const regBlock = currentWebinarSettings.regionalConfigs[selectedWebinarConfigRegion];
       const activeType = regBlock.activeType || currentWebinarSettings.activeType || 'b2c';
-      const dateVal = document.getElementById('admin-webinar-date')?.value || currentWebinarSettings.date;
-      const timeVal = document.getElementById('admin-webinar-time')?.value || currentWebinarSettings.time;
+      const dateVal = (document.getElementById('admin-webinar-date')?.value || '').trim();
+      const timeVal = document.getElementById('admin-webinar-time')?.value || currentWebinarSettings.time || '18:00';
       const spotsVal = parseInt(document.getElementById('admin-webinar-spots')?.value || '25', 10);
       const langVal = document.getElementById('admin-webinar-language')?.value || 'en';
       const titleVal = document.getElementById('admin-webinar-title')?.value || '';
       const targetVal = document.getElementById('admin-webinar-target')?.value || '';
       const subtitleVal = document.getElementById('admin-webinar-subtitle')?.value || '';
+      const isScheduledNow = Boolean(dateVal);
 
       regBlock.activeType = activeType;
       regBlock.language = langVal;
+      regBlock.scheduled = isScheduledNow;
       if (!regBlock[activeType]) regBlock[activeType] = {};
       regBlock[activeType].date = dateVal;
+      regBlock[activeType].scheduled = isScheduledNow;
       regBlock[activeType].time = timeVal;
       regBlock[activeType].spots = spotsVal;
       regBlock[activeType].language = langVal;
@@ -3587,6 +3844,7 @@
         currentWebinarSettings.spotsAvailable = spotsVal;
         if (!currentWebinarSettings[activeType]) currentWebinarSettings[activeType] = {};
         currentWebinarSettings[activeType].date = dateVal;
+        currentWebinarSettings[activeType].scheduled = isScheduledNow;
         currentWebinarSettings[activeType].time = timeVal;
         currentWebinarSettings[activeType].spots = spotsVal;
         if (titleVal) currentWebinarSettings[activeType].title = titleVal;
@@ -3599,7 +3857,11 @@
 
       populateWebinarForm(saved);
       const rLabel = (App.utils && App.utils.REGIONS[selectedWebinarConfigRegion]) ? App.utils.REGIONS[selectedWebinarConfigRegion].shortEs : selectedWebinarConfigRegion;
-      App.utils.showToast(`✅ ¡Webinario de ${rLabel} (${activeType.toUpperCase()}) guardado y publicado!`, 'success');
+      if (isScheduledNow) {
+        App.utils.showToast(`✅ ¡Webinario de ${rLabel} (${activeType.toUpperCase()}) programado para ${dateVal}!`, 'success');
+      } else {
+        App.utils.showToast(`⏸️ Webinario de ${rLabel} marcado como sin programar (oculto en los paneles de colaboradores).`, 'info');
+      }
 
     } catch (err) {
       console.error('[Admin] Error saving webinar settings:', err);
@@ -3612,11 +3874,17 @@
     }
   }
 
+  async function clearRegionalWebinarSchedule() {
+    const dateInput = document.getElementById('admin-webinar-date');
+    if (dateInput) dateInput.value = '';
+    await saveWebinarConfig(null);
+  }
+
   function resetWebinarDefaults() {
     const defaults = App.auth.getDefaultWebinarSettings();
     currentWebinarSettings = defaults;
     populateWebinarForm(currentWebinarSettings);
-    App.utils.showToast('Valores recomendados por región cargados. Haz clic en "Guardar y Publicar" para confirmar.', 'info');
+    App.utils.showToast('Valores recomendados por región cargados. Selecciona una fecha futura y haz clic en "Guardar y Publicar" para activar.', 'info');
   }
 
   /* ---- Robust categorization helper for Webinar Registrations (B2B vs B2C) ---- */
@@ -3782,8 +4050,11 @@
       if (currentWebinarRegionFilter && recRegion !== currentWebinarRegionFilter) return false;
 
       if (currentWebinarCountryFilter) {
-        const cLower = currentWebinarCountryFilter.toLowerCase();
-        if (!(r.country || '').toLowerCase().includes(cLower)) return false;
+        const pool = [r.country || '', r.state || ''].filter(Boolean).join(' / ');
+        const matched = App.utils.matchesCountryFilter
+          ? App.utils.matchesCountryFilter(pool, currentWebinarCountryFilter)
+          : pool.toLowerCase().includes(currentWebinarCountryFilter.toLowerCase());
+        if (!matched) return false;
       }
 
       if (currentWebinarAgentFilter) {
@@ -5132,23 +5403,25 @@
 
       // Populate Region & Country filter options dynamically
       const regionFilterSelect = document.getElementById('admin-unified-filter-region');
+      const countryFilterSelect = document.getElementById('admin-unified-filter-country');
+      const rawUnifiedCountries = [];
+      unifiedArray.forEach(it => {
+        if (it.country && it.country !== '—' && it.country !== 'N/A') rawUnifiedCountries.push(it.country.trim());
+      });
+
+      const initReg = pendingAdminRegionFilter || (regionFilterSelect ? regionFilterSelect.value : '') || '';
+      const initCnt = pendingAdminCountryFilter || (countryFilterSelect ? countryFilterSelect.value : '') || '';
+      pendingAdminRegionFilter = '';
+      pendingAdminCountryFilter = '';
+
       if (regionFilterSelect && App.utils && App.utils.getRegionFilterOptionsHtml) {
-        const initReg = pendingAdminRegionFilter || regionFilterSelect.value || '';
-        pendingAdminRegionFilter = '';
         regionFilterSelect.innerHTML = App.utils.getRegionFilterOptionsHtml(initReg);
         regionFilterSelect.value = initReg;
       }
 
-      const countryFilterSelect = document.getElementById('admin-unified-filter-country');
-      if (countryFilterSelect) {
-        const prevC = countryFilterSelect.value || '';
-        const cSet = new Set();
-        unifiedArray.forEach(it => {
-          if (it.country && it.country !== '—' && it.country !== 'N/A') cSet.add(it.country.trim());
-        });
-        const sortedC = Array.from(cSet).sort((a, b) => a.localeCompare(b));
-        countryFilterSelect.innerHTML = '<option value="">🏳️ Todos los Países</option>' +
-          sortedC.map(c => `<option value="${App.utils.escapeHtml(c)}" ${c === prevC ? 'selected' : ''}>${App.utils.escapeHtml(c)}</option>`).join('');
+      if (countryFilterSelect && App.utils && App.utils.getCountryFilterOptionsHtml) {
+        countryFilterSelect.innerHTML = App.utils.getCountryFilterOptionsHtml(initCnt, initReg, rawUnifiedCountries);
+        countryFilterSelect.value = initCnt;
       }
 
       // Populate Agent filter options dynamically with counts
@@ -5203,7 +5476,7 @@
 
         const term = (curSearchEl?.value || '').toLowerCase().trim();
         const selectedRegion = curRegEl?.value || '';
-        const selectedCountry = (curCntEl?.value || '').toLowerCase();
+        const selectedCountry = curCntEl?.value || '';
         const stat = curStatEl?.value || '';
         const selectedAgent = curAgentEl?.value || '';
 
@@ -5226,7 +5499,11 @@
             matchRegion = itemRegs.includes(selectedRegion) || fallbackReg === selectedRegion;
           }
 
-          const matchCountry = !selectedCountry || (item.country || '').toLowerCase().includes(selectedCountry);
+          const matchCountry = !selectedCountry || (
+            App.utils.matchesCountryFilter
+              ? App.utils.matchesCountryFilter(item.country || '', selectedCountry)
+              : (item.country || '').toLowerCase().includes(selectedCountry.toLowerCase())
+          );
 
           let matchStat = true;
           if (stat) {
@@ -5256,11 +5533,24 @@
       }
       if (regionSelect) {
         const newReg = regionSelect.cloneNode(true);
+        newReg.value = initReg;
         regionSelect.parentNode.replaceChild(newReg, regionSelect);
-        newReg.addEventListener('change', filterData);
+        newReg.addEventListener('change', () => {
+          const curCntEl = document.getElementById('admin-unified-filter-country');
+          if (curCntEl && App.utils && App.utils.getCountryFilterOptionsHtml) {
+            let curCntVal = curCntEl.value || '';
+            if (newReg.value && curCntVal && App.utils.resolveRegionFromCountry && App.utils.resolveRegionFromCountry(curCntVal) !== newReg.value) {
+              curCntVal = '';
+            }
+            curCntEl.innerHTML = App.utils.getCountryFilterOptionsHtml(curCntVal, newReg.value, rawUnifiedCountries);
+            curCntEl.value = curCntVal;
+          }
+          filterData();
+        });
       }
       if (countrySelect) {
         const newCnt = countrySelect.cloneNode(true);
+        newCnt.value = initCnt;
         countrySelect.parentNode.replaceChild(newCnt, countrySelect);
         newCnt.addEventListener('change', filterData);
       }
@@ -5273,6 +5563,10 @@
         const newAgent = agentSelect.cloneNode(true);
         agentSelect.parentNode.replaceChild(newAgent, agentSelect);
         newAgent.addEventListener('change', filterData);
+      }
+
+      if (initReg || initCnt) {
+        filterData();
       }
 
       // Run initial filter (in case a Region jump filter was applied)
@@ -5435,6 +5729,7 @@
     initNewsletter,
     initWebinar,
     jumpToRegionView,
+    jumpFromDashFilter,
     selectWebinarConfigRegion,
     setWebinarRegionFilter,
     setWebinarCountryFilter,
@@ -5465,6 +5760,7 @@
     handleDeleteWebinarRegistration,
     setWebinarType,
     saveWebinarConfig,
+    clearRegionalWebinarSchedule,
     resetWebinarDefaults,
     filterWebinarTable,
     searchWebinarTable,

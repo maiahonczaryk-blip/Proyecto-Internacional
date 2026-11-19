@@ -183,13 +183,17 @@ App.router = (function() {
       });
     }
 
-    // Re-sync sidebar & mobile nav whenever auth state finishes loading or updates
+    // Re-sync sidebar & mobile nav (and enforce role route guard) whenever auth state finishes loading or updates
     if (App.auth && typeof App.auth.onAuthChange === 'function') {
-      App.auth.onAuthChange(() => {
+      App.auth.onAuthChange((authedUser) => {
         const activeHash = window.location.hash.substring(1) || 'home';
         const queryIdx = activeHash.indexOf('?');
         const routeKey = queryIdx >= 0 ? activeHash.substring(0, queryIdx) : activeHash;
         const route = routes[routeKey];
+        if (authedUser && route && route.role && route.role !== 'authenticated' && authedUser.role && authedUser.role !== route.role) {
+          navigateTo(authedUser.role + '/dashboard', true);
+          return;
+        }
         if (route && route.sidebar) {
           updateSidebar(route.sidebar);
           updateActiveSidebarLink(routeKey);
@@ -425,31 +429,32 @@ App.router = (function() {
         const mobileRoleEl = document.getElementById('mobile-topbar-role');
         const mobileAvatarEl = document.getElementById('mobile-user-avatar');
         
-        const roleLabels = {
+        const roleLabelsHtml = {
           admin: 'Admin · Broker RE/MAX Inmomás',
-          embajador: '👑 Embajador',
-          agent_inmomas: '🇪🇸 Agente RE/MAX Inmomás',
-          colaborador: 'Colaborador',
-          broker: 'Broker Portal',
-          realtor: 'Realtor Portal',
-          partner: 'Partner Portal'
+          embajador: '👑 <span class="lang-en">Ambassador Dashboard</span><span class="lang-es">Dashboard de Embajador</span>',
+          agent_inmomas: '🇪🇸 <span class="lang-en">RE/MAX Inmomás Agent</span><span class="lang-es">Agente RE/MAX Inmomás</span>',
+          colaborador: '<span class="lang-en">Collaborator</span><span class="lang-es">Colaborador</span>',
+          broker: '<span class="lang-en">Broker Portal</span><span class="lang-es">Portal Broker</span>',
+          realtor: '<span class="lang-en">Realtor Portal</span><span class="lang-es">Portal Realtor</span>',
+          partner: '<span class="lang-en">Partner Portal</span><span class="lang-es">Portal Partner</span>'
         };
-        let formattedRole = roleLabels[user.role] || (user.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : '');
+        let formattedRoleHtml = roleLabelsHtml[user.role] || App.utils.escapeHtml(user.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : '');
         if (user.role !== 'admin' && App.utils && typeof App.utils.getUserRegions === 'function') {
           const uRegs = App.utils.getUserRegions(user);
           if (uRegs.length > 0 && App.utils.REGIONS && App.utils.REGIONS[uRegs[0]]) {
-            formattedRole += ` · ${App.utils.REGIONS[uRegs[0]].shortEs}`;
+            const regMeta = App.utils.REGIONS[uRegs[0]];
+            formattedRoleHtml += ` · <span class="lang-en">${App.utils.escapeHtml(regMeta.shortEn)}</span><span class="lang-es">${App.utils.escapeHtml(regMeta.shortEs)}</span>`;
           }
         }
         const initials = App.utils.getInitials(user.firstName, user.lastName);
 
         if (nameEl) nameEl.textContent = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || '—';
         if (roleEl) {
-          roleEl.textContent = formattedRole;
+          roleEl.innerHTML = formattedRoleHtml;
           roleEl.className = `sidebar-user__role sidebar-user__role--${user.role}`;
         }
         if (avatarEl) avatarEl.innerHTML = initials;
-        if (mobileRoleEl) mobileRoleEl.textContent = formattedRole;
+        if (mobileRoleEl) mobileRoleEl.innerHTML = formattedRoleHtml;
         if (mobileAvatarEl) mobileAvatarEl.innerHTML = initials;
         
         sidebar.classList.remove('sidebar--admin', 'sidebar--embajador', 'sidebar--broker', 'sidebar--realtor', 'sidebar--agent_inmomas', 'sidebar--colaborador');

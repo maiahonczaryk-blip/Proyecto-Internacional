@@ -168,19 +168,89 @@ h1, h2, h3, h4, h5, h6 {
 /* --- Language Toggle (4 idiomas: EN, ES, FR-Canada, EN-CA) --- */
 body.lang-en .lang-es,
 body.lang-en .lang-fr,
-body.lang-en .lang-en-ca { display: none; }
+body.lang-en .lang-en-ca { display: none !important; }
 
 body.lang-es .lang-en,
 body.lang-es .lang-fr,
-body.lang-es .lang-en-ca { display: none; }
+body.lang-es .lang-en-ca { display: none !important; }
 
 body.lang-fr .lang-en,
 body.lang-fr .lang-es,
-body.lang-fr .lang-en-ca { display: none; }
+body.lang-fr .lang-en-ca { display: none !important; }
 
 body.lang-en-ca .lang-en,
 body.lang-en-ca .lang-es,
-body.lang-en-ca .lang-fr { display: none; }
+body.lang-en-ca .lang-fr { display: none !important; }
+
+/* Segmented EN | ES Language Switcher for Dashboards (Sidebar & Topbar) */
+.dashboard-lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  user-select: none;
+}
+
+.dashboard-lang-switch__opt {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 6px;
+  cursor: pointer;
+  line-height: 1.2;
+  letter-spacing: 0.03em;
+  transition: all 0.18s ease;
+}
+
+.dashboard-lang-switch__opt:hover {
+  color: #ffffff;
+}
+
+body.lang-en .dashboard-lang-switch__opt[data-set-lang="en"],
+body:not(.lang-es):not(.lang-fr):not(.lang-en-ca) .dashboard-lang-switch__opt[data-set-lang="en"],
+body.lang-es .dashboard-lang-switch__opt[data-set-lang="es"] {
+  background: #0A89F6;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(10, 137, 246, 0.45);
+}
+
+/* Desktop Floating Top-Right Language Switcher in Dashboards */
+.dashboard-desktop-lang-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 28px 0;
+}
+
+.dashboard-lang-switch--light {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+  padding: 3px;
+  border-radius: 10px;
+}
+
+.dashboard-lang-switch--light .dashboard-lang-switch__opt {
+  color: #475569;
+  font-size: 0.74rem;
+  padding: 4px 10px;
+  border-radius: 7px;
+}
+
+.dashboard-lang-switch--light .dashboard-lang-switch__opt:hover {
+  color: #0f172a;
+}
+
+@media (max-width: 991px) {
+  .dashboard-desktop-lang-bar {
+    display: none !important;
+  }
+}
 
 /* --- Utilities --- */
 .container {

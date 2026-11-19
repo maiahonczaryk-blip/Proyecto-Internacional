@@ -31,6 +31,11 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
+      const welcomeEl = document.getElementById('realtor-welcome');
+      if (welcomeEl) {
+        welcomeEl.innerHTML = `<span class="lang-en">Welcome back, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Track your referred clients and commissions in Spain.</span><span class="lang-es">Bienvenido/a de nuevo, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Sigue tus clientes referidos y comisiones en España.</span>`;
+      }
+
       if (App.utils && App.utils.renderUserRegionalBanner) {
         await App.utils.renderUserRegionalBanner('realtor-regional-banner', currentUser);
       }
@@ -180,7 +185,9 @@
       if (addBtnContainer) {
         addBtnContainer.innerHTML = `
           <button class="btn btn-primary" onclick="App.views.realtor.showAddClientModal()" style="display: flex; align-items: center; gap: 8px; padding: 0.65rem 1.25rem; font-size: 0.9rem; border-radius: 8px; background: linear-gradient(135deg, #0043ff, #0066ff); border: none; box-shadow: 0 2px 8px rgba(0,67,255,0.2);">
-            <span style="font-size: 1.1rem;">➕</span> Add Client Manually
+            <span style="font-size: 1.1rem;">➕</span>
+            <span class="lang-en">Add Client Manually</span>
+            <span class="lang-es">Añadir Cliente Manualmente</span>
           </button>
         `;
       }
@@ -235,7 +242,7 @@
       .slice(0, 3);
 
     if (recent.length === 0) {
-      App.utils.showEmptyState('realtor-dash-recent', 'No clients yet. Share your referral link to get started!', '🔗');
+      App.utils.showEmptyState('realtor-dash-recent', '<span class="lang-en">No clients yet. Share your referral link to get started!</span><span class="lang-es">Aún no tienes clientes. ¡Comparte tu enlace de referido para empezar!</span>', '🔗');
       return;
     }
 
@@ -251,12 +258,12 @@
             <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; gap: 8px; align-items: center;">
               <span>🗓 ${App.utils.formatDate(c.createdAt)}</span>
               <span>•</span>
-              <span style="text-transform: capitalize;">${App.utils.escapeHtml(c.country || 'Unknown')}</span>
+              <span style="text-transform: capitalize;">${App.utils.escapeHtml(c.country || '—')}</span>
             </div>
           </div>
           <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
             ${statusBadge}
-            <button class="btn" style="padding: 4px 8px; font-size: 0.75rem; background: transparent; border: 1px solid var(--border-subtle); color: var(--text-secondary);">View Details</button>
+            <button class="btn" style="padding: 4px 8px; font-size: 0.75rem; background: transparent; border: 1px solid var(--border-subtle); color: var(--text-secondary);"><span class="lang-en">View Details</span><span class="lang-es">Ver Detalles</span></button>
           </div>
         </div>
       `;
@@ -272,6 +279,11 @@
     try {
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
+
+      const welcomeEl = document.getElementById('realtor-welcome');
+      if (welcomeEl) {
+        welcomeEl.innerHTML = `<span class="lang-en">Welcome back, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Track your referred clients and commissions in Spain.</span><span class="lang-es">Bienvenido/a de nuevo, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Sigue tus clientes referidos y comisiones en España.</span>`;
+      }
 
       if (App.utils && App.utils.renderUserRegionalBanner) {
         await App.utils.renderUserRegionalBanner('realtor-regional-banner', currentUser);
@@ -395,6 +407,11 @@
     try {
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
+
+      const welcomeEl = document.getElementById('realtor-welcome');
+      if (welcomeEl) {
+        welcomeEl.innerHTML = `<span class="lang-en">Welcome back, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Track your referred clients and commissions in Spain.</span><span class="lang-es">Bienvenido/a de nuevo, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Sigue tus clientes referidos y comisiones en España.</span>`;
+      }
 
       if (App.utils && App.utils.renderUserRegionalBanner) {
         await App.utils.renderUserRegionalBanner('realtor-regional-banner', currentUser);
@@ -561,6 +578,11 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
+      const welcomeEl = document.getElementById('realtor-welcome');
+      if (welcomeEl) {
+        welcomeEl.innerHTML = `<span class="lang-en">Welcome back, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Track your referred clients and commissions in Spain.</span><span class="lang-es">Bienvenido/a de nuevo, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Sigue tus clientes referidos y comisiones en España.</span>`;
+      }
+
       if (App.utils && App.utils.renderUserRegionalBanner) {
         await App.utils.renderUserRegionalBanner('realtor-regional-banner', currentUser);
       }
@@ -651,6 +673,11 @@
     try {
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
+
+      const welcomeEl = document.getElementById('realtor-welcome');
+      if (welcomeEl) {
+        welcomeEl.innerHTML = `<span class="lang-en">Welcome back, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Track your referred clients and commissions in Spain.</span><span class="lang-es">Bienvenido/a de nuevo, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Sigue tus clientes referidos y comisiones en España.</span>`;
+      }
 
       if (App.utils && App.utils.renderUserRegionalBanner) {
         await App.utils.renderUserRegionalBanner('realtor-regional-banner', currentUser);

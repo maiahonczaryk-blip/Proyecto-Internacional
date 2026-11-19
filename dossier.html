@@ -393,13 +393,109 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
 .back-pill.solid { background: var(--grad-sun); border-color: transparent; box-shadow: 0 8px 22px rgba(254, 137, 51, 0.4); }
 .disclaimer { font-size: 6.6pt; color: var(--muted); line-height: 1.4; max-width: 105mm; text-align: right; }
 
+/* ---------- Colección Obra Nueva por Precio ---------- */
+.trust-strip { display: flex; align-items: center; gap: 2.2mm; flex-wrap: wrap; }
+.trust-pill {
+  display: inline-flex; align-items: center; gap: 1.4mm; font-size: 7.4pt; font-weight: 700;
+  padding: 1.2mm 3mm; border-radius: 99px; background: #fff; border: 0.3mm solid rgba(6, 114, 197, 0.22); color: var(--ink);
+}
+.trust-pill b { color: var(--orange-d); font-weight: 800; }
+
+.prop-card {
+  background: #fff; border: 0.3mm solid rgba(75, 90, 112, 0.13); border-radius: 4.6mm;
+  overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column;
+}
+.prop-gallery {
+  display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.2mm; height: 64mm;
+  background: var(--navy); position: relative; flex-shrink: 0;
+}
+.prop-gallery > div { position: relative; overflow: hidden; height: 100%; }
+.prop-gallery img { width: 100%; height: 100%; object-fit: cover; }
+.prop-loc {
+  position: absolute; left: 2.6mm; bottom: 2.4mm; z-index: 2;
+  background: rgba(22, 48, 78, 0.88); color: #fff; border: 0.25mm solid rgba(255, 255, 255, 0.28);
+  font-size: 6.9pt; font-weight: 700; padding: 1mm 2.5mm; border-radius: 99px; letter-spacing: 0.2px;
+}
+.prop-body {
+  padding: 3.4mm 4mm 3.6mm; display: flex; flex-direction: column; gap: 2.4mm; flex: 1;
+}
+.prop-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 2.5mm; }
+.prop-tier { font-size: 6.7pt; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--blue); margin-bottom: 0.6mm; }
+.prop-tier.warm { color: var(--orange-d); }
+.prop-name { font-size: 11.8pt; font-weight: 800; color: var(--ink); line-height: 1.12; letter-spacing: -0.018em; }
+.prop-price-box {
+  background: var(--grad-navy); color: #fff; border-radius: 2.8mm; padding: 1.6mm 2.8mm;
+  text-align: right; flex-shrink: 0;
+}
+.prop-price-box.warm { background: linear-gradient(135deg, #16304E 0%, #0D4B82 100%); border-top: 0.7mm solid var(--orange); }
+.prop-price { font-size: 13pt; font-weight: 800; color: var(--orange); line-height: 1.02; letter-spacing: -0.02em; }
+.prop-price-sub { font-size: 6.3pt; color: #E2ECF7; font-weight: 600; margin-top: 0.5mm; white-space: nowrap; }
+
+.prop-specs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.6mm; }
+.prop-spec {
+  background: #FAF5EC; border: 0.25mm solid rgba(75, 90, 112, 0.11); border-radius: 2.3mm;
+  padding: 1.5mm 1mm; text-align: center;
+}
+.prop-spec b { display: block; font-size: 8.6pt; font-weight: 800; color: var(--ink); line-height: 1.1; }
+.prop-spec span { display: block; font-size: 6.2pt; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-top: 0.3mm; }
+.prop-spec.hl { background: rgba(254, 137, 51, 0.12); border-color: rgba(254, 137, 51, 0.32); }
+.prop-spec.hl b { color: var(--orange-d); }
+
+.prop-bullets { display: flex; flex-direction: column; gap: 1.4mm; }
+.prop-b { font-size: 7.9pt; line-height: 1.38; color: var(--slate); padding-left: 3.4mm; position: relative; }
+.prop-b::before { content: '•'; position: absolute; left: 0.4mm; color: var(--orange); font-weight: 900; }
+.prop-b strong { color: var(--ink); }
+.prop-tags { display: flex; flex-wrap: wrap; gap: 1.4mm; margin-top: 0.4mm; }
+.prop-tag {
+  font-size: 6.7pt; font-weight: 700; padding: 1mm 2.3mm; border-radius: 99px;
+  background: rgba(6, 114, 197, 0.08); color: var(--blue); border: 0.25mm solid rgba(6, 114, 197, 0.16);
+}
+.prop-tag.warm { background: rgba(254, 137, 51, 0.11); color: var(--orange-d); border-color: rgba(254, 137, 51, 0.24); }
+
+.prop-fin {
+  margin-top: auto; background: linear-gradient(135deg, #16304E 0%, #0D4B82 100%);
+  color: #fff; border-radius: 2.8mm; padding: 2.1mm 2.8mm;
+  display: grid; grid-template-columns: 1.15fr 0.85fr 0.95fr; gap: 2mm; align-items: center;
+}
+.prop-fin > div { border-right: 0.25mm solid rgba(255, 255, 255, 0.16); padding-right: 1.6mm; }
+.prop-fin > div:last-child { border-right: 0; padding-right: 0; text-align: right; }
+.prop-fin small { display: block; font-size: 6pt; color: rgba(226, 236, 247, 0.78); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; }
+.prop-fin b { display: block; font-size: 8.4pt; font-weight: 800; color: #fff; margin-top: 0.3mm; }
+.prop-fin b.acc { color: var(--peach); }
+
+/* Tarjeta horizontal de propiedad (Pág. 11) */
+.prop-hcard {
+  background: #fff; border: 0.3mm solid rgba(75, 90, 112, 0.13); border-radius: 4.6mm;
+  overflow: hidden; box-shadow: var(--shadow); display: grid; grid-template-columns: 66mm 1fr;
+}
+.prop-hphotos {
+  display: grid; grid-template-rows: 1.4fr 1fr; gap: 1.1mm; background: var(--navy); height: 100%;
+}
+.prop-hphotos > div { position: relative; overflow: hidden; min-height: 0; }
+.prop-hphotos img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.prop-hbody {
+  padding: 3mm 4mm; display: flex; flex-direction: column; justify-content: space-between; gap: 1.6mm;
+}
+.prop-hbody .prop-specs { gap: 1.6mm; }
+.prop-hbody .prop-spec { padding: 1.2mm 1mm; }
+.prop-hbody .prop-fin { margin-top: 0; padding: 1.8mm 2.8mm; }
+
 /* ---------- Impresión ---------- */
 @page { size: A4; margin: 0; }
 @media print {
   html, body { background: #fff !important; }
   .toolbar { display: none !important; }
-  .page { margin: 0 !important; box-shadow: none !important; zoom: 1 !important; }
-  .cover-kpi { backdrop-filter: none; }
+  *, *::before, *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .page { margin: 0 !important; zoom: 1 !important; }
+  .card, .kpi, .toc-item, .ios, .partner, .office, .mini-step, .logo-pill, table.tbl, .prop-card, .prop-hcard {
+    border-color: rgba(75, 90, 112, 0.16);
+  }
 }
 </style>
 </head>
@@ -493,11 +589,12 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
       <div class="toc-item"><span class="num bg-sun">01</span><span class="toc-t"><span class="es">Estilo de vida y conectividad</span><span class="en">Lifestyle &amp; connectivity</span><span class="fr">Style de vie et connectivité</span></span><span class="toc-p">03</span></div>
       <div class="toc-item"><span class="num bg-wave">05</span><span class="toc-t"><span class="es">Costes de compra y fiscalidad</span><span class="en">Acquisition costs &amp; taxation</span><span class="fr">Frais d'acquisition et fiscalité</span></span><span class="toc-p">08</span></div>
       <div class="toc-item"><span class="num bg-sun">02</span><span class="toc-t"><span class="es">¿Por qué Alicante?</span><span class="en">Why Alicante?</span><span class="fr">Pourquoi Alicante ?</span></span><span class="toc-p">05</span></div>
-      <div class="toc-item"><span class="num bg-wave">06</span><span class="toc-t"><span class="es">Residencia y visados</span><span class="en">Residency &amp; visas</span><span class="fr">Résidence et visas</span></span><span class="toc-p">10</span></div>
+      <div class="toc-item"><span class="num bg-wave">06</span><span class="toc-t"><span class="es">Obra nueva por rango de precio</span><span class="en">New-build collection by price</span><span class="fr">Programmes neufs par budget</span></span><span class="toc-p">10</span></div>
       <div class="toc-item"><span class="num bg-sun">03</span><span class="toc-t"><span class="es">Coste de vida</span><span class="en">Cost of living</span><span class="fr">Coût de la vie</span></span><span class="toc-p">06</span></div>
-      <div class="toc-item"><span class="num bg-wave">07</span><span class="toc-t"><span class="es">Ecosistema de socios</span><span class="en">Partner ecosystem</span><span class="fr">Écosystème de partenaires</span></span><span class="toc-p">12</span></div>
+      <div class="toc-item"><span class="num bg-wave">07</span><span class="toc-t"><span class="es">Residencia y visados</span><span class="en">Residency &amp; visas</span><span class="fr">Résidence et visas</span></span><span class="toc-p">12</span></div>
       <div class="toc-item"><span class="num bg-sun">04</span><span class="toc-t"><span class="es">Proceso de compra</span><span class="en">Buying process</span><span class="fr">Processus d'achat</span></span><span class="toc-p">07</span></div>
-      <div class="toc-item"><span class="num bg-wave">08</span><span class="toc-t"><span class="es">Contacto y oficinas</span><span class="en">Contact &amp; offices</span><span class="fr">Contact et bureaux</span></span><span class="toc-p">13</span></div>
+      <div class="toc-item"><span class="num bg-wave">08</span><span class="toc-t"><span class="es">Ecosistema de socios</span><span class="en">Partner ecosystem</span><span class="fr">Écosystème de partenaires</span></span><span class="toc-p">14</span></div>
+      <div class="toc-item" style="grid-column: 1 / -1;"><span class="num bg-navy">09</span><span class="toc-t"><span class="es">Contacto, oficinas de la alianza y siguientes pasos</span><span class="en">Contact, alliance offices &amp; next steps</span><span class="fr">Contact, bureaux de l'alliance et prochaines étapes</span></span><span class="toc-p">15</span></div>
     </div>
     <div class="navy-box">
       <div class="navy-title"><span class="es">Un único equipo, cuatro especialistas</span><span class="en">One team, four specialists</span><span class="fr">Une seule équipe, quatre spécialistes</span></div>
@@ -509,7 +606,7 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
       </div>
     </div>
   </div></div>
-  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">02 / 14</span></div>
+  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">02 / 16</span></div>
 </section>
 
 <!-- ============================ 03 · ESTILO DE VIDA (HÉROE) ============================ -->
@@ -554,7 +651,7 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
       </p>
     </div>
   </div></div>
-  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">03 / 14</span></div>
+  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">03 / 16</span></div>
 </section>
 
 <!-- ============================ 04 · CLIMA Y CONECTIVIDAD ============================ -->
@@ -607,7 +704,7 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
       <div class="cap">📍 <span class="es">Paseo marítimo · vida al aire libre todo el año</span><span class="en">Seafront promenade · outdoor living all year round</span><span class="fr">Promenade du front de mer · vie en plein air toute l'année</span></div>
     </div>
   </div></div>
-  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">04 / 14</span></div>
+  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">04 / 16</span></div>
 </section>
 
 <!-- ============================ 05 · ¿POR QUÉ ALICANTE? (HÉROE) ============================ -->
@@ -636,7 +733,7 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
     <div class="g3">
       <div class="kpi-dark" style="background:linear-gradient(135deg,#16304E 0%,#0D4B82 100%);"><div class="kpi-v" style="color:var(--orange);">1.2M+</div><div class="kpi-l"><span class="es">Expats residentes en España</span><span class="en">Expats living in Spain</span><span class="fr">Expatriés résidant en Espagne</span></div></div>
       <div class="kpi-dark" style="background:var(--grad-sun);"><div class="kpi-v">Nº 1</div><div class="kpi-l"><span class="es">País más saludable del mundo (Bloomberg)</span><span class="en">Healthiest country in the world (Bloomberg)</span><span class="fr">Pays le plus sain du monde (Bloomberg)</span></div></div>
-      <div class="kpi-dark" style="background:var(--grad-wave);"><div class="kpi-v">€150K</div><div class="kpi-l"><span class="es">Precio medio de entrada en Costa Blanca</span><span class="en">Average entry price Costa Blanca</span><span class="fr">Prix d'entrée moyen Costa Blanca</span></div></div>
+      <div class="kpi-dark" style="background:var(--grad-wave);"><div class="kpi-v">150K €</div><div class="kpi-l"><span class="es">Precio medio de entrada en Costa Blanca</span><span class="en">Average entry price Costa Blanca</span><span class="fr">Prix d'entrée moyen Costa Blanca</span></div></div>
     </div>
     <div class="panel grow">
       <div class="panel-body">
@@ -651,7 +748,7 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
       <div class="panel-img"><img src="images/guia/terrace.jpg" alt="Terraza mediterránea" style="object-position:center 55%;"></div>
     </div>
   </div></div>
-  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">05 / 14</span></div>
+  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">05 / 16</span></div>
 </section>
 
 <!-- ============================ 06 · COSTE DE VIDA ============================ -->
@@ -678,11 +775,11 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
         <th style="width:18%;"><span class="es">Ahorro</span><span class="en">Savings</span><span class="fr">Économies</span></th>
       </tr></thead>
       <tbody>
-        <tr><td><span class="es">Seguro Médico Privado</span><span class="en">Private Health Insurance</span><span class="fr">Assurance Santé Privée</span></td><td class="es-price">€80–150<span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></td><td class="us-price">$500–1,500<span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></td><td><span class="save">~85%</span></td></tr>
-        <tr><td><span class="es">Cena Gourmet para Dos</span><span class="en">Gourmet Dinner for Two</span><span class="fr">Dîner Gastronomique pour Deux</span></td><td class="es-price">€35–60</td><td class="us-price">$100–200</td><td><span class="save">~70%</span></td></tr>
-        <tr><td><span class="es">Cuota de la Comunidad</span><span class="en">HOA / Community Fees</span><span class="fr">Charges de Copropriété</span></td><td class="es-price">€40–100<span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></td><td class="us-price">$400–1,200<span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></td><td><span class="save">~90%</span></td></tr>
-        <tr><td><span class="es">Impuesto Anual (IBI)</span><span class="en">Annual Property Tax (IBI)</span><span class="fr">Taxe Foncière Annuelle (IBI)</span></td><td class="es-price">€300–900<span class="es">/año</span><span class="en">/yr</span><span class="fr">/an</span></td><td class="us-price">$4,000–12,000<span class="es">/año</span><span class="en">/yr</span><span class="fr">/an</span></td><td><span class="save">~92%</span></td></tr>
-        <tr><td><span class="es">Casa 3 Hab. de Calidad</span><span class="en">Quality 3BR Home</span><span class="fr">Maison 3 Ch. de Qualité</span></td><td class="es-price"><span class="es">desde</span><span class="en">from</span><span class="fr">à partir de</span> €250,000</td><td class="us-price">$900,000+</td><td><span class="save">~72%</span></td></tr>
+        <tr><td><span class="es">Seguro Médico Privado</span><span class="en">Private Health Insurance</span><span class="fr">Assurance Santé Privée</span></td><td class="es-price">80–150 €<span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></td><td class="us-price">$500–1,500<span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></td><td><span class="save">~85%</span></td></tr>
+        <tr><td><span class="es">Cena Gourmet para Dos</span><span class="en">Gourmet Dinner for Two</span><span class="fr">Dîner Gastronomique pour Deux</span></td><td class="es-price">35–60 €</td><td class="us-price">$100–200</td><td><span class="save">~70%</span></td></tr>
+        <tr><td><span class="es">Cuota de la Comunidad</span><span class="en">HOA / Community Fees</span><span class="fr">Charges de Copropriété</span></td><td class="es-price">40–100 €<span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></td><td class="us-price">$400–1,200<span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></td><td><span class="save">~90%</span></td></tr>
+        <tr><td><span class="es">Impuesto Anual (IBI)</span><span class="en">Annual Property Tax (IBI)</span><span class="fr">Taxe Foncière Annuelle (IBI)</span></td><td class="es-price">300–900 €<span class="es">/año</span><span class="en">/yr</span><span class="fr">/an</span></td><td class="us-price">$4,000–12,000<span class="es">/año</span><span class="en">/yr</span><span class="fr">/an</span></td><td><span class="save">~92%</span></td></tr>
+        <tr><td><span class="es">Casa 3 Hab. de Calidad</span><span class="en">Quality 3BR Home</span><span class="fr">Maison 3 Ch. de Qualité</span></td><td class="es-price"><span class="es">desde 250.000&nbsp;€</span><span class="en">from 250,000&nbsp;€</span><span class="fr">à partir de 250&nbsp;000&nbsp;€</span></td><td class="us-price">$900,000+</td><td><span class="save">~72%</span></td></tr>
       </tbody>
     </table>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:4.4mm; height:66mm;">
@@ -700,12 +797,12 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
       <div class="photo"><img src="images/guia/castle.jpg" alt="Castillo de Santa Bárbara, Alicante"><div class="cap">📍 <span class="es">Castillo de Santa Bárbara, Alicante</span><span class="en">Santa Bárbara Castle, Alicante</span><span class="fr">Château de Santa Bárbara, Alicante</span></div></div>
     </div>
     <div class="g3 grow">
-      <div class="photo"><img src="images/guia/paella.jpg" alt="Gastronomía mediterránea"><div class="cap"><span class="cap-label"><span class="es">Cena gourmet para dos</span><span class="en">Gourmet dinner for two</span><span class="fr">Dîner gastronomique à deux</span></span><span class="cap-big">€35–60</span></div></div>
-      <div class="photo"><img src="images/guia/hospital.jpg" alt="Sanidad privada"><div class="cap"><span class="cap-label"><span class="es">Seguro médico privado</span><span class="en">Private health insurance</span><span class="fr">Assurance santé privée</span></span><span class="cap-big">€80–150 <small><span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></small></span></div></div>
-      <div class="photo"><img src="images/guia/villa-sea.jpg" alt="Vivienda en la Costa Blanca"><div class="cap"><span class="cap-label"><span class="es">Casa 3 hab. de calidad</span><span class="en">Quality 3BR home</span><span class="fr">Maison 3 ch. de qualité</span></span><span class="cap-big"><small><span class="es">desde</span><span class="en">from</span><span class="fr">dès</span></small> €250K</span></div></div>
+      <div class="photo"><img src="images/guia/paella.jpg" alt="Gastronomía mediterránea"><div class="cap"><span class="cap-label"><span class="es">Cena gourmet para dos</span><span class="en">Gourmet dinner for two</span><span class="fr">Dîner gastronomique à deux</span></span><span class="cap-big">35–60 €</span></div></div>
+      <div class="photo"><img src="images/guia/hospital.jpg" alt="Sanidad privada"><div class="cap"><span class="cap-label"><span class="es">Seguro médico privado</span><span class="en">Private health insurance</span><span class="fr">Assurance santé privée</span></span><span class="cap-big">80–150 € <small><span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></small></span></div></div>
+      <div class="photo"><img src="images/guia/villa-sea.jpg" alt="Vivienda en la Costa Blanca"><div class="cap"><span class="cap-label"><span class="es">Casa 3 hab. de calidad</span><span class="en">Quality 3BR home</span><span class="fr">Maison 3 ch. de qualité</span></span><span class="cap-big"><small><span class="es">desde</span><span class="en">from</span><span class="fr">dès</span></small> 250K €</span></div></div>
     </div>
   </div></div>
-  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">06 / 14</span></div>
+  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">06 / 16</span></div>
 </section>
 
 <!-- ============================ 07 · PROCESO DE COMPRA ============================ -->
@@ -746,7 +843,7 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
       <div class="photo"><img src="images/guia/keys.jpg" alt="Entrega de llaves"><div class="cap"><span class="cap-label"><span class="es">Paso 8</span><span class="en">Step 8</span><span class="fr">Étape 8</span></span><span class="es">Entrega de Llaves</span><span class="en">Key Handover</span><span class="fr">Remise des Clés</span></div></div>
     </div>
   </div></div>
-  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">07 / 14</span></div>
+  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">07 / 16</span></div>
 </section>
 
 <!-- ============================ 08 · COSTES DE COMPRA (HÉROE) ============================ -->
@@ -773,24 +870,24 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
     <div class="g2">
       <div class="card t-blue">
         <h3>🏠 <span class="es">Propiedad de Segunda Mano</span><span class="en">Resale Property</span><span class="fr">Bien Immobilier de Revente</span></h3>
-        <div class="cost-row"><span><span class="es">Precio de compra</span><span class="en">Purchase price</span><span class="fr">Prix d'achat</span></span><b>€150,000</b></div>
-        <div class="cost-row"><span><span class="es">ITP (Impuesto Transmisiones): 9%</span><span class="en">ITP Transfer Tax: 9%</span><span class="fr">ITP (Taxe de Transmission) : 9 %</span></span><b class="c">€13,500</b></div>
-        <div class="cost-row"><span><span class="es">Notaría</span><span class="en">Notary fees</span><span class="fr">Frais de Notaire</span></span><b class="c">€1,500</b></div>
-        <div class="cost-row"><span><span class="es">Registro de la Propiedad</span><span class="en">Registry fees</span><span class="fr">Frais d'Inscription au Registre</span></span><b class="c">€700</b></div>
-        <div class="cost-row"><span><span class="es">Suministros</span><span class="en">Utilities transfer</span><span class="fr">Transfert des Services</span></span><b class="c">€500</b></div>
-        <div class="cost-row"><span><span class="es">Honorarios abogado</span><span class="en">Solicitor's fees</span><span class="fr">Honoraires d'Avocat</span></span><b class="c">€1,495+IVA</b></div>
-        <div class="cost-total"><span><span class="es">TOTAL ESTIMADO</span><span class="en">ESTIMATED TOTAL</span><span class="fr">TOTAL ESTIMÉ</span></span><b>€168,009</b></div>
+        <div class="cost-row"><span><span class="es">Precio de compra</span><span class="en">Purchase price</span><span class="fr">Prix d'achat</span></span><b><span class="es">150.000&nbsp;€</span><span class="en">150,000&nbsp;€</span><span class="fr">150&nbsp;000&nbsp;€</span></b></div>
+        <div class="cost-row"><span><span class="es">ITP (Impuesto Transmisiones): 9%</span><span class="en">ITP Transfer Tax: 9%</span><span class="fr">ITP (Taxe de Transmission) : 9 %</span></span><b class="c"><span class="es">13.500&nbsp;€</span><span class="en">13,500&nbsp;€</span><span class="fr">13&nbsp;500&nbsp;€</span></b></div>
+        <div class="cost-row"><span><span class="es">Notaría</span><span class="en">Notary fees</span><span class="fr">Frais de Notaire</span></span><b class="c"><span class="es">1.500&nbsp;€</span><span class="en">1,500&nbsp;€</span><span class="fr">1&nbsp;500&nbsp;€</span></b></div>
+        <div class="cost-row"><span><span class="es">Registro de la Propiedad</span><span class="en">Registry fees</span><span class="fr">Frais d'Inscription au Registre</span></span><b class="c">700&nbsp;€</b></div>
+        <div class="cost-row"><span><span class="es">Suministros</span><span class="en">Utilities transfer</span><span class="fr">Transfert des Services</span></span><b class="c">500&nbsp;€</b></div>
+        <div class="cost-row"><span><span class="es">Honorarios abogado</span><span class="en">Solicitor's fees</span><span class="fr">Honoraires d'Avocat</span></span><b class="c"><span class="es">1.495&nbsp;€ + IVA</span><span class="en">1,495&nbsp;€ + VAT</span><span class="fr">1&nbsp;495&nbsp;€ + TVA</span></b></div>
+        <div class="cost-total"><span><span class="es">TOTAL ESTIMADO</span><span class="en">ESTIMATED TOTAL</span><span class="fr">TOTAL ESTIMÉ</span></span><b><span class="es">168.009&nbsp;€</span><span class="en">168,009&nbsp;€</span><span class="fr">168&nbsp;009&nbsp;€</span></b></div>
       </div>
       <div class="card t-orange">
         <h3>🏗️ <span class="es">Obra Nueva</span><span class="en">New-Build Property</span><span class="fr">Construction Neuve</span></h3>
-        <div class="cost-row"><span><span class="es">Precio de compra</span><span class="en">Purchase price</span><span class="fr">Prix d'achat</span></span><b>€150,000</b></div>
-        <div class="cost-row"><span><span class="es">IVA: 10%</span><span class="en">VAT: 10%</span><span class="fr">TVA : 10 %</span></span><b class="c">€15,000</b></div>
-        <div class="cost-row"><span><span class="es">Actos Jurídicos Doc.: 1.4%</span><span class="en">Stamp Duty: 1.4%</span><span class="fr">Droits de Timbre : 1,4 %</span></span><b class="c">€2,100</b></div>
-        <div class="cost-row"><span><span class="es">Notaría</span><span class="en">Notary fees</span><span class="fr">Frais de Notaire</span></span><b class="c">€1,500</b></div>
-        <div class="cost-row"><span><span class="es">Registro</span><span class="en">Registry fees</span><span class="fr">Registre</span></span><b class="c">€700</b></div>
-        <div class="cost-row"><span><span class="es">Suministros</span><span class="en">Utilities</span><span class="fr">Transfert des Services</span></span><b class="c">€500</b></div>
-        <div class="cost-row"><span><span class="es">Honorarios abogado</span><span class="en">Solicitor's fees</span><span class="fr">Honoraires d'Avocat</span></span><b class="c">€1,500+IVA</b></div>
-        <div class="cost-total"><span><span class="es">TOTAL ESTIMADO</span><span class="en">ESTIMATED TOTAL</span><span class="fr">TOTAL ESTIMÉ</span></span><b>€171,615</b></div>
+        <div class="cost-row"><span><span class="es">Precio de compra</span><span class="en">Purchase price</span><span class="fr">Prix d'achat</span></span><b><span class="es">150.000&nbsp;€</span><span class="en">150,000&nbsp;€</span><span class="fr">150&nbsp;000&nbsp;€</span></b></div>
+        <div class="cost-row"><span><span class="es">IVA: 10%</span><span class="en">VAT: 10%</span><span class="fr">TVA : 10 %</span></span><b class="c"><span class="es">15.000&nbsp;€</span><span class="en">15,000&nbsp;€</span><span class="fr">15&nbsp;000&nbsp;€</span></b></div>
+        <div class="cost-row"><span><span class="es">Actos Jurídicos Doc.: 1.4%</span><span class="en">Stamp Duty: 1.4%</span><span class="fr">Droits de Timbre : 1,4 %</span></span><b class="c"><span class="es">2.100&nbsp;€</span><span class="en">2,100&nbsp;€</span><span class="fr">2&nbsp;100&nbsp;€</span></b></div>
+        <div class="cost-row"><span><span class="es">Notaría</span><span class="en">Notary fees</span><span class="fr">Frais de Notaire</span></span><b class="c"><span class="es">1.500&nbsp;€</span><span class="en">1,500&nbsp;€</span><span class="fr">1&nbsp;500&nbsp;€</span></b></div>
+        <div class="cost-row"><span><span class="es">Registro</span><span class="en">Registry fees</span><span class="fr">Registre</span></span><b class="c">700&nbsp;€</b></div>
+        <div class="cost-row"><span><span class="es">Suministros</span><span class="en">Utilities</span><span class="fr">Transfert des Services</span></span><b class="c">500&nbsp;€</b></div>
+        <div class="cost-row"><span><span class="es">Honorarios abogado</span><span class="en">Solicitor's fees</span><span class="fr">Honoraires d'Avocat</span></span><b class="c"><span class="es">1.500&nbsp;€ + IVA</span><span class="en">1,500&nbsp;€ + VAT</span><span class="fr">1&nbsp;500&nbsp;€ + TVA</span></b></div>
+        <div class="cost-total"><span><span class="es">TOTAL ESTIMADO</span><span class="en">ESTIMATED TOTAL</span><span class="fr">TOTAL ESTIMÉ</span></span><b><span class="es">171.615&nbsp;€</span><span class="en">171,615&nbsp;€</span><span class="fr">171&nbsp;615&nbsp;€</span></b></div>
       </div>
     </div>
     <p class="note">
@@ -820,7 +917,7 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
       </p>
     </div>
   </div></div>
-  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">08 / 14</span></div>
+  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">08 / 16</span></div>
 </section>
 
 <!-- ============================ 09 · IMPUESTOS ANUALES ============================ -->
@@ -839,13 +936,13 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
         <span class="ic">🏛️</span>
         <h3><span class="es">IBI — Impuesto sobre Bienes Inmuebles</span><span class="en">IBI — Property Tax (Municipal)</span><span class="fr">IBI — Taxe Foncière</span></h3>
         <p><span class="es">Equivalente al impuesto municipal sobre la propiedad. Se calcula sobre el valor catastral (muy inferior al valor de mercado). Rango habitual en la Costa Blanca:</span><span class="en">Equivalent to municipal property tax. Calculated on cadastral value (much lower than market value). Typical range on Costa Blanca:</span><span class="fr">Équivalent à la taxe foncière municipale. Calculé sur la valeur cadastrale (très inférieure à la valeur marchande). Fourchette typique sur la Costa Blanca :</span></p>
-        <div class="big-v" style="margin-top:3mm;">€250–800 <small><span class="es">/año</span><span class="en">/year</span><span class="fr">/an</span></small></div>
+        <div class="big-v" style="margin-top:3mm;">250–800 € <small><span class="es">/año</span><span class="en">/year</span><span class="fr">/an</span></small></div>
       </div>
       <div class="card t-orange">
         <span class="ic warm">🧾</span>
         <h3><span class="es">IRNR — Impuesto de No Residentes</span><span class="en">IRNR — Non-Resident Income Tax</span><span class="fr">IRNR — Impôt des Non-Résidents</span></h3>
         <p><span class="es">Impuesto sobre la renta imputada (si la propiedad no se alquila). Calculado como el 1.1% del valor catastral × 24% de tipo impositivo. Resultado habitual:</span><span class="en">Imputed income tax (if property is not rented). Calculated as 1.1% of cadastral value × 24% tax rate. Typical result:</span><span class="fr">Impôt imputé sur le revenu présumé (si la propriété n'est pas louée). Calculé comme 1,1% de la valeur cadastrale × 24% de taux d'imposition. Résultat typique :</span></p>
-        <div class="big-v" style="margin-top:3mm; color:var(--orange-d);">€100–350 <small><span class="es">/año</span><span class="en">/year</span><span class="fr">/an</span></small></div>
+        <div class="big-v" style="margin-top:3mm; color:var(--orange-d);">100–350 € <small><span class="es">/año</span><span class="en">/year</span><span class="fr">/an</span></small></div>
       </div>
     </div>
     <div class="panel" style="grid-template-columns:1.7fr 1fr;">
@@ -869,7 +966,7 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
           <div class="check"><span class="es">Hipoteca no residente disponible hasta el 70% LTV</span><span class="en">Non-resident mortgage available up to 70% LTV</span><span class="fr">Prêt non-résident disponible jusqu'à 70% LTV</span></div>
           <div class="check"><span class="es">Compra 100% remota posible mediante poder notarial</span><span class="en">100% remote purchase possible via Power of Attorney</span><span class="fr">Achat 100% à distance possible par procuration notariée</span></div>
           <div class="check"><span class="es">Costes totales de adquisición: ~14% del precio de compra</span><span class="en">Total acquisition costs: ~14% of the purchase price</span><span class="fr">Frais totaux d'acquisition : ~14% du prix d'achat</span></div>
-          <div class="check"><span class="es">Testamento español muy recomendable (~€350 con Fuster)</span><span class="en">Spanish Will strongly recommended (~€350 with Fuster)</span><span class="fr">Testament espagnol fortement recommandé (~350 € avec Fuster)</span></div>
+          <div class="check"><span class="es">Testamento español muy recomendable (~350 € con Fuster)</span><span class="en">Spanish Will strongly recommended (~350 € with Fuster)</span><span class="fr">Testament espagnol fortement recommandé (~350 € avec Fuster)</span></div>
         </div>
       </div>
       <div class="photo">
@@ -878,16 +975,302 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
       </div>
     </div>
   </div></div>
-  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">09 / 14</span></div>
+  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">09 / 16</span></div>
 </section>
 
-<!-- ============================ 10 · RESIDENCIA (HÉROE) ============================ -->
+<!-- ============================ 10 · OBRA NUEVA POR PRECIO (HÉROE) ============================ -->
+<section class="page page-hero" style="--hero-h:72mm;">
+  <div class="hero">
+    <img src="images/guia/propiedades/hero-obranueva.jpg" alt="Promoción de obra nueva en la Costa Blanca" style="object-position:center 55%;">
+    <div class="hero-veil"></div>
+    <div class="hero-content">
+      <div class="hero-num">06</div>
+      <div>
+        <div class="hero-kicker-row"><span class="hero-bar"></span><span class="hero-kicker"><span class="es">Colección Seleccionada</span><span class="en">Curated Collection</span><span class="fr">Collection Sélectionnée</span></span></div>
+        <h1 class="hero-title"><span class="es">Obra Nueva Llave en Mano<br>por Rango de Precio</span><span class="en">Turnkey New Builds<br>by Price Tier</span><span class="fr">Programmes Neufs Clé en Main<br>par Tranche de Prix</span></h1>
+      </div>
+    </div>
+  </div>
+  <div class="sh on-dark"><span class="sh-tag"><span class="es">Obra Nueva · Costa Blanca</span><span class="en">New-Build Showcase · Costa Blanca</span><span class="fr">Programmes Neufs · Costa Blanca</span></span><img src="images/spain-connection-logo-white.png" alt="The Spain Connection"></div>
+  <div class="stage"><div class="stage-in" style="gap:3.6mm;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:4mm; flex-wrap:wrap;">
+      <p class="lead" style="font-size:9.8pt; line-height:1.44; flex:1; min-width:95mm;">
+        <span class="es">¿Qué ofrece hoy el mercado en la Costa Blanca según tu presupuesto? Ejemplos reales de promociones verificadas por <strong>RE/MAX Inmomás</strong> y auditadas por <strong>Fuster &amp; Associates</strong>.</span>
+        <span class="en">What does your budget buy on the Costa Blanca today? Real examples of turnkey developments verified by <strong>RE/MAX Inmomás</strong> and audited by <strong>Fuster &amp; Associates</strong>.</span>
+        <span class="fr">Qu'offre aujourd'hui la Costa Blanca selon votre budget ? Exemples réels de résidences neuves vérifiées par <strong>RE/MAX Inmomás</strong> et auditées par <strong>Fuster &amp; Associates</strong>.</span>
+      </p>
+      <div class="trust-strip">
+        <span class="trust-pill">🛡️ <b>100%</b> <span class="es">Aval bancario</span><span class="en">Bank guarantee</span><span class="fr">Garantie bancaire</span></span>
+        <span class="trust-pill">🏗️ <b>10 <span class="es">años</span><span class="en">yr</span><span class="fr">ans</span></b> <span class="es">Garantía estructural</span><span class="en">Structural warranty</span><span class="fr">Garantie décennale</span></span>
+      </div>
+    </div>
+
+    <div class="sub-h"><span class="es">Rango 320K € – 385K € · Apartamentos y Resorts Junto al Mar</span><span class="en">320K € – 385K € Tier · Beachside &amp; Coastal Resort Living</span><span class="fr">Budget 320 K€ – 385 K€ · Appartements et Resorts en Bord de Mer</span></div>
+
+    <div class="g2 grow">
+      <!-- Propiedad 1: Portamarina Arena (320.000 €) -->
+      <div class="prop-card t-orange">
+        <div class="prop-gallery">
+          <div>
+            <img src="images/guia/propiedades/portamarina-1.jpg" alt="Portamarina Arena Guardamar" style="object-position:center 55%;">
+            <span class="prop-loc">📍 Guardamar del Segura</span>
+          </div>
+          <div>
+            <img src="images/guia/propiedades/portamarina-2.jpg" alt="Solárium Portamarina Arena" style="object-position:center 60%;">
+          </div>
+        </div>
+        <div class="prop-body">
+          <div class="prop-head">
+            <div>
+              <div class="prop-tier warm"><span class="es">Tier 1 · Playa y Rentabilidad</span><span class="en">Tier 1 · Smart Coastal Haven</span><span class="fr">Tier 1 · Bord de Mer &amp; Rendement</span></div>
+              <div class="prop-name">Portamarina Arena</div>
+            </div>
+            <div class="prop-price-box warm">
+              <div class="prop-price"><span class="es">320.000&nbsp;€</span><span class="en">320,000&nbsp;€</span><span class="fr">320&nbsp;000&nbsp;€</span></div>
+              <div class="prop-price-sub"><span class="es">Llave en mano</span><span class="us">~$345,000 USD</span><span class="ca">~$480,000 CAD</span><span class="fr">Clé en main</span></div>
+            </div>
+          </div>
+          <div class="prop-specs">
+            <div class="prop-spec"><b>2–3</b><span><span class="es">Hab.</span><span class="en">Beds</span><span class="fr">Ch.</span></span></div>
+            <div class="prop-spec"><b>2</b><span><span class="es">Baños</span><span class="en">Baths</span><span class="fr">Sdb.</span></span></div>
+            <div class="prop-spec"><b>98 m²</b><span><span class="es">Const.</span><span class="en">Built</span><span class="fr">Const.</span></span></div>
+            <div class="prop-spec hl"><b>A+</b><span><span class="es">Energía</span><span class="en">Energy</span><span class="fr">Énergie</span></span></div>
+          </div>
+          <div class="prop-bullets">
+            <div class="prop-b"><span class="es"><strong>A 400 m del mar:</strong> acceso a pie entre dunas naturales hasta playas de arena dorada.</span><span class="en"><strong>400m to the beach:</strong> short walk through protected pine dunes onto golden sand.</span><span class="fr"><strong>À 400 m de la mer :</strong> accès à pied par les dunes protégées jusqu'au sable doré.</span></div>
+            <div class="prop-b"><span class="es"><strong>Zonas comunes estilo resort:</strong> piscina infinity, jardines botánicos, garaje subterráneo y trastero.</span><span class="en"><strong>Resort amenities:</strong> infinity pool, landscaped gardens, underground parking &amp; storage.</span><span class="fr"><strong>Prestations resort :</strong> piscine à débordement, jardins paysagers, parking souterrain et cellier.</span></div>
+            <div class="prop-b"><span class="es"><strong>25 min al Aeropuerto ALC:</strong> mantenimiento mínimo ideal como segunda residencia e inversión.</span><span class="en"><strong>25 min to Alicante Airport:</strong> effortless lock-and-leave home with strong summer demand.</span><span class="fr"><strong>25 min de l'aéroport ALC :</strong> résidence secondaire idéale sans contraintes d'entretien.</span></div>
+          </div>
+          <div class="prop-tags">
+            <span class="prop-tag warm">🏖️ 400 m <span class="es">Playa</span><span class="en">Beach</span><span class="fr">Plage</span></span>
+            <span class="prop-tag">✈️ 25 min ALC</span>
+            <span class="prop-tag">🅿️ <span class="es">Garaje + Trastero</span><span class="en">Garage + Storage</span><span class="fr">Parking + Cellier</span></span>
+          </div>
+          <div class="prop-fin">
+            <div><small><span class="es">Hipoteca 70% UCI</span><span class="en">Est. 70% UCI Loan</span><span class="fr">Prêt 70 % UCI est.</span></small><b>~890&nbsp;€<span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></b></div>
+            <div><small>IBI <span class="es">Anual</span><span class="en">Tax/yr</span><span class="fr">Taxe/an</span></small><b>~420&nbsp;€</b></div>
+            <div><small><span class="es">Rentab. Neta</span><span class="en">Proj. Net Yield</span><span class="fr">Rendement Net</span></small><b class="acc">~7.4%</b></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Propiedad 2: Towers III Poniente (385.000 €) -->
+      <div class="prop-card t-blue">
+        <div class="prop-gallery">
+          <div>
+            <img src="images/guia/propiedades/towers3-1.jpg" alt="Terraza Towers III Poniente" style="object-position:center 55%;">
+            <span class="prop-loc">📍 Benidorm · Playa Poniente</span>
+          </div>
+          <div>
+            <img src="images/guia/propiedades/towers3-2.jpg" alt="Arquitectura Towers III" style="object-position:center 45%;">
+          </div>
+        </div>
+        <div class="prop-body">
+          <div class="prop-head">
+            <div>
+              <div class="prop-tier"><span class="es">Tier 1 · Resort Frente al Mar</span><span class="en">Tier 1 · High-Rise Beach Resort</span><span class="fr">Tier 1 · Resort Face à la Mer</span></div>
+              <div class="prop-name">Towers III Poniente</div>
+            </div>
+            <div class="prop-price-box">
+              <div class="prop-price"><span class="es">385.000&nbsp;€</span><span class="en">385,000&nbsp;€</span><span class="fr">385&nbsp;000&nbsp;€</span></div>
+              <div class="prop-price-sub"><span class="es">Llave en mano</span><span class="us">~$415,000 USD</span><span class="ca">~$575,000 CAD</span><span class="fr">Clé en main</span></div>
+            </div>
+          </div>
+          <div class="prop-specs">
+            <div class="prop-spec"><b>2–3</b><span><span class="es">Hab.</span><span class="en">Beds</span><span class="fr">Ch.</span></span></div>
+            <div class="prop-spec"><b>2</b><span><span class="es">Baños</span><span class="en">Baths</span><span class="fr">Sdb.</span></span></div>
+            <div class="prop-spec"><b>110 m²</b><span><span class="es">Const.</span><span class="en">Built</span><span class="fr">Const.</span></span></div>
+            <div class="prop-spec hl"><b>A+</b><span><span class="es">Energía</span><span class="en">Energy</span><span class="fr">Énergie</span></span></div>
+          </div>
+          <div class="prop-bullets">
+            <div class="prop-b"><span class="es"><strong>A 150 m de Playa de Poniente:</strong> amplias terrazas acristaladas con vistas panorámicas al mar.</span><span class="en"><strong>150m to Poniente Beach:</strong> aerodynamic glass terraces with panoramic Mediterranean views.</span><span class="fr"><strong>À 150 m de la plage Poniente :</strong> grandes terrasses vitrées avec vue panoramique sur la mer.</span></div>
+            <div class="prop-b"><span class="es"><strong>Club social y wellness 365 días:</strong> piscina climatizada, gimnasio con vistas al mar, spa y pádel.</span><span class="en"><strong>Year-round wellness club:</strong> heated indoor/outdoor pools, sea-view gym, spa &amp; paddle courts.</span><span class="fr"><strong>Espace bien-être toute l'année :</strong> piscine chauffée, salle de sport vue mer, spa et padel.</span></div>
+            <div class="prop-b"><span class="es"><strong>35 min al Aeropuerto ALC:</strong> gastronomía, paseo marítimo y alta revalorización patrimonial.</span><span class="en"><strong>35 min to Alicante Airport:</strong> vibrant beachfront dining, promenade &amp; strong capital growth.</span><span class="fr"><strong>35 min de l'aéroport ALC :</strong> promenade maritime animée et forte valorisation patrimoniale.</span></div>
+          </div>
+          <div class="prop-tags">
+            <span class="prop-tag warm">🏖️ 150 m <span class="es">Playa</span><span class="en">Beach</span><span class="fr">Plage</span></span>
+            <span class="prop-tag">✈️ 35 min ALC</span>
+            <span class="prop-tag">🧖 <span class="es">Spa + Piscina Climat.</span><span class="en">Spa + Heated Pool</span><span class="fr">Spa + Piscine Chauffée</span></span>
+          </div>
+          <div class="prop-fin">
+            <div><small><span class="es">Hipoteca 70% UCI</span><span class="en">Est. 70% UCI Loan</span><span class="fr">Prêt 70 % UCI est.</span></small><b>~<span class="es">1.060</span><span class="en">1,060</span><span class="fr">1&nbsp;060</span>&nbsp;€<span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></b></div>
+            <div><small>IBI <span class="es">Anual</span><span class="en">Tax/yr</span><span class="fr">Taxe/an</span></small><b>~520&nbsp;€</b></div>
+            <div><small><span class="es">Rentab. Neta</span><span class="en">Proj. Net Yield</span><span class="fr">Rendement Net</span></small><b class="acc">~8.2%</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="navy-box" style="padding:3mm 4.6mm; display:flex; align-items:center; justify-content:space-between; gap:4mm;">
+      <div style="font-size:8pt; color:#F1F6FC; line-height:1.38;">
+        <strong style="color:var(--peach);"><span class="es">💳 Pagos flexibles sobre plano o llave en mano:</span><span class="en">💳 Flexible stage payments or turnkey handover:</span><span class="fr">💳 Paiements échelonnés flexibles ou clé en main :</span></strong>
+        <span class="es">reserva desde 6.000&nbsp;€, pagos fraccionados durante obra con aval bancario y hasta el <strong>70% en escritura</strong> mediante hipoteca no residente UCI.</span>
+        <span class="en">reserve from 6,000&nbsp;€, bank-guaranteed construction milestones, and finance up to <strong>70% at closing</strong> via UCI non-resident mortgage.</span>
+        <span class="fr">réservation dès 6 000 €, appels de fonds garantis pendant les travaux et jusqu'à <strong>70 % à la signature</strong> via prêt non-résident UCI.</span>
+      </div>
+    </div>
+  </div></div>
+  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">10 / 16</span></div>
+</section>
+
+<!-- ============================ 11 · OBRA NUEVA VILLAS Y ÁTICOS ============================ -->
+<section class="page">
+  <div class="sh"><span class="sh-tag"><span class="es">Obra Nueva · Villas y Áticos</span><span class="en">New-Build Showcase · Villas &amp; Penthouses</span><span class="fr">Programmes Neufs · Villas et Penthouses</span></span><img src="images/spain-connection-logo.png" alt="The Spain Connection"></div>
+  <div class="stage"><div class="stage-in" style="gap:3.2mm;">
+    <div class="hd">
+      <div>
+        <div class="hd-kicker-row"><span class="hd-bar"></span><span class="hd-kicker"><span class="es">Rango 450K € – 650K € · Villas y Áticos Sky</span><span class="en">450K € – 650K € Tier · Detached Villas &amp; Sky Penthouses</span><span class="fr">Budget 450 K€ – 650 K€ · Villas Privées et Penthouses</span></span></div>
+        <h1 class="hd-title" style="font-size:19.5pt;"><span class="es">Villas con Piscina Privada,<br>Áticos Panorámicos y Golf</span><span class="en">Private Pool Villas, Panoramic<br>Penthouses &amp; Golf Estates</span><span class="fr">Villas avec Piscine Privée,<br>Penthouses Vue Mer et Golf</span></h1>
+      </div>
+      <div class="hd-num">06</div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:3.2mm;" class="grow">
+      <!-- Propiedad 3: Villa Palma Nova (450.000 €) -->
+      <div class="prop-hcard l-orange" style="flex:1;">
+        <div class="prop-hphotos">
+          <div>
+            <img src="images/guia/propiedades/palmanova-1.jpg" alt="Villa Palma Nova San Fulgencio" style="object-position:center 55%;">
+            <span class="prop-loc">📍 San Fulgencio</span>
+          </div>
+          <div>
+            <img src="images/guia/propiedades/palmanova-2.jpg" alt="Terraza Villa Palma Nova" style="object-position:center 60%;">
+          </div>
+        </div>
+        <div class="prop-hbody">
+          <div class="prop-head">
+            <div>
+              <div class="prop-tier warm"><span class="es">Tier 2 · Villa Independiente de Diseño</span><span class="en">Tier 2 · Single-Level Detached Villa</span><span class="fr">Tier 2 · Villa Individuelle de Plain-Pied</span></div>
+              <div class="prop-name">Villa Palma Nova</div>
+            </div>
+            <div class="prop-price-box warm">
+              <div class="prop-price"><span class="es">450.000&nbsp;€</span><span class="en">450,000&nbsp;€</span><span class="fr">450&nbsp;000&nbsp;€</span></div>
+              <div class="prop-price-sub"><span class="es">Parcela 250 m²</span><span class="us">~$485,000 USD</span><span class="ca">~$675,000 CAD</span><span class="fr">Terrain 250 m²</span></div>
+            </div>
+          </div>
+          <div class="prop-specs">
+            <div class="prop-spec"><b>3</b><span><span class="es">Hab.</span><span class="en">Beds</span><span class="fr">Ch.</span></span></div>
+            <div class="prop-spec"><b>2</b><span><span class="es">Baños</span><span class="en">Baths</span><span class="fr">Sdb.</span></span></div>
+            <div class="prop-spec"><b>125 m²</b><span><span class="es">Const.</span><span class="en">Built</span><span class="fr">Const.</span></span></div>
+            <div class="prop-spec hl"><b>A+</b><span><span class="es">Energía</span><span class="en">Energy</span><span class="fr">Énergie</span></span></div>
+          </div>
+          <div class="prop-bullets">
+            <div class="prop-b"><span class="es"><strong>Comodidad en una sola planta (0 escaleras interiores):</strong> privacidad total, ideal para retiro activo o residencia anual.</span><span class="en"><strong>Single-level 0-stair layout:</strong> complete privacy and effortless accessibility, ideal for active retirement.</span><span class="fr"><strong>Architecture de plain-pied (0 escalier intérieur) :</strong> intimité totale et confort optimal toute l'année.</span></div>
+            <div class="prop-b"><span class="es"><strong>Piscina privada 6×3 m y solárium de 45 m²:</strong> entorno tranquilo de pueblo mediterráneo a 12 min del mar y 25 min ALC.</span><span class="en"><strong>Private 6×3m pool &amp; 45 m² rooftop solarium:</strong> walkable Mediterranean village 12 min to beaches &amp; 25 min to ALC.</span><span class="fr"><strong>Piscine privée 6×3 m et solarium de 45 m² :</strong> village méditerranéen authentique à 12 min des plages et 25 min d'ALC.</span></div>
+          </div>
+          <div class="prop-fin">
+            <div><small><span class="es">Hipoteca 70% UCI</span><span class="en">Est. 70% UCI Loan</span><span class="fr">Prêt 70 % UCI est.</span></small><b>~<span class="es">1.240</span><span class="en">1,240</span><span class="fr">1&nbsp;240</span>&nbsp;€<span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></b></div>
+            <div><small>IBI <span class="es">Anual</span><span class="en">Tax/yr</span><span class="fr">Taxe/an</span></small><b>~480&nbsp;€</b></div>
+            <div><small><span class="es">Tipología</span><span class="en">Lifestyle</span><span class="fr">Typologie</span></small><b class="acc"><span class="es">Villa Privada</span><span class="en">Private Villa</span><span class="fr">Villa Privée</span></b></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Propiedad 4: Sierra Cortina Sky Penthouse (600.000 €) -->
+      <div class="prop-hcard l-blue" style="flex:1;">
+        <div class="prop-hphotos">
+          <div>
+            <img src="images/guia/propiedades/sierracortina-1.jpg" alt="Ático Sierra Cortina Finestrat" style="object-position:center 50%;">
+            <span class="prop-loc">📍 Finestrat · Sierra Cortina</span>
+          </div>
+          <div>
+            <img src="images/guia/propiedades/sierracortina-2.jpg" alt="Interior Sierra Cortina" style="object-position:center 55%;">
+          </div>
+        </div>
+        <div class="prop-hbody">
+          <div class="prop-head">
+            <div>
+              <div class="prop-tier"><span class="es">Tier 3 · Ático Sky en Resort Privado 24h</span><span class="en">Tier 3 · Gated Resort Sky Penthouse</span><span class="fr">Tier 3 · Penthouse Résidence Sécurisée 24h</span></div>
+              <div class="prop-name">Sierra Cortina Sky Penthouse</div>
+            </div>
+            <div class="prop-price-box">
+              <div class="prop-price"><span class="es">600.000&nbsp;€</span><span class="en">600,000&nbsp;€</span><span class="fr">600&nbsp;000&nbsp;€</span></div>
+              <div class="prop-price-sub"><span class="es">+85 m² Solárium</span><span class="us">~$645,000 USD</span><span class="ca">~$900,000 CAD</span><span class="fr">+85 m² Solarium</span></div>
+            </div>
+          </div>
+          <div class="prop-specs">
+            <div class="prop-spec"><b>3</b><span><span class="es">Hab.</span><span class="en">Beds</span><span class="fr">Ch.</span></span></div>
+            <div class="prop-spec"><b>3</b><span><span class="es">Baños</span><span class="en">Baths</span><span class="fr">Sdb.</span></span></div>
+            <div class="prop-spec"><b>160 m²</b><span><span class="es">Const.</span><span class="en">Built</span><span class="fr">Const.</span></span></div>
+            <div class="prop-spec hl"><b>A+</b><span><span class="es">Energía</span><span class="en">Energy</span><span class="fr">Énergie</span></span></div>
+          </div>
+          <div class="prop-bullets">
+            <div class="prop-b"><span class="es"><strong>Vistas panorámicas 180° al mar:</strong> solárium privado de 85 m² con jacuzzi integrado y cocina exterior de verano.</span><span class="en"><strong>180° Mediterranean bay views:</strong> 85 m² rooftop sky solarium with built-in jacuzzi &amp; outdoor BBQ kitchen.</span><span class="fr"><strong>Vue panoramique 180° sur la baie :</strong> toit-terrasse de 85 m² avec jacuzzi intégré et cuisine d'été extérieure.</span></div>
+            <div class="prop-b"><span class="es"><strong>Enclave privado Sierra Cortina:</strong> vigilancia 24/7, campos de golf, alta gastronomía, domótica y garaje doble a 5 min del mar.</span><span class="en"><strong>24/7 gated security:</strong> exclusive golf enclave with smart-home automation, double garage &amp; beaches 5 min away.</span><span class="fr"><strong>Domaine fermé sécurité 24h/24 :</strong> golf, domotique, porcelaine italienne, garage double et plages à 5 min.</span></div>
+          </div>
+          <div class="prop-fin">
+            <div><small><span class="es">Hipoteca 70% UCI</span><span class="en">Est. 70% UCI Loan</span><span class="fr">Prêt 70 % UCI est.</span></small><b>~<span class="es">1.650</span><span class="en">1,650</span><span class="fr">1&nbsp;650</span>&nbsp;€<span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></b></div>
+            <div><small>IBI <span class="es">Anual</span><span class="en">Tax/yr</span><span class="fr">Taxe/an</span></small><b>~680&nbsp;€</b></div>
+            <div><small><span class="es">Tipología</span><span class="en">Lifestyle</span><span class="fr">Typologie</span></small><b class="acc"><span class="es">Ático Sky</span><span class="en">Sky Luxury</span><span class="fr">Penthouse Luxe</span></b></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Propiedad 5: Residencial Homes II (650.000 €) -->
+      <div class="prop-hcard l-orange" style="flex:1;">
+        <div class="prop-hphotos">
+          <div>
+            <img src="images/guia/propiedades/homes2-1.jpg" alt="Residencial Homes II Algorfa Golf" style="object-position:center 55%;">
+            <span class="prop-loc">📍 Algorfa · Golf Resort</span>
+          </div>
+          <div>
+            <img src="images/guia/propiedades/homes2-2.jpg" alt="Salón Residencial Homes II" style="object-position:center 55%;">
+          </div>
+        </div>
+        <div class="prop-hbody">
+          <div class="prop-head">
+            <div>
+              <div class="prop-tier warm"><span class="es">Tier 3 · Villa Familiar en Campo de Golf</span><span class="en">Tier 3 · Contemporary Golf Estate</span><span class="fr">Tier 3 · Villa Contemporaine Bord de Golf</span></div>
+              <div class="prop-name">Residencial Homes II</div>
+            </div>
+            <div class="prop-price-box warm">
+              <div class="prop-price"><span class="es">650.000&nbsp;€</span><span class="en">650,000&nbsp;€</span><span class="fr">650&nbsp;000&nbsp;€</span></div>
+              <div class="prop-price-sub"><span class="es">Parcela 500 m²</span><span class="us">~$700,000 USD</span><span class="ca">~$975,000 CAD</span><span class="fr">Terrain 500 m²</span></div>
+            </div>
+          </div>
+          <div class="prop-specs">
+            <div class="prop-spec"><b>4</b><span><span class="es">Hab.</span><span class="en">Beds</span><span class="fr">Ch.</span></span></div>
+            <div class="prop-spec"><b>4</b><span><span class="es">Baños</span><span class="en">Baths</span><span class="fr">Sdb.</span></span></div>
+            <div class="prop-spec"><b>210 m²</b><span><span class="es">Const.</span><span class="en">Built</span><span class="fr">Const.</span></span></div>
+            <div class="prop-spec hl"><b>A+</b><span><span class="es">Energía</span><span class="en">Energy</span><span class="fr">Énergie</span></span></div>
+          </div>
+          <div class="prop-bullets">
+            <div class="prop-b"><span class="es"><strong>Parcela privada de 500 m² junto a golf de campeonato:</strong> piscina de diseño 8×4 m con plataforma solar húmeda.</span><span class="en"><strong>500 m² private plot by championship golf:</strong> oversized 8×4m pool with sun lounge ledge &amp; perimeter privacy.</span><span class="fr"><strong>Parcelle privée de 500 m² face au golf :</strong> piscine design 8×4 m avec plage immergée et intimité absolue.</span></div>
+            <div class="prop-b"><span class="es"><strong>Arquitectura de autor:</strong> salón de doble altura, suelo radiante por aerotermia y cocina italiana a 15 min del mar.</span><span class="en"><strong>Flagship craftsmanship:</strong> double-height salon, aerothermal underfloor heating &amp; Italian kitchen, 15 min to beach.</span><span class="fr"><strong>Prestations haut de gamme :</strong> séjour double hauteur, chauffage au sol aérothermique et cuisine italienne à 15 min mer.</span></div>
+          </div>
+          <div class="prop-fin">
+            <div><small><span class="es">Hipoteca 70% UCI</span><span class="en">Est. 70% UCI Loan</span><span class="fr">Prêt 70 % UCI est.</span></small><b>~<span class="es">1.790</span><span class="en">1,790</span><span class="fr">1&nbsp;790</span>&nbsp;€<span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></b></div>
+            <div><small>IBI <span class="es">Anual</span><span class="en">Tax/yr</span><span class="fr">Taxe/an</span></small><b>~740&nbsp;€</b></div>
+            <div><small><span class="es">Tipología</span><span class="en">Lifestyle</span><span class="fr">Typologie</span></small><b class="acc"><span class="es">Villa Golf</span><span class="en">Golf Estate</span><span class="fr">Villa Golf</span></b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="navy-box" style="padding:3mm 4.6mm; display:flex; align-items:center; justify-content:space-between; gap:4mm;">
+      <div style="font-size:8pt; color:#F1F6FC; line-height:1.38;">
+        <strong style="color:var(--peach);"><span class="es">🛡️ Mismo precio oficial del promotor, doble protección:</span><span class="en">🛡️ Official developer pricing, double protection:</span><span class="fr">🛡️ Prix direct promoteur garanti, double protection :</span></strong>
+        <span class="es">acceso a +150 promociones verificadas en Costa Blanca sin sobreprecio para el comprador, con aval bancario obligatorio (Ley 20/2015).</span>
+        <span class="en">access 150+ verified Costa Blanca developments with zero buyer markup and mandatory bank-guaranteed stage payments (Law 20/2015).</span>
+        <span class="fr">accès à +150 programmes vérifiés sur la Costa Blanca sans surcoût acheteur et paiements garantis par banque (Loi 20/2015).</span>
+      </div>
+    </div>
+    <p class="note" style="margin-top:-1mm;">
+      <span class="es">* Promociones representativas verificadas · Precios desde (impuestos no incl.), tipos de cambio y cuotas UCI (70% LTV) orientativos sujetos a disponibilidad.</span>
+      <span class="en">* Representative verified developments · Starting prices (excl. tax), FX equivalents and 70% LTV UCI monthly figures are indicative and subject to availability.</span>
+      <span class="fr">* Programmes représentatifs vérifiés · Prix à partir de (hors taxes) et mensualités UCI (70 % LTV) indicatifs sous réserve de disponibilité.</span>
+    </p>
+  </div></div>
+  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">11 / 16</span></div>
+</section>
+
+<!-- ============================ 12 · RESIDENCIA (HÉROE) ============================ -->
 <section class="page page-hero" style="--hero-h:92mm;">
   <div class="hero">
     <img src="images/guia/sunset-walk.jpg" alt="Paseo al atardecer" style="object-position:center 45%;">
     <div class="hero-veil"></div>
     <div class="hero-content">
-      <div class="hero-num">06</div>
+      <div class="hero-num">07</div>
       <div>
         <div class="hero-kicker-row"><span class="hero-bar"></span><span class="hero-kicker"><span class="es">Vías Legales</span><span class="en">Legal Pathways</span><span class="fr">Voies Légales</span></span></div>
         <h1 class="hero-title"><span class="es">Residencia, Visados<br>y Vías Legales</span><span class="en">Residency, Visas &amp;<br>Legal Pathways</span><span class="fr">Résidence, Visas<br>et Voies Légales</span></h1>
@@ -907,7 +1290,7 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
         <div class="ios-head"><span class="ic warm">💻</span><div><div class="ios-title"><span class="es">Visa Nómada Digital</span><span class="en">Digital Nomad Visa</span><span class="fr">Visa Nomade Numérique</span></div><div class="ios-sub"><span class="es">Para trabajadores remotos</span><span class="en">For remote workers</span><span class="fr">Pour les travailleurs à distance</span></div></div></div>
         <div class="ios-row"><span class="k"><span class="es">Dirigido a</span><span class="en">Target</span><span class="fr">S'adresse à</span></span><span class="v"><span class="es">Trabajadores remotos / freelancers</span><span class="en">Remote workers / freelancers</span><span class="fr">Travailleurs à distance / freelancers</span></span></div>
         <div class="ios-row"><span class="k"><span class="es">Duración</span><span class="en">Duration</span><span class="fr">Durée</span></span><span class="v"><span class="es">1 año (renovable a 3)</span><span class="en">1 year (renewable to 3)</span><span class="fr">1 an (renouvelable à 3)</span></span></div>
-        <div class="ios-row"><span class="k"><span class="es">Ingreso mínimo</span><span class="en">Min. income</span><span class="fr">Revenu minimum</span></span><span class="v">~€3,024<span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></span></div>
+        <div class="ios-row"><span class="k"><span class="es">Ingreso mínimo</span><span class="en">Min. income</span><span class="fr">Revenu minimum</span></span><span class="v">~<span class="es">3.024</span><span class="en">3,024</span><span class="fr">3&nbsp;024</span>&nbsp;€<span class="es">/mes</span><span class="en">/mo</span><span class="fr">/mois</span></span></div>
         <div class="ios-row"><span class="k"><span class="es">Beneficio fiscal</span><span class="en">Tax benefit</span><span class="fr">Avantage fiscal</span></span><span class="v hl"><span class="es">Ley Beckham — tipo fijo 24%</span><span class="en">Beckham Law — flat 24% rate</span><span class="fr">Loi Beckham — taux fixe 24 %</span></span></div>
         <div class="ios-row"><span class="k"><span class="es">Requisito laboral</span><span class="en">Work requirement</span><span class="fr">Condition de travail</span></span><span class="v"><span class="es">Max 20% clientes en España</span><span class="en">Max 20% clients in Spain</span><span class="fr">Max 20 % clients en Espagne</span></span></div>
         <div class="ios-row"><span class="k"><span class="es">Familia</span><span class="en">Family</span><span class="fr">Famille</span></span><span class="v"><span class="es">Incluye cónyuge e hijos</span><span class="en">Includes spouse &amp; children</span><span class="fr">Inclut conjoint et enfants</span></span></div>
@@ -916,7 +1299,7 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
         <div class="ios-head"><span class="ic">🌅</span><div><div class="ios-title"><span class="es">Visa No Lucrativa</span><span class="en">Non-Lucrative Visa</span><span class="fr">Visa Non Lucratif</span></div><div class="ios-sub"><span class="es">Para jubilados / renta pasiva</span><span class="en">For retirees / passive income</span><span class="fr">Pour retraités / revenus passifs</span></div></div></div>
         <div class="ios-row"><span class="k"><span class="es">Dirigido a</span><span class="en">Target</span><span class="fr">S'adresse à</span></span><span class="v"><span class="es">Jubilados / inversores pasivos</span><span class="en">Retirees / passive investors</span><span class="fr">Retraités / investisseurs passifs</span></span></div>
         <div class="ios-row"><span class="k"><span class="es">Duración</span><span class="en">Duration</span><span class="fr">Durée</span></span><span class="v"><span class="es">1 año (renovable a 2+2)</span><span class="en">1 year (renewable 2+2)</span><span class="fr">1 an (renouvelable 2+2)</span></span></div>
-        <div class="ios-row"><span class="k"><span class="es">Ingreso mínimo</span><span class="en">Min. income</span><span class="fr">Revenu minimum</span></span><span class="v">~€28,800<span class="es">/año</span><span class="en">/yr</span><span class="fr">/an</span></span></div>
+        <div class="ios-row"><span class="k"><span class="es">Ingreso mínimo</span><span class="en">Min. income</span><span class="fr">Revenu minimum</span></span><span class="v">~<span class="es">28.800</span><span class="en">28,800</span><span class="fr">28&nbsp;800</span>&nbsp;€<span class="es">/año</span><span class="en">/yr</span><span class="fr">/an</span></span></div>
         <div class="ios-row"><span class="k"><span class="es">Trabajo</span><span class="en">Employment</span><span class="fr">Travail</span></span><span class="v"><span class="es">No permite trabajar en España</span><span class="en">Cannot work in Spain</span><span class="fr">Ne permet pas de travailler en Espagne</span></span></div>
         <div class="ios-row"><span class="k"><span class="es">Seguro médico</span><span class="en">Health insurance</span><span class="fr">Assurance maladie</span></span><span class="v"><span class="es">Privado obligatorio (sin copago)</span><span class="en">Private required (no co-pay)</span><span class="fr">Privée obligatoire (sans franchise)</span></span></div>
         <div class="ios-row"><span class="k"><span class="es">Familia</span><span class="en">Family</span><span class="fr">Famille</span></span><span class="v"><span class="es">Incluye cónyuge e hijos</span><span class="en">Includes spouse &amp; children</span><span class="fr">Inclut conjoint et enfants</span></span></div>
@@ -929,10 +1312,10 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
       <div class="card l-orange" style="padding:3.6mm 4mm;"><h3>🌎 <span class="es">Doble Nacionalidad</span><span class="en">Dual Nationality</span><span class="fr">Double Nationalité</span></h3><p><span class="es">Ciudadanos de países iberoamericanos: nacionalidad tras 2 años de residencia legal.</span><span class="en">Citizens from Hispanic American countries: citizenship after 2 years of legal residency.</span><span class="fr">Citoyens des pays hispano-américains : nationalité après 2 ans de résidence légale.</span></p></div>
     </div>
   </div></div>
-  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">10 / 14</span></div>
+  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">12 / 16</span></div>
 </section>
 
-<!-- ============================ 11 · REQUISITOS DE VISADO ============================ -->
+<!-- ============================ 13 · REQUISITOS DE VISADO ============================ -->
 <section class="page">
   <div class="sh"><span class="sh-tag"><span class="es">Residencia y Visados</span><span class="en">Residency &amp; Visas</span><span class="fr">Résidence et Visas</span></span><img src="images/spain-connection-logo.png" alt="The Spain Connection"></div>
   <div class="stage"><div class="stage-in">
@@ -941,7 +1324,7 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
         <div class="hd-kicker-row"><span class="hd-bar"></span><span class="hd-kicker"><span class="es">Tu expediente</span><span class="en">Your application</span><span class="fr">Votre dossier</span></span></div>
         <h1 class="hd-title"><span class="es">Requisitos Generales para<br>Solicitar tu Visado</span><span class="en">Key Requirements for<br>Your Visa Application</span><span class="fr">Conditions Générales pour<br>Votre Demande de Visa</span></h1>
       </div>
-      <div class="hd-num">06</div>
+      <div class="hd-num">07</div>
     </div>
     <div class="g2">
       <div class="card step"><span class="num bg-sun">1</span><div><h3><span class="es">Seguro médico privado</span><span class="en">Private health insurance</span><span class="fr">Assurance santé privée</span></h3><p><span class="es">Cobertura completa en España sin copagos ni carencias.</span><span class="en">Full coverage in Spain with zero co-pays or waiting periods.</span><span class="fr">Couverture complète en Espagne sans franchise ni délai de carence.</span></p></div></div>
@@ -969,16 +1352,16 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
       <div class="cap">📍 <span class="es">Costa Blanca · Tu nueva vida empieza aquí</span><span class="en">Costa Blanca · Your new life starts here</span><span class="fr">Costa Blanca · Votre nouvelle vie commence ici</span></div>
     </div>
   </div></div>
-  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">11 / 14</span></div>
+  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">13 / 16</span></div>
 </section>
 
-<!-- ============================ 12 · SOCIOS (HÉROE) ============================ -->
+<!-- ============================ 14 · SOCIOS (HÉROE) ============================ -->
 <section class="page page-hero" style="--hero-h:80mm;">
   <div class="hero">
     <img src="images/guia/team.jpg" alt="Equipo de asesores" style="object-position:center 40%;">
     <div class="hero-veil"></div>
     <div class="hero-content">
-      <div class="hero-num">07</div>
+      <div class="hero-num">08</div>
       <div>
         <div class="hero-kicker-row"><span class="hero-bar"></span><span class="hero-kicker"><span class="es">Socios Aliados</span><span class="en">Allied Partners</span><span class="fr">Partenaires Alliés</span></span></div>
         <h1 class="hero-title"><span class="es">Ecosistema de Valor<br>y Socios Aliados</span><span class="en">Value Ecosystem &amp;<br>Allied Partners</span><span class="fr">Écosystème de Valeur<br>et Partenaires Alliés</span></h1>
@@ -1024,10 +1407,10 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
       <span class="fr">🛡️ Un seul point de contact pour tout. <strong style="color:var(--peach);">Vous vous concentrez sur le choix de votre bien. Nous nous occupons du reste.</strong></span>
     </div>
   </div></div>
-  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">12 / 14</span></div>
+  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">14 / 16</span></div>
 </section>
 
-<!-- ============================ 13 · CONTACTO Y OFICINAS ============================ -->
+<!-- ============================ 15 · CONTACTO Y OFICINAS ============================ -->
 <section class="page">
   <div class="sh"><span class="sh-tag"><span class="es">Contacto y Oficinas</span><span class="en">Contact &amp; Offices</span><span class="fr">Contact et Bureaux</span></span><img src="images/spain-connection-logo.png" alt="The Spain Connection"></div>
   <div class="stage"><div class="stage-in">
@@ -1036,7 +1419,7 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
         <div class="hd-kicker-row"><span class="hd-bar"></span><span class="hd-kicker"><span class="es">Tu Próximo Paso</span><span class="en">Your Next Step</span><span class="fr">Votre Prochaine Étape</span></span></div>
         <h1 class="hd-title"><span class="es">Contacto y<br>Oficinas de la Alianza</span><span class="en">Contact &amp;<br>Alliance Offices</span><span class="fr">Contact et<br>Bureaux de l'Alliance</span></h1>
       </div>
-      <div class="hd-num">08</div>
+      <div class="hd-num">09</div>
     </div>
     <div style="display:grid; grid-template-columns:1.6fr 1fr; gap:4.4mm;" class="grow">
       <div class="card letter l-orange" style="display:flex; flex-direction:column; justify-content:center;">
@@ -1068,10 +1451,10 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
       <div style="font-size:8.2pt; font-weight:600;">🌐 <a href="https://www.fuster-associates.com" target="_blank" style="color:var(--blue); text-decoration:none;">fuster-associates.com</a> &nbsp;·&nbsp; ✉️ <a href="mailto:hola@fuster-associates.com" style="color:var(--blue); text-decoration:none;">hola@fuster-associates.com</a></div>
     </div>
   </div></div>
-  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">13 / 14</span></div>
+  <div class="sf"><span>2026 © The Spain Connection</span><span class="sf-num">15 / 16</span></div>
 </section>
 
-<!-- ============================ 14 · CONTRAPORTADA ============================ -->
+<!-- ============================ 16 · CONTRAPORTADA ============================ -->
 <section class="page cover back">
   <img class="cover-bg" src="images/guia/cover-sunset.jpg" alt="Alicante al atardecer" style="object-position:center center;">
   <div class="cover-veil"></div>
@@ -1189,7 +1572,7 @@ table.tbl { width: 100%; border-collapse: separate; border-spacing: 0; backgroun
     };
     var name = pdfMap[getPreferredLang()] || pdfMap.es;
     var a = document.createElement('a');
-    a.href = 'pdfs/' + name;
+    a.href = 'pdfs/' + name + '?v=20261119_v4';
     a.download = name;
     document.body.appendChild(a);
     a.click();

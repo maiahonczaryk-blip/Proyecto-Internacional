@@ -110,10 +110,12 @@ App.buyerGuide = (function() {
     return pdfLibPromise;
   }
 
+  const TEMPLATE_VERSION = '20261119_v4';
+
   function loadTemplate(lang) {
     const cfg = LANGS[lang] || LANGS.es;
     if (!templateCache[cfg.file]) {
-      templateCache[cfg.file] = fetch(cfg.file)
+      templateCache[cfg.file] = fetch(cfg.file + '?v=' + TEMPLATE_VERSION)
         .then(r => {
           if (!r.ok) throw new Error('No se encontró la plantilla de la guía.');
           return r.arrayBuffer();
@@ -448,7 +450,7 @@ App.buyerGuide = (function() {
             <button type="button" class="btn btn-primary" id="${uid}-download-btn">📥 Descargar guía personalizada (PDF)</button>
             <button type="button" class="btn btn-outline" id="${uid}-save-btn">💾 Guardar datos</button>
           </div>
-          <p style="font-size:0.72rem; color:#94a3b8; margin:0.5rem 0 0;">Al descargar, los datos se guardan automáticamente. Tu foto y contacto aparecen en la carta final (pág. 13) y en la contraportada (pág. 14), con enlaces directos a tu email y teléfono.</p>
+          <p style="font-size:0.72rem; color:#94a3b8; margin:0.5rem 0 0;">Al descargar, los datos se guardan automáticamente. Tu foto y contacto aparecen en la carta final (pág. 15) y en la contraportada (pág. 16), con enlaces directos a tu email y teléfono.</p>
         </div>
       </div>
     `;
