@@ -24,39 +24,81 @@ document.addEventListener('DOMContentLoaded', () => {
   const langDropdown = document.getElementById('lang-dropdown');
   const langDropdownItems = document.querySelectorAll('.lang-dropdown-item');
 
-  function setLang(lang) {
-    if (!langConfig[lang]) return;
-    currentLang = lang;
+  function syncDynamicI18nAttributes(lang) {
+    const attrKey = lang === 'en-ca' ? 'i18nEnCa' : ('i18n' + lang.charAt(0).toUpperCase() + lang.slice(1));
+    const fallbackKey = lang === 'es' ? 'i18nEs' : 'i18nEn';
 
-    // Persist preference across sessions
-    try { localStorage.setItem(LANG_STORAGE_KEY, lang); } catch(e) {}
+    // Sync <option> and text-only elements carrying data-i18n-* attributes
+    document.querySelectorAll('[data-i18n-en], [data-i18n-es]').forEach(el => {
+      const nextText = el.dataset[attrKey] || el.dataset[fallbackKey] || el.dataset.i18nEn || el.dataset.i18nEs;
+      if (nextText !== undefined && el.textContent !== nextText) {
+        el.textContent = nextText;
+      }
+    });
+
+    // Sync input/textarea placeholders carrying data-placeholder-en / data-placeholder-es
+    const phKey = lang === 'es' ? 'placeholderEs' : 'placeholderEn';
+    document.querySelectorAll('[data-placeholder-en], [data-placeholder-es]').forEach(el => {
+      const nextPh = el.dataset[phKey] || el.dataset.placeholderEn || el.dataset.placeholderEs;
+      if (nextPh !== undefined) {
+        el.placeholder = nextPh;
+      }
+    });
+
+    // Sync aria-pressed on segmented EN | ES switch buttons
+    const effectiveDashLang = (lang === 'es') ? 'es' : 'en';
+    document.querySelectorAll('.dashboard-lang-switch__opt[data-set-lang]').forEach(btn => {
+      btn.setAttribute('aria-pressed', btn.dataset.setLang === effectiveDashLang ? 'true' : 'false');
+    });
+  }
+
+  function setLang(lang, options = {}) {
+    if (!langConfig[lang]) return;
+    const isDashboard = body.classList.contains('dashboard-body');
+    const effectiveLang = (isDashboard && (lang === 'fr' || lang === 'en-ca')) ? 'en' : lang;
+    currentLang = effectiveLang;
+
+    // Persist preference across sessions unless suppressed (e.g. dashboard fallback from FR/EN-CA)
+    if (options.persist !== false) {
+      try { localStorage.setItem(LANG_STORAGE_KEY, effectiveLang); } catch(e) {}
+    }
 
     // Update body class
     body.classList.remove('lang-en', 'lang-es', 'lang-fr', 'lang-en-ca');
-    body.classList.add('lang-' + lang);
+    body.classList.add('lang-' + effectiveLang);
 
     // Update html lang attribute
     const htmlLangMap = { en: 'en', es: 'es', fr: 'fr', 'en-ca': 'en-CA' };
-    document.documentElement.lang = htmlLangMap[lang];
+    document.documentElement.lang = htmlLangMap[effectiveLang] || 'en';
 
-    // Update button appearance (code only — flag handled by CSS span)
-    if (langCode) langCode.textContent = langConfig[lang].code;
+    // Update button appearance on landing navbar (code only — flag handled by CSS span)
+    if (langCode) langCode.textContent = langConfig[effectiveLang].code;
 
     // Update active state on dropdown items
     langDropdownItems.forEach(item => {
-      item.classList.toggle('active', item.dataset.lang === lang);
+      item.classList.toggle('active', item.dataset.lang === effectiveLang);
     });
 
-    // Update sidebar & mobile topbar dashboard lang toggle labels (app.html)
-    const nextLangText = (lang === 'es') ? 'EN' : 'ES';
+    // Legacy single-label fallback if present
+    const nextLangText = (effectiveLang === 'es') ? 'EN' : 'ES';
     const sidebarLangLabel = document.querySelector('#sidebar-lang-toggle .lang-label');
     if (sidebarLangLabel) sidebarLangLabel.textContent = nextLangText;
     const mobileLangLabel = document.querySelector('#mobile-lang-toggle .lang-label');
     if (mobileLangLabel) mobileLangLabel.textContent = nextLangText;
 
-    // Update form placeholders
-    updateFormPlaceholders(lang);
+    // Update form placeholders & dynamic <option> / placeholder attributes
+    updateFormPlaceholders(effectiveLang);
+    syncDynamicI18nAttributes(effectiveLang);
+
+    try {
+      window.dispatchEvent(new CustomEvent('remax:langchange', { detail: { lang: effectiveLang } }));
+    } catch (_) {}
   }
+
+  window.App = window.App || {};
+  window.App.setLanguage = (lang) => setLang(lang, { persist: true });
+  window.App.getLanguage = () => currentLang;
+  window.App.updateLangDisplay = () => syncDynamicI18nAttributes(currentLang);
 
   // Toggle dropdown open/close
   if (langSelectorBtn) {
@@ -76,18 +118,38 @@ document.addEventListener('DOMContentLoaded', () => {
   // Language option click
   langDropdownItems.forEach(item => {
     item.addEventListener('click', () => {
-      setLang(item.dataset.lang);
-      langSelectorWrapper.classList.remove('open');
+      setLang(item.dataset.lang, { persist: true });
+      if (langSelectorWrapper) langSelectorWrapper.classList.remove('open');
     });
+  });
+
+  // Delegate clicks on segmented EN | ES buttons ([data-set-lang]) anywhere in the app
+  document.addEventListener('click', (e) => {
+    const optBtn = e.target.closest('[data-set-lang]');
+    if (optBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      const targetLang = optBtn.dataset.setLang;
+      if (targetLang) setLang(targetLang, { persist: true });
+      return;
+    }
+    const toggleContainer = e.target.closest('#sidebar-lang-toggle, #mobile-lang-toggle');
+    if (toggleContainer) {
+      e.preventDefault();
+      const next = body.classList.contains('lang-es') ? 'en' : 'es';
+      setLang(next, { persist: true });
+    }
   });
 
   // Initialize: saved preference → browser language → 'en' fallback
   (function initLang() {
     let lang = 'en';
+    let hadSaved = false;
     try {
       const saved = localStorage.getItem(LANG_STORAGE_KEY);
       if (saved && langConfig[saved]) {
         lang = saved;
+        hadSaved = true;
       } else {
         // Auto-detect from browser language
         const bl = (navigator.language || navigator.userLanguage || '').toLowerCase();
@@ -100,24 +162,11 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch(e) { lang = 'en'; }
 
     // Dashboard pages (app.html) only have EN and ES content.
-    // If FR or EN-CA is selected, fall back to EN to avoid blank dashboards.
+    // If FR or EN-CA was saved on the landing page, render EN on dashboards without overwriting saved FR/EN-CA.
     const isDashboard = body.classList.contains('dashboard-body');
-    if (isDashboard && (lang === 'fr' || lang === 'en-ca')) {
-      lang = 'en';
-    }
-
-    setLang(lang);
+    const isFallbackFromFrCa = isDashboard && (lang === 'fr' || lang === 'en-ca');
+    setLang(isFallbackFromFrCa ? 'en' : lang, { persist: !isFallbackFromFrCa || !hadSaved });
   })();
-
-  // ── Dashboard sidebar & mobile topbar lang toggle (app.html: cycles EN ↔ ES) ──
-  [document.getElementById('sidebar-lang-toggle'), document.getElementById('mobile-lang-toggle')].forEach(btn => {
-    if (btn) {
-      btn.addEventListener('click', () => {
-        const next = body.classList.contains('lang-es') ? 'en' : 'es';
-        setLang(next);
-      });
-    }
-  });
 
   function updateFormPlaceholders(lang) {
     const placeholders = {
@@ -823,13 +872,9 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
     
-    // Listen for language changes to refresh details text (via lang dropdown)
-    document.querySelectorAll('.lang-dropdown-item').forEach(item => {
-      item.addEventListener('click', () => {
-        setTimeout(() => {
-          updatePipeline(currentStep);
-        }, 50);
-      });
+    // Listen for language changes to refresh details text
+    window.addEventListener('remax:langchange', () => {
+      updatePipeline(currentStep);
     });
     
     // Initialize step 1

@@ -32,6 +32,11 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
+      const welcomeEl = document.getElementById('broker-welcome');
+      if (welcomeEl) {
+        welcomeEl.innerHTML = `<span class="lang-en">Welcome back, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Manage your agency team, clients, and commissions.</span><span class="lang-es">Bienvenido/a de nuevo, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Gestiona tu equipo de agencia, clientes y comisiones.</span>`;
+      }
+
       if (App.utils && App.utils.renderUserRegionalBanner) {
         await App.utils.renderUserRegionalBanner('broker-regional-banner', currentUser);
       }
@@ -192,7 +197,9 @@
       if (addBtnContainer) {
         addBtnContainer.innerHTML = `
           <button class="btn btn-primary" onclick="App.views.broker.showAddClientModal()" style="display: flex; align-items: center; gap: 8px; padding: 0.65rem 1.25rem; font-size: 0.9rem; border-radius: 8px; background: linear-gradient(135deg, #0043ff, #0066ff); border: none; box-shadow: 0 2px 8px rgba(0,67,255,0.2);">
-            <span style="font-size: 1.1rem;">➕</span> Add Client Manually
+            <span style="font-size: 1.1rem;">➕</span>
+            <span class="lang-en">Add Client Manually</span>
+            <span class="lang-es">Añadir Cliente Manualmente</span>
           </button>
         `;
       }
@@ -235,7 +242,7 @@
     if (!container) return;
 
     if (realtors.length === 0) {
-      App.utils.showEmptyState('broker-team-overview', 'No team members yet.', '👥');
+      App.utils.showEmptyState('broker-team-overview', '<span class="lang-en">No team members yet.</span><span class="lang-es">Aún no hay miembros en el equipo.</span>', '👥');
       return;
     }
 
@@ -249,7 +256,7 @@
           ${avatar}
           <div style="flex: 1; min-width: 0;">
             <div style="font-weight: 600; font-size: 0.9rem;">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}</div>
-            <div style="font-size: 0.8rem; color: #6b7280;">${clientCount} client${clientCount !== 1 ? 's' : ''}</div>
+            <div style="font-size: 0.8rem; color: #6b7280;">${clientCount} <span class="lang-en">client${clientCount !== 1 ? 's' : ''}</span><span class="lang-es">cliente${clientCount !== 1 ? 's' : ''}</span></div>
           </div>
           ${statusBadge}
         </div>
@@ -309,6 +316,11 @@
     try {
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
+
+      const welcomeEl = document.getElementById('broker-welcome');
+      if (welcomeEl) {
+        welcomeEl.innerHTML = `<span class="lang-en">Welcome back, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Manage your agency team, clients, and commissions.</span><span class="lang-es">Bienvenido/a de nuevo, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Gestiona tu equipo de agencia, clientes y comisiones.</span>`;
+      }
 
       if (App.utils && App.utils.renderUserRegionalBanner) {
         await App.utils.renderUserRegionalBanner('broker-regional-banner', currentUser);
@@ -774,6 +786,11 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
+      const welcomeEl = document.getElementById('broker-welcome');
+      if (welcomeEl) {
+        welcomeEl.innerHTML = `<span class="lang-en">Welcome back, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Manage your agency team, clients, and commissions.</span><span class="lang-es">Bienvenido/a de nuevo, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Gestiona tu equipo de agencia, clientes y comisiones.</span>`;
+      }
+
       if (App.utils && App.utils.renderUserRegionalBanner) {
         await App.utils.renderUserRegionalBanner('broker-regional-banner', currentUser);
       }
@@ -892,6 +909,11 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
+      const welcomeEl = document.getElementById('broker-welcome');
+      if (welcomeEl) {
+        welcomeEl.innerHTML = `<span class="lang-en">Welcome back, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Manage your agency team, clients, and commissions.</span><span class="lang-es">Bienvenido/a de nuevo, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Gestiona tu equipo de agencia, clientes y comisiones.</span>`;
+      }
+
       if (App.utils && App.utils.renderUserRegionalBanner) {
         await App.utils.renderUserRegionalBanner('broker-regional-banner', currentUser);
       }
@@ -981,6 +1003,11 @@
     try {
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
+
+      const welcomeEl = document.getElementById('broker-welcome');
+      if (welcomeEl) {
+        welcomeEl.innerHTML = `<span class="lang-en">Welcome back, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Manage your agency team, clients, and commissions.</span><span class="lang-es">Bienvenido/a de nuevo, <strong>${App.utils.escapeHtml(currentUser.firstName || '')}</strong>. Gestiona tu equipo de agencia, clientes y comisiones.</span>`;
+      }
 
       if (App.utils && App.utils.renderUserRegionalBanner) {
         await App.utils.renderUserRegionalBanner('broker-regional-banner', currentUser);

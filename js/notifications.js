@@ -201,7 +201,11 @@
   }
 
   async function onNewReferredCollaborator(newUser, referrerAgent) {
-    const newUserName = `${newUser.firstName || ''} ${newUser.lastName || ''}`.trim() || newUser.email;
+    const isEmbajadorReferrer = Boolean(referrerAgent && String(referrerAgent.role || '').toLowerCase() === 'embajador');
+    const isEndClient = String(newUser.role || '').toLowerCase() === 'client';
+    const newUserName = (isEmbajadorReferrer && isEndClient)
+      ? 'Cliente Protegido (Paraguas Embajador)'
+      : (`${newUser.firstName || ''} ${newUser.lastName || ''}`.trim() || newUser.email);
     
     // Si el agente no tiene correo (improbable), no enviamos
     if (!referrerAgent || !referrerAgent.email) return;
@@ -209,17 +213,19 @@
     // Evitar duplicar si el referente ya está en ADMIN_EMAILS
     if (ADMIN_EMAILS.includes(referrerAgent.email.toLowerCase().trim())) return;
 
-    // Reutilizamos la plantilla de administrador para la alerta del agente
+    // Reutilizamos la plantilla de administrador para la alerta del agente (protegiendo PII si es Embajador + Cliente final)
     await sendEmail(EMAILJS_TEMPLATE_NEW_REG, {
       user_type:     roleLabel(newUser.role),
       user_name:     newUserName,
-      user_email:    newUser.email || '—',
+      user_email:    (isEmbajadorReferrer && isEndClient) ? 'Protegido por privacidad (RE/MAX Inmomás)' : (newUser.email || '—'),
       user_country:  newUser.country || newUser.currentLocation || '—',
       user_agency:   newUser.agencyName || newUser.objective || '—',
-      user_phone:    newUser.phone || '—',
+      user_phone:    (isEmbajadorReferrer && isEndClient) ? 'Protegido' : (newUser.phone || '—'),
       registered_at: fmtDate(newUser.createdAt),
       source:        newUser.source || '—',
-      admin_url:     'https://thespainconnection.com/app.html#agent/clients'
+      admin_url:     isEmbajadorReferrer
+        ? 'https://thespainconnection.com/app.html#embajador/clients'
+        : 'https://thespainconnection.com/app.html#agent/clients'
     }, referrerAgent.email);
   }
 
@@ -242,7 +248,7 @@
     }
   }
 
-  async function onNewWebinarRegistration(reg, agentEmail = null) {
+  async function onNewWebinarRegistration(reg, agentEmail = null, agentRole = null) {
     const name = `${reg.firstName || ''} ${reg.lastName || ''}`.trim() || reg.email;
     const emailData = {
       user_type:     `Registro Webinar (${reg.webinarType || 'VIP'})`,
@@ -259,7 +265,20 @@
     // 1. If referred, send a copy to the agent/realtor FIRST (unless already in ADMIN_EMAILS)
     const targetList = Array.isArray(ADMIN_EMAILS) && ADMIN_EMAILS.length ? ADMIN_EMAILS : [ADMIN_EMAIL];
     if (agentEmail && !targetList.includes(agentEmail.toLowerCase().trim())) {
-      await sendEmail(EMAILJS_TEMPLATE_NEW_REG, emailData, agentEmail.trim());
+      const isEmbajador = String(agentRole || reg.agentReferrerRole || '').toLowerCase() === 'embajador' ||
+        String(reg.referralCode || '').toUpperCase().startsWith('EMB-');
+      const isB2C = String(reg.webinarType || '').toLowerCase() === 'b2c' ||
+        String(reg.contactType || reg.role || '').toLowerCase() === 'client';
+      const partnerPayload = (isEmbajador && isB2C)
+        ? {
+            ...emailData,
+            user_name: 'Cliente Protegido (Inscrito B2C)',
+            user_email: 'Protegido por privacidad (RE/MAX Inmomás)',
+            user_phone: 'Protegido',
+            admin_url: 'https://thespainconnection.com/app.html#embajador/webinar'
+          }
+        : emailData;
+      await sendEmail(EMAILJS_TEMPLATE_NEW_REG, partnerPayload, agentEmail.trim());
     }
 
     // 2. Send to all Admin emails (1st: The Spain Connection, 2nd: Maia)

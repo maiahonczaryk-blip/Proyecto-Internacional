@@ -64,6 +64,19 @@ App.auth = (function() {
     }
   }
 
+  function normalizeUserRoleObj(u) {
+    if (!u || typeof u !== 'object') return u;
+    const rawRole = String(u.role || '').trim().toLowerCase();
+    if (rawRole === 'ambassador' || rawRole === 'embajador') {
+      u.role = 'embajador';
+    } else if (rawRole !== 'admin' && u.referralCode && String(u.referralCode).trim().toUpperCase().startsWith('EMB-')) {
+      u.role = 'embajador';
+    } else if (rawRole) {
+      u.role = rawRole;
+    }
+    return u;
+  }
+
   /* ---- Initialize ---- */
   function init() {
     return new Promise((resolve) => {
@@ -80,6 +93,10 @@ App.auth = (function() {
             if (!exists || exists.status === 'rejected') {
               currentUser = null;
               localStorage.removeItem(SESSION_KEY);
+            } else {
+              currentUser = normalizeUserRoleObj({ ...exists });
+              delete currentUser.password;
+              localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
             }
           } catch {
             currentUser = null;
@@ -103,7 +120,7 @@ App.auth = (function() {
               const doc = await App.db.collection('users').doc(firebaseUser.uid).get();
               if (doc.exists) {
                 const userData = doc.data() || {};
-                currentUser = { id: firebaseUser.uid, email: firebaseUser.email, ...userData };
+                currentUser = normalizeUserRoleObj({ id: firebaseUser.uid, email: firebaseUser.email, ...userData });
                 if (!currentUser.email) currentUser.email = firebaseUser.email;
 
                 // Super Admin auto-elevation and normalization for Maia Honczaryk
@@ -213,7 +230,7 @@ App.auth = (function() {
         throw new Error('An account with this email already exists.');
       }
 
-      // Resolve umbrella embajadorId from referrer if applicable
+      // Resolve umbrella embajadorId from referrer or selected broker if applicable
       let resolvedEmbajadorId = data.embajadorId || null;
       if (!resolvedEmbajadorId && referredBy && role !== 'embajador') {
         const refUser = App.demoData.users.find(u =>
@@ -221,6 +238,16 @@ App.auth = (function() {
         );
         if (refUser) {
           resolvedEmbajadorId = refUser.role === 'embajador' ? refUser.id : (refUser.embajadorId || null);
+        }
+      }
+      if (brokerId && role === 'realtor') {
+        const selBroker = App.demoData.users.find(u => u.id === brokerId);
+        if (selBroker) {
+          if (!resolvedEmbajadorId && selBroker.embajadorId) {
+            resolvedEmbajadorId = selBroker.embajadorId;
+          } else if (resolvedEmbajadorId && !selBroker.embajadorId) {
+            selBroker.embajadorId = resolvedEmbajadorId;
+          }
         }
       }
 
@@ -314,7 +341,7 @@ App.auth = (function() {
       const finalStatus = isMaiaAccount ? 'active' : 'pending';
       const finalReferralCode = isMaiaAccount ? 'ADM-INMOMAS' : `${getPrefixForRole(role)}-${lastName.toUpperCase()}-${uid.substring(0, 4)}`;
 
-      // Resolve umbrella embajadorId from referrer if not explicitly passed
+      // Resolve umbrella embajadorId from referrer (ID or referralCode) or selected broker
       let resolvedEmbajadorId = data.embajadorId || null;
       if (!resolvedEmbajadorId && referredBy && finalRole !== 'embajador' && finalRole !== 'admin') {
         try {
@@ -322,6 +349,29 @@ App.auth = (function() {
           if (refDoc.exists) {
             const rData = refDoc.data();
             resolvedEmbajadorId = rData.role === 'embajador' ? refDoc.id : (rData.embajadorId || null);
+          } else {
+            const byCodeSnap = await App.db.collection('users')
+              .where('referralCode', '==', String(referredBy).trim().toUpperCase())
+              .limit(1)
+              .get();
+            if (!byCodeSnap.empty) {
+              const rDoc = byCodeSnap.docs[0];
+              const rData = rDoc.data();
+              resolvedEmbajadorId = rData.role === 'embajador' ? rDoc.id : (rData.embajadorId || null);
+            }
+          }
+        } catch (_) {}
+      }
+      if (brokerId && finalRole === 'realtor') {
+        try {
+          const bDoc = await App.db.collection('users').doc(brokerId).get();
+          if (bDoc.exists) {
+            const bData = bDoc.data();
+            if (!resolvedEmbajadorId && bData.embajadorId) {
+              resolvedEmbajadorId = bData.embajadorId;
+            } else if (resolvedEmbajadorId && !bData.embajadorId) {
+              await App.db.collection('users').doc(brokerId).update({ embajadorId: resolvedEmbajadorId });
+            }
           }
         } catch (_) {}
       }
@@ -496,7 +546,7 @@ App.auth = (function() {
           }
         }
 
-        currentUser = { id: credential.user.uid, email: credential.user.email, ...userData };
+        currentUser = normalizeUserRoleObj({ id: credential.user.uid, email: credential.user.email, ...userData });
         notifyAuthChange();
         return currentUser;
 
@@ -576,7 +626,7 @@ App.auth = (function() {
         await App.db.collection('users').doc(firebaseUser.uid).update({ referralCode: userData.referralCode });
       }
 
-      currentUser = { id: firebaseUser.uid, ...userData };
+      currentUser = normalizeUserRoleObj({ id: firebaseUser.uid, ...userData });
       notifyAuthChange();
       return currentUser;
     }
@@ -827,12 +877,13 @@ App.auth = (function() {
   }
 
   async function updateUserRole(userId, newRole) {
-    const rolePrefix = newRole === 'admin' ? 'ADM' : (newRole === 'embajador' ? 'EMB' : (newRole === 'broker' ? 'BRK' : (newRole === 'agent_inmomas' ? 'LOC' : (newRole === 'colaborador' ? 'COL' : 'REA'))));
+    const cleanRole = String(newRole || '').trim().toLowerCase() === 'ambassador' ? 'embajador' : String(newRole || '').trim().toLowerCase();
+    const rolePrefix = cleanRole === 'admin' ? 'ADM' : (cleanRole === 'embajador' ? 'EMB' : (cleanRole === 'broker' ? 'BRK' : (cleanRole === 'agent_inmomas' ? 'LOC' : (cleanRole === 'colaborador' ? 'COL' : 'REA'))));
     if (App.demoMode) {
       const user = App.demoData.users.find(u => u.id === userId);
       if (!user) throw new Error('User not found.');
-      user.role = newRole;
-      if (newRole === 'embajador' || newRole === 'admin') {
+      user.role = cleanRole;
+      if (cleanRole === 'embajador' || cleanRole === 'admin') {
         user.embajadorId = null;
       }
       if (user.referralCode) {
@@ -844,35 +895,53 @@ App.auth = (function() {
           const lastName = user.lastName || 'USER';
           user.referralCode = `${rolePrefix}-${lastName.toUpperCase()}`;
         }
+      } else {
+        const lastName = user.lastName || 'USER';
+        user.referralCode = `${rolePrefix}-${lastName.toUpperCase()}`;
       }
       user.updatedAt = new Date().toISOString();
       saveDemoData();
+      if (currentUser && currentUser.id === userId) {
+        currentUser.role = cleanRole;
+        currentUser.referralCode = user.referralCode;
+        notifyAuthChange();
+      }
       return true;
     } else {
       const docRef = App.db.collection('users').doc(userId);
       const doc = await docRef.get();
       if (doc.exists) {
-        const userData = doc.data();
-        let updatedRefCode = userData.referralCode;
+        const userData = doc.data() || {};
+        let updatedRefCode = userData.referralCode || '';
+        const cleanLast = String(userData.lastName || 'USER').trim().toUpperCase() || 'USER';
         if (updatedRefCode) {
           const parts = updatedRefCode.split('-');
           if (parts.length > 1) {
             parts[0] = rolePrefix;
             updatedRefCode = parts.join('-');
           } else {
-            const lastName = userData.lastName || 'USER';
-            updatedRefCode = `${rolePrefix}-${lastName.toUpperCase()}-${userId.substring(0, 4)}`;
+            updatedRefCode = `${rolePrefix}-${cleanLast}-${userId.substring(0, 4)}`;
           }
+        } else {
+          updatedRefCode = `${rolePrefix}-${cleanLast}-${userId.substring(0, 4)}`;
         }
         const updatePayload = {
-          role: newRole,
+          role: cleanRole,
           referralCode: updatedRefCode,
           updatedAt: new Date().toISOString()
         };
-        if (newRole === 'embajador' || newRole === 'admin') {
+        if (cleanRole === 'embajador' || cleanRole === 'admin') {
           updatePayload.embajadorId = null;
         }
         await docRef.update(updatePayload);
+        if (currentUser && currentUser.id === userId) {
+          currentUser.role = cleanRole;
+          currentUser.referralCode = updatedRefCode;
+          if (cleanRole === 'embajador' || cleanRole === 'admin') {
+            currentUser.embajadorId = null;
+          }
+          notifyAuthChange();
+        }
       }
       return true;
     }
@@ -1142,6 +1211,106 @@ App.auth = (function() {
     }
   }
 
+  /* ---- Assign / Unassign Realtor to a Broker Office & Sync Umbrella (Admin action) ---- */
+  async function updateUserBroker(realtorId, brokerId) {
+    const cleanBrokerId = brokerId ? String(brokerId).trim() : null;
+    const now = new Date().toISOString();
+    const allSysUsers = await getAllUsers();
+    const lk = (App.utils && App.utils._buildUserLookupMaps)
+      ? App.utils._buildUserLookupMaps(allSysUsers)
+      : null;
+
+    const targetRealtor = allSysUsers.find(u => u.id === realtorId);
+    if (!targetRealtor) throw new Error('Realtor not found.');
+    const targetBroker = cleanBrokerId ? allSysUsers.find(u => u.id === cleanBrokerId) : null;
+
+    const realtorParents = (App.utils && App.utils.resolveUserUmbrellaParents)
+      ? App.utils.resolveUserUmbrellaParents(targetRealtor, allSysUsers, lk)
+      : { embajador: null };
+    const brokerParents = (targetBroker && App.utils && App.utils.resolveUserUmbrellaParents)
+      ? App.utils.resolveUserUmbrellaParents(targetBroker, allSysUsers, lk)
+      : { embajador: null };
+
+    const realtorEmbId = targetRealtor.embajadorId || (realtorParents.embajador ? realtorParents.embajador.id : null);
+    const brokerEmbId = targetBroker ? (targetBroker.embajadorId || (brokerParents.embajador ? brokerParents.embajador.id : null)) : null;
+    const syncedEmbajadorId = realtorEmbId || brokerEmbId || null;
+
+    if (App.demoMode) {
+      const r = App.demoData.users.find(u => u.id === realtorId);
+      if (r) {
+        r.brokerId = cleanBrokerId;
+        r.brokerStatus = cleanBrokerId ? 'approved' : null;
+        if (syncedEmbajadorId && !r.embajadorId) r.embajadorId = syncedEmbajadorId;
+        if (targetBroker && targetBroker.agencyName && !r.agencyName) r.agencyName = targetBroker.agencyName;
+        if (targetBroker && targetBroker.agencyLogo && !r.agencyLogo) r.agencyLogo = targetBroker.agencyLogo;
+        r.updatedAt = now;
+      }
+      // If Realtor belonged to an Embajador and Broker registered later without Embajador, attach Broker to the Embajador's umbrella!
+      if (targetBroker && syncedEmbajadorId && !targetBroker.embajadorId) {
+        const b = App.demoData.users.find(u => u.id === cleanBrokerId);
+        if (b) {
+          b.embajadorId = syncedEmbajadorId;
+          b.updatedAt = now;
+        }
+      }
+      // Sync existing clients of this Realtor to the Broker & Embajador
+      const rCodeUpper = targetRealtor.referralCode ? String(targetRealtor.referralCode).toUpperCase().trim() : '';
+      (App.demoData.clients || []).forEach(c => {
+        const cRefUpper = c.referredBy ? String(c.referredBy).toUpperCase().trim() : '';
+        if (c.realtorId === realtorId || c.referredBy === realtorId || (rCodeUpper && cRefUpper === rCodeUpper)) {
+          c.brokerId = cleanBrokerId;
+          if (syncedEmbajadorId && !c.embajadorId) c.embajadorId = syncedEmbajadorId;
+        }
+      });
+      saveDemoData();
+      return { attachedBrokerToEmbajador: Boolean(targetBroker && realtorEmbId && !brokerEmbId) };
+    } else {
+      const realtorPatch = {
+        brokerId: cleanBrokerId,
+        brokerStatus: cleanBrokerId ? 'approved' : null,
+        updatedAt: now
+      };
+      if (syncedEmbajadorId && !targetRealtor.embajadorId) {
+        realtorPatch.embajadorId = syncedEmbajadorId;
+      }
+      if (targetBroker && targetBroker.agencyName && !targetRealtor.agencyName) {
+        realtorPatch.agencyName = targetBroker.agencyName;
+      }
+      if (targetBroker && targetBroker.agencyLogo && !targetRealtor.agencyLogo) {
+        realtorPatch.agencyLogo = targetBroker.agencyLogo;
+      }
+      await App.db.collection('users').doc(realtorId).update(realtorPatch);
+
+      let attachedBrokerToEmbajador = false;
+      if (targetBroker && syncedEmbajadorId && !targetBroker.embajadorId) {
+        await App.db.collection('users').doc(cleanBrokerId).update({
+          embajadorId: syncedEmbajadorId,
+          updatedAt: now
+        });
+        attachedBrokerToEmbajador = Boolean(realtorEmbId && !brokerEmbId);
+      }
+
+      // Sync existing clients of this Realtor so Broker & Embajador pipelines stay aligned
+      try {
+        const allCli = await getClients();
+        const rCodeUpper = targetRealtor.referralCode ? String(targetRealtor.referralCode).toUpperCase().trim() : '';
+        const matchingClients = (allCli || []).filter(c => {
+          const cRefUpper = c.referredBy ? String(c.referredBy).toUpperCase().trim() : '';
+          return c.realtorId === realtorId || c.referredBy === realtorId || (rCodeUpper && cRefUpper === rCodeUpper);
+        });
+        for (const cl of matchingClients) {
+          const cliPatch = { brokerId: cleanBrokerId };
+          if (syncedEmbajadorId && !cl.embajadorId) cliPatch.embajadorId = syncedEmbajadorId;
+          await App.db.collection('clients').doc(cl.id).update(cliPatch);
+        }
+      } catch (cliErr) {
+        console.warn('[Auth] Client broker sync warning:', cliErr);
+      }
+
+      return { attachedBrokerToEmbajador };
+    }
+  }
+
   /* ---- Update User / Office Agency Branding & Logo (Admin action) ---- */
   async function updateUserAgencyBranding(userId, { agencyName, agencyLogo, applyToOffice = true } = {}) {
     const now = new Date().toISOString();
@@ -1268,15 +1437,116 @@ App.auth = (function() {
     }
   }
 
+  /* ---- End-Client Privacy Redaction for Embajador Role ---- */
+  function buildAnonClientCode(rawId, fallbackIdx = 0) {
+    const clean = String(rawId || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    const suffix = clean.length >= 4 ? clean.slice(-4) : String(fallbackIdx + 1).padStart(4, '0');
+    return `CLI-${suffix}`;
+  }
+
+  function redactEndClientRecord(c, idx = 0) {
+    if (!c || typeof c !== 'object') return c;
+    const code = c._anonCode || buildAnonClientCode(c.id, idx);
+    const seq = String(idx + 1).padStart(2, '0');
+    const safeHistory = Array.isArray(c.statusHistory)
+      ? c.statusHistory.map(h => ({ status: h.status, date: h.date }))
+      : [];
+    return {
+      id: c.id,
+      _isRedactedClient: true,
+      _anonCode: code,
+      _anonSeq: seq,
+      _labelEs: `Cliente #${seq} (${code})`,
+      _labelEn: `Client #${seq} (${code})`,
+      firstName: 'Cliente Protegido',
+      lastName: code,
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+      notes: '',
+      country: c.country || '',
+      region: c.region || '',
+      interestArea: c.interestArea || '',
+      budget: c.budget || '',
+      timeline: c.timeline || '',
+      objective: c.objective || '',
+      status: c.status || 'contacted',
+      tag: c.tag || 'spain_buyer',
+      referredBy: c.referredBy || null,
+      realtorId: c.realtorId || null,
+      brokerId: c.brokerId || null,
+      embajadorId: c.embajadorId || null,
+      addedManuallyBy: c.addedManuallyBy || null,
+      localAgentId: c.localAgentId || null,
+      localAgentName: c.localAgentName || '',
+      statusHistory: safeHistory,
+      createdAt: c.createdAt || null,
+      updatedAt: c.updatedAt || null,
+      _isDirectFromEmbajador: Boolean(c._isDirectFromEmbajador),
+      _originMemberId: c._originMemberId || null,
+      _originMemberName: c._originMemberName || '',
+      _originMemberRole: c._originMemberRole || ''
+    };
+  }
+
+  function isB2BWebinarRecord(w) {
+    const wt = String(w?.webinarType || '').toLowerCase();
+    const ct = String(w?.contactType || w?.role || '').toLowerCase();
+    if (wt === 'b2b') return true;
+    if (wt === 'b2c' || ct === 'client' || ct === 'cliente') return false;
+    return ['realtor', 'broker', 'embajador', 'colaborador', 'agent_inmomas'].includes(ct);
+  }
+
+  function redactWebinarRecordForEmbajador(w, idx = 0) {
+    if (!w || typeof w !== 'object') return w;
+    if (isB2BWebinarRecord(w)) {
+      return {
+        ...w,
+        email: '',
+        phone: ''
+      };
+    }
+    const clean = String(w.id || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    const code = `B2C-${clean.length >= 4 ? clean.slice(-4) : String(idx + 1).padStart(4, '0')}`;
+    const seq = String(idx + 1).padStart(2, '0');
+    return {
+      id: w.id,
+      _isRedactedB2C: true,
+      _anonCode: code,
+      _labelEs: `Cliente Final #${seq} (${code})`,
+      _labelEn: `End Client #${seq} (${code})`,
+      firstName: 'Cliente Protegido',
+      lastName: code,
+      name: '',
+      email: '',
+      phone: '',
+      agency: '',
+      clientInterest: w.clientInterest || '',
+      country: w.country || '',
+      region: w.region || w.webinarRegion || '',
+      webinarRegion: w.webinarRegion || '',
+      webinarType: w.webinarType || 'b2c',
+      contactType: 'client',
+      referralCode: w.referralCode || '',
+      referrerId: w.referrerId || null,
+      referrerName: w.referrerName || '',
+      agentReferrerId: w.agentReferrerId || null,
+      agentReferrerName: w.agentReferrerName || '',
+      createdAt: w.createdAt || null
+    };
+  }
+
   /* ---- Client Management ---- */
-  async function getClients(filters = {}) {
+  async function getClients(filters = {}, _internalRaw = false) {
+    let list = [];
     if (App.demoMode) {
       let clients = [...App.demoData.clients];
       if (filters.referredBy) clients = clients.filter(c => c.referredBy === filters.referredBy);
       if (filters.brokerId) clients = clients.filter(c => c.brokerId === filters.brokerId);
       if (filters.localAgentId) clients = clients.filter(c => c.localAgentId === filters.localAgentId);
       if (filters.status) clients = clients.filter(c => c.status === filters.status);
-      return clients;
+      list = clients;
     } else {
       let query = App.db.collection('clients');
       if (filters.referredBy) query = query.where('referredBy', '==', filters.referredBy);
@@ -1285,8 +1555,12 @@ App.auth = (function() {
       if (filters.status) query = query.where('status', '==', filters.status);
       
       const snapshot = await query.get();
-      return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      list = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     }
+    if (!_internalRaw && currentUser && currentUser.role === 'embajador') {
+      return list.map((c, idx) => redactEndClientRecord(c, idx));
+    }
+    return list;
   }
 
   async function updateClientStatus(clientId, newStatus, note = '') {
@@ -1486,13 +1760,14 @@ App.auth = (function() {
   }
 
   /* ---- Commission Management ---- */
-  async function getCommissions(filters = {}) {
+  async function getCommissions(filters = {}, _internalRaw = false) {
+    let list = [];
     if (App.demoMode) {
       let comms = [...App.demoData.commissions];
       if (filters.realtorId) comms = comms.filter(c => c.realtorId === filters.realtorId);
       if (filters.brokerId) comms = comms.filter(c => c.brokerId === filters.brokerId);
       if (filters.agentId) comms = comms.filter(c => c.agentId === filters.agentId);
-      return comms;
+      list = comms;
     } else {
       let query = App.db.collection('commissions');
       if (filters.realtorId) query = query.where('realtorId', '==', filters.realtorId);
@@ -1500,8 +1775,20 @@ App.auth = (function() {
       if (filters.agentId) query = query.where('agentId', '==', filters.agentId);
       
       const snapshot = await query.get();
-      return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      list = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     }
+    if (!_internalRaw && currentUser && currentUser.role === 'embajador') {
+      return list.map((cm, idx) => {
+        const code = buildAnonClientCode(cm.clientId || cm.id, idx);
+        return {
+          ...cm,
+          _anonCode: code,
+          clientName: `Cliente Protegido (${code})`,
+          propertyAddress: 'España'
+        };
+      });
+    }
+    return list;
   }
 
   /* ---- Auth State Change Listener ---- */
@@ -1601,11 +1888,19 @@ App.auth = (function() {
     const typeNorm = (payload.webinarType || '').toUpperCase().trim();
 
     let agentEmail = null;
-    if (payload.agentReferrerId) {
+    let agentRole = null;
+    if (payload.agentReferrerId || payload.referralCode) {
       try {
         const allUsers = await getAllUsers();
-        const agent = allUsers.find(u => u.id === payload.agentReferrerId);
-        if (agent && agent.email) agentEmail = agent.email;
+        const codeUpper = String(payload.referralCode || '').toUpperCase().trim();
+        const agent = allUsers.find(u =>
+          (payload.agentReferrerId && u.id === payload.agentReferrerId) ||
+          (codeUpper && u.referralCode && String(u.referralCode).toUpperCase().trim() === codeUpper)
+        );
+        if (agent) {
+          agentEmail = agent.email || null;
+          agentRole = agent.role || null;
+        }
       } catch (e) {
         console.warn('[Webinar] Could not fetch agent email for notification', e);
       }
@@ -1626,7 +1921,7 @@ App.auth = (function() {
       saveDemoData();
       // Notify admin of new webinar registration
       if (!options.silent && window.App && window.App.notifications) {
-        await window.App.notifications.onNewWebinarRegistration(payload, agentEmail).catch(() => {});
+        await window.App.notifications.onNewWebinarRegistration(payload, agentEmail, agentRole).catch(() => {});
       }
       return payload.id;
     } else {
@@ -1650,19 +1945,24 @@ App.auth = (function() {
       const docRef = await App.db.collection('webinar_registrations').add(payload);
       // Notify admin of new webinar registration
       if (!options.silent && window.App && window.App.notifications) {
-        await window.App.notifications.onNewWebinarRegistration({ id: docRef.id, ...payload }, agentEmail).catch(() => {});
+        await window.App.notifications.onNewWebinarRegistration({ id: docRef.id, ...payload }, agentEmail, agentRole).catch(() => {});
       }
       return docRef.id;
     }
   }
 
-  async function getWebinarRegistrations() {
+  async function getWebinarRegistrations(_internalRaw = false) {
+    let list = [];
     if (App.demoMode) {
-      return App.demoData.webinar_registrations || [];
+      list = App.demoData.webinar_registrations || [];
     } else {
       const snapshot = await App.db.collection('webinar_registrations').orderBy('createdAt', 'desc').get();
-      return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      list = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     }
+    if (!_internalRaw && currentUser && currentUser.role === 'embajador') {
+      return list.map((w, idx) => redactWebinarRecordForEmbajador(w, idx));
+    }
+    return list;
   }
 
   /* ---- Delete Webinar Registration ---- */
@@ -2171,133 +2471,166 @@ App.auth = (function() {
     return merged;
   }
 
+  const UNSCHEDULED_SEED_WEBINAR_DATES = new Set([
+    '2026-09-24',
+    '2026-10-15',
+    '2026-10-22',
+    '2026-10-29',
+    '2026-11-05',
+    '2026-11-12',
+    '2026-11-19',
+    '2026-11-26',
+    '2026-12-03',
+    '2026-12-10'
+  ]);
+
+  function sanitizeSeedWebinarTrack(track) {
+    if (!track || typeof track !== 'object') return track;
+    if (track.scheduled === false) {
+      return { ...track, date: '' };
+    }
+    if (track.scheduled !== true && track.date && UNSCHEDULED_SEED_WEBINAR_DATES.has(String(track.date).trim())) {
+      return { ...track, date: '', scheduled: false };
+    }
+    return track;
+  }
+
   function ensureRegionalWebinarConfigs(settingsObj) {
     const s = settingsObj || JSON.parse(JSON.stringify(DEFAULT_WEBINAR_SETTINGS));
     if (!s.regionalConfigs || typeof s.regionalConfigs !== 'object') {
       s.regionalConfigs = {};
     }
+
+    const buildRegionDefault = (labelEn, audienceB2B, audienceB2C, lang = 'en', timeB2B = '17:00', timeB2C = '18:00') => ({
+      activeType: 'b2c',
+      language: lang,
+      scheduled: false,
+      b2b: {
+        title: `Beyond Borders — ${labelEn} Partner Network`,
+        subtitle: '25% International Referral Commissions in Spain with RE/MAX Inmomás',
+        targetAudience: audienceB2B,
+        date: '',
+        time: timeB2B,
+        spots: 25,
+        language: lang,
+        scheduled: false
+      },
+      b2c: {
+        title: `Spain Unlocked — ${labelEn} Buyers & Investors`,
+        subtitle: 'Turnkey Real Estate, Legal, Tax & Mortgage Representation in Spain',
+        targetAudience: audienceB2C,
+        date: '',
+        time: timeB2C,
+        spots: 25,
+        language: lang,
+        scheduled: false
+      }
+    });
+
     const regionDefaults = {
       north_america: {
         activeType: s.activeType || 'b2c',
         language: 'en',
+        scheduled: false,
         b2b: {
           title: s.b2b?.title || 'Beyond Borders — North America',
           subtitle: s.b2b?.subtitle || 'Passive International Commissions for US, Canadian & PR Realtors',
           targetAudience: s.b2b?.targetAudience || 'US, Canadian & Puerto Rico Realtors & Brokers',
-          date: s.b2b?.date || '2026-09-24',
+          date: '',
           time: s.b2b?.time || '19:00',
           spots: s.b2b?.spots || 25,
-          language: 'en'
+          language: 'en',
+          scheduled: false
         },
         b2c: {
           title: s.b2c?.title || 'Spain Unlocked: Living & Investing',
           subtitle: s.b2c?.subtitle || 'How North American Buyers Safely Purchase, Relocate & Invest in Spain',
           targetAudience: s.b2c?.targetAudience || 'US, Canadian & PR Buyers, Expats & Investors',
-          date: s.b2c?.date || s.date || '2026-10-29',
+          date: '',
           time: s.b2c?.time || s.time || '18:00',
           spots: s.b2c?.spots || s.spotsAvailable || 25,
-          language: 'en'
+          language: 'en',
+          scheduled: false
         }
       },
       latam: {
         activeType: 'b2c',
         language: 'es',
+        scheduled: false,
         b2b: {
           title: 'Beyond Borders — Alianza Latinoamérica',
           subtitle: 'Comisiones Internacionales del 25% en España para Brokers e Inmobiliarias de Latam',
-          targetAudience: 'Brokers y Agentes Inmobiliarios de Latinoamérica y Caribe',
-          date: '2026-10-15',
+          targetAudience: 'Brokers y Agentes de Argentina, Colombia y Venezuela',
+          date: '',
           time: '18:00',
           spots: 30,
-          language: 'es'
+          language: 'es',
+          scheduled: false
         },
         b2c: {
           title: 'Invertir y Vivir en España — Edición Latinoamérica',
           subtitle: 'Guía legal, fiscal, hipotecaria e inmobiliaria para inversores y familias latinoamericanas',
-          targetAudience: 'Inversores y Compradores de México, Colombia, Argentina, Chile y Latam',
-          date: '2026-11-05',
+          targetAudience: 'Inversores y Compradores de Argentina, Colombia y Venezuela',
+          date: '',
           time: '18:00',
           spots: 30,
-          language: 'es'
+          language: 'es',
+          scheduled: false
         }
       },
-      western_europe: {
+      sweden: buildRegionDefault('Sweden', 'Swedish Real Estate Brokers & Advisors', 'Swedish Buyers & Second-Home Investors', 'en', '17:00', '18:00'),
+      netherlands: buildRegionDefault('Netherlands', 'Dutch Real Estate Agencies & Advisors', 'Dutch Buyers & Investors in Spain', 'nl', '17:00', '18:00'),
+      switzerland: buildRegionDefault('Switzerland', 'Swiss Real Estate Brokers & Wealth Advisors', 'Swiss Buyers & Investors in Spain', 'fr', '17:00', '18:00'),
+      francophonie_mena: {
         activeType: 'b2c',
-        language: 'en',
+        language: 'fr',
+        scheduled: false,
         b2b: {
-          title: 'Beyond Borders — Western Europe Partner Network',
-          subtitle: 'Cross-Border Spain Referral Commissions for European Agencies & Advisors',
-          targetAudience: 'UK, French, Belgian, German, Dutch & Nordic Real Estate Advisors',
-          date: '2026-10-22',
+          title: 'Beyond Borders — France, Belgique, Algérie & Émirats',
+          subtitle: 'Commissions Internationales de 25% en Espagne avec RE/MAX Inmomás',
+          targetAudience: 'Agences et Conseillers Immobiliers (France, Belgique, Algérie & EAU)',
+          date: '',
           time: '17:00',
           spots: 25,
-          language: 'en'
+          language: 'fr',
+          scheduled: false
         },
         b2c: {
-          title: 'Spain Unlocked — European Buyers & Second Homes',
-          subtitle: 'Mediterranean Property, Tax & Legal Turnkey Advisory in Spain',
-          targetAudience: 'UK, French, German, Benelux & Nordic Buyers',
-          date: '2026-11-12',
+          title: 'Investir et Vivre en Espagne — France, Belgique, Algérie & EAU',
+          subtitle: 'Accompagnement Immobilier, Juridique et Fiscal Clé en Main en Espagne',
+          targetAudience: 'Acheteurs et Investisseurs (France, Belgique, Algérie & Émirats Arabes Unis)',
+          date: '',
           time: '18:00',
           spots: 25,
-          language: 'en'
+          language: 'fr',
+          scheduled: false
         }
       },
-      eastern_europe: {
-        activeType: 'b2c',
-        language: 'en',
-        b2b: {
-          title: 'Beyond Borders — Eastern Europe & Baltics Partners',
-          subtitle: 'International Referral Partnership in Spain for Real Estate Agencies',
-          targetAudience: 'Polish, Ukrainian, Romanian, Czech & Baltic Real Estate Brokers',
-          date: '2026-11-19',
-          time: '17:00',
-          spots: 25,
-          language: 'en'
-        },
-        b2c: {
-          title: 'Safe Property Investment in Spain — Eastern Europe Edition',
-          subtitle: 'Full Turnkey Legal, Banking & Real Estate Representation in Costa Blanca & Spain',
-          targetAudience: 'Investors & Families from Eastern Europe & Baltics',
-          date: '2026-11-26',
-          time: '18:00',
-          spots: 25,
-          language: 'en'
-        }
-      },
-      mena: {
-        activeType: 'b2c',
-        language: 'en',
-        b2b: {
-          title: 'Beyond Borders — MENA & International Wealth Partners',
-          subtitle: 'Luxury Real Estate & Investment Advisory Partnership in Spain',
-          targetAudience: 'UAE, Gulf, MENA & International Real Estate Advisors',
-          date: '2026-12-03',
-          time: '16:00',
-          spots: 20,
-          language: 'en'
-        },
-        b2c: {
-          title: 'Prime Spain Real Estate & Lifestyle — MENA & Global Investors',
-          subtitle: 'Turnkey Prime Acquisitions, Legal Structuring & Property Management in Spain',
-          targetAudience: 'MENA & International Investors',
-          date: '2026-12-10',
-          time: '16:00',
-          spots: 20,
-          language: 'en'
-        }
-      }
+      germany: buildRegionDefault('Germany', 'German Real Estate Brokers & Advisors', 'German Buyers & Second-Home Investors', 'de', '17:00', '18:00'),
+      ukraine_bulgaria: buildRegionDefault('Ukraine & Bulgaria', 'Ukrainian & Bulgarian Real Estate Brokers', 'Investors & Families from Ukraine & Bulgaria', 'uk', '17:00', '18:00'),
+      italy: buildRegionDefault('Italy', 'Italian Real Estate Agencies & Advisors', 'Italian Buyers & Investors in Spain', 'it', '17:00', '18:00'),
+      ireland: buildRegionDefault('Ireland', 'Irish Real Estate Brokers & Advisors', 'Irish Buyers & Second-Home Investors', 'en', '18:00', '19:00')
     };
+
+    // Migrate legacy regionalConfigs keys if present in saved settings
+    if (!s.regionalConfigs.francophonie_mena && (s.regionalConfigs.western_europe || s.regionalConfigs.mena)) {
+      s.regionalConfigs.francophonie_mena = s.regionalConfigs.western_europe || s.regionalConfigs.mena;
+    }
+    if (!s.regionalConfigs.ukraine_bulgaria && s.regionalConfigs.eastern_europe) {
+      s.regionalConfigs.ukraine_bulgaria = s.regionalConfigs.eastern_europe;
+    }
 
     Object.keys(regionDefaults).forEach(regKey => {
       if (!s.regionalConfigs[regKey]) {
         s.regionalConfigs[regKey] = regionDefaults[regKey];
       } else {
+        const mergedB2B = sanitizeSeedWebinarTrack({ ...regionDefaults[regKey].b2b, ...(s.regionalConfigs[regKey].b2b || {}) });
+        const mergedB2C = sanitizeSeedWebinarTrack({ ...regionDefaults[regKey].b2c, ...(s.regionalConfigs[regKey].b2c || {}) });
         s.regionalConfigs[regKey] = {
           ...regionDefaults[regKey],
           ...s.regionalConfigs[regKey],
-          b2b: { ...regionDefaults[regKey].b2b, ...(s.regionalConfigs[regKey].b2b || {}) },
-          b2c: { ...regionDefaults[regKey].b2c, ...(s.regionalConfigs[regKey].b2c || {}) }
+          b2b: mergedB2B,
+          b2c: mergedB2C
         };
       }
     });
@@ -2306,18 +2639,24 @@ App.auth = (function() {
 
   function getRegionalWebinarConfig(settingsObj, regionId = 'north_america', forceType = null) {
     const s = ensureRegionalWebinarConfigs(settingsObj || DEFAULT_WEBINAR_SETTINGS);
-    const cleanReg = (regionId && s.regionalConfigs[regionId]) ? regionId : 'north_america';
+    const mappedReg = (App.utils && App.utils.LEGACY_REGION_MAP && App.utils.LEGACY_REGION_MAP[regionId]) || regionId;
+    const cleanReg = (mappedReg && s.regionalConfigs[mappedReg]) ? mappedReg : 'north_america';
     const regBlock = s.regionalConfigs[cleanReg];
     const activeType = forceType || regBlock.activeType || s.activeType || 'b2c';
-    const typeCfg = regBlock[activeType] || s[activeType] || {};
+    const typeCfg = regBlock[activeType] || {};
     const baseGlobalTypeCfg = s[activeType] || {};
+    const candidateDate = typeCfg.scheduled === false
+      ? ''
+      : (typeCfg.date || '');
+    const isExplicitlyScheduled = typeCfg.scheduled !== false && Boolean(candidateDate);
     return {
       ...baseGlobalTypeCfg,
       ...typeCfg,
       region: cleanReg,
       activeType,
+      scheduled: isExplicitlyScheduled,
       language: typeCfg.language || regBlock.language || 'en',
-      date: typeCfg.date || (cleanReg === 'north_america' ? s.date : '') || '2026-10-29',
+      date: candidateDate,
       time: typeCfg.time || (cleanReg === 'north_america' ? s.time : '') || '18:00',
       spots: typeCfg.spots || (cleanReg === 'north_america' ? s.spotsAvailable : 25) || 25
     };
@@ -2976,9 +3315,9 @@ App.auth = (function() {
 
     const [allUsers, allClients, allCommissions, allWebinars] = await Promise.all([
       getAllUsers(),
-      getClients(),
-      getCommissions(),
-      getWebinarRegistrations()
+      getClients({}, true),
+      getCommissions({}, true),
+      getWebinarRegistrations(true)
     ]);
 
     const userById = new Map();
@@ -3001,14 +3340,14 @@ App.auth = (function() {
     const eligibleRoles = new Set(['broker', 'realtor', 'colaborador']);
 
     const resolveParentUser = (u) => {
+      if (u.role !== 'broker' && u.brokerId && userById.has(u.brokerId)) {
+        return userById.get(u.brokerId);
+      }
       if (u.referredBy) {
         const byId = userById.get(u.referredBy);
-        if (byId) return byId;
+        if (byId && byId.role !== 'agent_inmomas') return byId;
         const byCode = userByRefCode.get(String(u.referredBy).toUpperCase().trim());
-        if (byCode) return byCode;
-      }
-      if (u.brokerId && userById.has(u.brokerId)) {
-        return userById.get(u.brokerId);
+        if (byCode && byCode.role !== 'agent_inmomas') return byCode;
       }
       if (u.embajadorId && userById.has(u.embajadorId)) {
         return userById.get(u.embajadorId);
@@ -3016,7 +3355,7 @@ App.auth = (function() {
       return null;
     };
 
-    // Multi-level graph expansion (Embajador -> Broker/Colaborador -> Realtor -> etc.)
+    // Multi-level graph expansion (downward + upward Broker attachment when an Agent registered first and Broker was linked later)
     let changed = true;
     while (changed) {
       changed = false;
@@ -3030,23 +3369,15 @@ App.auth = (function() {
         const matchesReferredBy = Boolean(
           u.referredBy && (umbrellaUserIds.has(u.referredBy) || (refCodeUpper && umbrellaRefCodes.has(refCodeUpper)))
         );
+        // Upward Broker attachment: if an Agent in this umbrella has brokerId === u.id, attach Broker u into the umbrella
+        const matchesLinkedAgentBroker = Boolean(
+          u.role === 'broker' &&
+          (!u.embajadorId || u.embajadorId === embajadorId) &&
+          Array.from(umbrellaMembersMap.values()).some(m => m.brokerId === u.id)
+        );
 
-        if (matchesEmbajadorId || matchesBrokerId || matchesReferredBy) {
-          const parent = resolveParentUser(u);
-          const isDirect = !parent || parent.id === embajadorId;
-          const parentMember = (!isDirect && parent) ? umbrellaMembersMap.get(parent.id) : null;
-          const enrichedMember = {
-            ...u,
-            _umbrellaLevel: isDirect ? 1 : ((parentMember ? parentMember._umbrellaLevel : 1) + 1),
-            _isDirectFromEmbajador: isDirect,
-            _umbrellaParentId: parent ? parent.id : embajadorId,
-            _umbrellaParentName: isDirect
-              ? 'Directo (Embajador)'
-              : `${parent.firstName || ''} ${parent.lastName || ''}`.trim() || parent.agencyName || 'Red Paraguas',
-            _umbrellaParentRole: isDirect ? 'embajador' : (parent.role || '')
-          };
-
-          umbrellaMembersMap.set(u.id, enrichedMember);
+        if (matchesEmbajadorId || matchesBrokerId || matchesReferredBy || matchesLinkedAgentBroker) {
+          umbrellaMembersMap.set(u.id, { ...u });
           umbrellaUserIds.add(u.id);
           if (u.referralCode) {
             umbrellaRefCodes.add(String(u.referralCode).toUpperCase().trim());
@@ -3055,6 +3386,31 @@ App.auth = (function() {
         }
       }
     }
+
+    // Recompute exact hierarchy levels now that all Brokers and Realtors in the umbrella are present
+    umbrellaMembersMap.forEach((u, id) => {
+      let parent = null;
+      if (u.role !== 'broker' && u.brokerId && umbrellaMembersMap.has(u.brokerId)) {
+        parent = umbrellaMembersMap.get(u.brokerId);
+      } else {
+        const candidate = resolveParentUser(u);
+        if (candidate && (candidate.id === embajadorId || umbrellaMembersMap.has(candidate.id))) {
+          parent = candidate;
+        }
+      }
+      const isDirect = !parent || parent.id === embajadorId || u.role === 'broker';
+      const effectiveParent = (u.role === 'broker') ? embajadorUser : parent;
+      umbrellaMembersMap.set(id, {
+        ...u,
+        _umbrellaLevel: isDirect ? 1 : 2,
+        _isDirectFromEmbajador: isDirect,
+        _umbrellaParentId: (!isDirect && effectiveParent) ? effectiveParent.id : embajadorId,
+        _umbrellaParentName: isDirect
+          ? 'Directo (Embajador)'
+          : (`${effectiveParent.firstName || ''} ${effectiveParent.lastName || ''}`.trim() || effectiveParent.agencyName || 'Broker'),
+        _umbrellaParentRole: isDirect ? 'embajador' : (effectiveParent.role || 'broker')
+      });
+    });
 
     const lookupMaps = (App.utils && App.utils._buildUserLookupMaps)
       ? App.utils._buildUserLookupMaps(allUsers)
@@ -3142,16 +3498,49 @@ App.auth = (function() {
       );
     });
 
+    // Strictly strip end-client personal data whenever caller is not an Administrator
+    const isAdminCaller = Boolean(currentUser && currentUser.role === 'admin');
+    const safeClients = isAdminCaller
+      ? umbrellaClients
+      : umbrellaClients.map((c, idx) => redactEndClientRecord(c, idx));
+
+    const safeClientById = new Map();
+    safeClients.forEach(c => { if (c && c.id) safeClientById.set(c.id, c); });
+
+    const safeCommissions = isAdminCaller
+      ? umbrellaCommissions
+      : umbrellaCommissions.map((comm, idx) => {
+          const matchedCli = comm.clientId ? safeClientById.get(comm.clientId) : null;
+          const code = matchedCli ? matchedCli._anonCode : buildAnonClientCode(comm.clientId || comm.id, idx);
+          return {
+            ...comm,
+            _anonCode: code,
+            _labelEs: matchedCli ? matchedCli._labelEs : `Cliente (${code})`,
+            _labelEn: matchedCli ? matchedCli._labelEn : `Client (${code})`,
+            clientName: matchedCli ? matchedCli._labelEs : `Cliente Protegido (${code})`,
+            propertyAddress: (matchedCli && matchedCli.interestArea) ? matchedCli.interestArea : 'España'
+          };
+        });
+
+    const safeWebinars = isAdminCaller
+      ? umbrellaWebinars
+      : umbrellaWebinars.map((w, idx) => redactWebinarRecordForEmbajador(w, idx));
+
+    // Also strip email/phone from professional umbrella members when viewed by Embajador
+    const safeUsers = isAdminCaller
+      ? umbrellaUsers
+      : umbrellaUsers.map(u => ({ ...u, email: '', phone: '' }));
+
     return {
       embajador: enrichedEmbajador,
-      allUsers,
-      users: umbrellaUsers,
-      brokers: umbrellaUsers.filter(u => u.role === 'broker'),
-      realtors: umbrellaUsers.filter(u => u.role === 'realtor'),
-      colaboradores: umbrellaUsers.filter(u => u.role === 'colaborador'),
-      clients: umbrellaClients,
-      commissions: umbrellaCommissions,
-      webinarRegistrations: umbrellaWebinars
+      allUsers: isAdminCaller ? allUsers : allUsers.map(u => (u.role === 'agent_inmomas' ? u : { ...u, email: '', phone: '' })),
+      users: safeUsers,
+      brokers: safeUsers.filter(u => u.role === 'broker'),
+      realtors: safeUsers.filter(u => u.role === 'realtor'),
+      colaboradores: safeUsers.filter(u => u.role === 'colaborador'),
+      clients: safeClients,
+      commissions: safeCommissions,
+      webinarRegistrations: safeWebinars
     };
   }
 
@@ -3169,6 +3558,7 @@ App.auth = (function() {
     updateUserRole,
     updateUserReferral,
     updateUserEmbajador,
+    updateUserBroker,
     updateUserRegionalProfile,
     updateUserAgencyBranding,
     updateBuyerGuideProfile,

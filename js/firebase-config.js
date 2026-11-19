@@ -78,20 +78,6 @@ App.demoData = {
       createdAt: '2026-09-09T09:41:26Z'
     },
     {
-      id: 'admin-003',
-      email: 'spainconnection0@gmail.com',
-      password: 'proyectointernacional2026',
-      role: 'admin',
-      status: 'active',
-      firstName: 'Maia',
-      lastName: 'Honczaryk',
-      agencyName: 'RE/MAX Inmomás',
-      phone: '+34 965 123 456',
-      country: 'Spain',
-      profileImage: null,
-      createdAt: '2026-09-10T12:06:56Z'
-    },
-    {
       id: 'admin-004',
       email: 'maia.honczaryk@remax.es',
       password: 'proyectointernacional2026',

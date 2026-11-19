@@ -206,7 +206,20 @@ App.views.auth = {
 
     if (nameEl) nameEl.textContent = `${user.firstName} ${user.lastName}`;
     if (emailEl) emailEl.textContent = user.email;
-    if (roleBadgeEl) roleBadgeEl.textContent = user.role === 'agent_inmomas' ? 'Agente RE/MAX Inmomás' : user.role.replace('_', ' ');
+    if (roleBadgeEl) {
+      const roleMap = {
+        admin:         { html: '🛡️ <span class="lang-en">Administrator</span><span class="lang-es">Administrador</span>', cls: 'badge badge--admin' },
+        embajador:     { html: '👑 <span class="lang-en">Ambassador</span><span class="lang-es">Embajador</span>', cls: 'badge badge--embajador' },
+        broker:        { html: '🏢 Broker', cls: 'badge badge--broker' },
+        realtor:       { html: '🏠 Realtor', cls: 'badge badge--realtor' },
+        agent_inmomas: { html: '🇪🇸 <span class="lang-en">RE/MAX Inmomás Agent</span><span class="lang-es">Agente RE/MAX Inmomás</span>', cls: 'badge badge--agent' },
+        colaborador:   { html: '🤝 <span class="lang-en">Collaborator</span><span class="lang-es">Colaborador</span>', cls: 'badge badge--agent' },
+        partner:       { html: '🤝 Partner', cls: 'badge badge--blue' }
+      };
+      const rCfg = roleMap[user.role] || { html: App.utils.escapeHtml((user.role || '').replace('_', ' ')), cls: 'badge badge--blue' };
+      roleBadgeEl.className = rCfg.cls;
+      roleBadgeEl.innerHTML = rCfg.html;
+    }
     if (agencyEl) agencyEl.textContent = user.agencyName || (user.role === 'agent_inmomas' ? 'RE/MAX Inmomás' : '—');
     if (statusEl) statusEl.innerHTML = App.utils.getUserStatusBadge(user.status);
     if (phoneEl) phoneEl.textContent = user.phone || '—';
@@ -222,8 +235,12 @@ App.views.auth = {
     }
     if (joinedEl) joinedEl.textContent = App.utils.formatDate(user.createdAt);
 
-    // Populate Broker Name if applicable
-    if (brokerEl) {
+    // Populate Broker Name only for roles that can report to a Broker (Realtors / Colaboradores)
+    const brokerGroupEl = document.getElementById('profile-broker-group') || (brokerEl ? brokerEl.parentElement : null);
+    if (brokerGroupEl && ['embajador', 'broker', 'admin', 'agent_inmomas', 'partner'].includes(user.role)) {
+      brokerGroupEl.style.display = 'none';
+    } else if (brokerEl) {
+      if (brokerGroupEl) brokerGroupEl.style.display = '';
       if (user.brokerId) {
         try {
           const broker = await App.auth.getUser(user.brokerId);
@@ -232,7 +249,7 @@ App.views.auth = {
           brokerEl.textContent = '—';
         }
       } else {
-        brokerEl.textContent = 'None / Independent';
+        brokerEl.innerHTML = '<span class="lang-en">None / Independent</span><span class="lang-es">Independiente</span>';
       }
     }
 
@@ -442,35 +459,35 @@ App.views.auth = {
               <div class="profile-stat-icon" style="background: rgba(0, 67, 255, 0.08); color: var(--blue);">👥</div>
               <div>
                 <div class="profile-stat-value">${clients.length}</div>
-                <div class="profile-stat-label">Total Referred</div>
+                <div class="profile-stat-label"><span class="lang-en">Total Referred</span><span class="lang-es">Total Referidos</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(253, 224, 71, 0.15); color: #a16207;">⚡</div>
               <div>
                 <div class="profile-stat-value">${activeDeals}</div>
-                <div class="profile-stat-label">Active Pipelines</div>
+                <div class="profile-stat-label"><span class="lang-en">Active Pipelines</span><span class="lang-es">Pipelines Activos</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(34, 197, 94, 0.08); color: #15803d;">🏠</div>
               <div>
                 <div class="profile-stat-value">${closedDeals}</div>
-                <div class="profile-stat-label">Closed Sales</div>
+                <div class="profile-stat-label"><span class="lang-en">Closed Sales</span><span class="lang-es">Ventas Cerradas</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(147, 51, 234, 0.08); color: #7e22ce;">💰</div>
               <div>
                 <div class="profile-stat-value">€${projectedComm.toLocaleString()}</div>
-                <div class="profile-stat-label">Projected Comm.</div>
+                <div class="profile-stat-label"><span class="lang-en">Projected Comm.</span><span class="lang-es">Com. Proyectada</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(34, 197, 94, 0.08); color: #15803d;">💵</div>
               <div>
                 <div class="profile-stat-value">€${paidComm.toLocaleString()}</div>
-                <div class="profile-stat-label">Paid Commission</div>
+                <div class="profile-stat-label"><span class="lang-en">Paid Commission</span><span class="lang-es">Comisión Cobrada</span></div>
               </div>
             </div>
           `;
@@ -484,28 +501,28 @@ App.views.auth = {
               <div class="profile-stat-icon" style="background: rgba(245, 158, 11, 0.14); color: #b45309;">👑</div>
               <div>
                 <div class="profile-stat-value">${(umb.users || []).length}</div>
-                <div class="profile-stat-label">Red Paraguas</div>
+                <div class="profile-stat-label"><span class="lang-en">Umbrella Network</span><span class="lang-es">Red Paraguas</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(0, 67, 255, 0.08); color: var(--blue);">🏢</div>
               <div>
                 <div class="profile-stat-value">${(umb.brokers || []).length} / ${(umb.realtors || []).length}</div>
-                <div class="profile-stat-label">Brokers / Agentes</div>
+                <div class="profile-stat-label"><span class="lang-en">Brokers / Agents</span><span class="lang-es">Brokers / Agentes</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(253, 224, 71, 0.15); color: #a16207;">⚡</div>
               <div>
                 <div class="profile-stat-value">${activeClients}</div>
-                <div class="profile-stat-label">Clientes Activos</div>
+                <div class="profile-stat-label"><span class="lang-en">Active Clients</span><span class="lang-es">Clientes Activos</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(34, 197, 94, 0.08); color: #15803d;">🏠</div>
               <div>
                 <div class="profile-stat-value">€${totalVolume.toLocaleString()}</div>
-                <div class="profile-stat-label">Volumen Paraguas</div>
+                <div class="profile-stat-label"><span class="lang-en">Umbrella Volume</span><span class="lang-es">Volumen Paraguas</span></div>
               </div>
             </div>
           `;
@@ -528,28 +545,28 @@ App.views.auth = {
               <div class="profile-stat-icon" style="background: rgba(0, 67, 255, 0.08); color: var(--blue);">👥</div>
               <div>
                 <div class="profile-stat-value">${team.length}</div>
-                <div class="profile-stat-label">Team Members</div>
+                <div class="profile-stat-label"><span class="lang-en">Team Members</span><span class="lang-es">Miembros Equipo</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(253, 224, 71, 0.15); color: #a16207;">⚡</div>
               <div>
                 <div class="profile-stat-value">${activeClients}</div>
-                <div class="profile-stat-label">Active Referrals</div>
+                <div class="profile-stat-label"><span class="lang-en">Active Referrals</span><span class="lang-es">Referidos Activos</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(34, 197, 94, 0.08); color: #15803d;">🏠</div>
               <div>
                 <div class="profile-stat-value">€${totalVolume.toLocaleString()}</div>
-                <div class="profile-stat-label">Total Volume</div>
+                <div class="profile-stat-label"><span class="lang-en">Total Volume</span><span class="lang-es">Volumen Total</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(147, 51, 234, 0.08); color: #7e22ce;">💰</div>
               <div>
                 <div class="profile-stat-value">€${brokerComm.toLocaleString()}</div>
-                <div class="profile-stat-label">Broker Commission</div>
+                <div class="profile-stat-label"><span class="lang-en">Broker Commission</span><span class="lang-es">Comisión Broker</span></div>
               </div>
             </div>
           `;
@@ -574,35 +591,35 @@ App.views.auth = {
               <div class="profile-stat-icon" style="background: rgba(0, 67, 255, 0.08); color: var(--blue);">👥</div>
               <div>
                 <div class="profile-stat-value">${clients.length}</div>
-                <div class="profile-stat-label">Assigned Clients</div>
+                <div class="profile-stat-label"><span class="lang-en">Assigned Clients</span><span class="lang-es">Clientes Asignados</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(253, 224, 71, 0.15); color: #a16207;">⚡</div>
               <div>
                 <div class="profile-stat-value">${activeClients}</div>
-                <div class="profile-stat-label">Active Negotiations</div>
+                <div class="profile-stat-label"><span class="lang-en">Active Negotiations</span><span class="lang-es">Negociaciones Activas</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(34, 197, 94, 0.08); color: #15803d;">🏠</div>
               <div>
                 <div class="profile-stat-value">${closedClients}</div>
-                <div class="profile-stat-label">Closed Deals</div>
+                <div class="profile-stat-label"><span class="lang-en">Closed Deals</span><span class="lang-es">Ventas Cerradas</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(147, 51, 234, 0.08); color: #7e22ce;">💰</div>
               <div>
                 <div class="profile-stat-value">€${totalProjected.toLocaleString()}</div>
-                <div class="profile-stat-label">Projected Comm.</div>
+                <div class="profile-stat-label"><span class="lang-en">Projected Comm.</span><span class="lang-es">Com. Proyectada</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(34, 197, 94, 0.08); color: #15803d;">💵</div>
               <div>
                 <div class="profile-stat-value">€${totalPaid.toLocaleString()}</div>
-                <div class="profile-stat-label">Paid Comm.</div>
+                <div class="profile-stat-label"><span class="lang-en">Paid Comm.</span><span class="lang-es">Comisión Cobrada</span></div>
               </div>
             </div>
           `;
@@ -619,28 +636,28 @@ App.views.auth = {
               <div class="profile-stat-icon" style="background: rgba(0, 67, 255, 0.08); color: var(--blue);">👥</div>
               <div>
                 <div class="profile-stat-value">${users.length}</div>
-                <div class="profile-stat-label">Total Users</div>
+                <div class="profile-stat-label"><span class="lang-en">Total Users</span><span class="lang-es">Usuarios Totales</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(253, 224, 71, 0.15); color: #a16207;">⚡</div>
               <div>
                 <div class="profile-stat-value">${clients.length}</div>
-                <div class="profile-stat-label">Total Clients</div>
+                <div class="profile-stat-label"><span class="lang-en">Total Clients</span><span class="lang-es">Clientes Totales</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(34, 197, 94, 0.08); color: #15803d;">🏠</div>
               <div>
                 <div class="profile-stat-value">${closedSales}</div>
-                <div class="profile-stat-label">Closed Sales</div>
+                <div class="profile-stat-label"><span class="lang-en">Closed Sales</span><span class="lang-es">Ventas Cerradas</span></div>
               </div>
             </div>
             <div class="profile-stat-card">
               <div class="profile-stat-icon" style="background: rgba(147, 51, 234, 0.08); color: #7e22ce;">💰</div>
               <div>
                 <div class="profile-stat-value">€${totalVolume.toLocaleString()}</div>
-                <div class="profile-stat-label">Platform Volume</div>
+                <div class="profile-stat-label"><span class="lang-en">Platform Volume</span><span class="lang-es">Volumen Plataforma</span></div>
               </div>
             </div>
           `;

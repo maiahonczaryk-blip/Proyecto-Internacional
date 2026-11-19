@@ -72,6 +72,21 @@
     return `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:0.74rem;font-weight:700;background:${cfg.bg};color:${cfg.color};border:1px solid ${cfg.border};white-space:nowrap;">${cfg.icon} <span class="lang-en">${cfg.labelEn}</span><span class="lang-es">${cfg.labelEs}</span></span>`;
   }
 
+  function getClientAnonCode(c) {
+    if (!c) return 'CLI';
+    if (c._anonCode) return String(c._anonCode);
+    const clean = String(c.id || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    return `CLI-${clean.length >= 4 ? clean.slice(-4) : '0001'}`;
+  }
+
+  function renderClientAnonLabel(c) {
+    if (!c) return '🔒 <span class="lang-en">Protected Buyer</span><span class="lang-es">Cliente Protegido</span>';
+    const code = getClientAnonCode(c);
+    const labelEn = c._labelEn || `Protected Client (${code})`;
+    const labelEs = c._labelEs || `Cliente Protegido (${code})`;
+    return `🔒 <span class="lang-en">${App.utils.escapeHtml(labelEn)}</span><span class="lang-es">${App.utils.escapeHtml(labelEs)}</span>`;
+  }
+
   /* ============================================
      1. DASHBOARD (#embajador/dashboard)
      ============================================ */
@@ -300,10 +315,10 @@
       <div onclick="App.views.embajador.showClientDetail('${c.id}')" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-bottom:1px solid var(--border-subtle);cursor:pointer;">
         <div style="min-width:0;">
           <div style="font-weight:700;color:var(--text-primary);font-size:0.9rem;">
-            ${App.utils.escapeHtml(c.firstName || '')} ${App.utils.escapeHtml(c.lastName || '')}
+            ${renderClientAnonLabel(c)}
           </div>
           <div style="font-size:0.76rem;color:var(--text-secondary);margin-top:2px;">
-            📍 ${App.utils.escapeHtml(c.interestArea || c.currentLocation || c.country || 'España')} · 🤝 ${App.utils.escapeHtml(c._originMemberName || 'Directo')}
+            📍 ${App.utils.escapeHtml(c.interestArea || c.country || 'España')} · 🤝 ${App.utils.escapeHtml(c._originMemberName || 'Directo')}
           </div>
         </div>
         <div style="flex-shrink:0;">
@@ -439,6 +454,76 @@
     renderNetworkView();
   }
 
+  function getDirectClientsForMember(u, subAgentIdsSet = null) {
+    if (!u) return [];
+    const uCode = u.referralCode ? String(u.referralCode).toUpperCase().trim() : '';
+    return (umbrella.clients || []).filter(c => {
+      if (!c) return false;
+      // If checking direct clients of a Broker, exclude clients originated by one of its sub-agents
+      if (subAgentIdsSet && subAgentIdsSet.size > 0) {
+        if ((c._originMemberId && subAgentIdsSet.has(c._originMemberId)) ||
+            (c.realtorId && subAgentIdsSet.has(c.realtorId)) ||
+            (c.referredBy && subAgentIdsSet.has(c.referredBy))) {
+          return false;
+        }
+      }
+      const cRef = c.referredBy ? String(c.referredBy).toUpperCase().trim() : '';
+      if (u.role === 'broker') {
+        return c._originMemberId === u.id ||
+               c.referredBy === u.id ||
+               (uCode && cRef === uCode) ||
+               (c.brokerId === u.id && !c.realtorId && (!c._originMemberId || c._originMemberId === u.id));
+      }
+      return c._originMemberId === u.id ||
+             c.referredBy === u.id ||
+             c.realtorId === u.id ||
+             (uCode && cRef === uCode);
+    });
+  }
+
+  function getUniqueClientsForGroup(brokerUser, subMembers = []) {
+    const map = new Map();
+    const subIds = new Set((subMembers || []).map(s => s.id));
+    getDirectClientsForMember(brokerUser, subIds).forEach(c => { if (c && c.id) map.set(c.id, c); });
+    (subMembers || []).forEach(m => {
+      getDirectClientsForMember(m).forEach(c => { if (c && c.id) map.set(c.id, c); });
+    });
+    // Also catch any client tagged with brokerId === brokerUser.id
+    if (brokerUser && brokerUser.id) {
+      (umbrella.clients || []).forEach(c => {
+        if (c && c.id && c.brokerId === brokerUser.id) map.set(c.id, c);
+      });
+    }
+    return Array.from(map.values());
+  }
+
+  function renderInlineClientPills(clientsList, emptyTextEs = '') {
+    if (!clientsList || clientsList.length === 0) {
+      return emptyTextEs
+        ? `<span style="font-size:0.74rem; color:#94a3b8; font-style:italic;">${emptyTextEs}</span>`
+        : '';
+    }
+    return `
+      <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:6px;">
+        ${clientsList.map(c => {
+          const code = getClientAnonCode(c);
+          const labelEn = c._labelEn || `Client (${code})`;
+          const labelEs = c._labelEs || `Cliente (${code})`;
+          const statusLbl = App.utils.getStatusLabel ? App.utils.getStatusLabel(c.status) : App.utils.escapeHtml(c.status || 'Nuevo');
+          return `
+            <button type="button"
+              onclick="event.stopPropagation(); App.views.embajador.showClientDetail('${c.id}')"
+              title="Ver seguimiento del expediente (datos personales protegidos)"
+              style="display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; background:#f5f3ff; border:1px solid #ddd6fe; color:#5b21b6; font-size:0.74rem; font-weight:700; cursor:pointer; transition:background 0.15s;">
+              <span>🔒 <span class="lang-en">${App.utils.escapeHtml(labelEn)}</span><span class="lang-es">${App.utils.escapeHtml(labelEs)}</span></span>
+              <span style="font-weight:600; color:#7c3aed; opacity:0.85;">· ${statusLbl}</span>
+            </button>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
   function getFilteredUmbrellaMembers() {
     return (umbrella.users || []).filter(u => {
       if (networkRoleFilter !== 'all' && u.role !== networkRoleFilter) return false;
@@ -448,7 +533,8 @@
         if (networkStatusFilter !== 'approved' && u.status !== networkStatusFilter) return false;
       }
       if (networkSearchQuery) {
-        const hay = `${u.firstName || ''} ${u.lastName || ''} ${u.email || ''} ${u.phone || ''} ${u.agencyName || ''} ${u.country || ''} ${u._umbrellaParentName || ''} ${u._inmomasAgentName || ''} ${u.referralCode || ''}`.toLowerCase();
+        const directClientsCodes = getDirectClientsForMember(u).map(c => getClientAnonCode(c)).join(' ');
+        const hay = `${u.firstName || ''} ${u.lastName || ''} ${u.agencyName || ''} ${u.country || ''} ${u._umbrellaParentName || ''} ${u._inmomasAgentName || ''} ${directClientsCodes} ${u.referralCode || ''}`.toLowerCase();
         if (!hay.includes(networkSearchQuery)) return false;
       }
       return true;
@@ -456,34 +542,44 @@
   }
 
   function countMemberClients(u) {
-    return (umbrella.clients || []).filter(c =>
-      c._originMemberId === u.id || c.referredBy === u.id || c.realtorId === u.id || c.brokerId === u.id
-    ).length;
+    return getDirectClientsForMember(u).length;
   }
 
   function renderEmbLeaf(u) {
     const allRefUsers = umbrella.allUsers || [];
-    const clientCnt = countMemberClients(u);
+    const memberClients = getDirectClientsForMember(u);
     const isColab = u.role === 'colaborador';
     const inmomasBadge = App.utils.renderInmomasAgentBadge
       ? App.utils.renderInmomasAgentBadge(u, allRefUsers, { showUnassigned: true, compact: true })
       : '';
+    const locParts = [u.agencyName, u.country ? `🌍 ${u.country}` : ''].filter(Boolean);
 
     return `
-      <div class="umbrella-leaf ${isColab ? 'umbrella-leaf--colaborador' : ''}">
+      <div class="umbrella-leaf ${isColab ? 'umbrella-leaf--colaborador' : ''}" style="align-items:flex-start;">
         <div style="min-width:0; flex:1;">
           <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-            <strong>${isColab ? '🤝' : '🏠'} ${App.utils.escapeHtml(u.firstName || '')} ${App.utils.escapeHtml(u.lastName || '')}</strong>
+            <strong style="font-size:0.9rem; color:#0f172a;">${isColab ? '🤝' : '🏠'} ${App.utils.escapeHtml(u.firstName || '')} ${App.utils.escapeHtml(u.lastName || '')}</strong>
             ${getRolePill(u.role)}
             ${App.utils.getUserStatusBadge(u.status)}
           </div>
-          <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">
-            ${App.utils.escapeHtml(u.email || '—')}${u.agencyName ? ` · ${App.utils.escapeHtml(u.agencyName)}` : ''}${u.country ? ` · 🌍 ${App.utils.escapeHtml(u.country)}` : ''}
+          <div style="font-size:0.75rem; color:#64748b; margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            ${locParts.length > 0 ? `<span>${ locParts.map(p => App.utils.escapeHtml(p)).join(' · ') }</span><span>·</span>` : ''}
+            <span style="color:#94a3b8;">🔒 <span class="lang-en">Protected contact</span><span class="lang-es">Contacto protegido</span></span>
           </div>
-          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:5px;">
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:6px;">
             ${inmomasBadge}
-            ${clientCnt > 0 ? `<span class="umbrella-kpi-pill umbrella-kpi-pill--clients" style="font-size:0.7rem; padding:1px 7px;">🏡 ${clientCnt} clientes</span>` : ''}
+            <span class="umbrella-kpi-pill umbrella-kpi-pill--clients" style="font-size:0.7rem; padding:1px 7px;">
+              🏡 ${memberClients.length} <span class="lang-en">${memberClients.length === 1 ? 'Client' : 'Clients'}</span><span class="lang-es">${memberClients.length === 1 ? 'Cliente' : 'Clientes'}</span>
+            </span>
           </div>
+          ${memberClients.length > 0 ? `
+            <div style="margin-top:6px; padding-top:6px; border-top:1px dashed #e2e8f0;">
+              <div style="font-size:0.71rem; font-weight:700; color:#6d28d9; text-transform:uppercase; letter-spacing:0.03em;">
+                <span class="lang-en">Referred Buyers:</span><span class="lang-es">Clientes Referidos:</span>
+              </div>
+              ${renderInlineClientPills(memberClients)}
+            </div>
+          ` : ''}
         </div>
         <div style="flex-shrink:0;">
           <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); App.views.embajador.showMemberDetail('${u.id}')">
@@ -499,16 +595,6 @@
     if (!container) return;
 
     const hasActiveFilter = Boolean(networkRoleFilter !== 'all' || networkRegionFilter || networkStatusFilter !== 'all' || networkSearchQuery);
-
-    if (filtered.length === 0) {
-      container.innerHTML = `
-        <div style="text-align:center;padding:2.5rem;background:#fff;border:1px solid #e2e8f0;border-radius:12px;color:#64748b;">
-          <div style="font-size:1.8rem;margin-bottom:6px;">🌐</div>
-          <span class="lang-en">No umbrella members match the current filters.</span>
-          <span class="lang-es">No hay miembros en tu paraguas con los filtros seleccionados.</span>
-        </div>`;
-      return;
-    }
 
     const allMembers = umbrella.users || [];
     const allRefUsers = umbrella.allUsers || [];
@@ -541,7 +627,10 @@
       if (!brkMatches && matchingSubTeam.length === 0) return;
 
       const shownSubTeam = (hasActiveFilter && !brkMatches) ? matchingSubTeam : (hasActiveFilter ? matchingSubTeam : fullSubTeam);
-      const totalClients = countMemberClients(brk) + fullSubTeam.reduce((sum, m) => sum + countMemberClients(m), 0);
+      const subIds = new Set(fullSubTeam.map(s => s.id));
+      const directBrokerClients = getDirectClientsForMember(brk, subIds);
+      const allGroupClients = getUniqueClientsForGroup(brk, fullSubTeam);
+
       const nodeId = `brk-${brk.id}`;
       if (!embUmbrellaInitialized && brokerCards.length < 3) {
         expandedEmbNodes.add(nodeId);
@@ -550,6 +639,9 @@
       const inmomasBadge = App.utils.renderInmomasAgentBadge
         ? App.utils.renderInmomasAgentBadge(brk, allRefUsers, { showUnassigned: true })
         : '';
+
+      const agentNamesPreview = fullSubTeam.map(a => `${a.firstName || ''} ${a.lastName || ''}`.trim()).filter(Boolean).join(', ');
+      const clientCodesPreview = allGroupClients.map(c => getClientAnonCode(c)).filter(Boolean).join(', ');
 
       brokerCards.push(`
         <div class="umbrella-card umbrella-card--broker ${isOpen ? 'is-open' : ''}" id="emb-umb-node-${nodeId}" data-emb-node="${nodeId}">
@@ -565,15 +657,17 @@
                   ${App.utils.getUserStatusBadge(brk.status)}
                 </div>
                 <div class="umbrella-card__meta">
-                  <span>✉️ ${App.utils.escapeHtml(brk.email || '—')}</span>
-                  ${brk.country ? `<span>· 🌍 ${App.utils.escapeHtml(brk.country)}</span>` : ''}
+                  ${brk.country ? `<span>🌍 ${App.utils.escapeHtml(brk.country)}</span><span>·</span>` : ''}
+                  <span style="color:#94a3b8;">🔒 <span class="lang-en">Protected contact</span><span class="lang-es">Contacto protegido</span></span>
+                  ${agentNamesPreview ? `<span>· <strong style="color:#047857;">🏠 ${App.utils.escapeHtml(agentNamesPreview)}</strong></span>` : ''}
+                  ${clientCodesPreview ? `<span>· <strong style="color:#6d28d9;">🔒 ${App.utils.escapeHtml(clientCodesPreview)}</strong></span>` : ''}
                 </div>
               </div>
             </div>
             <div class="umbrella-card__right">
               ${inmomasBadge}
-              <span class="umbrella-kpi-pill">🏠 ${fullSubTeam.length} <span class="lang-en">Sub-Agents</span><span class="lang-es">Sub-Agentes</span></span>
-              <span class="umbrella-kpi-pill umbrella-kpi-pill--clients">🏡 ${totalClients} <span class="lang-en">Clients</span><span class="lang-es">Clientes</span></span>
+              <span class="umbrella-kpi-pill">🏠 ${fullSubTeam.length} <span class="lang-en">${fullSubTeam.length === 1 ? 'Agent' : 'Agents'}</span><span class="lang-es">${fullSubTeam.length === 1 ? 'Agente' : 'Agentes'}</span></span>
+              <span class="umbrella-kpi-pill umbrella-kpi-pill--clients">🏡 ${allGroupClients.length} <span class="lang-en">${allGroupClients.length === 1 ? 'Client' : 'Clients'}</span><span class="lang-es">${allGroupClients.length === 1 ? 'Cliente' : 'Clientes'}</span></span>
               <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); App.views.embajador.showMemberDetail('${brk.id}')">
                 👁️ <span class="lang-en">Details</span><span class="lang-es">Ficha</span>
               </button>
@@ -585,6 +679,15 @@
                 ? `<div class="umbrella-leaf-grid">${shownSubTeam.map(m => renderEmbLeaf(m)).join('')}</div>`
                 : `<div style="font-size:0.82rem; color:#64748b;"><span class="lang-en">No agents registered under this Broker yet.</span><span class="lang-es">Aún no hay agentes registrados bajo este Broker.</span></div>`
               }
+              ${directBrokerClients.length > 0 ? `
+                <div style="background:#fff; border:1px solid #e2e8f0; border-left:3px solid #7c3aed; border-radius:9px; padding:9px 12px; margin-top:4px;">
+                  <div style="font-size:0.75rem; font-weight:700; color:#5b21b6;">
+                    🏡 <span class="lang-en">Direct Clients of ${App.utils.escapeHtml(brk.firstName || 'Broker')} (${directBrokerClients.length}):</span>
+                    <span class="lang-es">Clientes Directos de ${App.utils.escapeHtml(brk.firstName || 'Broker')} (${directBrokerClients.length}):</span>
+                  </div>
+                  ${renderInlineClientPills(directBrokerClients)}
+                </div>
+              ` : ''}
             </div>
           </div>
         </div>
@@ -593,6 +696,24 @@
 
     const directRealtors = filtered.filter(u => u.role === 'realtor' && !getBrokerForMember(u));
     const directColabs = filtered.filter(u => u.role === 'colaborador' && !getBrokerForMember(u));
+
+    // Clients invited directly by the Embajador (not through any sub-member)
+    const directEmbClients = (networkRoleFilter === 'all' ? (umbrella.clients || []) : []).filter(c => {
+      if (!c || !c._isDirectFromEmbajador) return false;
+      if (!networkSearchQuery) return true;
+      const hay = `${getClientAnonCode(c)} ${c.interestArea || ''} ${c.country || ''}`.toLowerCase();
+      return hay.includes(networkSearchQuery);
+    });
+
+    if (brokerCards.length === 0 && directRealtors.length === 0 && directColabs.length === 0 && directEmbClients.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center;padding:2.5rem;background:#fff;border:1px solid #e2e8f0;border-radius:12px;color:#64748b;">
+          <div style="font-size:1.8rem;margin-bottom:6px;">🌐</div>
+          <span class="lang-en">No umbrella members match the current filters.</span>
+          <span class="lang-es">No hay miembros en tu paraguas con los filtros seleccionados.</span>
+        </div>`;
+      return;
+    }
 
     let html = '';
     if (brokerCards.length > 0) {
@@ -615,7 +736,7 @@
       html += `
         <div class="umbrella-group">
           <div class="umbrella-group__title">
-            <span>🏠 <span class="lang-en">Direct Realtors / Agents (Level 1 — No Broker)</span><span class="lang-es">Agentes / Realtors Directos (Nivel 1 — Sin Broker intermedio)</span></span>
+            <span>🏠 <span class="lang-en">Direct Realtors / Agents (Level 1 — Pending or Without Broker)</span><span class="lang-es">Agentes / Realtors Directos (Nivel 1 — Sin Broker o a la espera de su Broker)</span></span>
             <span class="umbrella-kpi-pill">${directRealtors.length}</span>
           </div>
           <div class="umbrella-card umbrella-card--direct ${isOpen ? 'is-open' : ''}" id="emb-umb-node-${nodeId}" data-emb-node="${nodeId}">
@@ -624,6 +745,10 @@
                 <span class="umbrella-chevron">▶</span>
                 <div class="umbrella-card__identity">
                   <span class="umbrella-card__name">👑 ➔ 🏠 <span class="lang-en">Invited Directly by You</span><span class="lang-es">Invitados Directamente en tu Paraguas</span></span>
+                  <div class="umbrella-card__meta">
+                    <span class="lang-en">If their Broker registers later and is linked to them, the Broker automatically attaches to your umbrella</span>
+                    <span class="lang-es">Si su Broker se registra después y se vincula al agente, el Broker pasará automáticamente a tu paraguas</span>
+                  </div>
                 </div>
               </div>
               <div class="umbrella-card__right">
@@ -671,6 +796,36 @@
       `;
     }
 
+    if (directEmbClients.length > 0) {
+      const nodeId = 'direct-emb-clients';
+      if (!embUmbrellaInitialized) expandedEmbNodes.add(nodeId);
+      const isOpen = hasActiveFilter ? true : expandedEmbNodes.has(nodeId);
+      html += `
+        <div class="umbrella-group">
+          <div class="umbrella-group__title">
+            <span>🏡 <span class="lang-en">Direct Buyers Referred by You</span><span class="lang-es">Clientes Compradores Directos de tu Enlace</span></span>
+            <span class="umbrella-kpi-pill umbrella-kpi-pill--clients">${directEmbClients.length}</span>
+          </div>
+          <div class="umbrella-card umbrella-card--embajador ${isOpen ? 'is-open' : ''}" id="emb-umb-node-${nodeId}" data-emb-node="${nodeId}">
+            <div class="umbrella-card__header" onclick="App.views.embajador.toggleEmbNode('${nodeId}')">
+              <div class="umbrella-card__left">
+                <span class="umbrella-chevron">▶</span>
+                <div class="umbrella-card__identity">
+                  <span class="umbrella-card__name">👑 ➔ 🏡 <span class="lang-en">Direct Ambassador Buyers</span><span class="lang-es">Clientes Directos de Embajador</span></span>
+                </div>
+              </div>
+              <div class="umbrella-card__right">
+                <span class="umbrella-kpi-pill umbrella-kpi-pill--clients">🏡 ${directEmbClients.length} Clientes</span>
+              </div>
+            </div>
+            <div class="umbrella-card__body">
+              ${renderInlineClientPills(directEmbClients)}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     embUmbrellaInitialized = true;
     container.innerHTML = html;
   }
@@ -701,8 +856,10 @@
     }
 
     tbody.innerHTML = filtered.map(u => {
-      const memberClients = countMemberClients(u);
-      const subMembers = (umbrella.users || []).filter(sub => sub._umbrellaParentId === u.id).length;
+      const subMembers = (umbrella.users || []).filter(sub => sub._umbrellaParentId === u.id || (u.role === 'broker' && sub.brokerId === u.id));
+      const memberClients = u.role === 'broker'
+        ? getUniqueClientsForGroup(u, subMembers)
+        : getDirectClientsForMember(u);
       const originHtml = u._isDirectFromEmbajador
         ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.78rem;font-weight:700;color:#b45309;">👑 <span class="lang-en">Direct (Level 1)</span><span class="lang-es">Directo (Nivel 1)</span></span>`
         : `<div style="font-size:0.78rem;color:#1e40af;font-weight:600;">↳ ${App.utils.escapeHtml(u._umbrellaParentName)}</div><div style="font-size:0.7rem;color:#64748b;">Nivel ${u._umbrellaLevel}</div>`;
@@ -710,12 +867,18 @@
         ? App.utils.renderInmomasAgentBadge(u, allRefUsers, { showUnassigned: true, compact: true })
         : '—';
 
+      const subNamesHtml = subMembers.length > 0
+        ? `<div style="font-size:0.73rem;color:#047857;font-weight:600;margin-top:3px;">🏠 ${subMembers.map(s => App.utils.escapeHtml(`${s.firstName || ''} ${s.lastName || ''}`.trim())).join(', ')}</div>`
+        : '';
+      const clientCodesHtml = memberClients.length > 0
+        ? `<div style="font-size:0.73rem;color:#6d28d9;font-weight:600;margin-top:2px;">🔒 ${memberClients.map(c => App.utils.escapeHtml(getClientAnonCode(c))).join(', ')}</div>`
+        : '';
+
       return `
         <tr>
           <td>
             <div style="font-weight:700;color:var(--text-primary);">${App.utils.escapeHtml(u.firstName || '')} ${App.utils.escapeHtml(u.lastName || '')}</div>
-            <div style="font-size:0.78rem;color:var(--text-secondary);">${App.utils.escapeHtml(u.email || '—')}</div>
-            ${u.phone ? `<div style="font-size:0.75rem;color:#64748b;">📞 ${App.utils.escapeHtml(u.phone)}</div>` : ''}
+            <div style="font-size:0.73rem;color:#94a3b8;">🔒 <span class="lang-en">Protected contact</span><span class="lang-es">Contacto protegido</span></div>
           </td>
           <td>${getRolePill(u.role)}</td>
           <td>
@@ -724,9 +887,11 @@
           </td>
           <td>${originHtml}</td>
           <td>${inmomasBadge}</td>
-          <td style="text-align:center;">
-            <span style="font-weight:700;color:#003da5;">${memberClients}</span>
-            ${subMembers > 0 ? `<div style="font-size:0.72rem;color:#059669;font-weight:600;">+${subMembers} sub-red</div>` : ''}
+          <td style="text-align:left;">
+            <span style="font-weight:700;color:#003da5;">${memberClients.length} <span class="lang-en">clients</span><span class="lang-es">clientes</span></span>
+            ${subMembers.length > 0 ? ` · <span style="font-size:0.75rem;color:#059669;font-weight:700;">${subMembers.length} <span class="lang-en">agents</span><span class="lang-es">agentes</span></span>` : ''}
+            ${subNamesHtml}
+            ${clientCodesHtml}
           </td>
           <td>${App.utils.getUserStatusBadge(u.status)}</td>
           <td style="font-size:0.8rem;color:#64748b;white-space:nowrap;">${App.utils.formatDate(u.createdAt)}</td>
@@ -747,18 +912,18 @@
     }
 
     const subTeam = (umbrella.users || []).filter(u => u._umbrellaParentId === member.id || u.brokerId === member.id);
-    const referredClients = (umbrella.clients || []).filter(c =>
-      c._originMemberId === member.id || c.referredBy === member.id || c.realtorId === member.id || c.brokerId === member.id
-    );
+    const referredClients = member.role === 'broker'
+      ? getUniqueClientsForGroup(member, subTeam)
+      : getDirectClientsForMember(member);
 
     const subTeamHtml = subTeam.length > 0
       ? `<div style="margin-top:1rem;">
-           <h4 style="margin:0 0 0.5rem;font-size:0.9rem;color:#1e3a8a;">👥 Sub-Red Asociada (${subTeam.length})</h4>
+           <h4 style="margin:0 0 0.5rem;font-size:0.9rem;color:#1e3a8a;">👥 Agentes Asociados (${subTeam.length})</h4>
            <div style="max-height:160px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:8px;padding:0.5rem;">
              ${subTeam.map(s => `
                <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-bottom:1px solid #f1f5f9;font-size:0.82rem;">
-                 <span><strong>${App.utils.escapeHtml(s.firstName || '')} ${App.utils.escapeHtml(s.lastName || '')}</strong> (${App.utils.escapeHtml(s.email || '')})</span>
-                 ${getRolePill(s.role)}
+                 <span><strong>${App.utils.escapeHtml(s.firstName || '')} ${App.utils.escapeHtml(s.lastName || '')}</strong>${s.country ? ` · 🌍 ${App.utils.escapeHtml(s.country)}` : ''}</span>
+                 <div style="display:flex;gap:6px;align-items:center;">${getRolePill(s.role)} ${App.utils.getUserStatusBadge(s.status)}</div>
                </div>`).join('')}
            </div>
          </div>`
@@ -766,11 +931,11 @@
 
     const clientsHtml = referredClients.length > 0
       ? `<div style="margin-top:1rem;">
-           <h4 style="margin:0 0 0.5rem;font-size:0.9rem;color:#065f46;">🏡 Clientes Referidos (${referredClients.length})</h4>
+           <h4 style="margin:0 0 0.5rem;font-size:0.9rem;color:#065f46;">🏡 Clientes en Paraguas (${referredClients.length})</h4>
            <div style="max-height:160px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:8px;padding:0.5rem;">
              ${referredClients.map(c => `
-               <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-bottom:1px solid #f1f5f9;font-size:0.82rem;">
-                 <span><strong>${App.utils.escapeHtml(c.firstName || '')} ${App.utils.escapeHtml(c.lastName || '')}</strong> · ${App.utils.escapeHtml(c.interestArea || c.budget || 'España')}</span>
+               <div onclick="App.views.embajador.showClientDetail('${c.id}')" style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-bottom:1px solid #f1f5f9;font-size:0.82rem;cursor:pointer;">
+                 <span><strong>${renderClientAnonLabel(c)}</strong> · ${App.utils.escapeHtml(c.interestArea || c.budget || 'España')}</span>
                  <span class="badge ${App.utils.getStatusBadgeClass(c.status)}">${App.utils.getStatusLabel(c.status)}</span>
                </div>`).join('')}
            </div>
@@ -785,17 +950,13 @@
             ${getRolePill(member.role)}
             ${App.utils.getUserStatusBadge(member.status)}
             ${App.utils.renderInmomasAgentBadge ? App.utils.renderInmomasAgentBadge(member, umbrella.allUsers || [], { showUnassigned: true }) : ''}
-            <span style="font-size:0.78rem;color:#64748b;font-family:monospace;background:#f8fafc;padding:3px 8px;border-radius:6px;border:1px solid #e2e8f0;">
-              ${App.utils.escapeHtml(member.referralCode || '—')}
-            </span>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;background:#f8fafc;padding:1rem;border-radius:10px;border:1px solid #e2e8f0;font-size:0.85rem;">
-            <div><strong>Email:</strong><br>${App.utils.escapeHtml(member.email || '—')}</div>
-            <div><strong>Teléfono:</strong><br>${App.utils.escapeHtml(member.phone || '—')}</div>
             <div><strong>Agencia / Empresa:</strong><br>${App.utils.escapeHtml(member.agencyName || '—')}</div>
             <div><strong>País / Mercado:</strong><br>${App.utils.escapeHtml(member.country || '—')}</div>
             <div><strong>Origen en Paraguas:</strong><br>${App.utils.escapeHtml(member._umbrellaParentName || 'Directo')} (Nivel ${member._umbrellaLevel || 1})</div>
             <div><strong>Fecha Registro:</strong><br>${App.utils.formatDate(member.createdAt)}</div>
+            <div style="grid-column:span 2;color:#64748b;font-size:0.8rem;">🔒 <strong>Datos de contacto:</strong> Protegidos por privacidad de agencia y gestionados por RE/MAX Inmomás.</div>
           </div>
           ${subTeamHtml}
           ${clientsHtml}
@@ -811,22 +972,25 @@
       App.utils.showToast('No hay miembros en tu red para exportar.', 'info');
       return;
     }
-    const headers = ['Fecha', 'Nombre', 'Apellido', 'Rol', 'Estado', 'Email', 'Teléfono', 'Agencia', 'País', 'Origen en Paraguas', 'Nivel', 'Agente RE/MAX Inmomás', 'Código Referido'];
-    const rows = umbrella.users.map(u => [
-      u.createdAt ? new Date(u.createdAt).toLocaleDateString('es-ES') : '',
-      u.firstName || '',
-      u.lastName || '',
-      u.role || '',
-      u.status || '',
-      u.email || '',
-      u.phone || '',
-      u.agencyName || '',
-      u.country || '',
-      u._umbrellaParentName || 'Directo',
-      u._umbrellaLevel || 1,
-      u._inmomasAgentName ? (u._inmomasAgentInherited ? `${u._inmomasAgentName} (vía ${u._inmomasAgentInheritedFrom})` : u._inmomasAgentName) : '',
-      u.referralCode || ''
-    ]);
+    const headers = ['Fecha', 'Nombre', 'Apellido', 'Rol', 'Estado', 'Agencia', 'País', 'Origen en Paraguas', 'Nivel', 'Sub-Agentes', 'Expedientes Clientes (Protegidos)', 'Agente RE/MAX Inmomás'];
+    const rows = umbrella.users.map(u => {
+      const subMembers = (umbrella.users || []).filter(sub => sub._umbrellaParentId === u.id || (u.role === 'broker' && sub.brokerId === u.id));
+      const memberClients = u.role === 'broker' ? getUniqueClientsForGroup(u, subMembers) : getDirectClientsForMember(u);
+      return [
+        u.createdAt ? new Date(u.createdAt).toLocaleDateString('es-ES') : '',
+        u.firstName || '',
+        u.lastName || '',
+        u.role || '',
+        u.status || '',
+        u.agencyName || '',
+        u.country || '',
+        u._umbrellaParentName || 'Directo',
+        u._umbrellaLevel || 1,
+        subMembers.map(s => `${s.firstName || ''} ${s.lastName || ''}`.trim()).join(', '),
+        memberClients.length > 0 ? `${memberClients.length} (${memberClients.map(c => getClientAnonCode(c)).join(', ')})` : '0',
+        u._inmomasAgentName ? (u._inmomasAgentInherited ? `${u._inmomasAgentName} (vía ${u._inmomasAgentInheritedFrom})` : u._inmomasAgentName) : ''
+      ];
+    });
 
     if (typeof XLSX !== 'undefined') {
       const wb = XLSX.utils.book_new();
@@ -891,7 +1055,7 @@
         }
       }
       if (clientSearchQuery) {
-        const hay = `${c.firstName || ''} ${c.lastName || ''} ${c.email || ''} ${c.phone || ''} ${c.interestArea || ''} ${c.budget || ''} ${c._originMemberName || ''} ${c.localAgentName || ''}`.toLowerCase();
+        const hay = `${getClientAnonCode(c)} ${c._labelEs || ''} ${c._labelEn || ''} ${c.interestArea || ''} ${c.budget || ''} ${c.country || ''} ${c._originMemberName || ''} ${c.localAgentName || ''}`.toLowerCase();
         if (!hay.includes(clientSearchQuery)) return false;
       }
       return true;
@@ -923,7 +1087,19 @@
 
   function renderClientsViews() {
     const filtered = getFilteredClients();
-    App.utils.renderKanbanBoard('embajador-pipeline-board', filtered, 'App.views.embajador.showClientDetail', null, null);
+    const resolveOriginLabel = (refId) => {
+      if (!refId) return 'Directo (Embajador)';
+      const foundMember = (umbrella.users || []).find(u =>
+        u.id === refId || (u.referralCode && String(u.referralCode).toUpperCase() === String(refId).toUpperCase())
+      );
+      if (foundMember) return `${foundMember.firstName || ''} ${foundMember.lastName || ''}`.trim();
+      if (currentUser && (refId === currentUser.id || (currentUser.referralCode && String(currentUser.referralCode).toUpperCase() === String(refId).toUpperCase()))) {
+        return 'Directo (Embajador)';
+      }
+      return 'Paraguas';
+    };
+
+    App.utils.renderKanbanBoard('embajador-pipeline-board', filtered, 'App.views.embajador.showClientDetail', resolveOriginLabel, null);
 
     const tbody = document.getElementById('embajador-clients-tbody');
     if (tbody) {
@@ -933,8 +1109,8 @@
         tbody.innerHTML = filtered.map(c => `
           <tr>
             <td>
-              <div style="font-weight:700;color:var(--text-primary);">${App.utils.escapeHtml(c.firstName || '')} ${App.utils.escapeHtml(c.lastName || '')}</div>
-              <div style="font-size:0.78rem;color:var(--text-secondary);">${App.utils.escapeHtml(c.email || '—')} · ${App.utils.escapeHtml(c.phone || '—')}</div>
+              <div style="font-weight:700;color:var(--text-primary);">${renderClientAnonLabel(c)}</div>
+              <div style="font-size:0.75rem;color:#94a3b8;">${c.country ? `🌍 ${App.utils.escapeHtml(c.country)} · ` : ''}<span class="lang-en">Personal data protected</span><span class="lang-es">Datos personales protegidos</span></div>
             </td>
             <td>
               <div style="font-weight:600;font-size:0.84rem;color:#003da5;">${App.utils.escapeHtml(c._originMemberName || 'Directo')}</div>
@@ -945,7 +1121,7 @@
             <td><span class="badge ${App.utils.getStatusBadgeClass(c.status)}">${App.utils.getStatusLabel(c.status)}</span></td>
             <td style="font-size:0.8rem;color:#64748b;">${App.utils.formatDate(c.createdAt)}</td>
             <td>
-              <button class="btn btn-outline btn-sm" onclick="App.views.embajador.showClientDetail('${c.id}')">👁️ Ver</button>
+              <button class="btn btn-outline btn-sm" onclick="App.views.embajador.showClientDetail('${c.id}')">👁️ <span class="lang-en">Track</span><span class="lang-es">Ver</span></button>
             </td>
           </tr>
         `).join('');
@@ -961,6 +1137,7 @@
       return;
     }
 
+    const code = getClientAnonCode(client);
     const timeline = (client.statusHistory || []).map((entry, idx) => {
       const isLast = idx === client.statusHistory.length - 1;
       return `
@@ -972,34 +1149,39 @@
           <div>
             <span class="badge ${App.utils.getStatusBadgeClass(entry.status)}">${App.utils.getStatusLabel(entry.status)}</span>
             <div style="font-size:0.75rem;color:#64748b;margin-top:2px;">${App.utils.formatDate(entry.date)}</div>
-            ${entry.note ? `<div style="font-size:0.8rem;color:#334155;font-style:italic;margin-top:2px;">"${App.utils.escapeHtml(entry.note)}"</div>` : ''}
           </div>
         </div>`;
     }).join('');
 
     App.utils.showModal({
-      title: `Ficha de Cliente — ${client.firstName || ''} ${client.lastName || ''}`,
+      title: `🔒 Expediente Protegido — ${code}`,
       body: `
         <div style="text-align:left;">
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;margin-bottom:1rem;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;font-size:0.8rem;color:#1e40af;">
+            <span style="font-size:1.1rem;line-height:1.2;">🛡️</span>
+            <div>
+              <span class="lang-en"><strong>End-Client Privacy Protection:</strong> Personal identity and contact details of buyers are strictly confidential and managed directly by RE/MAX Inmomás.</span>
+              <span class="lang-es"><strong>Protección de Datos del Cliente Final:</strong> La identidad y los datos personales del comprador son estrictamente confidenciales y gestionados directamente por RE/MAX Inmomás.</span>
+            </div>
+          </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:1rem;">
             <span class="badge ${App.utils.getStatusBadgeClass(client.status)}">${App.utils.getStatusLabel(client.status)}</span>
             ${getRolePill(client._originMemberRole || 'embajador')}
-            <span style="font-size:0.82rem;font-weight:600;color:#003da5;">Origen: ${App.utils.escapeHtml(client._originMemberName || 'Directo')}</span>
+            <span style="font-size:0.82rem;font-weight:600;color:#003da5;"><span class="lang-en">Origin:</span><span class="lang-es">Origen:</span> ${App.utils.escapeHtml(client._originMemberName || 'Directo')}</span>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;background:#f8fafc;padding:1rem;border-radius:10px;border:1px solid #e2e8f0;font-size:0.85rem;margin-bottom:1rem;">
-            <div><strong>Email:</strong><br>${App.utils.escapeHtml(client.email || '—')}</div>
-            <div><strong>Teléfono:</strong><br>${App.utils.escapeHtml(client.phone || '—')}</div>
-            <div><strong>Zona de Interés:</strong><br>${App.utils.escapeHtml(client.interestArea || '—')}</div>
-            <div><strong>Presupuesto:</strong><br>${App.utils.escapeHtml(client.budget || '—')}</div>
-            <div><strong>Plazo / Objetivo:</strong><br>${App.utils.escapeHtml(client.timeline || '—')} · ${App.utils.escapeHtml(client.objective || '—')}</div>
-            <div><strong>Agente España Asignado:</strong><br>${App.utils.escapeHtml(client.localAgentName || 'En asignación por Admin')}</div>
+            <div><strong><span class="lang-en">Reference Code:</span><span class="lang-es">Código Expediente:</span></strong><br>${App.utils.escapeHtml(code)}</div>
+            <div><strong><span class="lang-en">Country / Market:</span><span class="lang-es">País de Residencia:</span></strong><br>${App.utils.escapeHtml(client.country || '—')}</div>
+            <div><strong><span class="lang-en">Area of Interest:</span><span class="lang-es">Zona de Interés:</span></strong><br>${App.utils.escapeHtml(client.interestArea || '—')}</div>
+            <div><strong><span class="lang-en">Estimated Budget:</span><span class="lang-es">Presupuesto:</span></strong><br>${App.utils.escapeHtml(client.budget || '—')}</div>
+            <div><strong><span class="lang-en">Timeline / Goal:</span><span class="lang-es">Plazo / Objetivo:</span></strong><br>${App.utils.escapeHtml(client.timeline || '—')} · ${App.utils.escapeHtml(client.objective || '—')}</div>
+            <div><strong><span class="lang-en">Assigned Spain Agent:</span><span class="lang-es">Agente España Asignado:</span></strong><br>${App.utils.escapeHtml(client.localAgentName || 'En asignación por Admin')}</div>
           </div>
-          ${client.notes ? `<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:0.75rem;font-size:0.83rem;color:#78350f;margin-bottom:1rem;"><strong>Notas:</strong> ${App.utils.escapeHtml(client.notes)}</div>` : ''}
-          <h4 style="margin:0 0 0.6rem;font-size:0.9rem;color:#0f172a;">📅 Historial de Seguimiento</h4>
-          <div>${timeline || '<p style="font-size:0.82rem;color:#64748b;">Sin historial adicional.</p>'}</div>
+          <h4 style="margin:0 0 0.6rem;font-size:0.9rem;color:#0f172a;">📅 <span class="lang-en">Pipeline Status History</span><span class="lang-es">Historial de Estados</span></h4>
+          <div>${timeline || '<p style="font-size:0.82rem;color:#64748b;"><span class="lang-en">No additional history.</span><span class="lang-es">Sin historial adicional.</span></p>'}</div>
         </div>
       `,
-      footer: `<button class="btn btn-outline" onclick="App.utils.closeModal()">Cerrar</button>`
+      footer: `<button class="btn btn-outline" onclick="App.utils.closeModal()"><span class="lang-en">Close</span><span class="lang-es">Cerrar</span></button>`
     });
     refreshLang();
   }
@@ -1096,13 +1278,11 @@
       App.utils.showToast('No hay clientes para exportar.', 'info');
       return;
     }
-    const headers = ['Fecha', 'Nombre', 'Apellido', 'Email', 'Teléfono', 'Zona Interés', 'Presupuesto', 'Estado', 'Origen en Paraguas', 'Rol Origen', 'Agente España'];
+    const headers = ['Fecha', 'Código Expediente', 'País', 'Zona Interés', 'Presupuesto', 'Estado', 'Origen en Paraguas', 'Rol Origen', 'Agente España'];
     const rows = list.map(c => [
       c.createdAt ? new Date(c.createdAt).toLocaleDateString('es-ES') : '',
-      c.firstName || '',
-      c.lastName || '',
-      c.email || '',
-      c.phone || '',
+      getClientAnonCode(c),
+      c.country || '',
       c.interestArea || '',
       c.budget || '',
       c.status || '',
@@ -1180,42 +1360,46 @@
     if (!tbody) return;
 
     const regs = (umbrella.webinarRegistrations || []).filter(r => {
-      const isB2B = (App.views.admin && typeof App.views.admin.isWebinarB2B === 'function')
+      const isB2B = !r._isRedactedB2C && ((App.views.admin && typeof App.views.admin.isWebinarB2B === 'function')
         ? App.views.admin.isWebinarB2B(r)
-        : (r.webinarType === 'b2b');
+        : (String(r.webinarType || '').toLowerCase() === 'b2b'));
       if (webinarFilter === 'b2b' && !isB2B) return false;
       if (webinarFilter === 'b2c' && isB2B) return false;
       if (webinarRegionFilter && App.utils && App.utils.getRecordRegion && App.utils.getRecordRegion(r, umbrella.users) !== webinarRegionFilter) return false;
       if (webinarSearchQuery) {
-        const hay = `${r.firstName || ''} ${r.lastName || ''} ${r.email || ''} ${r.phone || ''} ${r.agency || ''} ${r.country || ''} ${r.agentReferrerName || ''} ${r.referralCode || ''}`.toLowerCase();
+        const namePart = isB2B ? `${r.firstName || ''} ${r.lastName || ''} ${r.agency || ''}` : `${r._anonCode || ''} ${r._labelEs || ''} ${r._labelEn || ''}`;
+        const hay = `${namePart} ${r.country || ''} ${r.agentReferrerName || ''} ${r.referrerName || ''} ${r.referralCode || ''}`.toLowerCase();
         if (!hay.includes(webinarSearchQuery)) return false;
       }
       return true;
     });
 
     if (regs.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2.5rem;color:#64748b;">No hay inscripciones a webinarios registradas bajo tu paraguas todavía.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2.5rem;color:#64748b;"><span class="lang-en">No webinar registrations recorded under your umbrella yet.</span><span class="lang-es">No hay inscripciones a webinarios registradas bajo tu paraguas todavía.</span></td></tr>`;
       return;
     }
 
     tbody.innerHTML = regs.map(r => {
-      const isB2B = (App.views.admin && typeof App.views.admin.isWebinarB2B === 'function')
+      const isB2B = !r._isRedactedB2C && ((App.views.admin && typeof App.views.admin.isWebinarB2B === 'function')
         ? App.views.admin.isWebinarB2B(r)
-        : (r.webinarType === 'b2b');
+        : (String(r.webinarType || '').toLowerCase() === 'b2b'));
       const badge = isB2B
         ? `<span style="background:rgba(0,63,153,0.1);color:#003f99;padding:3px 8px;border-radius:999px;font-size:0.74rem;font-weight:700;">🏢 B2B Profesional</span>`
         : `<span style="background:rgba(16,185,129,0.1);color:#059669;padding:3px 8px;border-radius:999px;font-size:0.74rem;font-weight:700;">🏡 B2C Cliente</span>`;
+
+      const attendeeHtml = isB2B
+        ? `<div style="font-weight:700;">${App.utils.escapeHtml(r.firstName || '')} ${App.utils.escapeHtml(r.lastName || '')}</div>
+           <div style="font-size:0.73rem;color:#94a3b8;">🔒 <span class="lang-en">Protected contact</span><span class="lang-es">Contacto protegido</span></div>`
+        : `<div style="font-weight:700;">🔒 <span class="lang-en">${App.utils.escapeHtml(r._labelEn || 'Protected End Client')}</span><span class="lang-es">${App.utils.escapeHtml(r._labelEs || 'Cliente Final Protegido')}</span></div>
+           <div style="font-size:0.73rem;color:#94a3b8;"><span class="lang-en">End-client identity protected</span><span class="lang-es">Identidad del cliente protegida</span></div>`;
 
       return `
         <tr>
           <td style="font-size:0.8rem;color:#64748b;">${App.utils.formatDate(r.createdAt)}</td>
           <td>${badge}</td>
-          <td>
-            <div style="font-weight:700;">${App.utils.escapeHtml(r.firstName || '')} ${App.utils.escapeHtml(r.lastName || '')}</div>
-            <div style="font-size:0.78rem;color:#64748b;">${App.utils.escapeHtml(r.email || '—')}</div>
-          </td>
-          <td style="font-size:0.84rem;">${App.utils.escapeHtml(r.phone || '—')}</td>
-          <td style="font-size:0.84rem;">${App.utils.escapeHtml(r.agency || r.clientInterest || '—')}</td>
+          <td>${attendeeHtml}</td>
+          <td style="font-size:0.84rem;">🌍 ${App.utils.escapeHtml(r.country || '—')}</td>
+          <td style="font-size:0.84rem;">${App.utils.escapeHtml(isB2B ? (r.agency || '—') : (r.clientInterest || 'España'))}</td>
           <td style="font-size:0.82rem;font-weight:600;color:#003da5;">${App.utils.escapeHtml(r.agentReferrerName || r.referrerName || r.referralCode || 'Paraguas')}</td>
         </tr>
       `;
@@ -1261,17 +1445,19 @@
           tbody.innerHTML = comms.map(c => {
             const matchedClient = (data.clients || []).find(cl => cl.id === c.clientId);
             const originName = matchedClient ? matchedClient._originMemberName : 'Red Paraguas';
+            const clientCellHtml = renderClientAnonLabel(matchedClient || c);
+            const zoneLabel = (matchedClient && matchedClient.interestArea) || c.propertyAddress || 'España';
             const statusPill = c.status === 'paid'
-              ? `<span class="badge badge--approved">Pagada</span>`
+              ? `<span class="badge badge--approved"><span class="lang-en">Paid</span><span class="lang-es">Pagada</span></span>`
               : (c.status === 'pending_payment'
-                  ? `<span class="badge badge--pending">Pendiente Cobro</span>`
-                  : `<span class="badge badge--completed">Proyectada</span>`);
+                  ? `<span class="badge badge--pending"><span class="lang-en">Pending Payment</span><span class="lang-es">Pendiente Cobro</span></span>`
+                  : `<span class="badge badge--completed"><span class="lang-en">Projected</span><span class="lang-es">Proyectada</span></span>`);
 
             return `
               <tr>
-                <td style="font-weight:700;">${App.utils.escapeHtml(c.clientName || 'Cliente')}</td>
+                <td style="font-weight:700;">${clientCellHtml}</td>
                 <td style="font-size:0.84rem;color:#003da5;font-weight:600;">${App.utils.escapeHtml(originName)}</td>
-                <td style="font-size:0.84rem;">${App.utils.escapeHtml(c.propertyAddress || 'España')}</td>
+                <td style="font-size:0.84rem;">📍 ${App.utils.escapeHtml(zoneLabel)}</td>
                 <td style="font-weight:600;">${App.utils.formatCurrency(c.salePrice || 0)}</td>
                 <td style="font-weight:700;color:#059669;">${App.utils.formatCurrency(c.realtorAmount || 0)}</td>
                 <td>${statusPill}</td>

@@ -409,8 +409,15 @@ App.utils.getStatusBadgeClass = function(status) {
 
 /* ---- User Status Helpers ---- */
 App.utils.getUserStatusBadge = function(status) {
-  const safeStatus = status || 'pending';
-  return `<span class="badge ${App.utils.getStatusBadgeClass(safeStatus)}">${safeStatus.charAt(0).toUpperCase() + safeStatus.slice(1)}</span>`;
+  const safeStatus = (status || 'pending').toLowerCase();
+  const labels = {
+    active:   '<span class="lang-en">Active</span><span class="lang-es">Activo</span>',
+    approved: '<span class="lang-en">Approved</span><span class="lang-es">Aprobado</span>',
+    pending:  '<span class="lang-en">Pending</span><span class="lang-es">Pendiente</span>',
+    rejected: '<span class="lang-en">Rejected</span><span class="lang-es">Rechazado</span>'
+  };
+  const labelHtml = labels[safeStatus] || App.utils.escapeHtml(safeStatus.charAt(0).toUpperCase() + safeStatus.slice(1));
+  return `<span class="badge ${App.utils.getStatusBadgeClass(safeStatus)}">${labelHtml}</span>`;
 };
 
 App.utils.getRoleBadge = function(role) {
@@ -424,9 +431,9 @@ App.utils.getRoleBadge = function(role) {
     colaborador: 'badge--agent'
   };
   let displayName = safeRole.charAt(0).toUpperCase() + safeRole.slice(1);
-  if (safeRole === 'embajador') displayName = '👑 Embajador';
-  if (safeRole === 'agent_inmomas') displayName = '🇪🇸 Agente RE/MAX Inmomás';
-  if (safeRole === 'colaborador') displayName = 'Colaborador';
+  if (safeRole === 'embajador') displayName = '👑 <span class="lang-en">Ambassador</span><span class="lang-es">Embajador</span>';
+  if (safeRole === 'agent_inmomas') displayName = '🇪🇸 <span class="lang-en">RE/MAX Inmomás Agent</span><span class="lang-es">Agente RE/MAX Inmomás</span>';
+  if (safeRole === 'colaborador') displayName = '<span class="lang-en">Collaborator</span><span class="lang-es">Colaborador</span>';
   return `<span class="badge ${classes[safeRole] || ''}">${displayName}</span>`;
 };
 
@@ -633,8 +640,12 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
           </div>
           ${agentLabel}
           <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-primary);">
-            ${App.utils.escapeHtml(c.firstName)} ${App.utils.escapeHtml(c.lastName)}
+            ${c._isRedactedClient
+              ? `🔒 <span class="lang-en">${App.utils.escapeHtml(c._labelEn || c._anonCode || 'Protected Client')}</span><span class="lang-es">${App.utils.escapeHtml(c._labelEs || c._anonCode || 'Cliente Protegido')}</span>`
+              : `${App.utils.escapeHtml(c.firstName)} ${App.utils.escapeHtml(c.lastName)}`
+            }
           </div>
+          ${c._isRedactedClient && c.country ? `<div style="font-size: 0.76rem; color: #64748b; margin-bottom: 0.25rem;">🌍 ${App.utils.escapeHtml(c.country)}</div>` : ''}
           <div style="font-size: 0.8rem; color: #6b7280; margin-bottom: 0.25rem;">
             📍 ${App.utils.escapeHtml(c.interestArea || '—')}
           </div>
@@ -680,7 +691,8 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
 
   const status = user.agreementStatus || 'none'; // 'none' | 'data_submitted' | 'uploaded' | 'signed'
   const saved = user.contractCompanyData || {};
-  const isBroker = user.role === 'broker' || user.role === 'embajador';
+  const isEmbajador = user.role === 'embajador';
+  const isBroker = user.role === 'broker' || isEmbajador;
   const defaultBrokerName = isBroker
     ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
     : (user.brokerNameManual || '');
@@ -841,13 +853,13 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
         <!-- Block 1: Datos Fiscales de la Empresa -->
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:0.65rem; padding:1.15rem;">
           <h4 style="margin:0 0 0.85rem; font-size:0.9rem; color:#1e3a8a; text-transform:uppercase; letter-spacing:0.03em;">
-            📑 <span class="lang-en">1. Company &amp; Tax Details (Brokerage)</span>
-            <span class="lang-es">1. Datos de la Empresa y Datos Fiscales (Brokerage)</span>
+            📑 <span class="lang-en">${isEmbajador ? '1. Company / Professional &amp; Tax Details (Ambassador)' : '1. Company &amp; Tax Details (Brokerage)'}</span>
+            <span class="lang-es">${isEmbajador ? '1. Datos de Empresa / Profesionales y Fiscales (Embajador)' : '1. Datos de la Empresa y Datos Fiscales (Brokerage)'}</span>
           </h4>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:0.85rem;">
             <div>
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
-                <span class="lang-en">Legal Company Name (Razón Social) *</span>
+                <span class="lang-en">Legal Company / Entity Name (Razón Social) *</span>
                 <span class="lang-es">Razón Social / Nombre Legal de la Empresa *</span>
               </label>
               <input type="text" id="${prefix}-legal-name" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="Ej. RE/MAX Premier Realty LLC" value="${App.utils.escapeHtml(saved.companyLegalName || user.agencyName || '')}">
@@ -861,8 +873,8 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
             </div>
             <div>
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
-                <span class="lang-en">Brokerage License Number</span>
-                <span class="lang-es">Nº de Licencia Inmobiliaria (Brokerage License)</span>
+                <span class="lang-en">${isEmbajador ? 'Professional / Real Estate License (Optional)' : 'Brokerage License Number'}</span>
+                <span class="lang-es">${isEmbajador ? 'Nº de Licencia Profesional (Opcional)' : 'Nº de Licencia Inmobiliaria (Brokerage License)'}</span>
               </label>
               <input type="text" id="${prefix}-license-number" class="form-input" style="margin-bottom:0; width:100%;" placeholder="Ej. CQ1056789" value="${App.utils.escapeHtml(saved.licenseNumber || '')}">
             </div>
@@ -882,22 +894,22 @@ App.utils.renderContractDataSection = function(containerEl, user, prefix = 'cont
             </div>
             <div>
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
-                <span class="lang-en">Managing Broker / Legal Representative Name *</span>
-                <span class="lang-es">Nombre Completo del Broker / Representante Legal *</span>
+                <span class="lang-en">${isEmbajador ? 'Ambassador / Legal Representative Name *' : 'Managing Broker / Legal Representative Name *'}</span>
+                <span class="lang-es">${isEmbajador ? 'Nombre Completo del Embajador / Representante Legal *' : 'Nombre Completo del Broker / Representante Legal *'}</span>
               </label>
-              <input type="text" id="${prefix}-broker-name" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="Nombre y Apellidos del Broker" value="${App.utils.escapeHtml(saved.brokerFullName || saved.brokerSignerName || defaultBrokerName)}">
+              <input type="text" id="${prefix}-broker-name" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="${isEmbajador ? 'Nombre y Apellidos del Embajador' : 'Nombre y Apellidos del Broker'}" value="${App.utils.escapeHtml(saved.brokerFullName || saved.brokerSignerName || defaultBrokerName)}">
             </div>
             <div>
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
-                <span class="lang-en">Broker Email *</span>
-                <span class="lang-es">Email del Broker *</span>
+                <span class="lang-en">${isEmbajador ? 'Ambassador Email *' : 'Broker Email *'}</span>
+                <span class="lang-es">${isEmbajador ? 'Email del Embajador *' : 'Email del Broker *'}</span>
               </label>
-              <input type="email" id="${prefix}-broker-email" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="broker@agency.com" value="${App.utils.escapeHtml(saved.brokerEmail || saved.brokerSignerEmail || (isBroker ? user.email : ''))}">
+              <input type="email" id="${prefix}-broker-email" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="${isEmbajador ? 'embajador@empresa.com' : 'broker@agency.com'}" value="${App.utils.escapeHtml(saved.brokerEmail || saved.brokerSignerEmail || (isBroker ? user.email : ''))}">
             </div>
             <div>
               <label style="font-size:0.78rem; font-weight:600; color:#334155; display:block; margin-bottom:4px;">
-                <span class="lang-en">Broker Phone *</span>
-                <span class="lang-es">Teléfono del Broker *</span>
+                <span class="lang-en">${isEmbajador ? 'Ambassador Phone *' : 'Broker Phone *'}</span>
+                <span class="lang-es">${isEmbajador ? 'Teléfono del Embajador *' : 'Teléfono del Broker *'}</span>
               </label>
               <input type="tel" id="${prefix}-broker-phone" class="form-input" required style="margin-bottom:0; width:100%;" placeholder="+1 555 000 0000" value="${App.utils.escapeHtml(saved.brokerPhone || saved.brokerSignerPhone || (isBroker ? user.phone : ''))}">
             </div>
@@ -1164,6 +1176,51 @@ App.utils.handleSaveContractData = async function(user, prefix, onDone) {
    MULTI-REGION & NATIONALITY TAXONOMY (RE/MAX Inmomás)
    ============================================ */
 
+App.utils.COUNTRIES = [
+  // Norteamérica
+  { value: 'United States', flag: '🇺🇸', labelEs: 'EE.UU.', labelEn: 'United States', region: 'north_america', aliases: ['united states', 'estados unidos', 'ee.uu.', 'ee.uu', 'eeuu', 'usa', 'u.s.a.', 'u.s.', 'us', 'miami', 'florida', 'orlando', 'tampa', 'new york', 'texas', 'dallas', 'houston', 'austin', 'california', 'los angeles', 'san francisco', 'chicago', 'illinois', 'phoenix', 'arizona', 'atlanta', 'georgia', 'new jersey', 'north carolina', 'virginia', 'massachusetts', 'boston', 'washington', 'seattle', 'colorado', 'denver', 'nevada', 'las vegas', 'pennsylvania', 'ohio', 'michigan', 'tennessee', 'knoxville'] },
+  { value: 'Canada', flag: '🇨🇦', labelEs: 'Canadá', labelEn: 'Canada', region: 'north_america', aliases: ['canada', 'canadá', 'toronto', 'ontario', 'gta', 'quebec', 'québec', 'montreal', 'montréal', 'vancouver', 'british columbia', 'alberta', 'calgary', 'edmonton', 'ottawa', 'new brunswick', 'nova scotia', 'manitoba', 'saskatchewan'] },
+  { value: 'Puerto Rico', flag: '🇵🇷', labelEs: 'Puerto Rico', labelEn: 'Puerto Rico', region: 'north_america', aliases: ['puerto rico', 'pr', 'san juan', 'dorado', 'bayamon', 'bayamón', 'guaynabo', 'carolina, pr', 'ponce', 'mayaguez', 'mayagüez', 'rincon', 'rincón', 'caguas', 'humacao'] },
+
+  // Latinoamérica
+  { value: 'Argentina', flag: '🇦🇷', labelEs: 'Argentina', labelEn: 'Argentina', region: 'latam', aliases: ['argentina', 'buenos aires', 'cordoba', 'córdoba', 'rosario', 'mendoza'] },
+  { value: 'Colombia', flag: '🇨🇴', labelEs: 'Colombia', labelEn: 'Colombia', region: 'latam', aliases: ['colombia', 'bogota', 'bogotá', 'medellin', 'medellín', 'cali', 'barranquilla', 'cartagena'] },
+  { value: 'Venezuela', flag: '🇻🇪', labelEs: 'Venezuela', labelEn: 'Venezuela', region: 'latam', aliases: ['venezuela', 'caracas', 'maracaibo', 'valencia, ve'] },
+
+  // Suecia (solo)
+  { value: 'Sweden', flag: '🇸🇪', labelEs: 'Suecia', labelEn: 'Sweden', region: 'sweden', aliases: ['sweden', 'suecia', 'sverige', 'stockholm', 'estocolmo', 'gothenburg', 'gotemburgo', 'malmo', 'malmö'] },
+
+  // Holanda (solo)
+  { value: 'Netherlands', flag: '🇳🇱', labelEs: 'Holanda', labelEn: 'Netherlands', region: 'netherlands', aliases: ['netherlands', 'the netherlands', 'holanda', 'holland', 'países bajos', 'paises bajos', 'nederland', 'amsterdam', 'ámsterdam', 'rotterdam', 'utrecht', 'eindhoven', 'the hague', 'la haya'] },
+
+  // Suiza (solo)
+  { value: 'Switzerland', flag: '🇨🇭', labelEs: 'Suiza', labelEn: 'Switzerland', region: 'switzerland', aliases: ['switzerland', 'suiza', 'suisse', 'schweiz', 'svizzera', 'zurich', 'zúrich', 'geneva', 'ginebra', 'genève', 'basel', 'lugano', 'lausanne'] },
+
+  // Francia, Bélgica, Argelia y Emiratos Árabes (unidos)
+  { value: 'France', flag: '🇫🇷', labelEs: 'Francia', labelEn: 'France', region: 'francophonie_mena', aliases: ['france', 'francia', 'paris', 'parís', 'lyon', 'marseille', 'marsella', 'nice', 'niza', 'bordeaux', 'burdeos', 'toulouse'] },
+  { value: 'Algeria', flag: '🇩🇿', labelEs: 'Argelia', labelEn: 'Algeria', region: 'francophonie_mena', aliases: ['algeria', 'argelia', 'algérie', 'algerie', 'algiers', 'argel', 'oran', 'orán'] },
+  { value: 'Belgium', flag: '🇧🇪', labelEs: 'Bélgica', labelEn: 'Belgium', region: 'francophonie_mena', aliases: ['belgium', 'bélgica', 'belgica', 'belgique', 'belgië', 'brussels', 'bruselas', 'bruxelles', 'antwerp', 'amberes', 'ghent'] },
+  { value: 'United Arab Emirates', flag: '🇦🇪', labelEs: 'Emiratos Árabes', labelEn: 'United Arab Emirates', region: 'francophonie_mena', aliases: ['united arab emirates', 'emiratos árabes unidos', 'emiratos arabes unidos', 'emiratos árabes', 'emiratos arabes', 'emiratos', 'emirates', 'uae', 'u.a.e.', 'eau', 'dubai', 'dubái', 'abu dhabi', 'sharjah'] },
+
+  // Alemania (solo)
+  { value: 'Germany', flag: '🇩🇪', labelEs: 'Alemania', labelEn: 'Germany', region: 'germany', aliases: ['germany', 'alemania', 'deutschland', 'berlin', 'berlín', 'munich', 'múnich', 'münchen', 'frankfurt', 'hamburg', 'hamburgo', 'cologne', 'colonia', 'düsseldorf', 'dusseldorf', 'stuttgart'] },
+
+  // Ucrania y Bulgaria (unidos)
+  { value: 'Ukraine', flag: '🇺🇦', labelEs: 'Ucrania', labelEn: 'Ukraine', region: 'ukraine_bulgaria', aliases: ['ukraine', 'ucrania', 'kyiv', 'kiev', 'lviv', 'odesa', 'odessa', 'kharkiv'] },
+  { value: 'Bulgaria', flag: '🇧🇬', labelEs: 'Bulgaria', labelEn: 'Bulgaria', region: 'ukraine_bulgaria', aliases: ['bulgaria', 'sofia', 'sofía', 'plovdiv', 'varna', 'burgas'] },
+
+  // Italia (sola)
+  { value: 'Italy', flag: '🇮🇹', labelEs: 'Italia', labelEn: 'Italy', region: 'italy', aliases: ['italy', 'italia', 'rome', 'roma', 'milan', 'milán', 'milano', 'naples', 'nápoles', 'turin', 'turín', 'florence', 'florencia', 'bologna'] },
+
+  // Irlanda (sola)
+  { value: 'Ireland', flag: '🇮🇪', labelEs: 'Irlanda', labelEn: 'Ireland', region: 'ireland', aliases: ['ireland', 'irlanda', 'republic of ireland', 'dublin', 'dublín', 'cork', 'galway', 'limerick'] }
+];
+
+App.utils.COUNTRY_BY_VALUE = {};
+App.utils.COUNTRIES.forEach(c => {
+  App.utils.COUNTRY_BY_VALUE[c.value.toLowerCase()] = c;
+});
+
 App.utils.REGIONS = {
   north_america: {
     id: 'north_america',
@@ -1182,78 +1239,138 @@ App.utils.REGIONS = {
   latam: {
     id: 'latam',
     icon: '🌎',
-    flag: '🇲🇽🇨🇴🇦🇷',
-    labelEs: 'Latinoamérica y Caribe',
-    labelEn: 'Latin America & Caribbean',
+    flag: '🇦🇷🇨🇴🇻🇪',
+    labelEs: 'Latinoamérica (Argentina, Colombia y Venezuela)',
+    labelEn: 'Latin America (Argentina, Colombia & Venezuela)',
     shortEs: 'Latinoamérica',
     shortEn: 'Latin America',
     color: '#059669',
     bg: 'rgba(5, 150, 105, 0.10)',
     border: 'rgba(5, 150, 105, 0.25)',
     defaultLang: 'es',
-    countries: [
-      'Mexico', 'Colombia', 'Argentina', 'Chile', 'Peru', 'Panama',
-      'Costa Rica', 'Dominican Republic', 'Uruguay', 'Ecuador',
-      'Venezuela', 'Brazil', 'Guatemala', 'Paraguay', 'Bolivia'
-    ]
+    countries: ['Argentina', 'Colombia', 'Venezuela']
   },
-  western_europe: {
-    id: 'western_europe',
-    icon: '🇪🇺',
-    flag: '🇬🇧🇫🇷🇩🇪',
-    labelEs: 'Europa Occidental (UK, FR, DE, Benelux, Nórdicos)',
-    labelEn: 'Western Europe (UK, FR, DE, Benelux, Nordics)',
-    shortEs: 'Europa Occidental',
-    shortEn: 'Western Europe',
+  sweden: {
+    id: 'sweden',
+    icon: '🇸🇪',
+    flag: '🇸🇪',
+    labelEs: 'Suecia',
+    labelEn: 'Sweden',
+    shortEs: 'Suecia',
+    shortEn: 'Sweden',
+    color: '#0284c7',
+    bg: 'rgba(2, 132, 199, 0.10)',
+    border: 'rgba(2, 132, 199, 0.25)',
+    defaultLang: 'en',
+    countries: ['Sweden']
+  },
+  netherlands: {
+    id: 'netherlands',
+    icon: '🇳🇱',
+    flag: '🇳🇱',
+    labelEs: 'Holanda (Países Bajos)',
+    labelEn: 'Netherlands',
+    shortEs: 'Holanda',
+    shortEn: 'Netherlands',
+    color: '#ea580c',
+    bg: 'rgba(234, 88, 12, 0.10)',
+    border: 'rgba(234, 88, 12, 0.25)',
+    defaultLang: 'nl',
+    countries: ['Netherlands']
+  },
+  switzerland: {
+    id: 'switzerland',
+    icon: '🇨🇭',
+    flag: '🇨🇭',
+    labelEs: 'Suiza',
+    labelEn: 'Switzerland',
+    shortEs: 'Suiza',
+    shortEn: 'Switzerland',
+    color: '#dc2626',
+    bg: 'rgba(220, 38, 38, 0.10)',
+    border: 'rgba(220, 38, 38, 0.25)',
+    defaultLang: 'fr',
+    countries: ['Switzerland']
+  },
+  francophonie_mena: {
+    id: 'francophonie_mena',
+    icon: '🌍',
+    flag: '🇫🇷🇧🇪🇩🇿🇦🇪',
+    labelEs: 'Francia, Bélgica, Argelia y Emiratos Árabes',
+    labelEn: 'France, Belgium, Algeria & UAE',
+    shortEs: 'Francia · Bélgica · Argelia · EAU',
+    shortEn: 'FR · BE · Algeria · UAE',
     color: '#7c3aed',
     bg: 'rgba(124, 58, 237, 0.10)',
     border: 'rgba(124, 58, 237, 0.25)',
-    defaultLang: 'en',
-    countries: [
-      'United Kingdom', 'Ireland', 'France', 'Belgium', 'Switzerland',
-      'Germany', 'Austria', 'Netherlands', 'Luxembourg', 'Sweden',
-      'Norway', 'Denmark', 'Finland', 'Italy', 'Portugal', 'Spain'
-    ]
+    defaultLang: 'fr',
+    countries: ['France', 'Algeria', 'Belgium', 'United Arab Emirates']
   },
-  eastern_europe: {
-    id: 'eastern_europe',
+  germany: {
+    id: 'germany',
+    icon: '🇩🇪',
+    flag: '🇩🇪',
+    labelEs: 'Alemania',
+    labelEn: 'Germany',
+    shortEs: 'Alemania',
+    shortEn: 'Germany',
+    color: '#334155',
+    bg: 'rgba(51, 65, 85, 0.10)',
+    border: 'rgba(51, 65, 85, 0.25)',
+    defaultLang: 'de',
+    countries: ['Germany']
+  },
+  ukraine_bulgaria: {
+    id: 'ukraine_bulgaria',
     icon: '🌍',
-    flag: '🇵🇱🇺🇦🇷🇴',
-    labelEs: 'Europa del Este y Bálticos',
-    labelEn: 'Eastern Europe & Baltics',
-    shortEs: 'Europa del Este',
-    shortEn: 'Eastern Europe',
+    flag: '🇺🇦🇧🇬',
+    labelEs: 'Ucrania y Bulgaria',
+    labelEn: 'Ukraine & Bulgaria',
+    shortEs: 'Ucrania y Bulgaria',
+    shortEn: 'Ukraine & Bulgaria',
     color: '#d97706',
     bg: 'rgba(217, 119, 6, 0.12)',
     border: 'rgba(217, 119, 6, 0.28)',
-    defaultLang: 'en',
-    countries: [
-      'Poland', 'Ukraine', 'Romania', 'Czech Republic', 'Hungary',
-      'Slovakia', 'Bulgaria', 'Estonia', 'Latvia', 'Lithuania',
-      'Croatia', 'Slovenia', 'Serbia'
-    ]
+    defaultLang: 'uk',
+    countries: ['Ukraine', 'Bulgaria']
   },
-  mena: {
-    id: 'mena',
-    icon: '🌍',
-    flag: '🇦🇪🇸🇦🌍',
-    labelEs: 'Oriente Medio / MENA y Otros Mercados',
-    labelEn: 'Middle East / MENA & Other Markets',
-    shortEs: 'MENA / Otros',
-    shortEn: 'MENA / Other',
-    color: '#be123c',
-    bg: 'rgba(190, 18, 60, 0.10)',
-    border: 'rgba(190, 18, 60, 0.25)',
+  italy: {
+    id: 'italy',
+    icon: '🇮🇹',
+    flag: '🇮🇹',
+    labelEs: 'Italia',
+    labelEn: 'Italy',
+    shortEs: 'Italia',
+    shortEn: 'Italy',
+    color: '#15803d',
+    bg: 'rgba(21, 128, 61, 0.10)',
+    border: 'rgba(21, 128, 61, 0.25)',
     defaultLang: 'en',
-    countries: [
-      'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Kuwait', 'Bahrain',
-      'Oman', 'Israel', 'Lebanon', 'Jordan', 'Iran', 'Morocco', 'Egypt',
-      'Turkey', 'South Africa', 'Australia', 'Singapore', 'Other'
-    ]
+    countries: ['Italy']
+  },
+  ireland: {
+    id: 'ireland',
+    icon: '🇮🇪',
+    flag: '🇮🇪',
+    labelEs: 'Irlanda',
+    labelEn: 'Ireland',
+    shortEs: 'Irlanda',
+    shortEn: 'Ireland',
+    color: '#0d9488',
+    bg: 'rgba(13, 148, 136, 0.10)',
+    border: 'rgba(13, 148, 136, 0.25)',
+    defaultLang: 'en',
+    countries: ['Ireland']
   }
 };
 
 App.utils.REGION_LIST = Object.values(App.utils.REGIONS);
+
+App.utils.LEGACY_REGION_MAP = {
+  western_europe: 'francophonie_mena',
+  eastern_europe: 'ukraine_bulgaria',
+  mena: 'francophonie_mena'
+};
 
 App.utils.WEBINAR_LANGUAGES = [
   { code: 'en', labelEs: '🇬🇧 Inglés (English)', labelEn: '🇬🇧 English' },
@@ -1261,49 +1378,146 @@ App.utils.WEBINAR_LANGUAGES = [
   { code: 'fr', labelEs: '🇫🇷 Francés (Français)', labelEn: '🇫🇷 French' },
   { code: 'de', labelEs: '🇩🇪 Alemán (Deutsch)', labelEn: '🇩🇪 German' },
   { code: 'nl', labelEs: '🇳🇱 Neerlandés (Nederlands)', labelEn: '🇳🇱 Dutch' },
-  { code: 'pl', labelEs: '🇵🇱 Polaco (Polski)', labelEn: '🇵🇱 Polish' },
-  { code: 'uk', labelEs: '🇺🇦 Ucraniano / Ruso', labelEn: '🇺🇦 Ukrainian / Russian' },
-  { code: 'ar', labelEs: '🇦🇪 Árabe / Persa (MENA)', labelEn: '🇦🇪 Arabic / Farsi (MENA)' },
+  { code: 'sv', labelEs: '🇸🇪 Sueco (Svenska)', labelEn: '🇸🇪 Swedish' },
+  { code: 'it', labelEs: '🇮🇹 Italiano (Italiano)', labelEn: '🇮🇹 Italian' },
+  { code: 'uk', labelEs: '🇺🇦 Ucraniano / Búlgaro / Ruso', labelEn: '🇺🇦 Ukrainian / Bulgarian / Russian' },
+  { code: 'ar', labelEs: '🇦🇪 Árabe / Francófono (MENA)', labelEn: '🇦🇪 Arabic / Francophone (MENA)' },
   { code: 'bilingual', labelEs: '🌐 Bilingüe (ES / EN)', labelEn: '🌐 Bilingual (EN / ES)' }
 ];
 
 // Known RE/MAX Inmomás Agent fallback profiles when Firestore doc hasn't been explicitly tagged yet
 App.utils.KNOWN_MAS_AGENT_REGIONS = [
-  { match: ['james', 'lavoie', 'jamisa'], nationality: 'Canada', regions: ['north_america', 'western_europe'], languages: ['en', 'fr', 'es'] },
+  { match: ['james', 'lavoie', 'jamisa'], nationality: 'Canada', regions: ['north_america', 'francophonie_mena'], languages: ['en', 'fr', 'es'] },
   { match: ['angel luis', 'ángel luis', 'ángel luís', 'debra nadal'], nationality: 'Puerto Rico', regions: ['north_america', 'latam'], languages: ['es', 'en'] },
-  { match: ['sepehr', 'hosseini'], nationality: 'Canada / Iran', regions: ['north_america', 'mena'], languages: ['en', 'ar', 'es'] },
+  { match: ['sepehr', 'hosseini'], nationality: 'Canada', regions: ['north_america', 'francophonie_mena'], languages: ['en', 'ar', 'es'] },
   { match: ['denise', 'mcneal'], nationality: 'United States', regions: ['north_america'], languages: ['en', 'es'] },
   { match: ['giancarlo', 'agudelo'], nationality: 'Colombia', regions: ['latam', 'north_america'], languages: ['es', 'en'] },
   { match: ['ozzie', 'lleras'], nationality: 'United States', regions: ['north_america', 'latam'], languages: ['en', 'es'] },
-  { match: ['maia', 'honczaryk'], nationality: 'Argentina / Ukraine', regions: ['north_america', 'latam', 'western_europe', 'eastern_europe'], languages: ['es', 'en'] },
-  { match: ['josé martínez', 'jose martinez', 'dionisio', 'ana martínez', 'ana martinez', 'carlos garcía', 'carlos garcia'], nationality: 'Spain', regions: ['north_america', 'western_europe', 'latam'], languages: ['es', 'en'] }
+  { match: ['maia', 'honczaryk'], nationality: 'Argentina / Ukraine', regions: ['north_america', 'latam', 'ukraine_bulgaria'], languages: ['es', 'en'] },
+  { match: ['josé martínez', 'jose martinez', 'dionisio', 'ana martínez', 'ana martinez', 'carlos garcía', 'carlos garcia'], nationality: 'Spain', regions: ['north_america', 'latam', 'francophonie_mena'], languages: ['es', 'en'] }
 ];
+
+App.utils._matchSingleCountryMeta = function(partRaw) {
+  if (!partRaw) return null;
+  const clean = String(partRaw).trim().toLowerCase();
+  if (!clean || clean === '—' || clean === '-' || clean === 'n/a') return null;
+
+  // 1. Exact alias or value match first (handles short codes like 'pr', 'us', 'uae')
+  for (const c of App.utils.COUNTRIES) {
+    if (clean === c.value.toLowerCase() || clean === c.labelEs.toLowerCase()) return c;
+    if (c.aliases.some(a => clean === a)) return c;
+  }
+
+  // 2. Substring match for longer phrases like 'Toronto, Canada' or 'Miami, Florida'
+  for (const c of App.utils.COUNTRIES) {
+    if (c.aliases.some(a => a.length >= 4 && clean.includes(a))) return c;
+  }
+  return null;
+};
+
+App.utils.normalizeCountry = function(countryInput) {
+  if (!countryInput) return '';
+  const str = String(countryInput).trim();
+  if (!str || str === '—' || str === '-' || str.toLowerCase() === 'n/a') return '';
+  const direct = App.utils._matchSingleCountryMeta(str);
+  if (direct) return direct.value;
+
+  const parts = str.split(/[\/|,;]+/).map(s => s.trim()).filter(Boolean);
+  for (const p of parts) {
+    const m = App.utils._matchSingleCountryMeta(p);
+    if (m) return m.value;
+  }
+  return str;
+};
+
+App.utils.extractNormalizedCountries = function(countryInput) {
+  if (!countryInput) return [];
+  const str = String(countryInput).trim();
+  if (!str || str === '—' || str === '-' || str.toLowerCase() === 'n/a') return [];
+  const out = new Set();
+  const parts = str.split(/[\/|;]+/).map(s => s.trim()).filter(Boolean);
+  parts.forEach(p => {
+    const m = App.utils._matchSingleCountryMeta(p);
+    if (m) out.add(m.value);
+    else if (p) out.add(p);
+  });
+  if (out.size === 0) {
+    const m = App.utils._matchSingleCountryMeta(str);
+    if (m) out.add(m.value);
+  }
+  return Array.from(out);
+};
+
+App.utils.matchesCountryFilter = function(rawCountryInput, targetCountry) {
+  if (!targetCountry) return true;
+  if (!rawCountryInput) return false;
+  const targetClean = String(targetCountry).trim();
+  const targetNorm = App.utils.normalizeCountry(targetClean).toLowerCase();
+  const candidates = App.utils.extractNormalizedCountries(rawCountryInput).map(x => x.toLowerCase());
+  if (candidates.includes(targetNorm) || candidates.includes(targetClean.toLowerCase())) return true;
+  return String(rawCountryInput).toLowerCase().includes(targetClean.toLowerCase());
+};
+
+App.utils.getCountryDisplayLabel = function(countryVal, withFlag = true) {
+  const norm = App.utils.normalizeCountry(countryVal);
+  const meta = App.utils.COUNTRY_BY_VALUE[(norm || '').toLowerCase()];
+  if (!meta) return countryVal || '';
+  const isEs = App.utils.getCurrentLanguage ? (App.utils.getCurrentLanguage() === 'es') : true;
+  const name = isEs ? meta.labelEs : meta.labelEn;
+  return withFlag ? `${meta.flag} ${name}` : name;
+};
 
 App.utils.resolveRegionFromCountry = function(countryInput) {
   if (!countryInput) return '';
   const raw = String(countryInput).trim().toLowerCase();
   if (!raw || raw === '—' || raw === '-' || raw === 'n/a') return '';
 
-  // Direct region id match
+  // Direct region id match (including legacy mapping)
   if (App.utils.REGIONS[raw]) return raw;
+  if (App.utils.LEGACY_REGION_MAP[raw]) return App.utils.LEGACY_REGION_MAP[raw];
 
-  // Exact / substring checks across regions
-  const naKeywords = ['united states', 'estados unidos', 'ee.uu', 'eeuu', 'usa', 'u.s.', 'miami', 'florida', 'new york', 'texas', 'california', 'chicago', 'phoenix', 'dallas', 'canada', 'canadá', 'toronto', 'ontario', 'quebec', 'québec', 'vancouver', 'montreal', 'puerto rico', 'san juan', 'dorado', 'bayamon', 'bayamón'];
-  if (naKeywords.some(k => raw === k || raw.includes(k))) return 'north_america';
+  // Official 18 countries + aliases
+  const matchedMeta = App.utils._matchSingleCountryMeta(raw);
+  if (matchedMeta) return matchedMeta.region;
 
-  const latamKeywords = ['mexico', 'méxico', 'colombia', 'bogota', 'bogotá', 'medellin', 'medellín', 'argentina', 'buenos aires', 'chile', 'santiago', 'peru', 'perú', 'lima', 'panama', 'panamá', 'costa rica', 'dominican', 'dominicana', 'santo domingo', 'punta cana', 'uruguay', 'ecuador', 'venezuela', 'brazil', 'brasil', 'guatemala', 'paraguay', 'bolivia', 'latam', 'latinoamerica', 'latinoamérica'];
-  if (latamKeywords.some(k => raw === k || raw.includes(k))) return 'latam';
+  // Multi-part strings (e.g. 'Argentina / Ukraine')
+  const parts = raw.split(/[\/|;]+/).map(s => s.trim()).filter(Boolean);
+  for (const p of parts) {
+    const m = App.utils._matchSingleCountryMeta(p);
+    if (m) return m.region;
+  }
 
-  const eastEuKeywords = ['poland', 'polonia', 'ukraine', 'ucrania', 'romania', 'rumania', 'rumanía', 'czech', 'checa', 'hungary', 'hungría', 'hungria', 'slovakia', 'eslovaquia', 'bulgaria', 'estonia', 'latvia', 'letonia', 'lithuania', 'lituania', 'croatia', 'croacia', 'slovenia', 'eslovenia', 'serbia'];
-  if (eastEuKeywords.some(k => raw === k || raw.includes(k))) return 'eastern_europe';
+  // Internal Spain records should not falsely inflate international region counts
+  const spainKeywords = ['spain', 'españa', 'espana', 'alicante', 'costa blanca', 'madrid', 'valencia', 'barcelona', 'málaga', 'malaga'];
+  if (spainKeywords.some(k => raw === k || raw.includes(k))) return '';
 
-  const westEuKeywords = ['united kingdom', 'reino unido', 'uk', 'england', 'inglaterra', 'london', 'scotland', 'ireland', 'irlanda', 'france', 'francia', 'paris', 'belgium', 'bélgica', 'belgica', 'switzerland', 'suiza', 'germany', 'alemania', 'austria', 'netherlands', 'países bajos', 'paises bajos', 'holanda', 'holland', 'luxembourg', 'luxemburgo', 'sweden', 'suecia', 'norway', 'noruega', 'denmark', 'dinamarca', 'finland', 'finlandia', 'italy', 'italia', 'portugal', 'spain', 'españa', 'espana'];
-  if (westEuKeywords.some(k => raw === k || raw.includes(k))) return 'western_europe';
+  // Extended Latam fallback for legacy records (Mexico, Chile, Peru, etc.)
+  const extraLatamKeywords = ['mexico', 'méxico', 'chile', 'santiago', 'peru', 'perú', 'lima', 'panama', 'panamá', 'costa rica', 'dominican', 'dominicana', 'santo domingo', 'punta cana', 'uruguay', 'ecuador', 'brazil', 'brasil', 'guatemala', 'paraguay', 'bolivia', 'latam', 'latinoamerica', 'latinoamérica'];
+  if (extraLatamKeywords.some(k => raw === k || raw.includes(k))) return 'latam';
 
-  const menaKeywords = ['emirates', 'emiratos', 'dubai', 'dubái', 'abu dhabi', 'uae', 'saudi', 'arabia', 'qatar', 'catar', 'kuwait', 'bahrain', 'oman', 'israel', 'lebanon', 'líbano', 'libano', 'jordan', 'jordania', 'iran', 'irán', 'morocco', 'marruecos', 'egypt', 'egipto', 'turkey', 'turquía', 'turquia', 'south africa', 'sudáfrica', 'australia', 'singapore', 'singapur', 'mena', 'other', 'otro', 'international'];
-  if (menaKeywords.some(k => raw === k || raw.includes(k))) return 'mena';
+  // Extended Eastern Europe fallback
+  const extraEastKeywords = ['poland', 'polonia', 'romania', 'rumania', 'rumanía', 'czech', 'checa', 'hungary', 'hungría', 'slovakia', 'eslovaquia', 'estonia', 'latvia', 'letonia', 'lithuania', 'lituania', 'croatia', 'croacia', 'serbia'];
+  if (extraEastKeywords.some(k => raw === k || raw.includes(k))) return 'ukraine_bulgaria';
 
-  return 'mena';
+  // Extended Francophonie / MENA fallback
+  const extraMenaFrKeywords = ['luxembourg', 'luxemburgo', 'monaco', 'mónaco', 'morocco', 'marruecos', 'tunisia', 'túnez', 'saudi', 'qatar', 'catar', 'kuwait', 'bahrain', 'oman', 'lebanon', 'líbano', 'jordan', 'jordania', 'egypt', 'egipto'];
+  if (extraMenaFrKeywords.some(k => raw === k || raw.includes(k))) return 'francophonie_mena';
+
+  return '';
+};
+
+App.utils.normalizeRegionId = function(regId, countryFallback = '') {
+  const fromCountry = countryFallback ? App.utils.resolveRegionFromCountry(countryFallback) : '';
+  if (regId && App.utils.REGIONS[regId]) {
+    return regId;
+  }
+  if (fromCountry && App.utils.REGIONS[fromCountry]) {
+    return fromCountry;
+  }
+  if (regId && App.utils.LEGACY_REGION_MAP[regId]) {
+    return App.utils.LEGACY_REGION_MAP[regId];
+  }
+  return '';
 };
 
 App.utils.getUserNationality = function(user) {
@@ -1319,29 +1533,41 @@ App.utils.getUserNationality = function(user) {
 
 App.utils.getUserRegions = function(user) {
   if (!user) return [];
+  const countryHint = user.nationality || user.country || '';
+  const out = new Set();
+
   if (Array.isArray(user.regions) && user.regions.length > 0) {
-    return user.regions.filter(r => App.utils.REGIONS[r]);
+    user.regions.forEach(r => {
+      const norm = App.utils.normalizeRegionId(r, countryHint);
+      if (norm) out.add(norm);
+    });
   }
-  if (user.region && App.utils.REGIONS[user.region]) {
-    return [user.region];
+  if (user.region) {
+    const norm = App.utils.normalizeRegionId(user.region, countryHint);
+    if (norm) out.add(norm);
   }
+  if (out.size > 0) return Array.from(out);
+
   if (user.role === 'agent_inmomas') {
     const fullName = `${user.firstName || ''} ${user.lastName || ''} ${user.name || ''}`.toLowerCase();
     const known = App.utils.KNOWN_MAS_AGENT_REGIONS.find(k => k.match.some(m => fullName.includes(m)));
-    if (known) return [...known.regions];
+    if (known) return known.regions.filter(r => App.utils.REGIONS[r]);
   }
-  const resolved = App.utils.resolveRegionFromCountry(user.nationality || user.country || '');
+  const resolved = App.utils.resolveRegionFromCountry(countryHint);
   return resolved ? [resolved] : [];
 };
 
 App.utils.getRecordRegion = function(record, allUsers) {
   if (!record) return '';
-  if (record.region && App.utils.REGIONS[record.region]) return record.region;
-  if (record.webinarRegion && App.utils.REGIONS[record.webinarRegion]) return record.webinarRegion;
-
   const countryCandidate = record.country || record.currentLocation || '';
   const fromCountry = App.utils.resolveRegionFromCountry(countryCandidate);
+
+  if (record.region && App.utils.REGIONS[record.region]) return record.region;
+  if (record.webinarRegion && App.utils.REGIONS[record.webinarRegion]) return record.webinarRegion;
   if (fromCountry) return fromCountry;
+
+  if (record.region && App.utils.LEGACY_REGION_MAP[record.region]) return App.utils.LEGACY_REGION_MAP[record.region];
+  if (record.webinarRegion && App.utils.LEGACY_REGION_MAP[record.webinarRegion]) return App.utils.LEGACY_REGION_MAP[record.webinarRegion];
 
   // Fallback to referring user or assigned agent primary region
   if (Array.isArray(allUsers) && allUsers.length > 0) {
@@ -1363,7 +1589,8 @@ App.utils.getRecordRegion = function(record, allUsers) {
 };
 
 App.utils.getRegionLabel = function(regionId, short = false) {
-  const reg = App.utils.REGIONS[regionId];
+  const normId = (App.utils.REGIONS[regionId] ? regionId : App.utils.LEGACY_REGION_MAP[regionId]) || regionId;
+  const reg = App.utils.REGIONS[normId];
   if (!reg) return regionId || 'Sin región';
   const isEs = App.utils.getCurrentLanguage ? (App.utils.getCurrentLanguage() === 'es') : true;
   if (short) return isEs ? reg.shortEs : reg.shortEn;
@@ -1371,7 +1598,8 @@ App.utils.getRegionLabel = function(regionId, short = false) {
 };
 
 App.utils.getRegionBadge = function(regionId, compact = true) {
-  const reg = App.utils.REGIONS[regionId];
+  const normId = (App.utils.REGIONS[regionId] ? regionId : App.utils.LEGACY_REGION_MAP[regionId]) || regionId;
+  const reg = App.utils.REGIONS[normId];
   if (!reg) return `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:0.73rem;font-weight:600;background:#f3f4f6;color:#6b7280;">🌍 —</span>`;
   const textEs = compact ? reg.shortEs : reg.labelEs;
   const textEn = compact ? reg.shortEn : reg.labelEn;
@@ -1386,29 +1614,104 @@ App.utils.getUserRegionBadgesHtml = function(user) {
 
 App.utils.getRegionFilterOptionsHtml = function(selectedVal = '', allLabelEs = '🌍 Todas las Regiones', allLabelEn = '🌍 All Regions') {
   const isEs = App.utils.getCurrentLanguage ? (App.utils.getCurrentLanguage() === 'es') : true;
-  let html = `<option value="">${isEs ? allLabelEs : allLabelEn}</option>`;
+  let html = `<option value="" data-i18n-en="${App.utils.escapeHtml(allLabelEn)}" data-i18n-es="${App.utils.escapeHtml(allLabelEs)}">${App.utils.escapeHtml(isEs ? allLabelEs : allLabelEn)}</option>`;
   App.utils.REGION_LIST.forEach(r => {
     const sel = r.id === selectedVal ? 'selected' : '';
-    const label = isEs ? `${r.icon} ${r.labelEs}` : `${r.icon} ${r.labelEn}`;
-    html += `<option value="${r.id}" ${sel}>${label}</option>`;
+    const optEn = `${r.flag || r.icon} ${r.labelEn}`;
+    const optEs = `${r.flag || r.icon} ${r.labelEs}`;
+    html += `<option value="${r.id}" data-i18n-en="${App.utils.escapeHtml(optEn)}" data-i18n-es="${App.utils.escapeHtml(optEs)}" ${sel}>${App.utils.escapeHtml(isEs ? optEs : optEn)}</option>`;
   });
   return html;
 };
 
-App.utils.getCountryOptionsHtml = function(selectedVal = '', includeEmpty = false, emptyLabel = '— Seleccionar País / Nacionalidad —') {
+App.utils.getCountryFilterOptionsHtml = function(selectedVal = '', regionFilter = '', extraRawCountries = [], allLabelEs = '🏳️ Todos los Países', allLabelEn = '🏳️ All Countries') {
+  const isEs = App.utils.getCurrentLanguage ? (App.utils.getCurrentLanguage() === 'es') : true;
   const cleanSelected = String(selectedVal || '').trim();
+  const normSelected = App.utils.normalizeCountry(cleanSelected).toLowerCase();
+  let foundSelected = false;
+
+  let html = `<option value="" data-i18n-en="${App.utils.escapeHtml(allLabelEn)}" data-i18n-es="${App.utils.escapeHtml(allLabelEs)}">${App.utils.escapeHtml(isEs ? allLabelEs : allLabelEn)}</option>`;
+
+  const regionsToRender = regionFilter && App.utils.REGIONS[regionFilter]
+    ? [App.utils.REGIONS[regionFilter]]
+    : App.utils.REGION_LIST;
+
+  regionsToRender.forEach(reg => {
+    const groupLabel = isEs ? `${reg.icon} ${reg.shortEs}` : `${reg.icon} ${reg.shortEn}`;
+    const regCountries = App.utils.COUNTRIES.filter(c => c.region === reg.id);
+    if (!regCountries.length) return;
+    if (regionsToRender.length > 1) {
+      html += `<optgroup label="${App.utils.escapeHtml(groupLabel)}">`;
+    }
+    regCountries.forEach(c => {
+      const isSel = cleanSelected && (c.value.toLowerCase() === normSelected || c.value.toLowerCase() === cleanSelected.toLowerCase());
+      if (isSel) foundSelected = true;
+      const optEn = `${c.flag} ${c.labelEn}`;
+      const optEs = `${c.flag} ${c.labelEs}`;
+      html += `<option value="${App.utils.escapeHtml(c.value)}" data-region="${reg.id}" data-i18n-en="${App.utils.escapeHtml(optEn)}" data-i18n-es="${App.utils.escapeHtml(optEs)}" ${isSel ? 'selected' : ''}>${App.utils.escapeHtml(isEs ? optEs : optEn)}</option>`;
+    });
+    if (regionsToRender.length > 1) {
+      html += `</optgroup>`;
+    }
+  });
+
+  // Include any additional non-official countries present in DB records (when no regionFilter or matching regionFilter)
+  if (Array.isArray(extraRawCountries) && extraRawCountries.length > 0) {
+    const extraSet = new Set();
+    extraRawCountries.forEach(raw => {
+      App.utils.extractNormalizedCountries(raw).forEach(norm => {
+        if (!norm || norm === '—' || norm === '-' || norm.toLowerCase() === 'n/a') return;
+        if (App.utils.COUNTRY_BY_VALUE[norm.toLowerCase()]) return;
+        if (regionFilter && App.utils.resolveRegionFromCountry(norm) !== regionFilter) return;
+        extraSet.add(norm);
+      });
+    });
+    const extras = Array.from(extraSet).sort((a, b) => a.localeCompare(b));
+    if (extras.length > 0) {
+      html += `<optgroup label="${isEs ? '🌐 Otros países registrados' : '🌐 Other registered countries'}">`;
+      extras.forEach(ex => {
+        const isSel = cleanSelected && ex.toLowerCase() === cleanSelected.toLowerCase();
+        if (isSel) foundSelected = true;
+        html += `<option value="${App.utils.escapeHtml(ex)}" ${isSel ? 'selected' : ''}>🏳️ ${App.utils.escapeHtml(ex)}</option>`;
+      });
+      html += `</optgroup>`;
+    }
+  }
+
+  if (cleanSelected && !foundSelected && !regionFilter) {
+    html += `<option value="${App.utils.escapeHtml(cleanSelected)}" selected>${App.utils.escapeHtml(cleanSelected)}</option>`;
+  }
+  return html;
+};
+
+App.utils.getCountryOptionsHtml = function(selectedVal = '', includeEmpty = false, emptyLabel = '— Seleccionar País / Nacionalidad —') {
+  const isEs = App.utils.getCurrentLanguage ? (App.utils.getCurrentLanguage() === 'es') : true;
+  const cleanSelected = String(selectedVal || '').trim();
+  const normSelected = App.utils.normalizeCountry(cleanSelected).toLowerCase();
   let foundSelected = false;
   let html = includeEmpty ? `<option value="">${App.utils.escapeHtml(emptyLabel)}</option>` : '';
 
   App.utils.REGION_LIST.forEach(reg => {
     html += `<optgroup label="${reg.icon} ${reg.shortEs} / ${reg.shortEn}">`;
-    reg.countries.forEach(c => {
-      const isSel = cleanSelected.toLowerCase() === c.toLowerCase();
+    const regCountries = App.utils.COUNTRIES.filter(c => c.region === reg.id);
+    regCountries.forEach(c => {
+      const isSel = cleanSelected && (c.value.toLowerCase() === normSelected || c.value.toLowerCase() === cleanSelected.toLowerCase());
       if (isSel) foundSelected = true;
-      html += `<option value="${App.utils.escapeHtml(c)}" data-region="${reg.id}" ${isSel ? 'selected' : ''}>${App.utils.escapeHtml(c)}</option>`;
+      const label = isEs ? `${c.flag} ${c.labelEs} (${c.labelEn})` : `${c.flag} ${c.labelEn}`;
+      html += `<option value="${App.utils.escapeHtml(c.value)}" data-region="${reg.id}" ${isSel ? 'selected' : ''}>${App.utils.escapeHtml(label)}</option>`;
     });
     html += `</optgroup>`;
   });
+
+  // Internal Spain & Other options for internal agents / other markets
+  const isSpain = cleanSelected.toLowerCase() === 'spain' || cleanSelected.toLowerCase() === 'españa';
+  if (isSpain) foundSelected = true;
+  const isOther = cleanSelected.toLowerCase() === 'other' || cleanSelected.toLowerCase() === 'otro';
+  if (isOther) foundSelected = true;
+  html += `<optgroup label="🇪🇸 España / Otros">`;
+  html += `<option value="Spain" ${isSpain ? 'selected' : ''}>🇪🇸 España (Spain)</option>`;
+  html += `<option value="Other" ${isOther ? 'selected' : ''}>🌍 Otro / Other</option>`;
+  html += `</optgroup>`;
 
   if (cleanSelected && !foundSelected) {
     html += `<option value="${App.utils.escapeHtml(cleanSelected)}" selected>${App.utils.escapeHtml(cleanSelected)}</option>`;
@@ -1417,7 +1720,8 @@ App.utils.getCountryOptionsHtml = function(selectedVal = '', includeEmpty = fals
 };
 
 App.utils.getRegionsCheckboxesHtml = function(inputName, selectedRegions = []) {
-  const selectedSet = new Set(Array.isArray(selectedRegions) ? selectedRegions : (selectedRegions ? [selectedRegions] : []));
+  const rawArr = Array.isArray(selectedRegions) ? selectedRegions : (selectedRegions ? [selectedRegions] : []);
+  const selectedSet = new Set(rawArr.map(r => App.utils.REGIONS[r] ? r : (App.utils.LEGACY_REGION_MAP[r] || r)));
   return `
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:8px;margin-top:6px;">
       ${App.utils.REGION_LIST.map(reg => {
@@ -1425,12 +1729,34 @@ App.utils.getRegionsCheckboxesHtml = function(inputName, selectedRegions = []) {
         return `
           <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;border:1px solid ${reg.border};background:${reg.bg};cursor:pointer;font-size:0.82rem;font-weight:600;color:#1e293b;">
             <input type="checkbox" name="${inputName}" value="${reg.id}" ${checked} style="width:16px;height:16px;accent-color:${reg.color};cursor:pointer;">
-            <span>${reg.icon} <span class="lang-en">${reg.shortEn}</span><span class="lang-es">${reg.shortEs}</span></span>
+            <span>${reg.flag || reg.icon} <span class="lang-en">${reg.shortEn}</span><span class="lang-es">${reg.shortEs}</span></span>
           </label>
         `;
       }).join('')}
     </div>
   `;
+};
+
+App.utils.isWebinarScheduled = function(wCfg) {
+  if (!wCfg || typeof wCfg !== 'object') return false;
+  if (wCfg.scheduled === false || wCfg.enabled === false || wCfg.activeType === 'none') return false;
+  const dateStr = String(wCfg.date || '').trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+
+  const [y, m, d] = dateStr.split('-').map(Number);
+  if (!y || !m || !d) return false;
+
+  const timeStr = String(wCfg.time || '23:59').trim();
+  const [hhRaw, mmRaw] = timeStr.split(':').map(Number);
+  const hh = Number.isFinite(hhRaw) ? hhRaw : 23;
+  const mm = Number.isFinite(mmRaw) ? mmRaw : 59;
+
+  // Approximate CET/CEST (+01:00/+02:00) end time with a 2-hour live session buffer
+  const isDst = (m > 3 && m < 10) || (m === 3 && d >= 25) || (m === 10 && d < 25);
+  const offsetHours = isDst ? 2 : 1;
+  const eventStartUtcMs = Date.UTC(y, m - 1, d, hh - offsetHours, mm, 0);
+  const eventEndWithBufferMs = eventStartUtcMs + (2 * 60 * 60 * 1000);
+  return eventEndWithBufferMs >= Date.now();
 };
 
 App.utils.renderUserRegionalBanner = async function(containerId, user) {
@@ -1447,13 +1773,26 @@ App.utils.renderUserRegionalBanner = async function(containerId, user) {
       ? await App.auth.getWebinarSettings()
       : (App.auth && App.auth.getDefaultWebinarSettings ? App.auth.getDefaultWebinarSettings() : null);
 
-    const langLabels = { en: '🇬🇧 EN', es: '🇪🇸 ES', fr: '🇫🇷 FR', de: '🇩🇪 DE', nl: '🇳🇱 NL', pl: '🇵🇱 PL', uk: '🇺🇦 UK', ar: '🇦🇪 AR', bilingual: '🌐 ES/EN' };
+    const scheduledRegions = displayRegions
+      .map(rId => {
+        const regMeta = App.utils.REGIONS[rId] || App.utils.REGIONS.north_america;
+        const wCfg = (App.auth && App.auth.getRegionalWebinarConfig && settings)
+          ? App.auth.getRegionalWebinarConfig(settings, rId)
+          : null;
+        return { rId, regMeta, wCfg };
+      })
+      .filter(item => App.utils.isWebinarScheduled(item.wCfg));
 
-    const webinarCardsHtml = displayRegions.map(rId => {
-      const regMeta = App.utils.REGIONS[rId] || App.utils.REGIONS.north_america;
-      const wCfg = (App.auth && App.auth.getRegionalWebinarConfig && settings)
-        ? App.auth.getRegionalWebinarConfig(settings, rId)
-        : { activeType: 'b2c', title: 'Spain Unlocked', date: '2026-10-29', time: '18:00', language: regMeta.defaultLang || 'en' };
+    // If there is NO scheduled upcoming webinar for the user's region(s), hide the header banner completely
+    if (scheduledRegions.length === 0) {
+      el.innerHTML = '';
+      el.style.display = 'none';
+      return;
+    }
+
+    const langLabels = { en: '🇬🇧 EN', es: '🇪🇸 ES', fr: '🇫🇷 FR', de: '🇩🇪 DE', nl: '🇳🇱 NL', sv: '🇸🇪 SV', it: '🇮🇹 IT', pl: '🇵🇱 PL', uk: '🇺🇦 UK/BG', ar: '🇦🇪 AR', bilingual: '🌐 ES/EN' };
+
+    const webinarCardsHtml = scheduledRegions.map(({ rId, regMeta, wCfg }) => {
       const refParam = freshUser.referralCode ? `&ref=${encodeURIComponent(freshUser.referralCode)}` : '';
       const regWebinarUrl = `https://thespainconnection.com/index.html#webinar?region=${encodeURIComponent(rId)}${refParam}`;
       const langBadge = langLabels[wCfg.language || 'en'] || '🌐';
@@ -1462,12 +1801,12 @@ App.utils.renderUserRegionalBanner = async function(containerId, user) {
         <div style="background:#fff; border:1px solid ${regMeta.border}; border-left:4px solid ${regMeta.color}; border-radius:10px; padding:10px 12px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
           <div style="min-width:180px; flex:1;">
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:0.78rem; font-weight:800; color:${regMeta.color};">
-              <span>${regMeta.icon} ${App.utils.escapeHtml(regMeta.shortEs)}</span>
+              <span>${regMeta.icon} <span class="lang-en">${App.utils.escapeHtml(regMeta.shortEn)}</span><span class="lang-es">${App.utils.escapeHtml(regMeta.shortEs)}</span></span>
               <span style="background:${wCfg.activeType === 'b2b' ? '#003f99' : '#059669'}; color:#fff; padding:1px 7px; border-radius:999px; font-size:0.68rem;">${(wCfg.activeType || 'b2c').toUpperCase()}</span>
               <span style="background:#f1f5f9; color:#334155; padding:1px 6px; border-radius:6px; font-size:0.68rem;">${langBadge}</span>
             </div>
             <div style="font-weight:700; font-size:0.86rem; color:#0f172a; margin-top:3px;">🎙️ ${App.utils.escapeHtml(wCfg.title || 'Webinar')}</div>
-            <div style="font-size:0.76rem; color:#64748b; margin-top:1px;">📅 ${App.utils.escapeHtml(wCfg.date || '')} · ⏰ ${App.utils.escapeHtml(wCfg.time || '18:00')} CET (España)</div>
+            <div style="font-size:0.76rem; color:#64748b; margin-top:1px;">📅 ${App.utils.escapeHtml(wCfg.date || '')} · ⏰ ${App.utils.escapeHtml(wCfg.time || '18:00')} CET (<span class="lang-en">Spain</span><span class="lang-es">España</span>)</div>
           </div>
           <button type="button" class="btn btn-outline btn-sm" style="font-size:0.75rem; padding:5px 10px; white-space:nowrap;" onclick="App.utils.copyToClipboard('${regWebinarUrl}')">
             📋 <span class="lang-en">Copy Region Webinar Link</span><span class="lang-es">Link Webinar Región</span>
@@ -1500,6 +1839,8 @@ App.utils.renderUserRegionalBanner = async function(containerId, user) {
     `;
   } catch (err) {
     console.warn('[RegionalBanner] Render warning:', err);
+    el.innerHTML = '';
+    el.style.display = 'none';
   }
 };
 
@@ -1571,8 +1912,42 @@ App.utils.resolveUserUmbrellaParents = function(user, allUsers = [], maps = null
     cursor = parent;
   }
 
-  if (broker && !embajador && broker.embajadorId && lk.byId.has(broker.embajadorId)) {
-    embajador = lk.byId.get(broker.embajadorId);
+  if (broker && !embajador && user.role !== 'embajador') {
+    if (broker.embajadorId && lk.byId.has(broker.embajadorId)) {
+      embajador = lk.byId.get(broker.embajadorId);
+    } else if (broker.referredBy) {
+      const brkRef = findRefUser(broker.referredBy);
+      if (brkRef && brkRef.role === 'embajador') embajador = brkRef;
+      else if (brkRef && brkRef.embajadorId && lk.byId.has(brkRef.embajadorId)) embajador = lk.byId.get(brkRef.embajadorId);
+    }
+  }
+
+  // Upward Broker attachment: if this Broker registered without an Embajador link,
+  // but is assigned to a Realtor who already belongs to an Embajador's umbrella,
+  // attach this Broker to that Embajador's umbrella automatically.
+  if (user.role === 'broker' && !embajador && Array.isArray(allUsers)) {
+    for (const member of allUsers) {
+      if (!member || member.id === user.id || member.brokerId !== user.id) continue;
+      if (member.embajadorId && lk.byId.has(member.embajadorId)) {
+        embajador = lk.byId.get(member.embajadorId);
+        break;
+      }
+      if (member.referredBy) {
+        const mRef = findRefUser(member.referredBy);
+        if (mRef && mRef.role === 'embajador') {
+          embajador = mRef;
+          break;
+        }
+        if (mRef && mRef.embajadorId && lk.byId.has(mRef.embajadorId)) {
+          embajador = lk.byId.get(mRef.embajadorId);
+          break;
+        }
+      }
+    }
+  }
+
+  if (broker && user.role !== 'broker' && user.role !== 'embajador') {
+    directParent = broker;
   }
 
   return { embajador, broker, directParent };

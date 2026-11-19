@@ -1452,22 +1452,27 @@ App.views.public = {
 
     function populateStates(country) {
       if (!stateSelect) return;
+      const isEs = document.body.classList.contains('lang-es');
+      const isFr = document.body.classList.contains('lang-fr');
       if (country === 'United States' || !country) {
-        stateSelect.innerHTML = `<option value="">— Select State —</option>` +
+        const lbl = isEs ? '— Selecciona Estado —' : (isFr ? '— Sélectionner un État —' : '— Select State —');
+        stateSelect.innerHTML = `<option value="" data-i18n-en="— Select State —" data-i18n-es="— Selecciona Estado —" data-i18n-fr="— Sélectionner un État —" data-i18n-en-ca="— Select State —">${lbl}</option>` +
           US_STATES.map(s => `<option value="${s}">${s}</option>`).join('');
       } else if (country === 'Canada') {
-        stateSelect.innerHTML = `<option value="">— Select Province / Territory —</option>` +
+        const lbl = isEs ? '— Selecciona Provincia / Territorio —' : (isFr ? '— Sélectionner une Province —' : '— Select Province / Territory —');
+        stateSelect.innerHTML = `<option value="" data-i18n-en="— Select Province / Territory —" data-i18n-es="— Selecciona Provincia / Territorio —" data-i18n-fr="— Sélectionner une Province —" data-i18n-en-ca="— Select Province / Territory —">${lbl}</option>` +
           CA_PROVINCES.map(s => `<option value="${s}">${s}</option>`).join('');
       } else if (country === 'Puerto Rico') {
-        stateSelect.innerHTML = `<option value="">— Select Region / Municipality —</option>` +
+        const lbl = isEs ? '— Selecciona Municipio / Región —' : (isFr ? '— Sélectionner une Municipalité —' : '— Select Region / Municipality —');
+        stateSelect.innerHTML = `<option value="" data-i18n-en="— Select Region / Municipality —" data-i18n-es="— Selecciona Municipio / Región —" data-i18n-fr="— Sélectionner une Municipalité —" data-i18n-en-ca="— Select Region / Municipality —">${lbl}</option>` +
           PR_AREAS.map(s => `<option value="${s}">${s}</option>`).join('');
       } else if (country === 'Other') {
-        stateSelect.innerHTML = `<option value="International" selected>🌍 International</option>`;
+        stateSelect.innerHTML = `<option value="International" data-i18n-en="🌍 International" data-i18n-es="🌍 Internacional" data-i18n-fr="🌍 International" data-i18n-en-ca="🌍 International" selected>${isEs ? '🌍 Internacional' : '🌍 International'}</option>`;
       } else {
         stateSelect.innerHTML =
-          `<option value="${country} — General" selected>📍 ${country} (Principal / General)</option>` +
+          `<option value="${country} — General" selected>📍 ${country} (${isEs ? 'Principal / General' : 'General'})</option>` +
           `<option value="${country} — Capital / Metro">🏙️ ${country} — Capital / Metro</option>` +
-          `<option value="International">🌍 Otro / Internacional</option>`;
+          `<option value="International" data-i18n-en="🌍 Other / International" data-i18n-es="🌍 Otro / Internacional" data-i18n-fr="🌍 Autre / International" data-i18n-en-ca="🌍 Other / International">${isEs ? '🌍 Otro / Internacional' : '🌍 Other / International'}</option>`;
       }
     }
 

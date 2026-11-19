@@ -8,7 +8,7 @@
   <meta property="og:title" content="REMAX Inmomás — International Advisory Division">
   <meta property="og:description" content="Your trusted team for buying property on Spain's Costa Blanca. Legal, tax & real estate advisory for international buyers.">
   <meta property="og:type" content="website">
-  <link rel="stylesheet" href="css/styles.css?v=20261119_umbrella1">
+  <link rel="stylesheet" href="css/styles.css?v=20261119_v3">
   <link rel="icon" type="image/png" href="Globo_CMYK.png">
   <!-- EmailJS SDK — free email sending from the browser (200 emails/month) -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -423,9 +423,10 @@
       </a>
     </div>
     <div class="mobile-topbar-actions">
-      <button class="mobile-topbar-btn" id="mobile-lang-toggle" aria-label="Switch language" title="Switch Language">
-        <span class="lang-label">ES</span>
-      </button>
+      <div class="dashboard-lang-switch" id="mobile-lang-toggle" role="group" aria-label="Language / Idioma">
+        <button type="button" class="dashboard-lang-switch__opt" data-set-lang="en">EN</button>
+        <button type="button" class="dashboard-lang-switch__opt" data-set-lang="es">ES</button>
+      </div>
       <a href="#profile" class="mobile-topbar-avatar" id="mobile-user-avatar" title="My Profile" aria-label="My Profile">👤</a>
       <button class="mobile-topbar-btn mobile-topbar-logout" onclick="App.auth.logout().then(() => window.location.href='index.html#home')" title="Logout" aria-label="Logout">⏻</button>
     </div>
@@ -441,7 +442,7 @@
     <div class="sidebar-logo" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
       <div>
         <img src="images/spain-connection-logo.png" alt="The Spain Connection" style="max-height: 60px; padding: 5px;">
-        <span>Partner Portal</span>
+        <span><span class="lang-en">Partner Portal</span><span class="lang-es">Portal de Colaboradores</span></span>
       </div>
       <button type="button" class="sidebar-mobile-close-btn" id="sidebar-mobile-close-btn" aria-label="Close Menu">✕</button>
     </div>
@@ -449,10 +450,10 @@
     <!-- Admin Sidebar Nav (Broker Inmomás) -->
     <nav class="sidebar-nav" id="sidebar-admin" style="display:none;">
       <div class="sidebar-nav__title">Broker Inmomás</div>
-      <a href="#admin/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
-      <a href="#admin/users" class="sidebar-link"><span class="sidebar-link__icon">👥</span> Manage Users</a>
-      <a href="#admin/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> Clients</a>
-      <a href="#admin/agreements" class="sidebar-link" id="sidebar-agreements-link"><span class="sidebar-link__icon">📋</span> Acuerdos <span id="admin-agreements-badge" style="display:none; background:#e11b22; color:white; border-radius:10px; padding:1px 7px; font-size:0.72rem; font-weight:700; margin-left:4px;">0</span></a>
+      <a href="#admin/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> <span class="lang-en">Dashboard</span><span class="lang-es">Panel</span></a>
+      <a href="#admin/users" class="sidebar-link"><span class="sidebar-link__icon">👥</span> <span class="lang-en">Manage Users</span><span class="lang-es">Usuarios y Paraguas</span></a>
+      <a href="#admin/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> <span class="lang-en">Clients</span><span class="lang-es">Clientes</span></a>
+      <a href="#admin/agreements" class="sidebar-link" id="sidebar-agreements-link"><span class="sidebar-link__icon">📋</span> <span class="lang-en">Agreements</span><span class="lang-es">Acuerdos</span> <span id="admin-agreements-badge" style="display:none; background:#e11b22; color:white; border-radius:10px; padding:1px 7px; font-size:0.72rem; font-weight:700; margin-left:4px;">0</span></a>
       <a href="#admin/newsletter" class="sidebar-link"><span class="sidebar-link__icon">📧</span> <span class="lang-en">Newsletter</span><span class="lang-es">Newsletter</span></a>
       <a href="#admin/webinar" class="sidebar-link"><span class="sidebar-link__icon">🎙️</span> <span class="lang-en">Webinar</span><span class="lang-es">Webinar</span></a>
       <a href="#admin/unified" class="sidebar-link"><span class="sidebar-link__icon">🗂️</span> <span class="lang-en">Unified Directory</span><span class="lang-es">Directorio Unificado</span></a>
@@ -460,8 +461,8 @@
 
     <!-- Embajador Sidebar Nav -->
     <nav class="sidebar-nav" id="sidebar-embajador" style="display:none;">
-      <div class="sidebar-nav__title">👑 <span class="lang-en">Ambassador Portal</span><span class="lang-es">Portal Embajador</span></div>
-      <a href="#embajador/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
+      <div class="sidebar-nav__title">👑 <span class="lang-en">Ambassador Dashboard</span><span class="lang-es">Dashboard de Embajador</span></div>
+      <a href="#embajador/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> <span class="lang-en">Ambassador Dashboard</span><span class="lang-es">Dashboard de Embajador</span></a>
       <a href="#embajador/network" class="sidebar-link"><span class="sidebar-link__icon">🌐</span> <span class="lang-en">My Umbrella</span><span class="lang-es">Mi Paraguas / Red</span></a>
       <a href="#embajador/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> <span class="lang-en">Clients</span><span class="lang-es">Clientes</span></a>
       <a href="#embajador/webinar" class="sidebar-link"><span class="sidebar-link__icon">🎙️</span> <span class="lang-en">Webinars</span><span class="lang-es">Webinarios</span></a>
@@ -471,48 +472,48 @@
 
     <!-- Agente Inmomás Sidebar Nav -->
     <nav class="sidebar-nav" id="sidebar-agent_inmomas" style="display:none;">
-      <div class="sidebar-nav__title">Agente Inmomás</div>
+      <div class="sidebar-nav__title"><span class="lang-en">RE/MAX Inmomás Agent</span><span class="lang-es">Agente Inmomás</span></div>
       <a href="#agent_inmomas/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
-      <a href="#agent_inmomas/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> Clients</a>
-      <a href="#agent_inmomas/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> Finances</a>
+      <a href="#agent_inmomas/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> <span class="lang-en">Clients</span><span class="lang-es">Clientes</span></a>
+      <a href="#agent_inmomas/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> <span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></a>
       <a href="#agent_inmomas/webinar" class="sidebar-link"><span class="sidebar-link__icon">🎙️</span> <span class="lang-en">Webinar</span><span class="lang-es">Webinar</span></a>
       <a href="#agent_inmomas/partners" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> <span class="lang-en">My Realtors</span><span class="lang-es">Mis Realtors</span></a>
     </nav>
 
     <!-- Colaborador Sidebar Nav -->
     <nav class="sidebar-nav" id="sidebar-colaborador" style="display:none;">
-      <div class="sidebar-nav__title">Colaborador</div>
+      <div class="sidebar-nav__title"><span class="lang-en">Collaborator</span><span class="lang-es">Colaborador</span></div>
       <a href="#colaborador/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
-      <a href="#colaborador/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> Clients</a>
-      <a href="#colaborador/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> Finances</a>
+      <a href="#colaborador/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> <span class="lang-en">Clients</span><span class="lang-es">Clientes</span></a>
+      <a href="#colaborador/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> <span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></a>
       <a href="#colaborador/webinar" class="sidebar-link"><span class="sidebar-link__icon">🎙️</span> <span class="lang-en">Webinar</span><span class="lang-es">Webinar</span></a>
       <a href="#colaborador/partners" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> <span class="lang-en">Partners</span><span class="lang-es">Partners</span></a>
     </nav>
 
     <!-- Broker Sidebar Nav -->
     <nav class="sidebar-nav" id="sidebar-broker" style="display:none;">
-      <div class="sidebar-nav__title">Broker Portal</div>
-      <a href="#broker/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
-      <a href="#broker/team" class="sidebar-link"><span class="sidebar-link__icon">👥</span> My Team</a>
-      <a href="#broker/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> Clients</a>
-      <a href="#broker/documents" class="sidebar-link"><span class="sidebar-link__icon">📄</span> Documents</a>
-      <a href="#broker/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> Finances</a>
+      <div class="sidebar-nav__title"><span class="lang-en">Broker Portal</span><span class="lang-es">Portal Broker</span></div>
+      <a href="#broker/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> <span class="lang-en">Broker Dashboard</span><span class="lang-es">Panel de Broker</span></a>
+      <a href="#broker/team" class="sidebar-link"><span class="sidebar-link__icon">👥</span> <span class="lang-en">My Team</span><span class="lang-es">Mi Equipo</span></a>
+      <a href="#broker/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> <span class="lang-en">Clients</span><span class="lang-es">Clientes</span></a>
+      <a href="#broker/documents" class="sidebar-link"><span class="sidebar-link__icon">📄</span> <span class="lang-en">Documents</span><span class="lang-es">Documentos</span></a>
+      <a href="#broker/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> <span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></a>
     </nav>
 
     <!-- Realtor Sidebar Nav -->
     <nav class="sidebar-nav" id="sidebar-realtor" style="display:none;">
-      <div class="sidebar-nav__title">Realtor Portal</div>
-      <a href="#realtor/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
-      <a href="#realtor/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> My Clients</a>
-      <a href="#realtor/referral" class="sidebar-link"><span class="sidebar-link__icon">🔗</span> Referral Tools</a>
-      <a href="#realtor/documents" class="sidebar-link"><span class="sidebar-link__icon">📄</span> Documents</a>
-      <a href="#realtor/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> Finances</a>
+      <div class="sidebar-nav__title"><span class="lang-en">Realtor Portal</span><span class="lang-es">Portal Realtor</span></div>
+      <a href="#realtor/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> <span class="lang-en">Dashboard</span><span class="lang-es">Mi Panel</span></a>
+      <a href="#realtor/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> <span class="lang-en">My Clients</span><span class="lang-es">Mis Clientes</span></a>
+      <a href="#realtor/referral" class="sidebar-link"><span class="sidebar-link__icon">🔗</span> <span class="lang-en">Referral Tools</span><span class="lang-es">Herramientas de Referidos</span></a>
+      <a href="#realtor/documents" class="sidebar-link"><span class="sidebar-link__icon">📄</span> <span class="lang-en">Documents</span><span class="lang-es">Documentos</span></a>
+      <a href="#realtor/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> <span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></a>
     </nav>
 
     <!-- Partner Sidebar Nav -->
     <nav class="sidebar-nav" id="sidebar-partner" style="display:none;">
-      <div class="sidebar-nav__title">Partner Portal</div>
-      <a href="#partner/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
+      <div class="sidebar-nav__title"><span class="lang-en">Partner Portal</span><span class="lang-es">Portal Partner</span></div>
+      <a href="#partner/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> <span class="lang-en">Dashboard</span><span class="lang-es">Panel</span></a>
     </nav>
 
     <!-- Sidebar User Info -->
@@ -525,9 +526,10 @@
           <div class="sidebar-user__role" id="sidebar-user-role">—</div>
         </div>
         <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
-          <button class="lang-toggle" id="sidebar-lang-toggle" aria-label="Switch language" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 4px; padding: 4px 6px; font-size: 0.7rem; cursor: pointer; transition: all 0.2s;">
-            <span class="lang-label">ES</span>
-          </button>
+          <div class="dashboard-lang-switch" id="sidebar-lang-toggle" role="group" aria-label="Language / Idioma">
+            <button type="button" class="dashboard-lang-switch__opt" data-set-lang="en">EN</button>
+            <button type="button" class="dashboard-lang-switch__opt" data-set-lang="es">ES</button>
+          </div>
           <button class="sidebar-logout-btn" onclick="App.auth.logout().then(() => window.location.href='index.html#home')" title="Logout" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-size: 1.1rem; cursor: pointer; padding: 4px; line-height: 1; transition: color 0.2s;">⏻</button>
         </div>
       </div>
@@ -545,6 +547,14 @@
 
   <!-- ===================== MAIN CONTENT AREA ===================== -->
   <main class="app-main" id="app-main">
+
+    <!-- Desktop Top-Right Language Switcher (EN | ES) -->
+    <div class="dashboard-desktop-lang-bar">
+      <div class="dashboard-lang-switch dashboard-lang-switch--light" role="group" aria-label="Language / Idioma">
+        <button type="button" class="dashboard-lang-switch__opt" data-set-lang="en">🇬🇧 English</button>
+        <button type="button" class="dashboard-lang-switch__opt" data-set-lang="es">🇪🇸 Español</button>
+      </div>
+    </div>
 
     <!-- ===================== MOBILE TOP SECTION SWITCHER BAR ===================== -->
     <div class="mobile-section-switcher" id="mobile-section-switcher">
@@ -629,11 +639,37 @@
           <p class="dashboard-subtitle"><span class="lang-en">Manage the RE/MAX Inmomás International Platform</span><span class="lang-es">Gestiona la Plataforma Internacional de RE/MAX Inmomás</span></p>
         </div>
         <div id="admin-contract-notifications-banner" style="display:none; margin-bottom: 1.5rem;"></div>
+
+        <!-- Compact Region & Country Metrics Filter Bar -->
+        <div id="admin-dash-geo-filter-bar" style="background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:10px 14px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; box-shadow:0 1px 4px rgba(15,23,42,0.03);">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; flex:1; min-width:260px;">
+            <span style="font-size:0.82rem; font-weight:700; color:#334155; white-space:nowrap;">🌍 <span class="lang-en">Filter metrics:</span><span class="lang-es">Filtrar métricas:</span></span>
+            <select id="admin-dash-filter-region" class="form-select" style="width:auto; min-width:210px; max-width:280px; padding:6px 30px 6px 10px; font-size:0.83rem; height:36px; border-radius:8px;">
+              <option value="">🌍 Todas las Regiones</option>
+            </select>
+            <select id="admin-dash-filter-country" class="form-select" style="width:auto; min-width:175px; max-width:230px; padding:6px 30px 6px 10px; font-size:0.83rem; height:36px; border-radius:8px;">
+              <option value="">🏳️ Todos los Países</option>
+            </select>
+            <button type="button" id="admin-dash-filter-reset" class="btn btn-outline btn-sm" style="display:none; padding:5px 10px; font-size:0.76rem; border-radius:8px; height:34px; white-space:nowrap;">
+              ✕ <span class="lang-en">All Global</span><span class="lang-es">Ver Global</span>
+            </button>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span id="admin-dash-geo-meta" style="font-size:0.77rem; color:#475569; background:#f8fafc; border:1px solid #e2e8f0; padding:4px 10px; border-radius:999px; font-weight:600;"></span>
+            <div style="display:flex; align-items:center; gap:4px;">
+              <button type="button" class="btn btn-outline btn-xs" style="font-size:0.73rem; padding:4px 8px; border-radius:7px;" onclick="App.views.admin.jumpFromDashFilter('admin/users')" title="Abrir Partners / Usuarios filtrados">👥 <span class="lang-en">Partners</span><span class="lang-es">Partners</span> ↗</button>
+              <button type="button" class="btn btn-outline btn-xs" style="font-size:0.73rem; padding:4px 8px; border-radius:7px;" onclick="App.views.admin.jumpFromDashFilter('admin/clients')" title="Abrir Clientes filtrados">🏡 <span class="lang-en">Clients</span><span class="lang-es">Clientes</span> ↗</button>
+              <button type="button" class="btn btn-outline btn-xs" style="font-size:0.73rem; padding:4px 8px; border-radius:7px;" onclick="App.views.admin.jumpFromDashFilter('admin/webinar')" title="Abrir Webinar filtrado">🎙️ Webinar ↗</button>
+              <button type="button" class="btn btn-outline btn-xs" style="font-size:0.73rem; padding:4px 8px; border-radius:7px;" onclick="App.views.admin.jumpFromDashFilter('admin/unified')" title="Abrir Base Unificada filtrada">📒 BD ↗</button>
+            </div>
+          </div>
+        </div>
+
         <div class="stat-cards-grid stat-cards-grid--5cols">
           <div class="stat-card stat-card--amber"><div class="stat-card__icon stat-card__icon--amber">⏳</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-pending">0</div><div class="stat-card__label"><span class="lang-en">Pending Approvals</span><span class="lang-es">Pendientes</span></div></div></div>
-          <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">🏢</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-brokers">0</div><div class="stat-card__label"><span class="lang-en">Active Brokers</span><span class="lang-es">Brokers Activos</span></div></div></div>
-          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">👤</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-realtors">0</div><div class="stat-card__label"><span class="lang-en">Active Realtors</span><span class="lang-es">Realtors Activos</span></div></div></div>
-          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🤝</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Total Clients</span><span class="lang-es">Clientes Totales</span></div></div></div>
+          <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">🤝</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-partners">0</div><div class="stat-card__label"><span class="lang-en">Total Partners</span><span class="lang-es">Partners Activos</span></div><div style="font-size:0.72rem; color:#64748b; margin-top:2px; font-weight:600; line-height:1.25;"><span id="admin-stat-brokers">0</span> Brokers · <span id="admin-stat-realtors">0</span> Realtors<span id="admin-stat-other-partners"></span></div></div></div>
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🏡</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-clients">0</div><div class="stat-card__label"><span class="lang-en">Clients</span><span class="lang-es">Clientes</span></div></div></div>
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🎙️</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-dash-webinar">0</div><div class="stat-card__label"><span class="lang-en">Webinar Regs</span><span class="lang-es">Inscritos Webinar</span></div></div></div>
           <div class="stat-card stat-card--red"><div class="stat-card__icon stat-card__icon--red">📥</div><div class="stat-card__body"><div class="stat-card__value" id="admin-stat-leads">0</div><div class="stat-card__label"><span class="lang-en">Buyer Guide Leads</span><span class="lang-es">Leads de Guía</span></div></div></div>
         </div>
 
@@ -687,20 +723,6 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Global Regional Overview Section -->
-        <div class="dashboard-section">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
-            <div>
-              <h2 style="margin:0;">🌍 <span class="lang-en">International Regions &amp; RE/MAX Inmomás Coverage</span><span class="lang-es">Visión Global por Regiones y Agentes RE/MAX Inmomás</span></h2>
-              <p style="font-size:0.82rem; color:var(--text-secondary); margin:4px 0 0;">
-                <span class="lang-en">Segmented CRM databases, active RE/MAX Inmomás agents, partners, buyers, and webinars by region. Click a region to filter directly.</span>
-                <span class="lang-es">Bases de datos segmentadas por región, agentes RE/MAX Inmomás asignados, realtors, clientes y webinarios. Haz clic en una región para filtrar.</span>
-              </p>
-            </div>
-          </div>
-          <div id="admin-regional-overview-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px;"></div>
         </div>
 
         <div class="dashboard-section">
@@ -1068,12 +1090,12 @@
                   <span id="nl-recipient-badge" class="nl-badge">0 <span class="lang-en">subscribers</span><span class="lang-es">suscriptores</span></span>
                 </label>
                 <select id="nl-recipients" class="form-control" style="width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border-light); font-size: 0.95rem;">
-                  <option value="all"><span class="lang-en">All Subscribers</span><span class="lang-es">Todos los Suscriptores</span></option>
-                  <option value="embajador"><span class="lang-en">Ambassadors Only</span><span class="lang-es">Solo Embajadores</span></option>
-                  <option value="broker"><span class="lang-en">Brokers Only</span><span class="lang-es">Solo Brokers</span></option>
-                  <option value="realtor"><span class="lang-en">Realtors Only</span><span class="lang-es">Solo Realtors</span></option>
-                  <option value="colaborador"><span class="lang-en">Collaborators Only</span><span class="lang-es">Solo Colaboradores</span></option>
-                  <option value="agent_inmomas"><span class="lang-en">RE/MAX Inmomás Agents Only</span><span class="lang-es">Solo Agentes RE/MAX Inmomás</span></option>
+                  <option value="all" data-i18n-en="All Subscribers" data-i18n-es="Todos los Suscriptores">All Subscribers</option>
+                  <option value="embajador" data-i18n-en="Ambassadors Only" data-i18n-es="Solo Embajadores">Ambassadors Only</option>
+                  <option value="broker" data-i18n-en="Brokers Only" data-i18n-es="Solo Brokers">Brokers Only</option>
+                  <option value="realtor" data-i18n-en="Realtors Only" data-i18n-es="Solo Realtors">Realtors Only</option>
+                  <option value="colaborador" data-i18n-en="Collaborators Only" data-i18n-es="Solo Colaboradores">Collaborators Only</option>
+                  <option value="agent_inmomas" data-i18n-en="RE/MAX Inmomás Agents Only" data-i18n-es="Solo Agentes RE/MAX Inmomás">RE/MAX Inmomás Agents Only</option>
                 </select>
               </div>
 
@@ -1244,9 +1266,9 @@
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:18px;">
               <div class="form-group">
                 <label for="admin-webinar-date" style="display:block;font-size:0.82rem;font-weight:700;color:#374151;margin-bottom:6px;">
-                  📅 <span class="lang-en">Webinar Date *</span><span class="lang-es">Fecha del Webinario *</span>
+                  📅 <span class="lang-en">Webinar Date (leave empty if none)</span><span class="lang-es">Fecha del Webinario (vacío si no hay)</span>
                 </label>
-                <input type="date" id="admin-webinar-date" required class="form-input" style="font-weight:600;" value="2026-09-24">
+                <input type="date" id="admin-webinar-date" class="form-input" style="font-weight:600;" value="">
               </div>
 
               <div class="form-group">
@@ -1307,9 +1329,14 @@
 
             <!-- Form Actions -->
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-top:12px;border-top:1px solid #f3f4f6;">
-              <button type="button" onclick="App.views.admin.resetWebinarDefaults()" class="btn btn-outline" style="font-size:0.85rem;">
-                🔄 <span class="lang-en">Load Recommended Defaults</span><span class="lang-es">Cargar Valores Recomendados</span>
-              </button>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button type="button" onclick="App.views.admin.resetWebinarDefaults()" class="btn btn-outline" style="font-size:0.85rem;">
+                  🔄 <span class="lang-en">Load Recommended Defaults</span><span class="lang-es">Cargar Valores Recomendados</span>
+                </button>
+                <button type="button" onclick="App.views.admin.clearRegionalWebinarSchedule()" class="btn btn-outline" style="font-size:0.85rem;color:#b91c1c;border-color:#fca5a5;">
+                  ⏸️ <span class="lang-en">Unschedule / Hide Region Webinar</span><span class="lang-es">Desprogramar / Ocultar Webinario</span>
+                </button>
+              </div>
               <button type="submit" id="admin-save-webinar-btn" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;font-weight:800;font-size:0.92rem;background:#003f99;border-color:#003f99;box-shadow:0 4px 14px rgba(0,63,153,0.3);">
                 💾 <span class="lang-en">Save &amp; Publish on Website</span><span class="lang-es">Guardar y Publicar en la Web</span>
               </button>
@@ -1593,7 +1620,7 @@
                 🪪 <span class="lang-en">Cards</span><span class="lang-es">Tarjetas</span>
               </button>
             </div>
-            <input type="text" id="broker-team-search-input" class="form-input" placeholder="🔍 Buscar realtor por nombre, email o agente Inmomás..." oninput="App.views.broker.searchTeam(this.value)" style="margin-bottom:0; max-width:340px; flex:1; min-width:210px;">
+            <input type="text" id="broker-team-search-input" class="form-input" placeholder="🔍 Buscar realtor por nombre, email o agente Inmomás..." data-placeholder-en="🔍 Search realtor by name, email or Inmomás agent..." data-placeholder-es="🔍 Buscar realtor por nombre, email o agente Inmomás..." oninput="App.views.broker.searchTeam(this.value)" style="margin-bottom:0; max-width:340px; flex:1; min-width:210px;">
           </div>
           <div class="umbrella-expand-controls" id="broker-umbrella-expand-controls">
             <button type="button" class="btn btn-outline btn-sm" onclick="App.views.broker.expandAllBrokerNodes(true)">
@@ -1632,14 +1659,14 @@
         <div class="dashboard-header"><h1><span class="lang-en">Financial Overview</span><span class="lang-es">Resumen Financiero</span></h1></div>
         <div class="stat-cards-grid stat-cards-grid--4cols">
           <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">💰</div><div class="stat-card__body"><div class="stat-card__value" id="broker-fin-total">€0</div><div class="stat-card__label">Total</div></div></div>
-          <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">✓</div><div class="stat-card__body"><div class="stat-card__value" id="broker-fin-paid">€0</div><div class="stat-card__label">Paid</div></div></div>
-          <div class="stat-card stat-card--amber"><div class="stat-card__icon stat-card__icon--amber">⏳</div><div class="stat-card__body"><div class="stat-card__value" id="broker-fin-pending">€0</div><div class="stat-card__label">Pending</div></div></div>
-          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">📈</div><div class="stat-card__body"><div class="stat-card__value" id="broker-fin-projected">€0</div><div class="stat-card__label">Projected</div></div></div>
+          <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">✓</div><div class="stat-card__body"><div class="stat-card__value" id="broker-fin-paid">€0</div><div class="stat-card__label"><span class="lang-en">Paid</span><span class="lang-es">Pagado</span></div></div></div>
+          <div class="stat-card stat-card--amber"><div class="stat-card__icon stat-card__icon--amber">⏳</div><div class="stat-card__body"><div class="stat-card__value" id="broker-fin-pending">€0</div><div class="stat-card__label"><span class="lang-en">Pending</span><span class="lang-es">Pendiente</span></div></div></div>
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">📈</div><div class="stat-card__body"><div class="stat-card__value" id="broker-fin-projected">€0</div><div class="stat-card__label"><span class="lang-en">Projected</span><span class="lang-es">Proyectado</span></div></div></div>
         </div>
         <div class="dashboard-section">
           <h2><span class="lang-en">Commission Breakdown</span><span class="lang-es">Desglose de Comisiones</span></h2>
           <div class="data-table-container">
-            <table class="data-table data-table--medium"><thead><tr><th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th><th><span class="lang-en">Property</span><span class="lang-es">Propiedad</span></th><th><span class="lang-en">Sale Price</span><span class="lang-es">Precio</span></th><th><span class="lang-en">Total Commission</span><span class="lang-es">Comisión Total</span></th><th><span class="lang-en">Your Share</span><span class="lang-es">Tu Parte</span></th><th><span class="lang-en">Amount</span><span class="lang-es">Importe</span></th><th>Status</th></tr></thead>
+            <table class="data-table data-table--medium"><thead><tr><th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th><th><span class="lang-en">Property</span><span class="lang-es">Propiedad</span></th><th><span class="lang-en">Sale Price</span><span class="lang-es">Precio</span></th><th><span class="lang-en">Total Commission</span><span class="lang-es">Comisión Total</span></th><th><span class="lang-en">Your Share</span><span class="lang-es">Tu Parte</span></th><th><span class="lang-en">Amount</span><span class="lang-es">Importe</span></th><th><span class="lang-en">Status</span><span class="lang-es">Estado</span></th></tr></thead>
             <tbody id="broker-commission-table-body"></tbody></table>
           </div>
         </div>
@@ -1845,14 +1872,14 @@
         <div class="dashboard-header"><h1><span class="lang-en">My Finances</span><span class="lang-es">Mis Finanzas</span></h1></div>
         <div class="stat-cards-grid stat-cards-grid--4cols">
           <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">💰</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-fin-total">€0</div><div class="stat-card__label">Total</div></div></div>
-          <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">✓</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-fin-paid">€0</div><div class="stat-card__label">Paid</div></div></div>
-          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">📈</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-fin-projected">€0</div><div class="stat-card__label">Projected</div></div></div>
+          <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">✓</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-fin-paid">€0</div><div class="stat-card__label"><span class="lang-en">Paid</span><span class="lang-es">Pagado</span></div></div></div>
+          <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">📈</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-fin-projected">€0</div><div class="stat-card__label"><span class="lang-en">Projected</span><span class="lang-es">Proyectado</span></div></div></div>
           <div class="stat-card stat-card--amber"><div class="stat-card__icon stat-card__icon--amber">📊</div><div class="stat-card__body"><div class="stat-card__value" id="realtor-fin-avg">€0</div><div class="stat-card__label"><span class="lang-en">Avg per Sale</span><span class="lang-es">Media por Venta</span></div></div></div>
         </div>
         <div class="dashboard-section">
           <h2><span class="lang-en">Commission History</span><span class="lang-es">Historial de Comisiones</span></h2>
           <div class="data-table-container">
-            <table class="data-table data-table--medium"><thead><tr><th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th><th><span class="lang-en">Property</span><span class="lang-es">Propiedad</span></th><th><span class="lang-en">Sale Price</span><span class="lang-es">Precio</span></th><th><span class="lang-en">Total Commission</span><span class="lang-es">Comisión Total</span></th><th><span class="lang-en">Your Share</span><span class="lang-es">Tu Parte</span></th><th><span class="lang-en">Amount</span><span class="lang-es">Importe</span></th><th>Status</th></tr></thead>
+            <table class="data-table data-table--medium"><thead><tr><th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th><th><span class="lang-en">Property</span><span class="lang-es">Propiedad</span></th><th><span class="lang-en">Sale Price</span><span class="lang-es">Precio</span></th><th><span class="lang-en">Total Commission</span><span class="lang-es">Comisión Total</span></th><th><span class="lang-en">Your Share</span><span class="lang-es">Tu Parte</span></th><th><span class="lang-en">Amount</span><span class="lang-es">Importe</span></th><th><span class="lang-en">Status</span><span class="lang-es">Estado</span></th></tr></thead>
             <tbody id="realtor-commission-table-body"></tbody></table>
           </div>
         </div>
@@ -1989,9 +2016,9 @@
       <div class="dashboard-content">
         <div class="dashboard-header"><h1><span class="lang-en">Commission Overview</span><span class="lang-es">Resumen de Comisiones</span></h1></div>
         <div class="stat-cards-grid stat-cards-grid--3cols">
-          <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">💰</div><div class="stat-card__body"><div class="stat-card__value" id="agent-fin-total">€0</div><div class="stat-card__label">Total Earned</div></div></div>
-          <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">✓</div><div class="stat-card__body"><div class="stat-card__value" id="agent-fin-paid">€0</div><div class="stat-card__label">Paid</div></div></div>
-          <div class="stat-card stat-card--amber"><div class="stat-card__icon stat-card__icon--amber">⏳</div><div class="stat-card__body"><div class="stat-card__value" id="agent-fin-pending">€0</div><div class="stat-card__label">Pending Payment</div></div></div>
+          <div class="stat-card stat-card--purple"><div class="stat-card__icon stat-card__icon--purple">💰</div><div class="stat-card__body"><div class="stat-card__value" id="agent-fin-total">€0</div><div class="stat-card__label"><span class="lang-en">Total Earned</span><span class="lang-es">Total Generado</span></div></div></div>
+          <div class="stat-card stat-card--green"><div class="stat-card__icon stat-card__icon--green">✓</div><div class="stat-card__body"><div class="stat-card__value" id="agent-fin-paid">€0</div><div class="stat-card__label"><span class="lang-en">Paid</span><span class="lang-es">Cobrado</span></div></div></div>
+          <div class="stat-card stat-card--amber"><div class="stat-card__icon stat-card__icon--amber">⏳</div><div class="stat-card__body"><div class="stat-card__value" id="agent-fin-pending">€0</div><div class="stat-card__label"><span class="lang-en">Pending Payment</span><span class="lang-es">Pendiente de Cobro</span></div></div></div>
         </div>
         <div class="dashboard-section">
           <h2><span class="lang-en">Detailed History</span><span class="lang-es">Historial Detallado</span></h2>
@@ -2003,9 +2030,9 @@
                   <th><span class="lang-en">Property</span><span class="lang-es">Propiedad</span></th>
                   <th><span class="lang-en">Sale Price</span><span class="lang-es">Precio</span></th>
                   <th><span class="lang-en">Spain Commission</span><span class="lang-es">Comisión España</span></th>
-                  <th>Your Share</th>
-                  <th>Amount</th>
-                  <th>Status</th>
+                  <th><span class="lang-en">Your Share</span><span class="lang-es">Tu Parte</span></th>
+                  <th><span class="lang-en">Amount</span><span class="lang-es">Importe</span></th>
+                  <th><span class="lang-en">Status</span><span class="lang-es">Estado</span></th>
                 </tr>
               </thead>
               <tbody id="agent-commission-table-body"></tbody>
@@ -2259,15 +2286,15 @@
                 
                 <div class="profile-info-grid">
                   <div>
-                    <label class="profile-label">Agency</label>
+                    <label class="profile-label"><span class="lang-en">Agency</span><span class="lang-es">Agencia</span></label>
                     <p id="profile-agency" class="profile-value">—</p>
                   </div>
                   <div>
-                    <label class="profile-label">Status</label>
+                    <label class="profile-label"><span class="lang-en">Status</span><span class="lang-es">Estado</span></label>
                     <div class="profile-status-wrapper" id="profile-status"></div>
                   </div>
                   <div>
-                    <label class="profile-label">Phone</label>
+                    <label class="profile-label"><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></label>
                     <p id="profile-phone" class="profile-value">—</p>
                   </div>
                   <div>
@@ -2279,11 +2306,11 @@
                     <div id="profile-regions" style="margin-top:4px; display:flex; gap:6px; flex-wrap:wrap;">—</div>
                   </div>
                   <div>
-                    <label class="profile-label">Joined Date</label>
+                    <label class="profile-label"><span class="lang-en">Joined Date</span><span class="lang-es">Fecha de Alta</span></label>
                     <p id="profile-joined" class="profile-value">—</p>
                   </div>
-                  <div>
-                    <label class="profile-label">Broker</label>
+                  <div id="profile-broker-group">
+                    <label class="profile-label"><span class="lang-en">Broker</span><span class="lang-es">Broker</span></label>
                     <p id="profile-broker" class="profile-value">—</p>
                   </div>
                 </div>
@@ -2379,7 +2406,7 @@
       <div class="dashboard-content">
         <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
           <div>
-            <h1>👑 <span class="lang-en">Ambassador Executive Portal</span><span class="lang-es">Portal Ejecutivo de Embajador</span></h1>
+            <h1>👑 <span class="lang-en">Ambassador Dashboard</span><span class="lang-es">Dashboard de Embajador</span></h1>
             <p class="dashboard-subtitle">
               <span class="lang-en">Full visibility and management of your Umbrella Network — Brokers, Realtors, Collaborators &amp; End Clients</span>
               <span class="lang-es">Visión ejecutiva integral de tu Paraguas — Brokers, Agentes, Colaboradores y Clientes Finales</span>
@@ -2544,19 +2571,19 @@
         <!-- Search & Status Filter -->
         <div class="dashboard-filters" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
           <div class="form-group" style="margin-bottom:0; flex:1; min-width:220px;">
-            <input type="text" class="form-input" placeholder="🔍 Buscar por nombre, email, agencia, país o código..." oninput="App.views.embajador.searchNetwork(this.value)">
+            <input type="text" class="form-input" placeholder="🔍 Buscar por broker, agente, agencia, país o código..." data-placeholder-en="🔍 Search by broker, agent, agency, country or ref code..." data-placeholder-es="🔍 Buscar por broker, agente, agencia, país o código..." oninput="App.views.embajador.searchNetwork(this.value)">
           </div>
           <div class="form-group" style="margin-bottom:0; min-width:185px;">
             <select id="emb-net-region-select" class="form-select" onchange="App.views.embajador.setNetworkRegionFilter(this.value)">
-              <option value="">🌍 Todas las Regiones</option>
+              <option value="" data-i18n-en="🌍 All Regions" data-i18n-es="🌍 Todas las Regiones">🌍 Todas las Regiones</option>
             </select>
           </div>
           <div class="form-group" style="margin-bottom:0; min-width:180px;">
             <select class="form-select" onchange="App.views.embajador.setNetworkStatusFilter(this.value)">
-              <option value="all">Todos los Estados / All Status</option>
-              <option value="approved">Aprobados / Approved</option>
-              <option value="pending">Pendientes / Pending</option>
-              <option value="rejected">Rechazados / Rejected</option>
+              <option value="all" data-i18n-en="All Status" data-i18n-es="Todos los Estados">Todos los Estados</option>
+              <option value="approved" data-i18n-en="Approved" data-i18n-es="Aprobados">Aprobados</option>
+              <option value="pending" data-i18n-en="Pending" data-i18n-es="Pendientes">Pendientes</option>
+              <option value="rejected" data-i18n-en="Rejected" data-i18n-es="Rechazados">Rechazados</option>
             </select>
           </div>
         </div>
@@ -2636,11 +2663,11 @@
 
         <div class="dashboard-filters" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px;">
           <div class="form-group" style="margin-bottom:0; flex:1; min-width:220px;">
-            <input type="text" class="form-input" placeholder="🔍 Buscar cliente por nombre, email, zona o agente..." oninput="App.views.embajador.searchClients(this.value)">
+            <input type="text" class="form-input" placeholder="🔍 Buscar expediente por código, zona, país o agente..." data-placeholder-en="🔍 Search buyer ref by code, area, country or agent..." data-placeholder-es="🔍 Buscar expediente por código, zona, país o agente..." oninput="App.views.embajador.searchClients(this.value)">
           </div>
           <div class="form-group" style="margin-bottom:0; min-width:240px;">
             <select id="embajador-client-member-filter" class="form-select" onchange="App.views.embajador.filterClientsByMember(this.value)">
-              <option value="all">🌐 Todos los orígenes del Paraguas</option>
+              <option value="all" data-i18n-en="🌐 All Umbrella Origins" data-i18n-es="🌐 Todos los orígenes del Paraguas">🌐 Todos los orígenes del Paraguas</option>
             </select>
           </div>
         </div>
@@ -2653,7 +2680,7 @@
           <table class="data-table data-table--medium">
             <thead>
               <tr>
-                <th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th>
+                <th><span class="lang-en">Protected Buyer Ref.</span><span class="lang-es">Expediente Cliente</span></th>
                 <th><span class="lang-en">Umbrella Origin</span><span class="lang-es">Origen en Paraguas</span></th>
                 <th><span class="lang-en">Area &amp; Budget</span><span class="lang-es">Zona y Presupuesto</span></th>
                 <th><span class="lang-en">Assigned Spain Agent</span><span class="lang-es">Agente España</span></th>
@@ -2711,11 +2738,11 @@
           </div>
           <div class="form-group" style="margin-bottom:0; min-width:185px;">
             <select id="emb-webinar-region-select" class="form-select" onchange="App.views.embajador.setWebinarRegionFilter(this.value)">
-              <option value="">🌍 Todas las Regiones</option>
+              <option value="" data-i18n-en="🌍 All Regions" data-i18n-es="🌍 Todas las Regiones">🌍 Todas las Regiones</option>
             </select>
           </div>
           <div class="form-group" style="margin-bottom:0; flex:1; min-width:220px;">
-            <input type="text" class="form-input" placeholder="🔍 Buscar asistente por nombre, email, país o referidor..." oninput="App.views.embajador.searchWebinar(this.value)">
+            <input type="text" class="form-input" placeholder="🔍 Buscar por profesional B2B, código B2C, país o referidor..." data-placeholder-en="🔍 Search by B2B partner, B2C code, country or referrer..." data-placeholder-es="🔍 Buscar por profesional B2B, código B2C, país o referidor..." oninput="App.views.embajador.searchWebinar(this.value)">
           </div>
         </div>
 
@@ -2726,7 +2753,7 @@
                 <th><span class="lang-en">Date</span><span class="lang-es">Fecha</span></th>
                 <th><span class="lang-en">Type</span><span class="lang-es">Tipo</span></th>
                 <th><span class="lang-en">Attendee</span><span class="lang-es">Asistente</span></th>
-                <th><span class="lang-en">Phone</span><span class="lang-es">Teléfono</span></th>
+                <th><span class="lang-en">Country</span><span class="lang-es">País</span></th>
                 <th><span class="lang-en">Agency / Interest</span><span class="lang-es">Agencia / Interés</span></th>
                 <th><span class="lang-en">Referred By</span><span class="lang-es">Referido Por</span></th>
               </tr>
@@ -2797,9 +2824,9 @@
           <table class="data-table data-table--medium">
             <thead>
               <tr>
-                <th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th>
+                <th><span class="lang-en">Protected Buyer Ref.</span><span class="lang-es">Expediente Cliente</span></th>
                 <th><span class="lang-en">Umbrella Origin</span><span class="lang-es">Origen en Paraguas</span></th>
-                <th><span class="lang-en">Property / Area</span><span class="lang-es">Propiedad / Zona</span></th>
+                <th><span class="lang-en">Area</span><span class="lang-es">Zona</span></th>
                 <th><span class="lang-en">Sale Price</span><span class="lang-es">Precio Venta</span></th>
                 <th><span class="lang-en">Referral Commission</span><span class="lang-es">Comisión Referido</span></th>
                 <th><span class="lang-en">Status</span><span class="lang-es">Estado</span></th>
@@ -3020,21 +3047,21 @@
   <script src="js/xlsx.full.min.js"></script>
 
   <!-- ===================== SCRIPTS ===================== -->
-  <script src="js/notifications.js?v=20261112_v1"></script>
-  <script src="js/firebase-config.js?v=20261112_v1"></script>
-  <script src="js/utils.js?v=20261119_umbrella1"></script>
-  <script src="js/auth-service.js?v=20261119_umbrella1"></script>
-  <script src="js/buyer-guide.js?v=20261119_v1"></script>
-  <script src="js/router.js?v=20261119_v2"></script>
-  <script src="js/views/auth-views.js?v=20261117_v1"></script>
-  <script src="js/views/admin-views.js?v=20261119_umbrella1"></script>
-  <script src="js/views/embajador-views.js?v=20261119_umbrella1"></script>
-  <script src="js/views/broker-views.js?v=20261119_umbrella1"></script>
-  <script src="js/views/realtor-views.js?v=20261119_v2"></script>
-  <script src="js/views/agent-views.js?v=20261119_umbrella1"></script>
-  <script src="js/views/partner-views.js?v=20261119_v2"></script>
-  <script src="js/referral-agreement.js?v=20261112_v1"></script>
-  <script src="js/main.js?v=20261109_v4"></script>
+  <script src="js/notifications.js?v=20261119_v4"></script>
+  <script src="js/firebase-config.js?v=20261119_v3"></script>
+  <script src="js/utils.js?v=20261119_v4"></script>
+  <script src="js/auth-service.js?v=20261119_v4"></script>
+  <script src="js/buyer-guide.js?v=20261119_v3"></script>
+  <script src="js/router.js?v=20261119_v3"></script>
+  <script src="js/views/auth-views.js?v=20261119_v3"></script>
+  <script src="js/views/admin-views.js?v=20261119_umbrella2"></script>
+  <script src="js/views/embajador-views.js?v=20261119_v4"></script>
+  <script src="js/views/broker-views.js?v=20261119_umbrella2"></script>
+  <script src="js/views/realtor-views.js?v=20261119_v3"></script>
+  <script src="js/views/agent-views.js?v=20261119_umbrella2"></script>
+  <script src="js/views/partner-views.js?v=20261119_v3"></script>
+  <script src="js/referral-agreement.js?v=20261119_v3"></script>
+  <script src="js/main.js?v=20261119_v3"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       if (App && App.auth) {
