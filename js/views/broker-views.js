@@ -204,6 +204,12 @@
         `;
       }
 
+      // Referral Link Logo & Brand Customizer
+      const brokerDashBranding = document.getElementById('broker-dash-referral-branding');
+      if (brokerDashBranding && App.referralBranding && App.referralBranding.canUse(currentUser)) {
+        App.referralBranding.renderEditor(brokerDashBranding, currentUser, { compact: true });
+      }
+
       // Personalized Buyer Guide
       const brokerDashGuide = document.getElementById('broker-dash-buyer-guide');
       if (brokerDashGuide && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {

@@ -179,6 +179,17 @@
         `;
       }
 
+      // Referral Link Logo & Brand Customizer (Colaboradores)
+      const agentDashBranding = document.getElementById('agent-dash-referral-branding');
+      if (agentDashBranding) {
+        const activeUser = freshMe || currentUser;
+        const canBrand = App.referralBranding && App.referralBranding.canUse(activeUser);
+        agentDashBranding.style.display = canBrand ? 'block' : 'none';
+        if (canBrand) {
+          App.referralBranding.renderEditor(agentDashBranding, activeUser, { compact: true });
+        }
+      }
+
       // Personalized Buyer Guide (RE/MAX Inmomás Agents & Collaborators)
       const agentDashGuide = document.getElementById('agent-dash-buyer-guide');
       if (agentDashGuide && App.buyerGuide && App.buyerGuide.canUse(freshMe || currentUser)) {

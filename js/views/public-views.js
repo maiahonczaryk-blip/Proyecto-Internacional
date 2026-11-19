@@ -61,14 +61,55 @@ App.views.public = {
     const refCode = sessionStorage.getItem('referralCode');
     const welcomeMsg = document.getElementById('intake-welcome-msg');
 
-    if (refCode && App.demoData && App.demoData.users) {
-      const referrer = App.demoData.users.find(u => u.referralCode === refCode);
-      if (referrer) {
-        App.views.public.renderPartnerBranding(referrer, 'intake');
-        if (welcomeMsg) {
-          welcomeMsg.innerHTML = `<span class="lang-en">Welcome! You've been referred by <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong>.</span>
-                                  <span class="lang-es">¡Bienvenido! Has sido referido por <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong>.</span>`;
+    const applyIntakeReferrer = (referrer) => {
+      if (!referrer) return;
+      App.views.public.renderPartnerBranding(referrer, 'intake');
+      if (welcomeMsg) {
+        welcomeMsg.innerHTML = `<span class="lang-en">Welcome! You've been referred by <strong>${App.utils.escapeHtml(referrer.firstName || '')} ${App.utils.escapeHtml(referrer.lastName || '')}</strong>.</span>
+                                <span class="lang-es">¡Bienvenido! Has sido referido por <strong>${App.utils.escapeHtml(referrer.firstName || '')} ${App.utils.escapeHtml(referrer.lastName || '')}</strong>.</span>`;
+      }
+    };
+
+    if (refCode) {
+      if (App.demoData && App.demoData.users) {
+        const demoRef = App.demoData.users.find(u => u.referralCode === refCode);
+        if (demoRef) {
+          const copy = { ...demoRef };
+          if (copy.role === 'realtor' && App.utils && App.utils.resolveUserUmbrellaParents) {
+            const pBrk = App.utils.resolveUserUmbrellaParents(copy, App.demoData.users).broker;
+            if (pBrk) {
+              if (pBrk.agencyName) copy.agencyName = pBrk.agencyName;
+              copy.agencyLogo = pBrk.agencyLogo || null;
+            }
+          }
+          applyIntakeReferrer(copy);
         }
+      }
+      if (!App.demoMode && App.db) {
+        App.db.collection('users').where('referralCode', '==', refCode).limit(1).get()
+          .then(async (snap) => {
+            if (snap.empty) return;
+            const refData = { id: snap.docs[0].id, ...snap.docs[0].data() };
+            if (refData.role === 'realtor' && (refData.brokerId || refData.referredBy)) {
+              try {
+                let bData = null;
+                if (refData.brokerId) {
+                  const bDoc = await App.db.collection('users').doc(refData.brokerId).get();
+                  if (bDoc.exists && bDoc.data().role === 'broker') bData = bDoc.data();
+                }
+                if (!bData && refData.referredBy) {
+                  const bSnap = await App.db.collection('users').where('referralCode', '==', refData.referredBy).limit(1).get();
+                  if (!bSnap.empty && bSnap.docs[0].data().role === 'broker') bData = bSnap.docs[0].data();
+                }
+                if (bData) {
+                  if (bData.agencyName) refData.agencyName = bData.agencyName;
+                  refData.agencyLogo = bData.agencyLogo || null;
+                }
+              } catch (_) {}
+            }
+            applyIntakeReferrer(refData);
+          })
+          .catch(() => {});
       }
     }
 
@@ -342,15 +383,24 @@ App.views.public = {
       let agency = (enriched.agencyName || enriched.brokerNameManual || '').trim();
       let logo = enriched.agencyLogo || '';
 
-      // 1. Check linked broker via brokerId or referredBy
-      if ((!agency || !logo) && (enriched.brokerId || enriched.referredBy)) {
-        const parentBroker = usersPool.find(u =>
-          (enriched.brokerId && u.id === enriched.brokerId) ||
-          (enriched.referredBy && (u.id === enriched.referredBy || u.referralCode === enriched.referredBy))
+      // 1. If Realtor is under a Broker's umbrella, always enforce the Broker's logo & agency
+      if (enriched.brokerId || enriched.referredBy) {
+        const parentBroker = (App.utils && App.utils.resolveUserUmbrellaParents
+          ? App.utils.resolveUserUmbrellaParents(enriched, usersPool).broker
+          : null) || usersPool.find(u =>
+          u.role === 'broker' && (
+            (enriched.brokerId && u.id === enriched.brokerId) ||
+            (enriched.referredBy && (u.id === enriched.referredBy || u.referralCode === enriched.referredBy))
+          )
         );
         if (parentBroker) {
-          if (!agency && parentBroker.agencyName) agency = parentBroker.agencyName;
-          if (!logo && parentBroker.agencyLogo) logo = parentBroker.agencyLogo;
+          if (enriched.role === 'realtor') {
+            if (parentBroker.agencyName) agency = parentBroker.agencyName;
+            logo = parentBroker.agencyLogo || '';
+          } else {
+            if (!agency && parentBroker.agencyName) agency = parentBroker.agencyName;
+            if (!logo && parentBroker.agencyLogo) logo = parentBroker.agencyLogo;
+          }
         }
       }
 
@@ -371,57 +421,77 @@ App.views.public = {
     }
 
     // ---- Step 1: Look up referrer (sync from demoData first, then async Firestore) ----
+    const PARTNER_TYPE_BY_REF = {
+      'UCI': 'needsUCI',
+      'Fuster & Associates': 'needsFuster',
+      'Inmomás Holidays': 'needsHolidays'
+    };
+
     function lookupReferrerSync() {
       if (!refCode) return null;
-      
+
+      if (App.demoData && App.demoData.users) {
+        const mappedPType = PARTNER_TYPE_BY_REF[refCode];
+        const found = App.demoData.users.find(u =>
+          u.referralCode === refCode || (mappedPType && u.partnerType === mappedPType)
+        ) || null;
+        if (found) return enrichReferrerFromPool(found, App.demoData.users);
+      }
+
       // Hardcoded partner fallbacks
       if (refCode === 'UCI') return { firstName: 'UCI', lastName: '', agencyName: 'UCI', role: 'partner' };
       if (refCode === 'Fuster & Associates') return { firstName: 'Fuster', lastName: '& Associates', agencyName: 'Fuster & Associates', role: 'partner' };
       if (refCode === 'Inmomás Holidays') return { firstName: 'Inmomás', lastName: 'Holidays', agencyName: 'Inmomás Holidays', role: 'partner' };
 
-      if (App.demoData && App.demoData.users) {
-        const found = App.demoData.users.find(u => u.referralCode === refCode) || null;
-        return enrichReferrerFromPool(found, App.demoData.users);
-      }
       return null;
     }
 
     async function lookupReferrerFirestore() {
       if (!refCode || App.demoMode || !App.db) return null;
       try {
-        const snapshot = await App.db.collection('users')
+        let snapshot = await App.db.collection('users')
           .where('referralCode', '==', refCode)
           .limit(1)
           .get();
+        if (snapshot.empty && PARTNER_TYPE_BY_REF[refCode]) {
+          snapshot = await App.db.collection('users')
+            .where('partnerType', '==', PARTNER_TYPE_BY_REF[refCode])
+            .limit(1)
+            .get();
+        }
         if (!snapshot.empty) {
           const doc = snapshot.docs[0];
           let refData = { id: doc.id, ...doc.data() };
 
-          // If agencyLogo or agencyName is missing, try to inherit from broker or office peers
-          if (!refData.agencyLogo || !refData.agencyName) {
-            if (refData.brokerId) {
-              try {
+          // Enforce Broker's official logo & agency when Realtor is under a Broker's umbrella
+          if (refData.role === 'realtor' && (refData.brokerId || refData.referredBy)) {
+            let bData = null;
+            try {
+              if (refData.brokerId) {
                 const brokerDoc = await App.db.collection('users').doc(refData.brokerId).get();
-                if (brokerDoc.exists) {
-                  const bData = brokerDoc.data();
-                  if (!refData.agencyName && bData.agencyName) refData.agencyName = bData.agencyName;
-                  if (!refData.agencyLogo && bData.agencyLogo) refData.agencyLogo = bData.agencyLogo;
+                if (brokerDoc.exists && brokerDoc.data().role === 'broker') bData = brokerDoc.data();
+              }
+              if (!bData && refData.referredBy) {
+                const bSnap = await App.db.collection('users').where('referralCode', '==', refData.referredBy).limit(1).get();
+                if (!bSnap.empty && bSnap.docs[0].data().role === 'broker') bData = bSnap.docs[0].data();
+              }
+            } catch (_) {}
+            if (bData) {
+              if (bData.agencyName) refData.agencyName = bData.agencyName;
+              refData.agencyLogo = bData.agencyLogo || null;
+            }
+          } else if (!refData.agencyLogo && refData.agencyName) {
+            try {
+              const agencySnap = await App.db.collection('users')
+                .where('agencyName', '==', refData.agencyName)
+                .get();
+              agencySnap.forEach(d => {
+                const dData = d.data();
+                if (!refData.agencyLogo && dData.agencyLogo) {
+                  refData.agencyLogo = dData.agencyLogo;
                 }
-              } catch (_) {}
-            }
-            if (!refData.agencyLogo && refData.agencyName) {
-              try {
-                const agencySnap = await App.db.collection('users')
-                  .where('agencyName', '==', refData.agencyName)
-                  .get();
-                agencySnap.forEach(d => {
-                  const dData = d.data();
-                  if (!refData.agencyLogo && dData.agencyLogo) {
-                    refData.agencyLogo = dData.agencyLogo;
-                  }
-                });
-              } catch (_) {}
-            }
+              });
+            } catch (_) {}
           }
           return refData;
         }
@@ -1506,28 +1576,53 @@ App.views.public = {
 
     async function resolveWebinarReferrer(code) {
       if (!code) return null;
-      if (code === 'UCI') return { id: 'UCI', firstName: 'UCI', lastName: '', agencyName: 'UCI', role: 'partner', referralCode: 'UCI' };
-      if (code === 'Fuster & Associates') return { id: 'Fuster & Associates', firstName: 'Fuster', lastName: '& Associates', agencyName: 'Fuster & Associates', role: 'partner', referralCode: 'Fuster & Associates' };
-      if (code === 'Inmomás Holidays') return { id: 'Inmomás Holidays', firstName: 'Inmomás', lastName: 'Holidays', agencyName: 'Inmomás Holidays', role: 'partner', referralCode: 'Inmomás Holidays' };
+      const partnerTypeByCode = {
+        'UCI': 'needsUCI',
+        'Fuster & Associates': 'needsFuster',
+        'Inmomás Holidays': 'needsHolidays'
+      };
+      const mappedPType = partnerTypeByCode[code];
 
       if (App.demoData && Array.isArray(App.demoData.users)) {
-        const demoRef = App.demoData.users.find(u => u.referralCode === code);
-        if (demoRef && (App.demoMode || !App.db)) return { ...demoRef };
+        const demoRef = App.demoData.users.find(u =>
+          u.referralCode === code || (mappedPType && u.partnerType === mappedPType)
+        );
+        if (demoRef && (App.demoMode || !App.db)) {
+          const copy = { ...demoRef };
+          if (copy.role === 'realtor' && App.utils && App.utils.resolveUserUmbrellaParents) {
+            const pBrk = App.utils.resolveUserUmbrellaParents(copy, App.demoData.users).broker;
+            if (pBrk) {
+              if (pBrk.agencyName) copy.agencyName = pBrk.agencyName;
+              copy.agencyLogo = pBrk.agencyLogo || null;
+            }
+          }
+          return copy;
+        }
       }
 
       if (!App.demoMode && App.db) {
         try {
-          const snap = await App.db.collection('users').where('referralCode', '==', code).limit(1).get();
+          let snap = await App.db.collection('users').where('referralCode', '==', code).limit(1).get();
+          if (snap.empty && mappedPType) {
+            snap = await App.db.collection('users').where('partnerType', '==', mappedPType).limit(1).get();
+          }
           if (!snap.empty) {
             const doc = snap.docs[0];
             const refData = { id: doc.id, ...doc.data() };
-            if ((!refData.agencyLogo || !refData.agencyName) && refData.brokerId) {
+            if (refData.role === 'realtor' && (refData.brokerId || refData.referredBy)) {
               try {
-                const bDoc = await App.db.collection('users').doc(refData.brokerId).get();
-                if (bDoc.exists) {
-                  const bData = bDoc.data();
-                  if (!refData.agencyName && bData.agencyName) refData.agencyName = bData.agencyName;
-                  if (!refData.agencyLogo && bData.agencyLogo) refData.agencyLogo = bData.agencyLogo;
+                let bData = null;
+                if (refData.brokerId) {
+                  const bDoc = await App.db.collection('users').doc(refData.brokerId).get();
+                  if (bDoc.exists && bDoc.data().role === 'broker') bData = bDoc.data();
+                }
+                if (!bData && refData.referredBy) {
+                  const bSnap = await App.db.collection('users').where('referralCode', '==', refData.referredBy).limit(1).get();
+                  if (!bSnap.empty && bSnap.docs[0].data().role === 'broker') bData = bSnap.docs[0].data();
+                }
+                if (bData) {
+                  if (bData.agencyName) refData.agencyName = bData.agencyName;
+                  refData.agencyLogo = bData.agencyLogo || null;
                 }
               } catch (_) {}
             }
@@ -1539,9 +1634,14 @@ App.views.public = {
       }
 
       if (App.demoData && Array.isArray(App.demoData.users)) {
-        const fallbackRef = App.demoData.users.find(u => u.referralCode === code);
+        const fallbackRef = App.demoData.users.find(u =>
+          u.referralCode === code || (mappedPType && u.partnerType === mappedPType)
+        );
         if (fallbackRef) return { ...fallbackRef };
       }
+      if (code === 'UCI') return { id: 'UCI', firstName: 'UCI', lastName: '', agencyName: 'UCI', role: 'partner', referralCode: 'UCI' };
+      if (code === 'Fuster & Associates') return { id: 'Fuster & Associates', firstName: 'Fuster', lastName: '& Associates', agencyName: 'Fuster & Associates', role: 'partner', referralCode: 'Fuster & Associates' };
+      if (code === 'Inmomás Holidays') return { id: 'Inmomás Holidays', firstName: 'Inmomás', lastName: 'Holidays', agencyName: 'Inmomás Holidays', role: 'partner', referralCode: 'Inmomás Holidays' };
       return null;
     }
 
