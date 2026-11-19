@@ -8,7 +8,7 @@
   <meta property="og:title" content="REMAX Inmomás — International Advisory Division">
   <meta property="og:description" content="Your trusted team for buying property on Spain's Costa Blanca. Legal, tax & real estate advisory for international buyers.">
   <meta property="og:type" content="website">
-  <link rel="stylesheet" href="css/styles.css?v=20261119_v3">
+  <link rel="stylesheet" href="css/styles.css?v=20261119_v6">
   <link rel="icon" type="image/png" href="Globo_CMYK.png">
   <!-- EmailJS SDK — free email sending from the browser (200 emails/month) -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -517,28 +517,28 @@
     </nav>
 
     <!-- Sidebar User Info -->
-    <div class="sidebar-user" style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-top: 1px solid rgba(255, 255, 255, 0.06); width: 100%; box-sizing: border-box;">
-      <!-- Row 1: Profile Info & Actions -->
-      <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
+    <div class="sidebar-user">
+      <!-- Row 1: Avatar, Full Name & Clean Role Pill -->
+      <div class="sidebar-user__top">
         <div class="sidebar-user__avatar" id="sidebar-user-avatar"></div>
-        <div class="sidebar-user__info" style="flex: 1; min-width: 0;">
-          <div class="sidebar-user__name" id="sidebar-user-name" style="font-size: 0.85rem; font-weight: 600; color: var(--sidebar-text-active); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">—</div>
+        <div class="sidebar-user__info">
+          <div class="sidebar-user__name" id="sidebar-user-name">—</div>
           <div class="sidebar-user__role" id="sidebar-user-role">—</div>
         </div>
-        <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
-          <div class="dashboard-lang-switch" id="sidebar-lang-toggle" role="group" aria-label="Language / Idioma">
-            <button type="button" class="dashboard-lang-switch__opt" data-set-lang="en">EN</button>
-            <button type="button" class="dashboard-lang-switch__opt" data-set-lang="es">ES</button>
-          </div>
-          <button class="sidebar-logout-btn" onclick="App.auth.logout().then(() => window.location.href='index.html#home')" title="Logout" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-size: 1.1rem; cursor: pointer; padding: 4px; line-height: 1; transition: color 0.2s;">⏻</button>
-        </div>
       </div>
-      
-      <!-- Row 2: Profile Button -->
-      <a href="#profile" style="color: rgba(255,255,255,0.8); font-size: 0.8rem; text-decoration: none; text-align: center; display: block; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.03); transition: all 0.2s; width: 100%; box-sizing: border-box;" onmouseover="this.style.background='rgba(255,255,255,0.08)'; this.style.borderColor='rgba(255,255,255,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.15)';">
-        <span class="lang-en">👤 My Profile</span>
-        <span class="lang-es">👤 Mi Perfil</span>
-      </a>
+
+      <!-- Row 2: Profile Button + Language Switcher + Logout -->
+      <div class="sidebar-user__actions">
+        <a href="#profile" class="sidebar-user__profile-btn">
+          <span class="lang-en">👤 My Profile</span>
+          <span class="lang-es">👤 Mi Perfil</span>
+        </a>
+        <div class="dashboard-lang-switch" id="sidebar-lang-toggle" role="group" aria-label="Language / Idioma">
+          <button type="button" class="dashboard-lang-switch__opt" data-set-lang="en">EN</button>
+          <button type="button" class="dashboard-lang-switch__opt" data-set-lang="es">ES</button>
+        </div>
+        <button class="sidebar-logout-btn" onclick="App.auth.logout().then(() => window.location.href='index.html#home')" title="Cerrar sesión / Logout" aria-label="Logout">⏻</button>
+      </div>
     </div>
   </aside>
 
@@ -1581,6 +1581,8 @@
         </div>
         <!-- Manual Add Client Button -->
         <div id="broker-dash-add-client-btn" style="margin-top: 16px;"></div>
+        <!-- Personalized Buyer Guide -->
+        <div class="dashboard-section" id="broker-dash-buyer-guide"></div>
         <div class="dashboard-grid-2col">
           <div class="dashboard-section">
             <h2><span class="lang-en">Team Overview</span><span class="lang-es">Resumen del Equipo</span></h2>
@@ -1649,6 +1651,7 @@
     <div id="view-broker-documents" class="app-view">
       <div class="dashboard-content">
         <div class="dashboard-header"><h1><span class="lang-en">Documents</span><span class="lang-es">Documentos</span></h1></div>
+        <div class="dashboard-section" id="broker-docs-buyer-guide" style="margin-bottom: 1.5rem;"></div>
         <div id="broker-documents-content"></div>
       </div>
     </div>
@@ -1744,6 +1747,8 @@
         </div>
         <!-- Manual Add Client Button -->
         <div id="realtor-dash-add-client-btn" style="margin-top: 16px;"></div>
+        <!-- Personalized Buyer Guide -->
+        <div class="dashboard-section" id="realtor-dash-buyer-guide"></div>
         <div class="dashboard-grid-2col">
           <div class="dashboard-section">
             <h2><span class="lang-en">Pipeline Summary</span><span class="lang-es">Resumen del Pipeline</span></h2>
@@ -1821,6 +1826,7 @@
             </div>
           </div>
         </div>
+        <div class="dashboard-section" id="realtor-referral-buyer-guide"></div>
         <div class="stat-cards-grid stat-cards-grid--4cols">
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">👥</div><div class="stat-card__body"><div class="stat-card__value" id="referral-stat-total">0</div><div class="stat-card__label"><span class="lang-en">Total Referred</span><span class="lang-es">Total Referidos</span></div></div></div>
           <div class="stat-card stat-card--blue"><div class="stat-card__icon stat-card__icon--blue">🔄</div><div class="stat-card__body"><div class="stat-card__value" id="referral-stat-active">0</div><div class="stat-card__label"><span class="lang-en">In Pipeline</span><span class="lang-es">En Pipeline</span></div></div></div>
@@ -1847,6 +1853,8 @@
     <div id="view-realtor-documents" class="app-view">
       <div class="dashboard-content">
         <div class="dashboard-header"><h1><span class="lang-en">Documents & Agreements</span><span class="lang-es">Documentos y Acuerdos</span></h1></div>
+        <!-- Personalized Buyer Guide -->
+        <div class="dashboard-section" id="realtor-docs-buyer-guide"></div>
         <!-- Collaboration Agreement -->
         <div class="dashboard-section">
           <h2><span class="lang-en">Collaboration Agreement</span><span class="lang-es">Acuerdo de Colaboración</span></h2>
@@ -1959,6 +1967,8 @@
         </div>
         <!-- Manual Add Client Button -->
         <div id="agent-dash-add-client-btn" style="margin-top: 16px;"></div>
+        <!-- Personalized Buyer Guide -->
+        <div class="dashboard-section" id="agent-dash-buyer-guide"></div>
         <div class="dashboard-grid-2col">
           <div class="dashboard-section">
             <h2><span class="lang-en">Funnel Summary</span><span class="lang-es">Resumen del Embudo</span></h2>
@@ -2507,6 +2517,9 @@
           </div>
         </div>
 
+        <!-- Personalized Buyer Guide -->
+        <div class="dashboard-section" id="embajador-dash-buyer-guide"></div>
+
         <!-- Pipeline Overview + Recent Activity -->
         <div class="dashboard-grid-2col" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
           <div class="dashboard-section">
@@ -2663,7 +2676,7 @@
 
         <div class="dashboard-filters" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px;">
           <div class="form-group" style="margin-bottom:0; flex:1; min-width:220px;">
-            <input type="text" class="form-input" placeholder="🔍 Buscar expediente por código, zona, país o agente..." data-placeholder-en="🔍 Search buyer ref by code, area, country or agent..." data-placeholder-es="🔍 Buscar expediente por código, zona, país o agente..." oninput="App.views.embajador.searchClients(this.value)">
+            <input type="text" class="form-input" placeholder="🔍 Buscar cliente por nombre, zona, país o agente..." data-placeholder-en="🔍 Search buyer by name, area, country or agent..." data-placeholder-es="🔍 Buscar cliente por nombre, zona, país o agente..." oninput="App.views.embajador.searchClients(this.value)">
           </div>
           <div class="form-group" style="margin-bottom:0; min-width:240px;">
             <select id="embajador-client-member-filter" class="form-select" onchange="App.views.embajador.filterClientsByMember(this.value)">
@@ -2680,7 +2693,7 @@
           <table class="data-table data-table--medium">
             <thead>
               <tr>
-                <th><span class="lang-en">Protected Buyer Ref.</span><span class="lang-es">Expediente Cliente</span></th>
+                <th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th>
                 <th><span class="lang-en">Umbrella Origin</span><span class="lang-es">Origen en Paraguas</span></th>
                 <th><span class="lang-en">Area &amp; Budget</span><span class="lang-es">Zona y Presupuesto</span></th>
                 <th><span class="lang-en">Assigned Spain Agent</span><span class="lang-es">Agente España</span></th>
@@ -2768,12 +2781,13 @@
     <div id="view-embajador-documents" class="app-view">
       <div class="dashboard-content">
         <div class="dashboard-header">
-          <h1>📄 <span class="lang-en">Ambassador Agreement &amp; Fiscal Data</span><span class="lang-es">Acuerdo de Embajador y Datos Fiscales</span></h1>
+          <h1>📄 <span class="lang-en">Ambassador Agreement &amp; Fiscal Data</span><span class="lang-es">Acuerdo de Embajador, Guía y Datos Fiscales</span></h1>
           <p class="dashboard-subtitle">
-            <span class="lang-en">Manage your company/tax information, international bank details, and signed collaboration contract with RE/MAX Inmomás</span>
-            <span class="lang-es">Gestiona tus datos fiscales, cuenta bancaria internacional y contrato de colaboración con RE/MAX Inmomás</span>
+            <span class="lang-en">Download your personalized Spain Buyer's Guide and manage your company/tax details and collaboration contract</span>
+            <span class="lang-es">Descarga tu Guía del Comprador personalizada y gestiona tus datos fiscales, cuenta bancaria y contrato de colaboración</span>
           </p>
         </div>
+        <div class="dashboard-section" id="embajador-docs-buyer-guide" style="margin-bottom: 1.5rem;"></div>
         <div id="embajador-contract-section"></div>
       </div>
     </div>
@@ -3047,18 +3061,18 @@
   <script src="js/xlsx.full.min.js"></script>
 
   <!-- ===================== SCRIPTS ===================== -->
-  <script src="js/notifications.js?v=20261119_v4"></script>
+  <script src="js/notifications.js?v=20261119_v7"></script>
   <script src="js/firebase-config.js?v=20261119_v3"></script>
-  <script src="js/utils.js?v=20261119_v5"></script>
-  <script src="js/auth-service.js?v=20261119_v5"></script>
-  <script src="js/buyer-guide.js?v=20261119_v4"></script>
-  <script src="js/router.js?v=20261119_v3"></script>
-  <script src="js/views/auth-views.js?v=20261119_v3"></script>
-  <script src="js/views/admin-views.js?v=20261119_v5"></script>
-  <script src="js/views/embajador-views.js?v=20261119_v4"></script>
-  <script src="js/views/broker-views.js?v=20261119_umbrella2"></script>
-  <script src="js/views/realtor-views.js?v=20261119_v3"></script>
-  <script src="js/views/agent-views.js?v=20261119_umbrella2"></script>
+  <script src="js/utils.js?v=20261119_v7"></script>
+  <script src="js/auth-service.js?v=20261119_v7"></script>
+  <script src="js/buyer-guide.js?v=20261119_v7"></script>
+  <script src="js/router.js?v=20261119_v7"></script>
+  <script src="js/views/auth-views.js?v=20261119_v7"></script>
+  <script src="js/views/admin-views.js?v=20261119_v7"></script>
+  <script src="js/views/embajador-views.js?v=20261119_v7"></script>
+  <script src="js/views/broker-views.js?v=20261119_v6"></script>
+  <script src="js/views/realtor-views.js?v=20261119_v6"></script>
+  <script src="js/views/agent-views.js?v=20261119_v6"></script>
   <script src="js/views/partner-views.js?v=20261119_v3"></script>
   <script src="js/referral-agreement.js?v=20261119_v3"></script>
   <script src="js/main.js?v=20261119_v3"></script>

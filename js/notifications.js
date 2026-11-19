@@ -203,9 +203,10 @@
   async function onNewReferredCollaborator(newUser, referrerAgent) {
     const isEmbajadorReferrer = Boolean(referrerAgent && String(referrerAgent.role || '').toLowerCase() === 'embajador');
     const isEndClient = String(newUser.role || '').toLowerCase() === 'client';
+    const clientFullName = `${newUser.firstName || ''} ${newUser.lastName || ''}`.trim();
     const newUserName = (isEmbajadorReferrer && isEndClient)
-      ? 'Cliente Protegido (Paraguas Embajador)'
-      : (`${newUser.firstName || ''} ${newUser.lastName || ''}`.trim() || newUser.email);
+      ? (clientFullName || 'Cliente Referido')
+      : (clientFullName || newUser.email);
     
     // Si el agente no tiene correo (improbable), no enviamos
     if (!referrerAgent || !referrerAgent.email) return;
@@ -269,10 +270,11 @@
         String(reg.referralCode || '').toUpperCase().startsWith('EMB-');
       const isB2C = String(reg.webinarType || '').toLowerCase() === 'b2c' ||
         String(reg.contactType || reg.role || '').toLowerCase() === 'client';
+      const regFullName = `${reg.firstName || ''} ${reg.lastName || ''}`.trim();
       const partnerPayload = (isEmbajador && isB2C)
         ? {
             ...emailData,
-            user_name: 'Cliente Protegido (Inscrito B2C)',
+            user_name: regFullName || 'Cliente Inscrito B2C',
             user_email: 'Protegido por privacidad (RE/MAX Inmomás)',
             user_phone: 'Protegido',
             admin_url: 'https://thespainconnection.com/app.html#embajador/webinar'

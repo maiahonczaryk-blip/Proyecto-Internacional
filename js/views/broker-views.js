@@ -204,6 +204,12 @@
         `;
       }
 
+      // Personalized Buyer Guide
+      const brokerDashGuide = document.getElementById('broker-dash-buyer-guide');
+      if (brokerDashGuide && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
+        App.buyerGuide.renderEditor(brokerDashGuide, currentUser);
+      }
+
     } catch (err) {
       console.error('[Broker] initDashboard error:', err);
       App.utils.showToast('Error loading broker dashboard.', 'error');
@@ -916,6 +922,11 @@
 
       if (App.utils && App.utils.renderUserRegionalBanner) {
         await App.utils.renderUserRegionalBanner('broker-regional-banner', currentUser);
+      }
+
+      const brokerDocsGuide = document.getElementById('broker-docs-buyer-guide');
+      if (brokerDocsGuide && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
+        App.buyerGuide.renderEditor(brokerDocsGuide, currentUser);
       }
 
       const container = document.getElementById('broker-documents-content');

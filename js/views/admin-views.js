@@ -2217,7 +2217,7 @@
           </div>
           `}
 
-          ${user.role === 'agent_inmomas' ? `
+          ${['embajador', 'broker', 'realtor', 'colaborador', 'agent_inmomas'].includes(user.role) ? `
           <div id="admin-buyer-guide-editor" style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;"></div>
           ` : ''}
 

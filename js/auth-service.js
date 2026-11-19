@@ -1437,7 +1437,7 @@ App.auth = (function() {
     }
   }
 
-  /* ---- End-Client Privacy Redaction for Embajador Role ---- */
+  /* ---- End-Client Contact Redaction for Embajador Role (keeps Name, hides Email & Phone) ---- */
   function buildAnonClientCode(rawId, fallbackIdx = 0) {
     const clean = String(rawId || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
     const suffix = clean.length >= 4 ? clean.slice(-4) : String(fallbackIdx + 1).padStart(4, '0');
@@ -1447,20 +1447,23 @@ App.auth = (function() {
   function redactEndClientRecord(c, idx = 0) {
     if (!c || typeof c !== 'object') return c;
     const code = c._anonCode || buildAnonClientCode(c.id, idx);
-    const seq = String(idx + 1).padStart(2, '0');
+    const firstName = String(c.firstName || '').trim();
+    const lastName = String(c.lastName || '').trim();
+    const fullName = `${firstName} ${lastName}`.trim() || String(c.name || '').trim() || `Cliente (${code})`;
     const safeHistory = Array.isArray(c.statusHistory)
       ? c.statusHistory.map(h => ({ status: h.status, date: h.date }))
       : [];
     return {
       id: c.id,
       _isRedactedClient: true,
+      _contactProtected: true,
       _anonCode: code,
-      _anonSeq: seq,
-      _labelEs: `Cliente #${seq} (${code})`,
-      _labelEn: `Client #${seq} (${code})`,
-      firstName: 'Cliente Protegido',
-      lastName: code,
-      name: '',
+      _displayName: fullName,
+      _labelEs: fullName,
+      _labelEn: fullName,
+      firstName: firstName || fullName,
+      lastName: firstName ? lastName : '',
+      name: fullName,
       email: '',
       phone: '',
       address: '',
@@ -1509,16 +1512,20 @@ App.auth = (function() {
     }
     const clean = String(w.id || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
     const code = `B2C-${clean.length >= 4 ? clean.slice(-4) : String(idx + 1).padStart(4, '0')}`;
-    const seq = String(idx + 1).padStart(2, '0');
+    const firstName = String(w.firstName || '').trim();
+    const lastName = String(w.lastName || '').trim();
+    const fullName = `${firstName} ${lastName}`.trim() || String(w.name || '').trim() || `Cliente (${code})`;
     return {
       id: w.id,
       _isRedactedB2C: true,
+      _contactProtected: true,
       _anonCode: code,
-      _labelEs: `Cliente Final #${seq} (${code})`,
-      _labelEn: `End Client #${seq} (${code})`,
-      firstName: 'Cliente Protegido',
-      lastName: code,
-      name: '',
+      _displayName: fullName,
+      _labelEs: fullName,
+      _labelEn: fullName,
+      firstName: firstName || fullName,
+      lastName: firstName ? lastName : '',
+      name: fullName,
       email: '',
       phone: '',
       agency: '',
@@ -1783,8 +1790,8 @@ App.auth = (function() {
         return {
           ...cm,
           _anonCode: code,
-          clientName: `Cliente Protegido (${code})`,
-          propertyAddress: 'España'
+          clientName: cm.clientName || `Cliente (${code})`,
+          propertyAddress: cm.propertyAddress || 'España'
         };
       });
     }
@@ -3512,13 +3519,15 @@ App.auth = (function() {
       : umbrellaCommissions.map((comm, idx) => {
           const matchedCli = comm.clientId ? safeClientById.get(comm.clientId) : null;
           const code = matchedCli ? matchedCli._anonCode : buildAnonClientCode(comm.clientId || comm.id, idx);
+          const displayName = (matchedCli && matchedCli._displayName) || comm.clientName || `Cliente (${code})`;
           return {
             ...comm,
             _anonCode: code,
-            _labelEs: matchedCli ? matchedCli._labelEs : `Cliente (${code})`,
-            _labelEn: matchedCli ? matchedCli._labelEn : `Client (${code})`,
-            clientName: matchedCli ? matchedCli._labelEs : `Cliente Protegido (${code})`,
-            propertyAddress: (matchedCli && matchedCli.interestArea) ? matchedCli.interestArea : 'España'
+            _displayName: displayName,
+            _labelEs: displayName,
+            _labelEn: displayName,
+            clientName: displayName,
+            propertyAddress: (matchedCli && matchedCli.interestArea) ? matchedCli.interestArea : (comm.propertyAddress || 'España')
           };
         });
 

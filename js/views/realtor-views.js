@@ -192,6 +192,12 @@
         `;
       }
 
+      // Personalized Buyer Guide
+      const realtorDashGuide = document.getElementById('realtor-dash-buyer-guide');
+      if (realtorDashGuide && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
+        App.buyerGuide.renderEditor(realtorDashGuide, currentUser);
+      }
+
       // Mini pipeline summary
       renderMiniPipeline(realtorClients);
 
@@ -498,6 +504,12 @@
       setTextById('referral-stat-converted',  converted);
       setTextById('referral-stat-conversion', conversionRate + '%');
 
+      // Personalized Buyer Guide in Referral Tools
+      const realtorRefGuide = document.getElementById('realtor-referral-buyer-guide');
+      if (realtorRefGuide && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
+        App.buyerGuide.renderEditor(realtorRefGuide, currentUser);
+      }
+
       // QR Code placeholder (highlights Client Webinar Link)
       const qrContainer = document.getElementById('referral-qr-code');
       if (qrContainer) {
@@ -602,6 +614,11 @@
 
       renderAgreementSection();
       renderUploadSection();
+
+      const realtorDocsGuide = document.getElementById('realtor-docs-buyer-guide');
+      if (realtorDocsGuide && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
+        App.buyerGuide.renderEditor(realtorDocsGuide, currentUser);
+      }
 
     } catch (err) {
       console.error('[Realtor] initDocuments error:', err);

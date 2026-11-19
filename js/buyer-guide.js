@@ -20,42 +20,84 @@ App.buyerGuide = (function() {
 
   const LANGS = {
     es: {
-      label: 'Español',
+      label: '🇪🇸 Español',
       file: 'pdfs/Guia_Compra_Espana_The_Spain_Connection_ES.pdf',
       fileName: 'Guia_Compra_Espana',
       defaultTitle: 'Agente Inmobiliario',
-      cardLabel: 'TU CONTACTO EN ESPAÑA',
+      roleTitles: {
+        embajador: 'Embajador Internacional',
+        broker: 'Broker Inmobiliario',
+        realtor: 'Agente Inmobiliario / Realtor',
+        colaborador: 'Colaborador Oficial',
+        agent_inmomas: 'Agente Inmobiliario',
+        admin: 'Dirección Internacional'
+      },
+      cardLabelSpain: 'TU CONTACTO EN ESPAÑA',
+      cardLabelPartner: 'TU ASESOR DE CONFIANZA',
       phoneLabel: 'Tel.',
       sigOffset: 0
     },
     en: {
-      label: 'English (USA)',
+      label: '🇺🇸 English (USA)',
       file: 'pdfs/Buying_Guide_Spain_The_Spain_Connection_EN.pdf',
       fileName: 'Buying_Guide_Spain',
       defaultTitle: 'Real Estate Agent',
-      cardLabel: 'YOUR CONTACT IN SPAIN',
+      roleTitles: {
+        embajador: 'International Ambassador',
+        broker: 'Real Estate Broker',
+        realtor: 'Real Estate Agent / Realtor',
+        colaborador: 'Official Partner',
+        agent_inmomas: 'Real Estate Agent',
+        admin: 'International Advisory'
+      },
+      cardLabelSpain: 'YOUR CONTACT IN SPAIN',
+      cardLabelPartner: 'YOUR TRUSTED ADVISOR',
       phoneLabel: 'Phone',
       sigOffset: 0
     },
     ca: {
-      label: 'English (Canada)',
+      label: '🇨🇦 English (Canada)',
       file: 'pdfs/Buying_Guide_Spain_The_Spain_Connection_CA.pdf',
       fileName: 'Buying_Guide_Spain_CA',
       defaultTitle: 'Real Estate Agent',
-      cardLabel: 'YOUR CONTACT IN SPAIN',
+      roleTitles: {
+        embajador: 'International Ambassador',
+        broker: 'Real Estate Broker',
+        realtor: 'Real Estate Agent / Realtor',
+        colaborador: 'Official Partner',
+        agent_inmomas: 'Real Estate Agent',
+        admin: 'International Advisory'
+      },
+      cardLabelSpain: 'YOUR CONTACT IN SPAIN',
+      cardLabelPartner: 'YOUR TRUSTED ADVISOR',
       phoneLabel: 'Phone',
       sigOffset: 0
     },
     fr: {
-      label: 'Français',
+      label: '🇫🇷 Français',
       file: 'pdfs/Guide_Achat_Espagne_The_Spain_Connection_FR.pdf',
       fileName: 'Guide_Achat_Espagne',
       defaultTitle: 'Agent Immobilier',
-      cardLabel: 'VOTRE CONTACT EN ESPAGNE',
+      roleTitles: {
+        embajador: 'Ambassadeur International',
+        broker: 'Courtier Immobilier',
+        realtor: 'Agent Immobilier',
+        colaborador: 'Partenaire Officiel',
+        agent_inmomas: 'Agent Immobilier',
+        admin: 'Direction Internationale'
+      },
+      cardLabelSpain: 'VOTRE CONTACT EN ESPAGNE',
+      cardLabelPartner: 'VOTRE CONSEILLER DE CONFIANCE',
       phoneLabel: 'Tél.',
       sigOffset: 7.5
     }
   };
+
+  const ALLOWED_ROLES = ['embajador', 'broker', 'realtor', 'colaborador', 'agent_inmomas', 'admin'];
+
+  function canUse(user) {
+    return !!(user && ALLOWED_ROLES.includes(user.role));
+  }
 
   const DEFAULT_WEBSITE = 'remaxinmomas.com';
 
@@ -110,7 +152,7 @@ App.buyerGuide = (function() {
     return pdfLibPromise;
   }
 
-  const TEMPLATE_VERSION = '20261119_v4';
+  const TEMPLATE_VERSION = '20261119_v5';
 
   function loadTemplate(lang) {
     const cfg = LANGS[lang] || LANGS.es;
@@ -155,7 +197,7 @@ App.buyerGuide = (function() {
     });
   }
 
-  /** Recorta en cuadrado (sesgado hacia la cara en retratos) y reduce a 900px JPEG. */
+  /** Recorta en cuadrado (sesgado hacia la cara en retratos) y reduce a 640px JPEG (ligero para Firestore). */
   async function processPhotoFile(file) {
     if (!file || !/^image\//.test(file.type)) throw new Error('Selecciona un archivo de imagen (JPG o PNG).');
     if (file.size > 15 * 1024 * 1024) throw new Error('La imagen es demasiado grande (máx. 15MB).');
@@ -163,7 +205,7 @@ App.buyerGuide = (function() {
     const side = Math.min(img.width, img.height);
     const sx = (img.width - side) / 2;
     const sy = img.height > img.width ? Math.max(0, (img.height - side) * 0.2) : (img.height - side) / 2;
-    const OUT = 900;
+    const OUT = 640;
     const canvas = document.createElement('canvas');
     canvas.width = OUT; canvas.height = OUT;
     const ctx = canvas.getContext('2d');
@@ -171,13 +213,13 @@ App.buyerGuide = (function() {
     ctx.fillRect(0, 0, OUT, OUT);
     ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img, sx, sy, side, side, 0, 0, OUT, OUT);
-    return canvas.toDataURL('image/jpeg', 0.9);
+    return canvas.toDataURL('image/jpeg', 0.86);
   }
 
   /** Convierte la foto en un PNG circular (con transparencia) para el PDF. */
   async function circlePngBytes(photoSrc) {
     const img = await loadImage(photoSrc);
-    const OUT = 900;
+    const OUT = 640;
     const side = Math.min(img.width, img.height);
     const canvas = document.createElement('canvas');
     canvas.width = OUT; canvas.height = OUT;
@@ -197,6 +239,8 @@ App.buyerGuide = (function() {
   function getGuideData(user, overrides) {
     const g = (user && user.buyerGuide) || {};
     const data = {
+      role: (user && user.role) || 'agent_inmomas',
+      agencyName: (user && user.agencyName) || '',
       name: `${(user && user.firstName) || ''} ${(user && user.lastName) || ''}`.trim(),
       title: g.title || '',
       mobile: g.mobile || (user && user.phone) || '',
@@ -209,10 +253,10 @@ App.buyerGuide = (function() {
 
   function getMissing(data) {
     const missing = [];
-    if (!data.photo) missing.push('foto profesional');
-    if (!data.name) missing.push('nombre');
-    if (!data.mobile) missing.push('teléfono');
-    if (!data.email) missing.push('email');
+    if (!data.photo) missing.push({ es: 'foto profesional', en: 'professional photo' });
+    if (!data.name) missing.push({ es: 'nombre', en: 'name' });
+    if (!data.mobile) missing.push({ es: 'teléfono', en: 'phone' });
+    if (!data.email) missing.push({ es: 'email', en: 'email' });
     return missing;
   }
 
@@ -220,7 +264,7 @@ App.buyerGuide = (function() {
 
   async function generatePdf(data, lang = 'es') {
     const missing = getMissing(data);
-    if (missing.length) throw new Error('Faltan datos para la guía: ' + missing.join(', ') + '.');
+    if (missing.length) throw new Error('Faltan datos para la guía: ' + missing.map(m => m.es).join(', ') + '.');
     const L = LANGS[lang] || LANGS.es;
 
     const [PDFLib, templateBytes] = await Promise.all([loadPdfLib(), loadTemplate(lang)]);
@@ -237,7 +281,13 @@ App.buyerGuide = (function() {
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const photoImg = await pdfDoc.embedPng(await circlePngBytes(data.photo));
 
-    const title = pdfSafe(data.title) || L.defaultTitle;
+    const defaultRoleTitle = (L.roleTitles && L.roleTitles[data.role]) || L.defaultTitle;
+    const baseTitle = pdfSafe(data.title) || defaultRoleTitle;
+    const title = !pdfSafe(data.title) && data.agencyName && !['agent_inmomas', 'admin'].includes(data.role)
+      ? `${baseTitle} · ${pdfSafe(data.agencyName)}`
+      : baseTitle;
+    const cardKicker = ['agent_inmomas', 'admin'].includes(data.role) ? L.cardLabelSpain : L.cardLabelPartner;
+
     const phoneHref = 'tel:' + String(data.mobile).replace(/[^\d+]/g, '');
     const mailHref = 'mailto:' + String(data.email).trim();
     const webHref = /^https?:\/\//i.test(data.website) ? data.website : 'https://' + String(data.website).replace(/^\/+/, '');
@@ -300,7 +350,7 @@ App.buyerGuide = (function() {
       { text: data.website, href: webHref }
     ];
 
-    /* ---- Pág. 13: firma de la carta ---- */
+    /* ---- Penúltima página: firma de la carta ---- */
     {
       const page = sigPage;
       const H = page.getHeight();
@@ -321,7 +371,7 @@ App.buyerGuide = (function() {
       });
     }
 
-    /* ---- Pág. 14: tarjeta de contacto en la contraportada ---- */
+    /* ---- Contraportada: tarjeta de contacto ---- */
     {
       const page = backPage;
       const H = page.getHeight();
@@ -340,7 +390,7 @@ App.buyerGuide = (function() {
       page.drawImage(photoImg, { x: ph.x, y: H - ph.top - ph.size, width: ph.size, height: ph.size });
       page.drawCircle({ x: ph.x + ph.size / 2, y: H - ph.top - ph.size / 2, size: ph.size / 2, borderColor: C(COLORS.orange), borderWidth: 2.5 });
 
-      drawText(page, L.cardLabel, K.textX + 34, K.label, fontBold, 8, K.textMaxWidth - 34, C(COLORS.orange));
+      drawText(page, cardKicker, K.textX + 34, K.label, fontBold, 8, K.textMaxWidth - 34, C(COLORS.orange));
       drawText(page, data.name, K.textX, K.name, fontBold, 18, K.textMaxWidth, C(COLORS.navy));
       drawText(page, title, K.textX, K.title, fontBold, 9.5, K.textMaxWidth, C(COLORS.blue));
       contactLines.forEach((ln, i) => {
@@ -351,8 +401,9 @@ App.buyerGuide = (function() {
       addLink(page, ph.x, ph.top, ph.size, ph.size, mailHref);
     }
 
+    const authorOrg = pdfSafe(data.agencyName) || 'The Spain Connection · RE/MAX Inmomás';
     pdfDoc.setTitle(`The Spain Connection — ${pdfSafe(data.name)}`);
-    pdfDoc.setAuthor(`${pdfSafe(data.name)} · RE/MAX Inmomás`);
+    pdfDoc.setAuthor(`${pdfSafe(data.name)} · ${authorOrg}`);
     pdfDoc.setCreator('The Spain Connection · RE/MAX Inmomás');
 
     return pdfDoc.save({ useObjectStreams: true });
@@ -361,7 +412,7 @@ App.buyerGuide = (function() {
   function fileNameFor(data, lang) {
     const L = LANGS[lang] || LANGS.es;
     const slug = pdfSafe(data.name).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '');
-    return `${L.fileName}_The_Spain_Connection_${slug || 'RE-MAX'}.pdf`;
+    return `${L.fileName}_The_Spain_Connection_${slug || 'Partner'}.pdf`;
   }
 
   function triggerDownload(bytes, fileName) {
@@ -382,75 +433,119 @@ App.buyerGuide = (function() {
     triggerDownload(bytes, fileNameFor(data, lang));
   }
 
-  /* ---------- Editor UI (perfil del agente y modal de admin) ---------- */
+  /* ---------- Editor UI (Dashboards, Documentos, Perfil y Admin) ---------- */
 
   function renderEditor(container, user, options = {}) {
     if (!container || !user) return;
+    if (container._bgSyncCleanup) {
+      container._bgSyncCleanup();
+      container._bgSyncCleanup = null;
+    }
+
     const isAdmin = !!options.admin;
-    const uid = 'bg-' + (isAdmin ? 'adm' : 'me');
+    const safeId = (options.uid || container.id || ('inst-' + Math.random().toString(36).slice(2, 8))).replace(/[^a-zA-Z0-9_-]/g, '');
+    const uid = 'bg-' + safeId;
     const data = getGuideData(user);
     let currentPhoto = data.photo;
 
-    const inputStyle = 'width:100%; padding:0.5rem 0.65rem; border:1px solid #d1d5db; border-radius:0.45rem; font-size:0.86rem; background:#fff;';
-    const labelStyle = 'font-weight:600; font-size:0.78rem; color:#374151; display:block; margin-bottom:0.25rem;';
+    const rolePlaceholderEs = (LANGS.es.roleTitles && LANGS.es.roleTitles[user.role]) || LANGS.es.defaultTitle;
+    const defaultTitlePreview = user.agencyName && !['agent_inmomas', 'admin'].includes(user.role)
+      ? `${rolePlaceholderEs} · ${user.agencyName}`
+      : rolePlaceholderEs;
+
+    const inputStyle = 'width:100%; padding:0.52rem 0.7rem; border:1px solid #cbd5e1; border-radius:0.5rem; font-size:0.86rem; background:#fff; color:#0f172a; box-sizing:border-box;';
+    const labelStyle = 'font-weight:600; font-size:0.78rem; color:#334155; display:block; margin-bottom:0.28rem;';
     const langOptions = Object.keys(LANGS).map(k => `<option value="${k}">${LANGS[k].label}</option>`).join('');
 
     container.innerHTML = `
-      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:0.9rem;">
-        <div>
-          <h2 style="font-weight:700; color:var(--text-primary, #111827); margin:0 0 0.25rem; font-size:1.15rem;">
-            📘 ${isAdmin ? 'Guía de Compra en España personalizada' : 'Mi Guía de Compra en España personalizada'}
-          </h2>
-          <p style="margin:0; font-size:0.84rem; color:#6b7280; max-width:640px;">
-            ${isAdmin
-              ? 'Sube la foto profesional del agente y revisa sus datos. La guía de The Spain Connection se genera con su foto y contacto en la carta final y en la contraportada.'
-              : 'Sube tu foto profesional y completa tus datos. Descarga la "Guía Completa para Comprar tu Casa en España" de The Spain Connection con tu foto y tu contacto, lista para enviar a tus clientes.'}
-          </p>
-        </div>
-        <span id="${uid}-status"></span>
-      </div>
-
-      <div style="display:flex; gap:1.5rem; flex-wrap:wrap; align-items:flex-start;">
-        <div style="display:flex; flex-direction:column; align-items:center; gap:0.55rem; width:160px;">
-          <div id="${uid}-photo-preview" style="width:130px; height:130px; border-radius:50%; border:3px solid #fe9748; background:#f8fafc center/cover no-repeat; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:0.75rem; text-align:center; overflow:hidden;"></div>
-          <input type="file" id="${uid}-photo-input" accept="image/*" style="display:none;">
-          <button type="button" class="btn btn-outline btn-sm" id="${uid}-photo-btn" style="width:100%; justify-content:center;">📸 Subir foto profesional</button>
-          <p style="font-size:0.7rem; color:#94a3b8; margin:0; text-align:center; line-height:1.35;">Foto de busto, buena luz y fondo neutro. Se recorta en círculo automáticamente.</p>
+      <div style="background:linear-gradient(135deg, rgba(6,114,197,0.04) 0%, rgba(254,151,72,0.06) 100%); border:1px solid rgba(6,114,197,0.16); border-radius:14px; padding:1.25rem;">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:1rem;">
+          <div>
+            <h2 style="font-weight:700; color:var(--text-primary, #0f172a); margin:0 0 0.3rem; font-size:1.12rem; display:flex; align-items:center; gap:0.45rem;">
+              <span>📘</span>
+              ${isAdmin
+                ? '<span>Guía del Comprador en España Personalizada</span>'
+                : '<span class="lang-en">Personalized Spain Buyer\'s Guide (PDF)</span><span class="lang-es">Tu Guía del Comprador en España Personalizada (PDF)</span>'}
+            </h2>
+            <p style="margin:0; font-size:0.84rem; color:#475569; max-width:720px; line-height:1.45;">
+              ${isAdmin
+                ? 'Sube la foto profesional y revisa los datos de contacto. La guía oficial de The Spain Connection (16 págs. A4) se genera con su foto, nombre, cargo, teléfono y email en la carta final y en la contraportada.'
+                : '<span class="lang-en">Upload your professional photo and verify your contact details to download the official 16-page <strong>Spain Buyer\'s Guide</strong> branded with your photo, name, phone, and email — ready to send to your clients in 4 languages.</span><span class="lang-es">Sube tu foto profesional y verifica tus datos para descargar la <strong>Guía Completa del Comprador en España</strong> (16 págs.) personalizada con tu foto, nombre, teléfono y email, lista para enviar a tus clientes en 4 idiomas.</span>'}
+            </p>
+          </div>
+          <span id="${uid}-status"></span>
         </div>
 
-        <div style="flex:1; min-width:260px;">
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:0.75rem;">
-            <div>
-              <label style="${labelStyle}">Nombre en la guía</label>
-              <input type="text" value="${esc(data.name)}" disabled style="${inputStyle} background:#f3f4f6; color:#6b7280;" title="Se toma del perfil (Editar Perfil)">
-            </div>
-            <div>
-              <label style="${labelStyle}">Cargo <span style="font-weight:400; color:#9ca3af;">(vacío = "Agente Inmobiliario" traducido)</span></label>
-              <input type="text" id="${uid}-title" value="${esc(data.title)}" placeholder="Agente Inmobiliario" maxlength="60" style="${inputStyle}">
-            </div>
-            <div>
-              <label style="${labelStyle}">Teléfono / WhatsApp</label>
-              <input type="tel" id="${uid}-mobile" value="${esc(data.mobile)}" placeholder="+34 600 000 000" maxlength="30" style="${inputStyle}">
-            </div>
-            <div>
-              <label style="${labelStyle}">Email de contacto</label>
-              <input type="email" id="${uid}-email" value="${esc(data.email)}" placeholder="nombre@remax.es" maxlength="80" style="${inputStyle}">
-            </div>
-            <div>
-              <label style="${labelStyle}">Web</label>
-              <input type="text" id="${uid}-website" value="${esc(data.website)}" placeholder="remaxinmomas.com" maxlength="60" style="${inputStyle}">
-            </div>
-            <div>
-              <label style="${labelStyle}">Idioma de la guía</label>
-              <select id="${uid}-lang" style="${inputStyle}">${langOptions}</select>
-            </div>
+        <div style="display:flex; gap:1.5rem; flex-wrap:wrap; align-items:flex-start;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:0.55rem; width:164px; flex-shrink:0;">
+            <div id="${uid}-photo-preview" style="width:124px; height:124px; border-radius:50%; border:3px solid #fe9748; box-shadow:0 4px 12px rgba(15,23,42,0.08); background:#ffffff center/cover no-repeat; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:0.76rem; font-weight:600; text-align:center; overflow:hidden; padding:0.5rem;"></div>
+            <input type="file" id="${uid}-photo-input" accept="image/*" style="display:none;">
+            <button type="button" class="btn btn-outline btn-sm" id="${uid}-photo-btn" style="width:100%; justify-content:center; background:#fff;">
+              📸 <span class="lang-en">Upload Photo</span><span class="lang-es">Subir Foto</span>
+            </button>
+            <p style="font-size:0.7rem; color:#64748b; margin:0; text-align:center; line-height:1.35;">
+              <span class="lang-en">Headshot with good lighting. Auto-cropped in a circle.</span>
+              <span class="lang-es">Foto de busto con buena luz. Se recorta en círculo automáticamente.</span>
+            </p>
           </div>
 
-          <div style="display:flex; gap:0.6rem; flex-wrap:wrap; margin-top:1rem;">
-            <button type="button" class="btn btn-primary" id="${uid}-download-btn">📥 Descargar guía personalizada (PDF)</button>
-            <button type="button" class="btn btn-outline" id="${uid}-save-btn">💾 Guardar datos</button>
+          <div style="flex:1; min-width:260px;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(205px, 1fr)); gap:0.75rem;">
+              <div>
+                <label style="${labelStyle}">
+                  <span class="lang-en">Name on Guide</span><span class="lang-es">Nombre en la Guía</span>
+                </label>
+                <input type="text" value="${esc(data.name)}" disabled style="${inputStyle} background:#f1f5f9; color:#64748b;" title="Tomado de tu perfil / Taken from your profile">
+              </div>
+              <div>
+                <label style="${labelStyle}">
+                  <span class="lang-en">Title / Role</span><span class="lang-es">Cargo / Rol</span>
+                  <span style="font-weight:400; color:#94a3b8;">(<span class="lang-en">optional</span><span class="lang-es">opcional</span>)</span>
+                </label>
+                <input type="text" id="${uid}-title" value="${esc(data.title)}" placeholder="${esc(defaultTitlePreview)}" maxlength="60" style="${inputStyle}">
+              </div>
+              <div>
+                <label style="${labelStyle}">
+                  <span class="lang-en">Phone / WhatsApp *</span><span class="lang-es">Teléfono / WhatsApp *</span>
+                </label>
+                <input type="tel" id="${uid}-mobile" value="${esc(data.mobile)}" placeholder="+1 305 555 0199 / +34 600 000 000" maxlength="30" style="${inputStyle}">
+              </div>
+              <div>
+                <label style="${labelStyle}">
+                  <span class="lang-en">Contact Email *</span><span class="lang-es">Email de Contacto *</span>
+                </label>
+                <input type="email" id="${uid}-email" value="${esc(data.email)}" placeholder="email@agencia.com" maxlength="80" style="${inputStyle}">
+              </div>
+              <div>
+                <label style="${labelStyle}">
+                  <span class="lang-en">Website</span><span class="lang-es">Sitio Web</span>
+                </label>
+                <input type="text" id="${uid}-website" value="${esc(data.website)}" placeholder="remaxinmomas.com" maxlength="60" style="${inputStyle}">
+              </div>
+              <div>
+                <label style="${labelStyle}">
+                  <span class="lang-en">Guide Language</span><span class="lang-es">Idioma de la Guía</span>
+                </label>
+                <select id="${uid}-lang" style="${inputStyle} font-weight:600;">${langOptions}</select>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:0.65rem; flex-wrap:wrap; align-items:center; margin-top:1rem;">
+              <button type="button" class="btn btn-primary" id="${uid}-download-btn" style="font-weight:700;">
+                📥 <span class="lang-en">Download Personalized Guide (PDF)</span><span class="lang-es">Descargar Guía Personalizada (PDF)</span>
+              </button>
+              <button type="button" class="btn btn-outline" id="${uid}-save-btn" style="background:#fff;">
+                💾 <span class="lang-en">Save Details</span><span class="lang-es">Guardar Datos</span>
+              </button>
+              <a href="dossier.html" target="_blank" rel="noopener" class="btn btn-outline btn-sm" style="background:#fff; text-decoration:none;">
+                👁️ <span class="lang-en">Preview Base Guide</span><span class="lang-es">Ver Guía Base</span>
+              </a>
+            </div>
+            <p style="font-size:0.73rem; color:#64748b; margin:0.55rem 0 0; line-height:1.4;">
+              <span class="lang-en">Your details are saved automatically when downloading. Your photo and clickable email/phone appear on the closing letter (p. 15) and back cover (p. 16).</span>
+              <span class="lang-es">Tus datos se guardan automáticamente al descargar. Tu foto y enlaces clicables a tu email y teléfono aparecen en la carta final (pág. 15) y en la contraportada (pág. 16).</span>
+            </p>
           </div>
-          <p style="font-size:0.72rem; color:#94a3b8; margin:0.5rem 0 0;">Al descargar, los datos se guardan automáticamente. Tu foto y contacto aparecen en la carta final (pág. 15) y en la contraportada (pág. 16), con enlaces directos a tu email y teléfono.</p>
         </div>
       </div>
     `;
@@ -458,6 +553,18 @@ App.buyerGuide = (function() {
     const $ = (id) => container.querySelector('#' + uid + '-' + id);
     const preview = $('photo-preview');
     const statusEl = $('status');
+
+    // Default guide language to EN when dashboard is in English, ES when in Spanish
+    const langSel = $('lang');
+    if (langSel && document.body.classList.contains('lang-en')) {
+      langSel.value = 'en';
+    }
+
+    const syncLangVisibility = () => {
+      if (window.App && typeof window.App.updateLangDisplay === 'function') {
+        window.App.updateLangDisplay();
+      }
+    };
 
     const readForm = () => ({
       title: $('title').value,
@@ -470,23 +577,41 @@ App.buyerGuide = (function() {
     const refreshUI = () => {
       if (currentPhoto) {
         preview.style.backgroundImage = `url("${currentPhoto}")`;
-        preview.textContent = '';
+        preview.innerHTML = '';
       } else {
         preview.style.backgroundImage = 'none';
-        preview.textContent = 'Sin foto';
+        preview.innerHTML = '<span class="lang-en">No photo yet</span><span class="lang-es">Sin foto</span>';
       }
       const missing = getMissing(getGuideData(user, readForm()));
       statusEl.innerHTML = missing.length
-        ? `<span class="badge" style="background:#fef3c7; color:#92400e; padding:4px 10px; border-radius:999px; font-size:0.75rem; font-weight:700;">⚠️ Falta: ${esc(missing.join(', '))}</span>`
-        : `<span class="badge" style="background:#dcfce7; color:#166534; padding:4px 10px; border-radius:999px; font-size:0.75rem; font-weight:700;">✅ Lista para descargar</span>`;
+        ? `<span class="badge" style="background:#fef3c7; color:#92400e; border:1px solid #fde68a; padding:5px 11px; border-radius:999px; font-size:0.75rem; font-weight:700;">⚠️ <span class="lang-en">Missing: ${esc(missing.map(m => m.en).join(', '))}</span><span class="lang-es">Falta: ${esc(missing.map(m => m.es).join(', '))}</span></span>`
+        : `<span class="badge" style="background:#dcfce7; color:#166534; border:1px solid #bbf7d0; padding:5px 11px; border-radius:999px; font-size:0.75rem; font-weight:700;">✅ <span class="lang-en">Ready to download</span><span class="lang-es">Lista para descargar</span></span>`;
+      syncLangVisibility();
     };
 
     const save = async (silent) => {
       const saved = await App.auth.updateBuyerGuideProfile(user.id, readForm());
       user.buyerGuide = saved;
+      window.dispatchEvent(new CustomEvent('buyerGuideUpdated', {
+        detail: { userId: user.id, sourceUid: uid, buyerGuide: saved }
+      }));
       if (!silent) App.utils.showToast('Datos de la guía guardados ✅', 'success');
       return saved;
     };
+
+    const onExternalSync = (ev) => {
+      const d = ev && ev.detail;
+      if (!d || d.userId !== user.id || d.sourceUid === uid || !d.buyerGuide) return;
+      user.buyerGuide = d.buyerGuide;
+      currentPhoto = d.buyerGuide.photo || user.profileImage || null;
+      if ($('title')) $('title').value = d.buyerGuide.title || '';
+      if ($('mobile')) $('mobile').value = d.buyerGuide.mobile || user.phone || '';
+      if ($('email')) $('email').value = d.buyerGuide.email || user.email || '';
+      if ($('website')) $('website').value = d.buyerGuide.website || DEFAULT_WEBSITE;
+      refreshUI();
+    };
+    window.addEventListener('buyerGuideUpdated', onExternalSync);
+    container._bgSyncCleanup = () => window.removeEventListener('buyerGuideUpdated', onExternalSync);
 
     $('photo-btn').onclick = () => $('photo-input').click();
     $('photo-input').onchange = async (e) => {
@@ -517,21 +642,22 @@ App.buyerGuide = (function() {
       const old = btn.innerHTML;
       const missing = getMissing(getGuideData(user, readForm()));
       if (missing.length) {
-        App.utils.showToast('Completa antes: ' + missing.join(', '), 'error');
+        App.utils.showToast('Completa antes: ' + missing.map(m => m.es).join(', '), 'error');
         return;
       }
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> Generando guía...';
+      btn.innerHTML = '<span class="spinner"></span> Generando guía PDF...';
       try {
         await save(true);
         await download(user, $('lang').value);
-        App.utils.showToast('Guía generada y descargada 📘', 'success');
+        App.utils.showToast('Guía personalizada generada y descargada 📘', 'success');
       } catch (err) {
         console.error('[BuyerGuide] Error:', err);
         App.utils.showToast(err.message || 'Error al generar la guía.', 'error');
       } finally {
         btn.disabled = false;
         btn.innerHTML = old;
+        syncLangVisibility();
       }
     };
 
@@ -540,6 +666,8 @@ App.buyerGuide = (function() {
 
   return {
     LANGS,
+    ALLOWED_ROLES,
+    canUse,
     getGuideData,
     getMissing,
     generatePdf,
