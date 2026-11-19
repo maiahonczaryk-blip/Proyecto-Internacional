@@ -34,13 +34,13 @@
     }
   }
 
-  function buildSmartMasAgentOptions(localAgents, selectedAgentId = '', targetRegionId = '', placeholder = '-- Seleccionar Agente RE/MAX MÁS --') {
+  function buildSmartMasAgentOptions(localAgents, selectedAgentId = '', targetRegionId = '', placeholder = '-- Seleccionar Agente RE/MAX Inmomás --') {
     const formatAgentLabel = (a) => {
       const nat = App.utils.getUserNationality ? App.utils.getUserNationality(a) : (a.nationality || a.country || '');
       const regs = App.utils.getUserRegions ? App.utils.getUserRegions(a) : [];
       const regNames = regs.map(r => (App.utils.REGIONS && App.utils.REGIONS[r]) ? App.utils.REGIONS[r].shortEs : r).filter(Boolean).join(', ');
       const meta = [nat, regNames].filter(Boolean).join(' · ');
-      return `${App.utils.escapeHtml(a.firstName)} ${App.utils.escapeHtml(a.lastName)}${meta ? ` (${App.utils.escapeHtml(meta)})` : ' (RE/MAX MÁS)'}`;
+      return `${App.utils.escapeHtml(a.firstName)} ${App.utils.escapeHtml(a.lastName)}${meta ? ` (${App.utils.escapeHtml(meta)})` : ' (RE/MAX Inmomás)'}`;
     };
 
     if (!targetRegionId) {
@@ -65,7 +65,7 @@
       html += `</optgroup>`;
     }
     if (others.length > 0) {
-      html += `<optgroup label="🇪🇸 Otros Agentes RE/MAX MÁS">`;
+      html += `<optgroup label="🇪🇸 Otros Agentes RE/MAX Inmomás">`;
       html += others.map(a => `<option value="${a.id}" ${selectedAgentId === a.id ? 'selected' : ''}>${formatAgentLabel(a)}</option>`).join('');
       html += `</optgroup>`;
     }
@@ -252,7 +252,7 @@
           copyMasBtn.onclick = () => {
             const masUrl = `${referralLink}&type=agent_inmomas`;
             App.utils.copyToClipboard(masUrl);
-            App.utils.showToast('🇪🇸 Enlace de registro directo para Agente RE/MAX MÁS copiado al portapapeles', 'success');
+            App.utils.showToast('🇪🇸 Enlace de registro interno para Agente RE/MAX Inmomás copiado al portapapeles', 'success');
           };
         }
       }
@@ -343,7 +343,7 @@
 
       const agentNamesPreview = regMasAgents.length > 0
         ? regMasAgents.slice(0, 3).map(a => `${App.utils.escapeHtml(a.firstName)} ${App.utils.escapeHtml((a.lastName || '').charAt(0))}.`).join(', ') + (regMasAgents.length > 3 ? ` +${regMasAgents.length - 3}` : '')
-        : '<span style="color:#94a3b8;font-style:italic;">Sin agente MÁS etiquetado</span>';
+        : '<span style="color:#94a3b8;font-style:italic;">Sin agente Inmomás etiquetado</span>';
 
       return `
         <div style="background:#fff; border:1px solid ${reg.border}; border-top:4px solid ${reg.color}; border-radius:12px; padding:14px 16px; box-shadow:0 2px 8px rgba(0,0,0,0.03); display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
@@ -353,7 +353,7 @@
               <span style="font-size:0.82rem;">${reg.flag}</span>
             </div>
             <div style="font-size:0.75rem; color:#475569; margin-bottom:10px; line-height:1.35;">
-              <strong>🇪🇸 RE/MAX MÁS (${regMasAgents.length}):</strong> ${agentNamesPreview}
+              <strong>🇪🇸 RE/MAX Inmomás (${regMasAgents.length}):</strong> ${agentNamesPreview}
             </div>
             <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px; text-align:center; background:#f8fafc; border-radius:8px; padding:8px 4px; border:1px solid #f1f5f9;">
               <div>
@@ -1297,17 +1297,17 @@
                 <option value="broker" ${user.role === 'broker' ? 'selected' : ''}>Broker</option>
                 <option value="realtor" ${user.role === 'realtor' ? 'selected' : ''}>Realtor</option>
                 <option value="colaborador" ${user.role === 'colaborador' ? 'selected' : ''}>Colaborador</option>
-                <option value="agent_inmomas" ${user.role === 'agent_inmomas' ? 'selected' : ''}>🇪🇸 Agente RE/MAX MÁS</option>
+                <option value="agent_inmomas" ${user.role === 'agent_inmomas' ? 'selected' : ''}>🇪🇸 Agente RE/MAX Inmomás</option>
               </select>
               <button class="btn btn-primary btn-sm" id="save-user-role-btn">Update Role</button>
             </div>
           </div>
           ` : ''}
 
-          <!-- Nationality & Regional Assignment Section (RE/MAX MÁS & International Segmentation) -->
+          <!-- Nationality & Regional Assignment Section (RE/MAX Inmomás & International Segmentation) -->
           <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem; background: rgba(0, 63, 153, 0.03); border-radius: 0.5rem; padding: 0.9rem; border: 1px solid rgba(0, 63, 153, 0.16);">
             <label style="font-weight: 700; font-size: 0.88rem; color: #003f99; display: flex; align-items: center; gap: 6px; margin-bottom: 0.35rem;">
-              🌍 Nacionalidad, País y Regiones Asignadas (RE/MAX MÁS)
+              🌍 Nacionalidad, País y Regiones Asignadas (RE/MAX Inmomás)
             </label>
             <p style="font-size: 0.76rem; color: #475569; margin: 0 0 0.75rem;">
               Etiqueta la nacionalidad/país y la(s) región(es) de trabajo para segmentar bases de datos, webinarios paralelos y asignación de clientes.
@@ -1768,11 +1768,11 @@
         };
       }
 
-      // Populate RE/MAX MÁS Agent Filter
+      // Populate RE/MAX Inmomás Agent Filter
       const agentSel = document.getElementById('admin-client-filter-agent');
       if (agentSel) {
         const localAgents = allUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
-        agentSel.innerHTML = '<option value="">🇪🇸 Todos los Agentes MÁS</option>' +
+        agentSel.innerHTML = '<option value="">🇪🇸 Todos los Agentes Inmomás</option>' +
           '<option value="__unassigned__" ' + (clientAgentFilter === '__unassigned__' ? 'selected' : '') + '>⚠️ Sin Agente Asignado</option>' +
           localAgents.map(a => {
             const nat = App.utils.getUserNationality ? App.utils.getUserNationality(a) : '';
@@ -1993,7 +1993,7 @@
 
       // Get all active local agents sorted/grouped by Client's Region
       const localAgents = allUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
-      const dropdownOptions = buildSmartMasAgentOptions(localAgents, client.localAgentId || '', clientRegion, '-- Seleccionar Agente RE/MAX MÁS --');
+      const dropdownOptions = buildSmartMasAgentOptions(localAgents, client.localAgentId || '', clientRegion, '-- Seleccionar Agente RE/MAX Inmomás --');
 
       const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(client.status)}">${App.utils.getStatusLabel(client.status)}</span>`;
 
@@ -2254,7 +2254,7 @@
       // Get all active local agents with regional grouping
       const localAgents = allUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
       const leadRegion = App.utils.getRecordRegion ? App.utils.getRecordRegion(lead, allUsers) : '';
-      const dropdownOptions = buildSmartMasAgentOptions(localAgents, lead.localAgentId || '', leadRegion, '-- Seleccionar Agente RE/MAX MÁS --');
+      const dropdownOptions = buildSmartMasAgentOptions(localAgents, lead.localAgentId || '', leadRegion, '-- Seleccionar Agente RE/MAX Inmomás --');
 
       App.utils.showModal({
         title: 'Lead Details & Assignment',
@@ -3319,7 +3319,7 @@
     }
 
     const headers = [
-      'Date', 'First Name', 'Last Name', 'Email', 'Phone', 'Region', 'Country', 'Budget', 'Interest Area', 'Status', 'Assigned RE/MAX MAS Agent', 'Referring Realtor / Partner'
+      'Date', 'First Name', 'Last Name', 'Email', 'Phone', 'Region', 'Country', 'Budget', 'Interest Area', 'Status', 'Assigned RE/MAX Inmomás Agent', 'Referring Realtor / Partner'
     ];
 
     const getRealtorName = (realtorId) => {

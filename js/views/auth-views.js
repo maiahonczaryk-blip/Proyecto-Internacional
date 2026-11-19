@@ -206,8 +206,8 @@ App.views.auth = {
 
     if (nameEl) nameEl.textContent = `${user.firstName} ${user.lastName}`;
     if (emailEl) emailEl.textContent = user.email;
-    if (roleBadgeEl) roleBadgeEl.textContent = user.role === 'agent_inmomas' ? 'Agente RE/MAX MÁS' : user.role.replace('_', ' ');
-    if (agencyEl) agencyEl.textContent = user.agencyName || (user.role === 'agent_inmomas' ? 'RE/MAX MÁS' : '—');
+    if (roleBadgeEl) roleBadgeEl.textContent = user.role === 'agent_inmomas' ? 'Agente RE/MAX Inmomás' : user.role.replace('_', ' ');
+    if (agencyEl) agencyEl.textContent = user.agencyName || (user.role === 'agent_inmomas' ? 'RE/MAX Inmomás' : '—');
     if (statusEl) statusEl.innerHTML = App.utils.getUserStatusBadge(user.status);
     if (phoneEl) phoneEl.textContent = user.phone || '—';
     if (countryEl) {
@@ -240,7 +240,7 @@ App.views.auth = {
     if (editFirstName) editFirstName.value = user.firstName || '';
     if (editLastName) editLastName.value = user.lastName || '';
     if (editPhone) editPhone.value = user.phone || '';
-    if (editAgencyName) editAgencyName.value = user.agencyName || (user.role === 'agent_inmomas' ? 'RE/MAX MÁS' : '');
+    if (editAgencyName) editAgencyName.value = user.agencyName || (user.role === 'agent_inmomas' ? 'RE/MAX Inmomás' : '');
     if (editCountry) {
       if (editCountry.tagName === 'SELECT' && App.utils.getCountryOptionsHtml) {
         editCountry.innerHTML = App.utils.getCountryOptionsHtml(user.country || userNationality || 'United States', true, '— Seleccionar País —');
@@ -690,34 +690,16 @@ App.views.auth = {
         });
       }
       
-      // Toggle fields based on role
+      // Toggle fields based on role (public registration only allows Broker or Realtor)
       const roleRadios = newForm.querySelectorAll('input[name="register-role"]');
       const brokerSelectGroup = newForm.querySelector('#broker-select-group');
       const agencyNameInput = newForm.querySelector('#register-agencyName');
       const agencyNameGroup = agencyNameInput ? agencyNameInput.parentNode : null;
-      const masRegionsGroup = newForm.querySelector('#register-mas-regions-group');
-      const masRegionsCheckboxes = newForm.querySelector('#register-mas-regions-checkboxes');
       const inmomasAgentGroup = newForm.querySelector('#register-inmomas-agent-group');
-      const countrySelectEl = newForm.querySelector('#register-country');
 
-      if (masRegionsCheckboxes && App.utils && App.utils.getRegionsCheckboxesHtml) {
-        masRegionsCheckboxes.innerHTML = App.utils.getRegionsCheckboxesHtml('register-mas-region', ['north_america']);
-      }
-
-      if (countrySelectEl && masRegionsCheckboxes && App.utils && App.utils.resolveRegionFromCountry) {
-        countrySelectEl.addEventListener('change', () => {
-          const reg = App.utils.resolveRegionFromCountry(countrySelectEl.value);
-          if (reg) {
-            const cb = masRegionsCheckboxes.querySelector(`input[value="${reg}"]`);
-            if (cb) cb.checked = true;
-          }
-        });
-      }
-      
       // Initial state
       if (brokerSelectGroup) brokerSelectGroup.style.display = 'block';
       if (agencyNameGroup) agencyNameGroup.style.display = 'none';
-      if (masRegionsGroup) masRegionsGroup.style.display = 'none';
       
       roleRadios.forEach(r => {
         r.addEventListener('change', (e) => {
@@ -725,20 +707,10 @@ App.views.auth = {
           if (roleVal === 'broker') {
             if (brokerSelectGroup) brokerSelectGroup.style.display = 'none';
             if (agencyNameGroup) agencyNameGroup.style.display = 'block';
-            if (masRegionsGroup) masRegionsGroup.style.display = 'none';
             if (inmomasAgentGroup) inmomasAgentGroup.style.display = 'block';
-          } else if (roleVal === 'agent_inmomas') {
-            if (brokerSelectGroup) brokerSelectGroup.style.display = 'none';
-            if (agencyNameGroup) {
-              agencyNameGroup.style.display = 'block';
-              if (agencyNameInput && !agencyNameInput.value) agencyNameInput.value = 'RE/MAX MÁS';
-            }
-            if (masRegionsGroup) masRegionsGroup.style.display = 'block';
-            if (inmomasAgentGroup) inmomasAgentGroup.style.display = 'none';
           } else {
             if (brokerSelectGroup) brokerSelectGroup.style.display = 'block';
             if (agencyNameGroup) agencyNameGroup.style.display = 'none';
-            if (masRegionsGroup) masRegionsGroup.style.display = 'none';
             if (inmomasAgentGroup) inmomasAgentGroup.style.display = 'block';
           }
         });
@@ -750,15 +722,11 @@ App.views.auth = {
         const termsChecked = newForm.querySelector('#register-terms').checked;
         if (!termsChecked) return alert('Debes aceptar los Términos y Condiciones para continuar. / Please agree to the Terms & Conditions.');
 
-        const selectedRole = newForm.querySelector('input[name="register-role"]:checked').value;
+        const rawRole = newForm.querySelector('input[name="register-role"]:checked').value;
+        const selectedRole = rawRole === 'broker' ? 'broker' : 'realtor';
         const countryVal = newForm.querySelector('#register-country').value;
         let selectedRegions = [];
-        if (selectedRole === 'agent_inmomas' && masRegionsCheckboxes) {
-          selectedRegions = Array.from(masRegionsCheckboxes.querySelectorAll('input[name="register-mas-region"]:checked')).map(cb => cb.value);
-          if (selectedRegions.length === 0) {
-            return alert('Por favor, selecciona al menos una Región comercial para tu perfil de Agente RE/MAX MÁS.');
-          }
-        } else if (App.utils && App.utils.resolveRegionFromCountry) {
+        if (App.utils && App.utils.resolveRegionFromCountry) {
           const autoReg = App.utils.resolveRegionFromCountry(countryVal);
           if (autoReg) selectedRegions = [autoReg];
         }
@@ -778,18 +746,16 @@ App.views.auth = {
           nationality: countryVal,
           region: selectedRegions[0] || '',
           regions: selectedRegions,
-          agencyName: selectedRole === 'agent_inmomas'
-            ? ((agencyNameInput && agencyNameInput.value) || 'RE/MAX MÁS')
-            : (isManualBroker
-              ? (newForm.querySelector('#register-agency-manual')?.value || '')
-              : (agencyNameInput ? agencyNameInput.value : '')),
-          brokerId: (isManualBroker || selectedRole === 'agent_inmomas') ? '' : brokerId,
+          agencyName: isManualBroker
+            ? (newForm.querySelector('#register-agency-manual')?.value || '')
+            : (agencyNameInput ? agencyNameInput.value : ''),
+          brokerId: isManualBroker ? '' : brokerId,
           brokerNameManual: isManualBroker ? (newForm.querySelector('#register-broker-manual')?.value || '') : '',
-          inmomasAgentName: selectedRole === 'agent_inmomas' ? null : (inmomasAgent || null),
+          inmomasAgentName: inmomasAgent || null,
           termsAccepted: true,
           termsAcceptedAt: new Date().toISOString(),
           newsletterConsent: newForm.querySelector('#register-newsletter')?.checked || false,
-          referredBy: refCode || (selectedRole === 'agent_inmomas' ? null : (inmomasAgent || null)),
+          referredBy: refCode || (inmomasAgent || null),
           source: (refCode || inmomasAgent) ? 'referral' : 'direct',
         };
         
@@ -820,6 +786,7 @@ App.views.auth = {
             return;
           }
 
+          const safeGoogleRole = roleRadio.value === 'broker' ? 'broker' : 'realtor';
           const firstName = newForm.querySelector('#register-firstName').value;
           const lastName = newForm.querySelector('#register-lastName').value;
           const refCode = sessionStorage.getItem('referralCode') || null;
@@ -827,16 +794,13 @@ App.views.auth = {
 
           const countryVal = newForm.querySelector('#register-country').value;
           let selectedRegions = [];
-          if (roleRadio.value === 'agent_inmomas' && masRegionsCheckboxes) {
-            selectedRegions = Array.from(masRegionsCheckboxes.querySelectorAll('input[name="register-mas-region"]:checked')).map(cb => cb.value);
-          }
-          if (selectedRegions.length === 0 && App.utils && App.utils.resolveRegionFromCountry) {
+          if (App.utils && App.utils.resolveRegionFromCountry) {
             const autoReg = App.utils.resolveRegionFromCountry(countryVal);
             if (autoReg) selectedRegions = [autoReg];
           }
 
           const data = {
-            role: roleRadio.value,
+            role: safeGoogleRole,
             firstName,
             lastName,
             phone: newForm.querySelector('#register-phone').value,
@@ -844,13 +808,13 @@ App.views.auth = {
             nationality: countryVal,
             region: selectedRegions[0] || '',
             regions: selectedRegions,
-            agencyName: roleRadio.value === 'agent_inmomas' ? ((agencyNameInput && agencyNameInput.value) || 'RE/MAX MÁS') : (agencyNameInput ? agencyNameInput.value : ''),
-            brokerId: roleRadio.value === 'agent_inmomas' ? '' : (brokerSelect ? brokerSelect.value : ''),
-            inmomasAgentName: roleRadio.value === 'agent_inmomas' ? null : (inmomasAgent || null),
+            agencyName: agencyNameInput ? agencyNameInput.value : '',
+            brokerId: brokerSelect ? brokerSelect.value : '',
+            inmomasAgentName: inmomasAgent || null,
             termsAccepted: true,
             termsAcceptedAt: new Date().toISOString(),
             newsletterConsent: newForm.querySelector('#register-newsletter')?.checked || false,
-            referredBy: refCode || (roleRadio.value === 'agent_inmomas' ? null : (inmomasAgent || null)),
+            referredBy: refCode || (inmomasAgent || null),
             source: (refCode || inmomasAgent) ? 'referral' : 'direct',
           };
 

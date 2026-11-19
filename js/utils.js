@@ -397,7 +397,7 @@ App.utils.getRoleBadge = function(role) {
   };
   let displayName = safeRole.charAt(0).toUpperCase() + safeRole.slice(1);
   if (safeRole === 'embajador') displayName = '👑 Embajador';
-  if (safeRole === 'agent_inmomas') displayName = '🇪🇸 Agente RE/MAX MÁS';
+  if (safeRole === 'agent_inmomas') displayName = '🇪🇸 Agente RE/MAX Inmomás';
   if (safeRole === 'colaborador') displayName = 'Colaborador';
   return `<span class="badge ${classes[safeRole] || ''}">${displayName}</span>`;
 };
@@ -1133,7 +1133,7 @@ App.utils.handleSaveContractData = async function(user, prefix, onDone) {
 };
 
 /* ============================================
-   MULTI-REGION & NATIONALITY TAXONOMY (RE/MAX MÁS)
+   MULTI-REGION & NATIONALITY TAXONOMY (RE/MAX Inmomás)
    ============================================ */
 
 App.utils.REGIONS = {
@@ -1239,7 +1239,7 @@ App.utils.WEBINAR_LANGUAGES = [
   { code: 'bilingual', labelEs: '🌐 Bilingüe (ES / EN)', labelEn: '🌐 Bilingual (EN / ES)' }
 ];
 
-// Known RE/MAX MÁS Agent fallback profiles when Firestore doc hasn't been explicitly tagged yet
+// Known RE/MAX Inmomás Agent fallback profiles when Firestore doc hasn't been explicitly tagged yet
 App.utils.KNOWN_MAS_AGENT_REGIONS = [
   { match: ['james', 'lavoie', 'jamisa'], nationality: 'Canada', regions: ['north_america', 'western_europe'], languages: ['en', 'fr', 'es'] },
   { match: ['angel luis', 'ángel luis', 'ángel luís', 'debra nadal'], nationality: 'Puerto Rico', regions: ['north_america', 'latam'], languages: ['es', 'en'] },
@@ -1449,8 +1449,8 @@ App.utils.renderUserRegionalBanner = async function(containerId, user) {
     }).join('');
 
     const isMasAgent = freshUser.role === 'agent_inmomas';
-    const titleEs = isMasAgent ? '🇪🇸 Tu Visión Regional RE/MAX MÁS' : '🌍 Tu Mercado Regional y Webinario Activo';
-    const titleEn = isMasAgent ? '🇪🇸 Your RE/MAX MÁS Regional Hub' : '🌍 Your Regional Market & Active Webinar';
+    const titleEs = isMasAgent ? '🇪🇸 Tu Visión Regional RE/MAX Inmomás' : '🌍 Tu Mercado Regional y Webinario Activo';
+    const titleEn = isMasAgent ? '🇪🇸 Your RE/MAX Inmomás Regional Hub' : '🌍 Your Regional Market & Active Webinar';
 
     el.style.display = 'block';
     el.innerHTML = `

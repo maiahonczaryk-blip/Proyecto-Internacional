@@ -52,7 +52,7 @@
       allUsers = await App.auth.getAllUsers();
       const freshMe = allUsers.find(u => u.id === currentUser.id) || currentUser;
 
-      // Render RE/MAX MÁS Regional Hub Banner
+      // Render RE/MAX Inmomás Regional Hub Banner
       if (App.utils && App.utils.renderUserRegionalBanner) {
         await App.utils.renderUserRegionalBanner('agent-regional-banner', freshMe);
       }

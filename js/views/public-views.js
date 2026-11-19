@@ -159,7 +159,7 @@ App.views.public = {
     const requestedType = sessionStorage.getItem('referralType') || 'client';
     let selectedType = requestedType;
 
-    // Populate international country options & RE/MAX MÁS region checkboxes in #referral-professional-fields
+    // Populate international country options & RE/MAX Inmomás region checkboxes in #referral-professional-fields
     const profCountrySel = document.getElementById('referral-prof-country');
     const masRegionsWrap = document.getElementById('referral-agent-mas-regions-wrap');
     const masRegionsCheckboxes = document.getElementById('referral-agent-mas-regions-checkboxes');
@@ -200,7 +200,7 @@ App.views.public = {
       if (masRegionsWrap) masRegionsWrap.style.display = type === 'agent_inmomas' ? 'block' : 'none';
       if (inmomasAgentGroup) inmomasAgentGroup.style.display = type === 'agent_inmomas' ? 'none' : '';
       if (type === 'agent_inmomas' && agencyInp && !agencyInp.value) {
-        agencyInp.value = 'RE/MAX MÁS';
+        agencyInp.value = 'RE/MAX Inmomás';
       }
 
       // Webinar Spotlight Banners:
@@ -289,13 +289,13 @@ App.views.public = {
         }
       } else if (type === 'agent_inmomas') {
         if (formTitle) {
-          formTitle.innerHTML = `<span class="lang-en">RE/MAX MÁS Agent Registration</span><span class="lang-es">Registro de Agente RE/MAX MÁS</span><span class="lang-fr">Inscription Agent RE/MAX MÁS</span><span class="lang-en-ca">RE/MAX MÁS Agent Registration</span>`;
+          formTitle.innerHTML = `<span class="lang-en">RE/MAX Inmomás Agent Registration</span><span class="lang-es">Registro de Agente RE/MAX Inmomás</span><span class="lang-fr">Inscription Agent RE/MAX Inmomás</span><span class="lang-en-ca">RE/MAX Inmomás Agent Registration</span>`;
         }
         if (welcomeMsg) {
-          welcomeMsg.innerHTML = `<span class="lang-en">Select your nationality and target region(s) to activate your regional RE/MAX MÁS CRM</span><span class="lang-es">Indica tu nacionalidad y región(es) de mercado para activar tu panel regional de RE/MAX MÁS</span><span class="lang-fr">Indiquez votre nationalité et vos régions pour activer votre CRM RE/MAX MÁS</span><span class="lang-en-ca">Select your nationality and target region(s) to activate your RE/MAX MÁS CRM</span>`;
+          welcomeMsg.innerHTML = `<span class="lang-en">Select your nationality and target region(s) to activate your regional RE/MAX Inmomás CRM</span><span class="lang-es">Indica tu nacionalidad y región(es) de mercado para activar tu panel regional de RE/MAX Inmomás</span><span class="lang-fr">Indiquez votre nationalité et vos régions pour activer votre CRM RE/MAX Inmomás</span><span class="lang-en-ca">Select your nationality and target region(s) to activate your RE/MAX Inmomás CRM</span>`;
         }
         if (submitBtn) {
-          submitBtn.innerHTML = `<span class="lang-en">Register RE/MAX MÁS Agent</span><span class="lang-es">Registrar Agente RE/MAX MÁS</span><span class="lang-fr">Inscrire Agent RE/MAX MÁS</span><span class="lang-en-ca">Register RE/MAX MÁS Agent</span>`;
+          submitBtn.innerHTML = `<span class="lang-en">Register RE/MAX Inmomás Agent</span><span class="lang-es">Registrar Agente RE/MAX Inmomás</span><span class="lang-fr">Inscrire Agent RE/MAX Inmomás</span><span class="lang-en-ca">Register RE/MAX Inmomás Agent</span>`;
         }
       } else {
         if (formTitle) {
@@ -475,18 +475,26 @@ App.views.public = {
       // An Embajador's referral link includes all umbrella variants ('broker', 'realtor', 'colaborador', 'client') EXCEPT 'embajador'.
       let availableTypes = ['realtor', 'client'];
       if (!referrer) {
-        availableTypes = ['realtor', 'broker', 'colaborador', 'client'];
+        availableTypes = (refCode && refCode.toUpperCase().startsWith('BRK-'))
+          ? ['realtor', 'client']
+          : ['realtor', 'broker', 'colaborador', 'client'];
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
         } else {
           selectedType = 'realtor';
         }
       } else if (referrer.role === 'admin') {
-        availableTypes = ['embajador', 'broker', 'realtor', 'colaborador', 'agent_inmomas', 'client'];
-        if (availableTypes.includes(requestedType)) {
-          selectedType = requestedType;
-        } else if (!availableTypes.includes(selectedType)) {
-          selectedType = 'realtor';
+        if (requestedType === 'agent_inmomas') {
+          // Internal direct onboarding link from Admin Dashboard only
+          availableTypes = ['agent_inmomas'];
+          selectedType = 'agent_inmomas';
+        } else {
+          availableTypes = ['embajador', 'broker', 'realtor', 'colaborador', 'client'];
+          if (availableTypes.includes(requestedType)) {
+            selectedType = requestedType;
+          } else if (!availableTypes.includes(selectedType)) {
+            selectedType = 'realtor';
+          }
         }
       } else if (referrer.role === 'embajador') {
         availableTypes = ['broker', 'realtor', 'colaborador', 'client'];
@@ -503,7 +511,8 @@ App.views.public = {
           selectedType = 'realtor';
         }
       } else if (referrer.role === 'broker') {
-        availableTypes = ['realtor', 'broker', 'client'];
+        // A Broker cannot have another Broker registered underneath them
+        availableTypes = ['realtor', 'client'];
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
         } else if (!availableTypes.includes(selectedType)) {
@@ -560,11 +569,11 @@ App.views.public = {
         },
         agent_inmomas: {
           icon: '🇪🇸',
-          badge: 'MÁS',
-          labelEn: 'RE/MAX MÁS Agent',
-          labelEs: 'Agente RE/MAX MÁS',
-          labelFr: 'Agent RE/MAX MÁS',
-          labelEnCa: 'RE/MAX MÁS Agent'
+          badge: 'Inmomás',
+          labelEn: 'RE/MAX Inmomás Agent',
+          labelEs: 'Agente RE/MAX Inmomás',
+          labelFr: 'Agent RE/MAX Inmomás',
+          labelEnCa: 'RE/MAX Inmomás Agent'
         },
         colaborador: {
           icon: '🤝',
@@ -831,14 +840,20 @@ App.views.public = {
 
             await App.auth.addReferralClient(clientPayload);
           } else {
-            // Strictly enforce that applying as 'embajador' is only permitted via an Administrator referral link
+            // Strictly enforce that applying as 'embajador' or internal 'agent_inmomas' is only permitted via an Administrator referral link
             if (contactType === 'embajador' && (!referrer || referrer.role !== 'admin')) {
               throw new Error('La postulación como Embajador solo está disponible a través del enlace oficial de Administración.');
+            }
+            if (contactType === 'agent_inmomas' && (!referrer || referrer.role !== 'admin')) {
+              throw new Error('El registro de Agente RE/MAX Inmomás es de uso interno.');
+            }
+            if (contactType === 'broker' && ((referrer && referrer.role === 'broker') || (refCode && refCode.toUpperCase().startsWith('BRK-')))) {
+              throw new Error('Un Broker no puede registrar a otro Broker debajo de su estructura.');
             }
 
             agencyName = form.querySelector('#referral-agencyName')?.value.trim() || '';
             if (!agencyName && contactType === 'agent_inmomas') {
-              agencyName = 'RE/MAX MÁS';
+              agencyName = 'RE/MAX Inmomás';
             } else if (!agencyName && referrer && referrer.role === 'broker' && referrer.agencyName) {
               agencyName = referrer.agencyName;
             }
@@ -851,7 +866,7 @@ App.views.public = {
             if (contactType === 'agent_inmomas' && masRegionsCheckboxes) {
               selectedRegions = Array.from(masRegionsCheckboxes.querySelectorAll('input[name="referral-mas-region"]:checked')).map(cb => cb.value);
               if (selectedRegions.length === 0) {
-                throw new Error('Por favor selecciona al menos una Región comercial para tu cuenta RE/MAX MÁS.');
+                throw new Error('Por favor selecciona al menos una Región comercial para tu cuenta RE/MAX Inmomás.');
               }
             } else if (App.utils && App.utils.resolveRegionFromCountry) {
               const inferred = App.utils.resolveRegionFromCountry(profCountryVal || market || '');
