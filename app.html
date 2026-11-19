@@ -485,6 +485,7 @@
       <div class="sidebar-nav__title"><span class="lang-en">Collaborator</span><span class="lang-es">Colaborador</span></div>
       <a href="#colaborador/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
       <a href="#colaborador/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> <span class="lang-en">Clients</span><span class="lang-es">Clientes</span></a>
+      <a href="#colaborador/documents" class="sidebar-link"><span class="sidebar-link__icon">📄</span> <span class="lang-en">Documents</span><span class="lang-es">Documentos</span></a>
       <a href="#colaborador/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> <span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></a>
       <a href="#colaborador/webinar" class="sidebar-link"><span class="sidebar-link__icon">🎙️</span> <span class="lang-en">Webinar</span><span class="lang-es">Webinar</span></a>
       <a href="#colaborador/partners" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> <span class="lang-en">Partners</span><span class="lang-es">Partners</span></a>
@@ -598,10 +599,10 @@
       <div class="mobile-section-group mobile-section-group--3cols" id="msec-group-colaborador">
         <a href="#colaborador/dashboard" class="mobile-section-pill"><span class="mobile-section-pill__icon">📊</span><span>Panel</span></a>
         <a href="#colaborador/clients" class="mobile-section-pill"><span class="mobile-section-pill__icon">🤝</span><span><span class="lang-en">Clients</span><span class="lang-es">Clientes</span></span></a>
+        <a href="#colaborador/documents" class="mobile-section-pill"><span class="mobile-section-pill__icon">📄</span><span><span class="lang-en">Docs</span><span class="lang-es">Documentos</span></span></a>
         <a href="#colaborador/finances" class="mobile-section-pill"><span class="mobile-section-pill__icon">💰</span><span><span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></span></a>
         <a href="#colaborador/webinar" class="mobile-section-pill"><span class="mobile-section-pill__icon">🎙️</span><span>Webinar</span></a>
         <a href="#colaborador/partners" class="mobile-section-pill"><span class="mobile-section-pill__icon">👥</span><span>Partners</span></a>
-        <a href="#profile" class="mobile-section-pill"><span class="mobile-section-pill__icon">👤</span><span><span class="lang-en">Profile</span><span class="lang-es">Mi Perfil</span></span></a>
       </div>
 
       <!-- Broker Section Grid (6 items: 2 rows of 3) -->
@@ -999,14 +1000,32 @@
     <!-- ==================== VIEW: ADMIN AGREEMENTS ==================== -->
     <div id="view-admin-agreements" class="app-view">
       <div class="dashboard-content">
-        <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+        <div class="dashboard-header" style="display:flex; flex-direction:column; align-items:stretch; gap:1rem;">
           <div>
             <h1>📋 <span class="lang-en">Collaboration Agreements &amp; Fiscal Data</span><span class="lang-es">Contratos de Colaboración y Datos Fiscales</span></h1>
-            <p class="dashboard-subtitle"><span class="lang-en">Review submitted company fiscal &amp; bank details to prepare external contracts and manage signed agreements.</span><span class="lang-es">Revisa los datos fiscales y bancarios enviados por Brokers y Agentes para armar el contrato externo y gestionar acuerdos activos.</span></p>
+            <p class="dashboard-subtitle"><span class="lang-en">Review submitted fiscal &amp; bank details from Ambassadors, Collaborators, Brokers &amp; Realtors to generate the document matching their registered role and manage active agreements.</span><span class="lang-es">Revisa los datos fiscales y bancarios enviados por Embajadores, Colaboradores, Brokers y Agentes para generar la variante de acuerdo según su rol registrado y gestionar contratos activos.</span></p>
           </div>
-          <button type="button" class="btn btn-primary" style="background:#1e3a8a; border-color:#1e3a8a; font-weight:700; display:inline-flex; align-items:center; gap:0.5rem;" onclick="App.views.admin.exportUserAgreementToWord('template')">
-            📄 <span class="lang-en">Download Master Agreement Template (Word .doc)</span><span class="lang-es">Descargar Plantilla Master Referral Agreement (Word .doc)</span>
-          </button>
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px;">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; flex:1; min-width:260px;">
+              <label for="admin-agreements-doc-selector" style="font-size:0.82rem; font-weight:700; color:#334155; white-space:nowrap;">
+                👤 <span class="lang-en">User / Document Variant:</span><span class="lang-es">Usuario / Variante de Contrato:</span>
+              </label>
+              <select id="admin-agreements-doc-selector" class="form-select" style="margin-bottom:0; flex:1; min-width:250px; max-width:460px; font-size:0.86rem; font-weight:600; padding:8px 32px 8px 12px; border-radius:9px;" onchange="App.views.admin.onAgreementDocSelectorChange(this.value)">
+                <optgroup label="Plantillas Base según Rol">
+                  <option value="template:embajador">👑 Plantilla — Acuerdo de Embajador</option>
+                  <option value="template:colaborador">🤝 Plantilla — Acuerdo de Colaborador</option>
+                  <option value="template:broker">🏢 Plantilla — Acuerdo Marco de Broker</option>
+                  <option value="template:realtor">🏠 Plantilla — Acuerdo de Agente / Realtor</option>
+                </optgroup>
+              </select>
+              <span id="admin-agreements-variant-badge" style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; font-size:0.75rem; font-weight:800; background:#fffbeb; color:#92400e; border:1px solid #f59e0b; white-space:nowrap;">
+                👑 Acuerdo de Embajador
+              </span>
+            </div>
+            <button type="button" id="admin-agreements-download-btn" class="btn btn-primary" style="background:#92400e; border-color:#92400e; font-weight:700; display:inline-flex; align-items:center; gap:0.5rem; white-space:nowrap;" onclick="App.views.admin.downloadSelectedAgreementDoc()">
+              👑 <span class="lang-en">Download Ambassador Template (Word .doc)</span><span class="lang-es">Descargar Plantilla de Embajador (Word .doc)</span>
+            </button>
+          </div>
         </div>
 
         <!-- Agreements Pending Contract Preparation / Signature -->
@@ -1590,6 +1609,7 @@
               </div>
             </div>
           </div>
+          <div id="broker-dash-referral-branding"></div>
         </div>
         <!-- Manual Add Client Button -->
         <div id="broker-dash-add-client-btn" style="margin-top: 16px;"></div>
@@ -1756,6 +1776,7 @@
               </div>
             </div>
           </div>
+          <div id="realtor-dash-referral-branding"></div>
         </div>
         <!-- Manual Add Client Button -->
         <div id="realtor-dash-add-client-btn" style="margin-top: 16px;"></div>
@@ -1837,6 +1858,7 @@
               </div>
             </div>
           </div>
+          <div id="realtor-referral-branding"></div>
         </div>
         <div class="dashboard-section" id="realtor-referral-buyer-guide"></div>
         <div class="stat-cards-grid stat-cards-grid--4cols">
@@ -1979,6 +2001,7 @@
               </div>
             </div>
           </div>
+          <div id="agent-dash-referral-branding" style="display: none;"></div>
         </div>
         <!-- Manual Add Client Button -->
         <div id="agent-dash-add-client-btn" style="margin-top: 16px;"></div>
@@ -2172,6 +2195,21 @@
       </div>
     </div>
 
+    <!-- ==================== VIEW: COLABORADOR DOCUMENTS ==================== -->
+    <div id="view-colaborador-documents" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1>📄 <span class="lang-en">Collaborator Agreement &amp; Fiscal Data</span><span class="lang-es">Acuerdo de Colaborador, Guía y Datos Fiscales</span></h1>
+          <p class="dashboard-subtitle">
+            <span class="lang-en">Download your personalized Spain Buyer's Guide and manage your tax details and Strategic Collaborator Agreement</span>
+            <span class="lang-es">Descarga tu Guía del Comprador personalizada y gestiona tus datos fiscales, cuenta bancaria y Acuerdo de Colaboración Estratégica</span>
+          </p>
+        </div>
+        <div class="dashboard-section" id="colaborador-docs-buyer-guide" style="margin-bottom: 1.5rem;"></div>
+        <div id="colaborador-contract-section"></div>
+      </div>
+    </div>
+
     <!-- ==================== VIEW: PARTNER DASHBOARD ==================== -->
     <div id="view-partner-dashboard" class="app-view">
       <div class="dashboard-content">
@@ -2244,6 +2282,7 @@
               </div>
             </div>
           </div>
+          <div id="partner-dash-referral-branding"></div>
         </div>
 
         <!-- Account Settings / Email -->
@@ -2409,6 +2448,9 @@
           </div>
         </div>
         
+        <!-- PERSONALIZED REFERRAL LINK LOGO & BRAND -->
+        <div class="dashboard-section" id="profile-referral-branding-section" style="display: none; margin-top: 1.5rem;"></div>
+
         <!-- PERSONALIZED BUYER GUIDE (RE/MAX Inmomás agents) -->
         <div class="dashboard-section" id="profile-buyer-guide-section" style="display: none; margin-top: 1.5rem;"></div>
 
@@ -2530,6 +2572,7 @@
               </div>
             </div>
           </div>
+          <div id="embajador-dash-referral-branding"></div>
         </div>
 
         <!-- Personalized Buyer Guide -->
@@ -2969,6 +3012,10 @@
         <span class="dashboard-bnav-icon">🤝</span>
         <span class="lang-en">Clients</span><span class="lang-es">Clientes</span>
       </a>
+      <a href="#colaborador/documents" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">📄</span>
+        <span class="lang-en">Docs</span><span class="lang-es">Docs</span>
+      </a>
       <a href="#colaborador/finances" class="dashboard-bnav-item">
         <span class="dashboard-bnav-icon">💰</span>
         <span class="lang-en">Finances</span><span class="lang-es">Finanzas</span>
@@ -2980,10 +3027,6 @@
       <a href="#colaborador/partners" class="dashboard-bnav-item">
         <span class="dashboard-bnav-icon">👥</span>
         <span class="lang-en">Partners</span><span class="lang-es">Partners</span>
-      </a>
-      <a href="#profile" class="dashboard-bnav-item">
-        <span class="dashboard-bnav-icon">👤</span>
-        <span class="lang-en">Profile</span><span class="lang-es">Perfil</span>
       </a>
     </div>
 
@@ -3081,18 +3124,19 @@
   <!-- ===================== SCRIPTS ===================== -->
   <script src="js/notifications.js?v=20261119_v7"></script>
   <script src="js/firebase-config.js?v=20261119_v4"></script>
-  <script src="js/utils.js?v=20261119_v10"></script>
-  <script src="js/auth-service.js?v=20261119_v11"></script>
+  <script src="js/utils.js?v=20261119_v12"></script>
+  <script src="js/auth-service.js?v=20261119_v13"></script>
   <script src="js/buyer-guide.js?v=20261119_v9"></script>
-  <script src="js/router.js?v=20261119_v7"></script>
-  <script src="js/views/auth-views.js?v=20261119_v7"></script>
-  <script src="js/views/admin-views.js?v=20261119_v10"></script>
-  <script src="js/views/embajador-views.js?v=20261119_v10"></script>
-  <script src="js/views/broker-views.js?v=20261119_v10"></script>
-  <script src="js/views/realtor-views.js?v=20261119_v6"></script>
-  <script src="js/views/agent-views.js?v=20261119_v11"></script>
-  <script src="js/views/partner-views.js?v=20261119_v3"></script>
-  <script src="js/referral-agreement.js?v=20261119_v4"></script>
+  <script src="js/referral-branding.js?v=20261119_v2"></script>
+  <script src="js/router.js?v=20261119_v8"></script>
+  <script src="js/views/auth-views.js?v=20261119_v9"></script>
+  <script src="js/views/admin-views.js?v=20261119_v12"></script>
+  <script src="js/views/embajador-views.js?v=20261119_v11"></script>
+  <script src="js/views/broker-views.js?v=20261119_v12"></script>
+  <script src="js/views/realtor-views.js?v=20261119_v7"></script>
+  <script src="js/views/agent-views.js?v=20261119_v13"></script>
+  <script src="js/views/partner-views.js?v=20261119_v4"></script>
+  <script src="js/referral-agreement.js?v=20261119_v6"></script>
   <script src="js/main.js?v=20261119_v3"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {

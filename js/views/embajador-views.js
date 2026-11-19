@@ -226,6 +226,11 @@
         `;
       }
 
+      const dashBrandingEl = document.getElementById('embajador-dash-referral-branding');
+      if (dashBrandingEl && App.referralBranding && App.referralBranding.canUse(currentUser)) {
+        App.referralBranding.renderEditor(dashBrandingEl, currentUser, { compact: true });
+      }
+
       const dashGuideEl = document.getElementById('embajador-dash-buyer-guide');
       if (dashGuideEl && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
         App.buyerGuide.renderEditor(dashGuideEl, currentUser);

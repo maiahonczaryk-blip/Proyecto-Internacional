@@ -192,6 +192,12 @@
         `;
       }
 
+      // Referral Link Logo & Brand Customizer
+      const realtorDashBranding = document.getElementById('realtor-dash-referral-branding');
+      if (realtorDashBranding && App.referralBranding && App.referralBranding.canUse(currentUser)) {
+        App.referralBranding.renderEditor(realtorDashBranding, currentUser, { compact: true });
+      }
+
       // Personalized Buyer Guide
       const realtorDashGuide = document.getElementById('realtor-dash-buyer-guide');
       if (realtorDashGuide && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
@@ -503,6 +509,12 @@
       setTextById('referral-stat-active',     activeInPipeline);
       setTextById('referral-stat-converted',  converted);
       setTextById('referral-stat-conversion', conversionRate + '%');
+
+      // Referral Link Logo & Brand Customizer in Referral Tools
+      const realtorRefBranding = document.getElementById('realtor-referral-branding');
+      if (realtorRefBranding && App.referralBranding && App.referralBranding.canUse(currentUser)) {
+        App.referralBranding.renderEditor(realtorRefBranding, currentUser, { compact: true });
+      }
 
       // Personalized Buyer Guide in Referral Tools
       const realtorRefGuide = document.getElementById('realtor-referral-buyer-guide');

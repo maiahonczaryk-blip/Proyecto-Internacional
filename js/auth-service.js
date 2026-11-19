@@ -1287,8 +1287,8 @@ App.auth = (function() {
         r.brokerId = cleanBrokerId;
         r.brokerStatus = cleanBrokerId ? 'approved' : null;
         if (syncedEmbajadorId && !r.embajadorId) r.embajadorId = syncedEmbajadorId;
-        if (targetBroker && targetBroker.agencyName && !r.agencyName) r.agencyName = targetBroker.agencyName;
-        if (targetBroker && targetBroker.agencyLogo && !r.agencyLogo) r.agencyLogo = targetBroker.agencyLogo;
+        if (targetBroker && targetBroker.agencyName) r.agencyName = targetBroker.agencyName;
+        if (targetBroker) r.agencyLogo = targetBroker.agencyLogo || null;
         r.updatedAt = now;
       }
       // If Realtor belonged to an Embajador and Broker registered later without Embajador, attach Broker to the Embajador's umbrella!
@@ -1319,11 +1319,11 @@ App.auth = (function() {
       if (syncedEmbajadorId && !targetRealtor.embajadorId) {
         realtorPatch.embajadorId = syncedEmbajadorId;
       }
-      if (targetBroker && targetBroker.agencyName && !targetRealtor.agencyName) {
+      if (targetBroker && targetBroker.agencyName) {
         realtorPatch.agencyName = targetBroker.agencyName;
       }
-      if (targetBroker && targetBroker.agencyLogo && !targetRealtor.agencyLogo) {
-        realtorPatch.agencyLogo = targetBroker.agencyLogo;
+      if (targetBroker) {
+        realtorPatch.agencyLogo = targetBroker.agencyLogo || null;
       }
       await App.db.collection('users').doc(realtorId).update(realtorPatch);
 
@@ -1357,39 +1357,69 @@ App.auth = (function() {
     }
   }
 
-  /* ---- Update User / Office Agency Branding & Logo (Admin action) ---- */
+  /* ---- Update User / Office Agency Branding & Logo (Self or Admin action) ---- */
   async function updateUserAgencyBranding(userId, { agencyName, agencyLogo, applyToOffice = true } = {}) {
+    if (!userId) throw new Error('User ID is required.');
     const now = new Date().toISOString();
     const cleanAgencyName = typeof agencyName === 'string' ? agencyName.trim() : undefined;
+    const isAdminCaller = !!(currentUser && currentUser.role === 'admin');
+    const GENERIC_AGENCIES = new Set(['', 'independent', 'independiente', 'none', '—', '-']);
+    const isSpecificAgency = (val) => val && !GENERIC_AGENCIES.has(val.trim().toLowerCase());
 
     if (App.demoMode) {
       const targetUser = App.demoData.users.find(u => u.id === userId);
       if (!targetUser) throw new Error('User not found.');
 
+      if (!isAdminCaller && targetUser.role === 'realtor') {
+        const parents = App.utils && App.utils.resolveUserUmbrellaParents
+          ? App.utils.resolveUserUmbrellaParents(targetUser, App.demoData.users)
+          : { broker: targetUser.brokerId ? App.demoData.users.find(u => u.id === targetUser.brokerId) : null };
+        if (targetUser.brokerId || parents.broker) {
+          throw new Error('Tu enlace está bajo el paraguas de un Broker: el logo es oficial de tu oficina y solo puede editarlo tu Broker.');
+        }
+      }
+
+      const effectiveApplyToOffice = targetUser.role === 'broker' ? true : applyToOffice;
       const oldAgencyName = (targetUser.agencyName || '').trim().toLowerCase();
       const officeBrokerId = targetUser.role === 'broker' ? targetUser.id : (targetUser.brokerId || null);
 
       const usersToUpdate = [targetUser];
-      if (applyToOffice) {
+      if (effectiveApplyToOffice) {
+        const lk = App.utils && App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(App.demoData.users) : null;
         App.demoData.users.forEach(u => {
           if (u.id === targetUser.id) return;
-          const sameBrokerOffice = officeBrokerId && (u.id === officeBrokerId || u.brokerId === officeBrokerId);
+          let sameBrokerOffice = Boolean(officeBrokerId && (u.id === officeBrokerId || u.brokerId === officeBrokerId));
+          if (!sameBrokerOffice && officeBrokerId && u.role === 'realtor' && App.utils && App.utils.resolveUserUmbrellaParents) {
+            const p = App.utils.resolveUserUmbrellaParents(u, App.demoData.users, lk);
+            if (p.broker && p.broker.id === officeBrokerId) sameBrokerOffice = true;
+          }
           const uAgency = (u.agencyName || '').trim().toLowerCase();
-          const sameAgencyName = (oldAgencyName && uAgency === oldAgencyName) ||
-            (cleanAgencyName && uAgency === cleanAgencyName.toLowerCase());
+          const sameAgencyName = isAdminCaller && (
+            (isSpecificAgency(oldAgencyName) && uAgency === oldAgencyName) ||
+            (isSpecificAgency(cleanAgencyName) && uAgency === cleanAgencyName.toLowerCase())
+          );
           if (sameBrokerOffice || sameAgencyName) {
             usersToUpdate.push(u);
           }
         });
       }
 
+      const updatedIds = new Set();
       usersToUpdate.forEach(u => {
         if (cleanAgencyName !== undefined) u.agencyName = cleanAgencyName;
         if (agencyLogo !== undefined) u.agencyLogo = agencyLogo || null;
         u.updatedAt = now;
+        updatedIds.add(u.id);
       });
 
       saveDemoData();
+      if (currentUser && updatedIds.has(currentUser.id)) {
+        if (cleanAgencyName !== undefined) currentUser.agencyName = cleanAgencyName;
+        if (agencyLogo !== undefined) currentUser.agencyLogo = agencyLogo || null;
+        currentUser.updatedAt = now;
+        try { localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser)); } catch (e) { /* quota */ }
+        notifyAuthChange();
+      }
       return { updatedCount: usersToUpdate.length };
     } else {
       const userRef = App.db.collection('users').doc(userId);
@@ -1397,34 +1427,69 @@ App.auth = (function() {
       if (!userDoc.exists) throw new Error('User not found.');
       const targetUser = { id: userDoc.id, ...userDoc.data() };
 
+      let cachedAllUsers = null;
+      const loadAllUsersOnce = async () => {
+        if (cachedAllUsers) return cachedAllUsers;
+        const snap = await App.db.collection('users').get();
+        cachedAllUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        return cachedAllUsers;
+      };
+
+      if (!isAdminCaller && targetUser.role === 'realtor') {
+        let hasParentBroker = Boolean(targetUser.brokerId);
+        if (!hasParentBroker && targetUser.referredBy && App.utils && App.utils.resolveUserUmbrellaParents) {
+          const pool = await loadAllUsersOnce();
+          const parents = App.utils.resolveUserUmbrellaParents(targetUser, pool);
+          if (parents.broker) hasParentBroker = true;
+        }
+        if (hasParentBroker) {
+          throw new Error('Tu enlace está bajo el paraguas de un Broker: el logo es oficial de tu oficina y solo puede editarlo tu Broker.');
+        }
+      }
+
+      const effectiveApplyToOffice = targetUser.role === 'broker' ? true : applyToOffice;
       const updatePayload = { updatedAt: now };
       if (cleanAgencyName !== undefined) updatePayload.agencyName = cleanAgencyName;
       if (agencyLogo !== undefined) updatePayload.agencyLogo = agencyLogo || null;
 
       await userRef.update(updatePayload);
       let updatedCount = 1;
+      const updatedIds = new Set([userId]);
 
-      if (applyToOffice) {
+      if (effectiveApplyToOffice) {
         const oldAgencyName = (targetUser.agencyName || '').trim().toLowerCase();
         const officeBrokerId = targetUser.role === 'broker' ? targetUser.id : (targetUser.brokerId || null);
-
-        const allSnap = await App.db.collection('users').get();
+        const pool = await loadAllUsersOnce();
+        const lk = App.utils && App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(pool) : null;
         const batchPromises = [];
-        allSnap.docs.forEach(doc => {
-          if (doc.id === userId) return;
-          const u = doc.data();
-          const sameBrokerOffice = officeBrokerId && (doc.id === officeBrokerId || u.brokerId === officeBrokerId);
+
+        pool.forEach(u => {
+          if (u.id === userId) return;
+          let sameBrokerOffice = Boolean(officeBrokerId && (u.id === officeBrokerId || u.brokerId === officeBrokerId));
+          if (!sameBrokerOffice && officeBrokerId && u.role === 'realtor' && App.utils && App.utils.resolveUserUmbrellaParents) {
+            const p = App.utils.resolveUserUmbrellaParents(u, pool, lk);
+            if (p.broker && p.broker.id === officeBrokerId) sameBrokerOffice = true;
+          }
           const uAgency = (u.agencyName || '').trim().toLowerCase();
-          const sameAgencyName = (oldAgencyName && uAgency === oldAgencyName) ||
-            (cleanAgencyName && uAgency === cleanAgencyName.toLowerCase());
+          const sameAgencyName = isAdminCaller && (
+            (isSpecificAgency(oldAgencyName) && uAgency === oldAgencyName) ||
+            (isSpecificAgency(cleanAgencyName) && uAgency === cleanAgencyName.toLowerCase())
+          );
           if (sameBrokerOffice || sameAgencyName) {
-            batchPromises.push(App.db.collection('users').doc(doc.id).update(updatePayload));
+            batchPromises.push(App.db.collection('users').doc(u.id).update(updatePayload));
+            updatedIds.add(u.id);
             updatedCount++;
           }
         });
+
         if (batchPromises.length > 0) {
           await Promise.all(batchPromises);
         }
+      }
+
+      if (currentUser && updatedIds.has(currentUser.id)) {
+        Object.assign(currentUser, updatePayload);
+        notifyAuthChange();
       }
 
       return { updatedCount };

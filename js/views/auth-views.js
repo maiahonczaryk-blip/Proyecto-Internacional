@@ -236,17 +236,24 @@ App.views.auth = {
     if (joinedEl) joinedEl.textContent = App.utils.formatDate(user.createdAt);
 
     // Populate Broker Name only for roles that can report to a Broker (Realtors / Colaboradores)
+    let resolvedParentBroker = null;
     const brokerGroupEl = document.getElementById('profile-broker-group') || (brokerEl ? brokerEl.parentElement : null);
     if (brokerGroupEl && ['embajador', 'broker', 'admin', 'agent_inmomas', 'partner'].includes(user.role)) {
       brokerGroupEl.style.display = 'none';
     } else if (brokerEl) {
       if (brokerGroupEl) brokerGroupEl.style.display = '';
-      if (user.brokerId) {
+      if (user.role === 'realtor' && App.referralBranding && typeof App.referralBranding.resolveParentBrokerForRealtor === 'function') {
+        resolvedParentBroker = await App.referralBranding.resolveParentBrokerForRealtor(user);
+      } else if (user.brokerId) {
         try {
-          const broker = await App.auth.getUser(user.brokerId);
-          brokerEl.textContent = broker ? `${broker.firstName} ${broker.lastName}` : '—';
-        } catch (e) {
-          brokerEl.textContent = '—';
+          resolvedParentBroker = await App.auth.getUser(user.brokerId);
+        } catch (_) {}
+      }
+      if (resolvedParentBroker && (resolvedParentBroker.firstName || resolvedParentBroker.lastName || resolvedParentBroker.agencyName)) {
+        const bFullName = `${resolvedParentBroker.firstName || ''} ${resolvedParentBroker.lastName || ''}`.trim();
+        brokerEl.textContent = bFullName || resolvedParentBroker.agencyName || '—';
+        if (user.role === 'realtor' && resolvedParentBroker.agencyName && agencyEl) {
+          agencyEl.textContent = resolvedParentBroker.agencyName;
         }
       } else {
         brokerEl.innerHTML = '<span class="lang-en">None / Independent</span><span class="lang-es">Independiente</span>';
@@ -257,7 +264,17 @@ App.views.auth = {
     if (editFirstName) editFirstName.value = user.firstName || '';
     if (editLastName) editLastName.value = user.lastName || '';
     if (editPhone) editPhone.value = user.phone || '';
-    if (editAgencyName) editAgencyName.value = user.agencyName || (user.role === 'agent_inmomas' ? 'RE/MAX Inmomás' : '');
+    if (editAgencyName) {
+      const lockedToBroker = Boolean(user.role === 'realtor' && (user.brokerId || resolvedParentBroker));
+      const brokerAgencyVal = resolvedParentBroker && resolvedParentBroker.agencyName ? resolvedParentBroker.agencyName : '';
+      editAgencyName.value = lockedToBroker
+        ? (brokerAgencyVal || user.agencyName || '')
+        : (user.agencyName || (user.role === 'agent_inmomas' ? 'RE/MAX Inmomás' : ''));
+      editAgencyName.readOnly = lockedToBroker;
+      editAgencyName.style.backgroundColor = lockedToBroker ? '#f1f5f9' : '';
+      editAgencyName.style.cursor = lockedToBroker ? 'not-allowed' : '';
+      editAgencyName.title = lockedToBroker ? 'Gestionado por tu Broker / Managed by your Broker' : '';
+    }
     if (editCountry) {
       if (editCountry.tagName === 'SELECT' && App.utils.getCountryOptionsHtml) {
         editCountry.innerHTML = App.utils.getCountryOptionsHtml(user.country || userNationality || 'United States', true, '— Seleccionar País —');
@@ -420,6 +437,25 @@ App.views.auth = {
           App.utils.showToast(err.message, 'error');
         }
       };
+    }
+
+    // 7a. Personalized Referral Link Logo & Brand (Brokers, Realtors, Colaboradores, Embajadores, Partners)
+    const brandingSection = document.getElementById('profile-referral-branding-section');
+    if (brandingSection) {
+      const canUseBranding = App.referralBranding && App.referralBranding.canUse(user);
+      brandingSection.style.display = canUseBranding ? 'block' : 'none';
+      if (canUseBranding) {
+        App.referralBranding.renderEditor(brandingSection, user, { compact: false });
+        if (brandingSection._profileAgencyCleanup) brandingSection._profileAgencyCleanup();
+        const syncProfileAgencyText = (ev) => {
+          const d = ev && ev.detail;
+          if (!d || d.userId !== user.id) return;
+          if (agencyEl) agencyEl.textContent = d.agencyName || '—';
+          if (editAgencyName) editAgencyName.value = d.agencyName || '';
+        };
+        window.addEventListener('agencyBrandingUpdated', syncProfileAgencyText);
+        brandingSection._profileAgencyCleanup = () => window.removeEventListener('agencyBrandingUpdated', syncProfileAgencyText);
+      }
     }
 
     // 7b. Personalized Buyer Guide (All Professionals + Admins)

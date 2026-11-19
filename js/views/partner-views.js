@@ -43,6 +43,11 @@ App.views.partner = (function() {
         clientLinkInput.value = clientWebinarLink;
       }
 
+      const partnerDashBranding = document.getElementById('partner-dash-referral-branding');
+      if (partnerDashBranding && App.referralBranding && App.referralBranding.canUse(user)) {
+        App.referralBranding.renderEditor(partnerDashBranding, user, { compact: true });
+      }
+
       // Account Settings / Email Logic
       const emailInput = document.getElementById('partner-email');
       const saveEmailBtn = document.getElementById('btn-partner-save-email');
