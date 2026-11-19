@@ -1014,6 +1014,7 @@ App.auth = (function() {
     if (!userId) throw new Error('User ID is required.');
     const clean = (v) => (typeof v === 'string' ? v.trim() : '');
     const buyerGuide = {
+      name: clean(guideData.name),
       title: clean(guideData.title),
       mobile: clean(guideData.mobile),
       email: clean(guideData.email),
