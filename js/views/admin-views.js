@@ -24,6 +24,9 @@
   let filteredUsersCache = [];
   let filteredClientsCache = [];
   let filteredUnifiedCache = [];
+  let currentUsersViewMode = 'umbrella'; // 'umbrella' | 'table'
+  let expandedAdminNodes = new Set();
+  let adminUmbrellaInitialized = false;
 
   function jumpToRegionView(routeName, regionId) {
     pendingAdminRegionFilter = regionId || '';
@@ -657,16 +660,37 @@
      ============================================ */
   async function initUsers() {
     try {
-      // 1. Load all users
-      allUsers = await App.auth.getAllUsers();
+      // 1. Load all users, webinar registrations & clients in parallel
+      const [loadedUsers, webinarRegs, loadedClients] = await Promise.all([
+        App.auth.getAllUsers(),
+        App.auth.getWebinarRegistrations(),
+        App.auth.getClients()
+      ]);
+      allUsers = loadedUsers || [];
+      allClients = loadedClients || [];
 
-      // Fetch webinar registrations to correlate
-      const webinarRegs = await App.auth.getWebinarRegistrations();
-      
       // Attach webinar registration status
       allUsers.forEach(u => {
-        u.isWebinarRegistered = webinarRegs.some(r => r.email.toLowerCase() === u.email.toLowerCase());
+        u.isWebinarRegistered = (webinarRegs || []).some(r => (r.email || '').toLowerCase() === (u.email || '').toLowerCase());
       });
+
+      // Populate RE/MAX Inmomás Agent Filter
+      const inmomasFilterSel = document.getElementById('admin-filter-inmomas-agent');
+      if (inmomasFilterSel) {
+        const prevVal = inmomasFilterSel.value || '';
+        const activeInmomas = allUsers
+          .filter(u => u.role === 'agent_inmomas' && (u.status === 'active' || u.status === 'approved'))
+          .sort((a, b) => `${a.firstName || ''} ${a.lastName || ''}`.localeCompare(`${b.firstName || ''} ${b.lastName || ''}`));
+        inmomasFilterSel.innerHTML = `
+          <option value="">🇪🇸 Todos los Agentes Inmomás</option>
+          <option value="__unassigned__" ${prevVal === '__unassigned__' ? 'selected' : ''}>⚠️ Sin Agente Inmomás asignado</option>
+          ${activeInmomas.map(a => {
+            const label = `${a.firstName || ''} ${a.lastName || ''}`.trim();
+            return `<option value="${a.id}" ${prevVal === a.id ? 'selected' : ''}>🇪🇸 ${App.utils.escapeHtml(label)}</option>`;
+          }).join('')}
+        `;
+        inmomasFilterSel.onchange = handleFilters;
+      }
 
       // Populate Region & Country Filters
       const regionSelect = document.getElementById('admin-filter-region');
@@ -693,10 +717,11 @@
         countrySelect.onchange = handleFilters;
       }
 
-      // 2. Bind filter and search handlers + render (applying any active filter)
+      // 2. Bind filter and search handlers + render
       bindFilterRole();
       bindFilterStatus();
       bindSearchInput();
+      setUsersViewMode(currentUsersViewMode, false);
       handleFilters();
 
       // 4. Role Notification Banner (ONLY for José Martínez, NEVER for Maia / Super Admin)
@@ -810,17 +835,26 @@
         </button>
       `;
 
-      let sourceStr = user.source ? App.utils.escapeHtml(user.source) : ((user.referredBy || user.inmomasAgentName) ? 'Referral' : 'Direct');
-      if (user.referredBy) {
-        const agent = window.App && window.App.auth && allUsers ? allUsers.find(u => u.referralCode === user.referredBy || u.id === user.referredBy || (u.referralCode && u.referralCode.toUpperCase() === user.referredBy.toUpperCase())) : null;
-        if (agent) {
-          sourceStr = `<span style="font-weight:600; color:#047857;">Paraguas: ${App.utils.escapeHtml(agent.firstName)} ${App.utils.escapeHtml(agent.lastName)}</span>`;
-        } else {
-          sourceStr = `<span style="font-weight:600; color:#047857;">Paraguas: ${App.utils.escapeHtml(user.referredBy)}</span>`;
-        }
+      const lookupMaps = App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(allUsers) : null;
+      const parents = App.utils.resolveUserUmbrellaParents ? App.utils.resolveUserUmbrellaParents(user, allUsers, lookupMaps) : { embajador: null, broker: null };
+      const chainParts = [];
+      if (parents.embajador && parents.embajador.id !== user.id) {
+        chainParts.push(`<span class="umbrella-chain-pill umbrella-chain-pill--embajador">👑 ${App.utils.escapeHtml(parents.embajador.firstName || '')} ${App.utils.escapeHtml(parents.embajador.lastName || '')}</span>`);
       }
-      if (user.inmomasAgentName && (!user.referredBy || !sourceStr.includes(user.inmomasAgentName))) {
-        sourceStr += `<div style="font-size:0.78em; color:#0369a1; font-weight:600; margin-top:2px;">🇪🇸 Agente Inmomás: ${App.utils.escapeHtml(user.inmomasAgentName)}</div>`;
+      if (parents.broker && parents.broker.id !== user.id) {
+        const brkLabel = parents.broker.agencyName || `${parents.broker.firstName || ''} ${parents.broker.lastName || ''}`.trim();
+        chainParts.push(`<span class="umbrella-chain-pill umbrella-chain-pill--broker">🏢 ${App.utils.escapeHtml(brkLabel)}</span>`);
+      }
+
+      let sourceStr = '';
+      if (chainParts.length > 0) {
+        sourceStr = `<div class="umbrella-chain-pills" style="margin-bottom:4px;">${chainParts.join('<span style="color:#94a3b8;font-size:0.72rem;">➔</span>')}</div>`;
+      } else {
+        const fallbackLabel = user.source ? App.utils.escapeHtml(user.source) : 'Directo';
+        sourceStr = `<div style="font-size:0.76rem; color:#64748b; margin-bottom:4px;">${fallbackLabel}</div>`;
+      }
+      if (user.role !== 'admin' && user.role !== 'agent_inmomas' && App.utils.renderInmomasAgentBadge) {
+        sourceStr += `<div>${App.utils.renderInmomasAgentBadge(user, allUsers, { showUnassigned: true, maps: lookupMaps })}</div>`;
       }
 
       const webinarStr = user.isWebinarRegistered 
@@ -892,24 +926,606 @@
     input.addEventListener('input', debouncedFilter);
   }
 
+  /* ── View Mode Switch & Accordion Controls ── */
+  function setUsersViewMode(mode, reRender = true) {
+    currentUsersViewMode = mode === 'table' ? 'table' : 'umbrella';
+    const umbContainer = document.getElementById('admin-users-umbrella-container');
+    const tblWrap = document.getElementById('admin-users-table-wrap');
+    const expControls = document.getElementById('admin-umbrella-expand-controls');
+    const btnUmb = document.getElementById('btn-admin-users-mode-umbrella');
+    const btnTbl = document.getElementById('btn-admin-users-mode-table');
+
+    if (umbContainer) umbContainer.style.display = currentUsersViewMode === 'umbrella' ? 'flex' : 'none';
+    if (tblWrap) tblWrap.style.display = currentUsersViewMode === 'table' ? 'block' : 'none';
+    if (expControls) expControls.style.display = currentUsersViewMode === 'umbrella' ? 'inline-flex' : 'none';
+    if (btnUmb) btnUmb.classList.toggle('active', currentUsersViewMode === 'umbrella');
+    if (btnTbl) btnTbl.classList.toggle('active', currentUsersViewMode === 'table');
+
+    if (reRender) handleFilters();
+  }
+
+  function toggleUmbrellaNode(nodeId) {
+    if (!nodeId) return;
+    const domEl = document.getElementById(`adm-umb-node-${nodeId}`);
+    if (expandedAdminNodes.has(nodeId)) {
+      expandedAdminNodes.delete(nodeId);
+      if (domEl) domEl.classList.remove('is-open');
+    } else {
+      expandedAdminNodes.add(nodeId);
+      if (domEl) domEl.classList.add('is-open');
+    }
+  }
+
+  function expandAllUmbrellas(expand) {
+    const container = document.getElementById('admin-users-umbrella-container');
+    if (!container) return;
+    const nodes = container.querySelectorAll('[data-umb-node]');
+    nodes.forEach(el => {
+      const id = el.getAttribute('data-umb-node');
+      if (expand) {
+        expandedAdminNodes.add(id);
+        el.classList.add('is-open');
+      } else {
+        expandedAdminNodes.delete(id);
+        el.classList.remove('is-open');
+      }
+    });
+  }
+
+  function buildAdminQuickActions(user) {
+    let html = `
+      <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); App.views.admin.viewUser('${user.id}')" title="Ver / Asignar Paraguas o Agente Inmomás">
+        👁
+      </button>
+    `;
+    if (user.status === 'pending') {
+      html += `
+        <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation(); App.views.admin.handleApprove('${user.id}')" title="Aprobar">✓</button>
+        <button type="button" class="btn btn-danger btn-sm" onclick="event.stopPropagation(); App.views.admin.handleReject('${user.id}')" title="Rechazar">✕</button>
+      `;
+    } else if (user.status === 'rejected') {
+      html += `
+        <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation(); App.views.admin.handleApprove('${user.id}')" title="Re-aprobar">✓</button>
+      `;
+    }
+    return html;
+  }
+
+  function countDirectClientsForUser(user) {
+    if (!user || !allClients || !allClients.length) return 0;
+    const uCode = user.referralCode ? String(user.referralCode).toUpperCase().trim() : '';
+    return allClients.filter(c => {
+      if (!c) return false;
+      const cRef = c.referredBy ? String(c.referredBy).toUpperCase().trim() : '';
+      return c.realtorId === user.id ||
+             c.brokerId === user.id ||
+             c.embajadorId === user.id ||
+             c.referredBy === user.id ||
+             (uCode && cRef === uCode);
+    }).length;
+  }
+
+  function renderAdminLeafCard(u, lookupMaps) {
+    const isColab = u.role === 'colaborador';
+    const roleIcon = isColab ? '🤝' : '🏠';
+    const roleLabel = isColab ? 'Colaborador' : 'Realtor';
+    const clientCnt = countDirectClientsForUser(u);
+    const statusBadge = App.utils.getUserStatusBadge(u.status);
+    const inmomasBadge = App.utils.renderInmomasAgentBadge
+      ? App.utils.renderInmomasAgentBadge(u, allUsers, { showUnassigned: true, compact: true, maps: lookupMaps })
+      : '';
+    const subMeta = [u.agencyName, u.country].filter(Boolean).join(' · ');
+
+    return `
+      <div class="umbrella-leaf ${isColab ? 'umbrella-leaf--colaborador' : ''}">
+        <div style="min-width:0; flex:1;">
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <span style="font-weight:700; color:#0f172a;">${roleIcon} ${App.utils.escapeHtml(u.firstName || '')} ${App.utils.escapeHtml(u.lastName || '')}</span>
+            <span style="font-size:0.7rem; font-weight:700; color:#475569; background:#f1f5f9; padding:1px 6px; border-radius:999px;">${roleLabel}</span>
+            ${statusBadge}
+          </div>
+          <div style="font-size:0.75rem; color:#64748b; margin-top:2px; overflow:hidden; text-overflow:ellipsis;">
+            ${App.utils.escapeHtml(u.email || '—')}${subMeta ? ` · ${App.utils.escapeHtml(subMeta)}` : ''}
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:5px;">
+            ${inmomasBadge}
+            ${clientCnt > 0 ? `<span class="umbrella-kpi-pill umbrella-kpi-pill--clients" style="font-size:0.7rem; padding:1px 7px;">🏡 ${clientCnt} clientes</span>` : ''}
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+          ${buildAdminQuickActions(u)}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderUsersUmbrellaAccordion(filteredUsers, hasActiveFilter = false) {
+    const container = document.getElementById('admin-users-umbrella-container');
+    if (!container) return;
+
+    if (!filteredUsers || filteredUsers.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:3rem 1.5rem; background:#fff; border:1px solid #e2e8f0; border-radius:12px;">
+          <div style="font-size:2rem; margin-bottom:8px;">🔍</div>
+          <div style="font-weight:700; color:#0f172a;"><span class="lang-en">No users or umbrellas match your filters</span><span class="lang-es">Ningún usuario o paraguas coincide con los filtros</span></div>
+        </div>
+      `;
+      return;
+    }
+
+    const lookupMaps = App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(allUsers) : null;
+    const filteredIds = new Set(filteredUsers.map(u => u.id));
+
+    // Resolve parents for every user in the system so full hierarchy context is preserved
+    const parentInfoById = new Map();
+    allUsers.forEach(u => {
+      const p = App.utils.resolveUserUmbrellaParents
+        ? App.utils.resolveUserUmbrellaParents(u, allUsers, lookupMaps)
+        : { embajador: null, broker: null, directParent: null };
+      parentInfoById.set(u.id, p);
+    });
+
+    // 1. Embajadores section
+    const allEmbajadores = allUsers.filter(u => u.role === 'embajador');
+    const embajadorCards = [];
+
+    allEmbajadores.forEach(emb => {
+      // Find all members belonging to this Embajador
+      const embMembers = allUsers.filter(u => {
+        if (u.id === emb.id || !['broker', 'realtor', 'colaborador'].includes(u.role)) return false;
+        const p = parentInfoById.get(u.id);
+        return p && p.embajador && p.embajador.id === emb.id;
+      });
+
+      const matchingMembers = embMembers.filter(m => filteredIds.has(m.id));
+      const embMatchesSelf = filteredIds.has(emb.id);
+
+      if (!embMatchesSelf && matchingMembers.length === 0) return;
+
+      // If Embajador itself matched (e.g. searching Embajador name or no filter), show all their members unless role/status filter narrows children
+      const visibleMembers = hasActiveFilter && !embMatchesSelf ? matchingMembers : (hasActiveFilter ? matchingMembers : embMembers);
+      const brokersUnderEmb = embMembers.filter(m => m.role === 'broker');
+      const visibleBrokers = visibleMembers.filter(m => m.role === 'broker');
+
+      // Include brokers that have matching realtors even if broker itself didn't match search
+      const brokerIdsToRender = new Set(visibleBrokers.map(b => b.id));
+      visibleMembers.forEach(m => {
+        if (m.role !== 'broker') {
+          const p = parentInfoById.get(m.id);
+          if (p && p.broker && brokersUnderEmb.some(b => b.id === p.broker.id)) {
+            brokerIdsToRender.add(p.broker.id);
+          }
+        }
+      });
+
+      const brokersToShow = brokersUnderEmb.filter(b => brokerIdsToRender.has(b.id));
+      const directLeafs = visibleMembers.filter(m => {
+        if (m.role === 'broker') return false;
+        const p = parentInfoById.get(m.id);
+        return !(p && p.broker && brokersUnderEmb.some(b => b.id === p.broker.id));
+      });
+
+      const totalRealtors = embMembers.filter(m => m.role === 'realtor').length;
+      const totalColabs = embMembers.filter(m => m.role === 'colaborador').length;
+      const memberIdSet = new Set([emb.id, ...embMembers.map(m => m.id)]);
+      const memberCodeSet = new Set([emb.referralCode, ...embMembers.map(m => m.referralCode)].filter(Boolean).map(c => String(c).toUpperCase().trim()));
+      const totalEmbClients = (allClients || []).filter(c => {
+        if (!c) return false;
+        const cRef = c.referredBy ? String(c.referredBy).toUpperCase().trim() : '';
+        return (c.embajadorId && memberIdSet.has(c.embajadorId)) ||
+               (c.brokerId && memberIdSet.has(c.brokerId)) ||
+               (c.realtorId && memberIdSet.has(c.realtorId)) ||
+               (c.referredBy && (memberIdSet.has(c.referredBy) || (cRef && memberCodeSet.has(cRef))));
+      }).length;
+
+      const nodeId = `emb-${emb.id}`;
+      if (!adminUmbrellaInitialized && embMembers.length > 0 && embajadorCards.length < 2) {
+        expandedAdminNodes.add(nodeId);
+      }
+      const isOpen = hasActiveFilter ? true : expandedAdminNodes.has(nodeId);
+
+      const embAvatar = App.utils.generateAvatar(emb.firstName, emb.lastName, 'sm');
+      const embInmomasBadge = App.utils.renderInmomasAgentBadge
+        ? App.utils.renderInmomasAgentBadge(emb, allUsers, { showUnassigned: true, maps: lookupMaps })
+        : '';
+      const embRegBadges = App.utils.getUserRegionBadgesHtml ? App.utils.getUserRegionBadgesHtml(emb) : '';
+
+      const subBrokersHtml = brokersToShow.map(brk => {
+        const brkNodeId = `brk-${brk.id}`;
+        const allBrkTeam = embMembers.filter(m => {
+          if (m.role === 'broker') return false;
+          const p = parentInfoById.get(m.id);
+          return p && p.broker && p.broker.id === brk.id;
+        });
+        const shownBrkTeam = (hasActiveFilter && !filteredIds.has(brk.id))
+          ? allBrkTeam.filter(m => filteredIds.has(m.id))
+          : allBrkTeam;
+        const brkClients = countDirectClientsForUser(brk) + allBrkTeam.reduce((acc, r) => acc + countDirectClientsForUser(r), 0);
+        const brkInmomasBadge = App.utils.renderInmomasAgentBadge
+          ? App.utils.renderInmomasAgentBadge(brk, allUsers, { showUnassigned: true, compact: true, maps: lookupMaps })
+          : '';
+        const brkOpen = hasActiveFilter ? true : expandedAdminNodes.has(brkNodeId);
+        const logoHtml = brk.agencyLogo
+          ? `<img src="${App.utils.escapeHtml(brk.agencyLogo)}" alt="" style="height:20px; max-width:56px; object-fit:contain; border-radius:4px; border:1px solid #e2e8f0; background:#fff; padding:1px;">`
+          : '';
+
+        return `
+          <div class="umbrella-subcard ${brkOpen ? 'is-open' : ''}" id="adm-umb-node-${brkNodeId}" data-umb-node="${brkNodeId}">
+            <div class="umbrella-subcard__header" onclick="App.views.admin.toggleUmbrellaNode('${brkNodeId}')">
+              <div style="display:flex; align-items:center; gap:8px; min-width:200px; flex:1; flex-wrap:wrap;">
+                <span class="umbrella-chevron">▶</span>
+                <span class="umbrella-chain-pill umbrella-chain-pill--broker">🏢 Broker</span>
+                ${logoHtml}
+                <strong style="font-size:0.88rem; color:#0f172a;">${App.utils.escapeHtml(brk.firstName || '')} ${App.utils.escapeHtml(brk.lastName || '')}</strong>
+                ${brk.agencyName ? `<span style="font-size:0.8rem; color:#475569; font-weight:600;">· ${App.utils.escapeHtml(brk.agencyName)}</span>` : ''}
+                ${brk.country ? `<span style="font-size:0.75rem; color:#64748b;">(${App.utils.escapeHtml(brk.country)})</span>` : ''}
+                ${App.utils.getUserStatusBadge(brk.status)}
+              </div>
+              <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                ${brkInmomasBadge}
+                <span class="umbrella-kpi-pill">🏠 ${allBrkTeam.length} Realtors</span>
+                <span class="umbrella-kpi-pill umbrella-kpi-pill--clients">🏡 ${brkClients} Clientes</span>
+                ${buildAdminQuickActions(brk)}
+              </div>
+            </div>
+            <div class="umbrella-subcard__body">
+              ${shownBrkTeam.length > 0
+                ? `<div class="umbrella-leaf-grid">${shownBrkTeam.map(r => renderAdminLeafCard(r, lookupMaps)).join('')}</div>`
+                : `<div style="font-size:0.8rem; color:#64748b; padding:4px 2px;"><span class="lang-en">No realtors registered under this Broker yet.</span><span class="lang-es">Aún no hay realtors registrados bajo este Broker.</span></div>`
+              }
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const directLeafsHtml = directLeafs.length > 0 ? `
+        <div style="margin-top:${brokersToShow.length > 0 ? '6px' : '0'};">
+          <div style="font-size:0.76rem; font-weight:700; color:#92400e; margin-bottom:6px;">
+            ↳ <span class="lang-en">Direct under Ambassador (No intermediate Broker) — ${directLeafs.length}</span><span class="lang-es">Directos del Embajador (Nivel 1, sin Broker intermedio) — ${directLeafs.length}</span>
+          </div>
+          <div class="umbrella-leaf-grid">
+            ${directLeafs.map(d => renderAdminLeafCard(d, lookupMaps)).join('')}
+          </div>
+        </div>
+      ` : '';
+
+      const emptyEmbBody = (brokersToShow.length === 0 && directLeafs.length === 0)
+        ? `<div style="font-size:0.82rem; color:#64748b; padding:4px 0;"><span class="lang-en">No Brokers or Realtors under this Ambassador umbrella yet.</span><span class="lang-es">Aún no hay Brokers ni Agentes registrados bajo el paraguas de este Embajador.</span></div>`
+        : '';
+
+      embajadorCards.push(`
+        <div class="umbrella-card umbrella-card--embajador ${isOpen ? 'is-open' : ''}" id="adm-umb-node-${nodeId}" data-umb-node="${nodeId}">
+          <div class="umbrella-card__header" onclick="App.views.admin.toggleUmbrellaNode('${nodeId}')">
+            <div class="umbrella-card__left">
+              <span class="umbrella-chevron">▶</span>
+              ${embAvatar}
+              <div class="umbrella-card__identity">
+                <div class="umbrella-card__title-row">
+                  <span class="umbrella-chain-pill umbrella-chain-pill--embajador">👑 Embajador</span>
+                  <span class="umbrella-card__name">${App.utils.escapeHtml(emb.firstName || '')} ${App.utils.escapeHtml(emb.lastName || '')}</span>
+                  ${App.utils.getUserStatusBadge(emb.status)}
+                  ${embRegBadges}
+                </div>
+                <div class="umbrella-card__meta">
+                  <span>✉️ ${App.utils.escapeHtml(emb.email || '—')}</span>
+                  ${emb.agencyName ? `<span>· 🏢 ${App.utils.escapeHtml(emb.agencyName)}</span>` : ''}
+                  ${emb.country ? `<span>· 🏳️ ${App.utils.escapeHtml(emb.country)}</span>` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="umbrella-card__right">
+              ${embInmomasBadge}
+              <span class="umbrella-kpi-pill">🏢 ${brokersUnderEmb.length} Brokers</span>
+              <span class="umbrella-kpi-pill">🏠 ${totalRealtors} Agentes</span>
+              ${totalColabs > 0 ? `<span class="umbrella-kpi-pill">🤝 ${totalColabs} Colab.</span>` : ''}
+              <span class="umbrella-kpi-pill umbrella-kpi-pill--clients">🏡 ${totalEmbClients} Clientes</span>
+              ${buildAdminQuickActions(emb)}
+            </div>
+          </div>
+          <div class="umbrella-card__body">
+            <div class="umbrella-branch">
+              ${subBrokersHtml}
+              ${directLeafsHtml}
+              ${emptyEmbBody}
+            </div>
+          </div>
+        </div>
+      `);
+    });
+
+    // 2. Direct / Independent Brokers (NOT under an Embajador)
+    const directBrokers = allUsers.filter(u => {
+      if (u.role !== 'broker') return false;
+      const p = parentInfoById.get(u.id);
+      return !(p && p.embajador);
+    });
+
+    const brokerCards = [];
+    directBrokers.forEach(brk => {
+      const teamMembers = allUsers.filter(u => {
+        if (u.id === brk.id || !['realtor', 'colaborador'].includes(u.role)) return false;
+        const p = parentInfoById.get(u.id);
+        return p && p.broker && p.broker.id === brk.id && !p.embajador;
+      });
+
+      const matchingTeam = teamMembers.filter(m => filteredIds.has(m.id));
+      const brkMatchesSelf = filteredIds.has(brk.id);
+      if (!brkMatchesSelf && matchingTeam.length === 0) return;
+
+      const shownTeam = (hasActiveFilter && !brkMatchesSelf) ? matchingTeam : (hasActiveFilter ? matchingTeam : teamMembers);
+      const totalClients = countDirectClientsForUser(brk) + teamMembers.reduce((acc, m) => acc + countDirectClientsForUser(m), 0);
+
+      const nodeId = `dirbrk-${brk.id}`;
+      const isOpen = hasActiveFilter ? true : expandedAdminNodes.has(nodeId);
+      const brkAvatar = App.utils.generateAvatar(brk.firstName, brk.lastName, 'sm');
+      const brkInmomasBadge = App.utils.renderInmomasAgentBadge
+        ? App.utils.renderInmomasAgentBadge(brk, allUsers, { showUnassigned: true, maps: lookupMaps })
+        : '';
+      const brkRegBadges = App.utils.getUserRegionBadgesHtml ? App.utils.getUserRegionBadgesHtml(brk) : '';
+      const logoHtml = brk.agencyLogo
+        ? `<img src="${App.utils.escapeHtml(brk.agencyLogo)}" alt="" style="height:22px; max-width:64px; object-fit:contain; border-radius:4px; border:1px solid #e2e8f0; background:#fff; padding:2px;">`
+        : '';
+
+      brokerCards.push(`
+        <div class="umbrella-card umbrella-card--broker ${isOpen ? 'is-open' : ''}" id="adm-umb-node-${nodeId}" data-umb-node="${nodeId}">
+          <div class="umbrella-card__header" onclick="App.views.admin.toggleUmbrellaNode('${nodeId}')">
+            <div class="umbrella-card__left">
+              <span class="umbrella-chevron">▶</span>
+              ${brkAvatar}
+              <div class="umbrella-card__identity">
+                <div class="umbrella-card__title-row">
+                  <span class="umbrella-chain-pill umbrella-chain-pill--broker">🏢 Broker Directo</span>
+                  ${logoHtml}
+                  <span class="umbrella-card__name">${App.utils.escapeHtml(brk.firstName || '')} ${App.utils.escapeHtml(brk.lastName || '')}</span>
+                  ${brk.agencyName ? `<span style="font-weight:700; color:#003da5; font-size:0.86rem;">— ${App.utils.escapeHtml(brk.agencyName)}</span>` : ''}
+                  ${App.utils.getUserStatusBadge(brk.status)}
+                  ${brkRegBadges}
+                </div>
+                <div class="umbrella-card__meta">
+                  <span>✉️ ${App.utils.escapeHtml(brk.email || '—')}</span>
+                  ${brk.country ? `<span>· 🏳️ ${App.utils.escapeHtml(brk.country)}</span>` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="umbrella-card__right">
+              ${brkInmomasBadge}
+              <span class="umbrella-kpi-pill">🏠 ${teamMembers.length} Realtors</span>
+              <span class="umbrella-kpi-pill umbrella-kpi-pill--clients">🏡 ${totalClients} Clientes</span>
+              ${buildAdminQuickActions(brk)}
+            </div>
+          </div>
+          <div class="umbrella-card__body">
+            <div class="umbrella-branch">
+              ${shownTeam.length > 0
+                ? `<div class="umbrella-leaf-grid">${shownTeam.map(r => renderAdminLeafCard(r, lookupMaps)).join('')}</div>`
+                : `<div style="font-size:0.82rem; color:#64748b;"><span class="lang-en">No realtors registered in this Broker office yet.</span><span class="lang-es">Aún no hay realtors registrados bajo esta oficina Broker.</span></div>`
+              }
+            </div>
+          </div>
+        </div>
+      `);
+    });
+
+    // 3. Standalone Realtors & Colaboradores (no Embajador & no Broker) — grouped by Assigned RE/MAX Inmomás Agent!
+    const standalonePartners = filteredUsers.filter(u => {
+      if (!['realtor', 'colaborador'].includes(u.role)) return false;
+      const p = parentInfoById.get(u.id);
+      return !(p && (p.embajador || p.broker));
+    });
+
+    const standaloneGroupCards = [];
+    if (standalonePartners.length > 0) {
+      const byAgentMap = new Map();
+      standalonePartners.forEach(u => {
+        const res = App.utils.resolveAssignedInmomasAgent
+          ? App.utils.resolveAssignedInmomasAgent(u, allUsers, lookupMaps)
+          : { id: null, name: '' };
+        const key = res.name ? (res.id || res.name) : '__unassigned__';
+        if (!byAgentMap.has(key)) {
+          byAgentMap.set(key, {
+            key,
+            label: res.name || '',
+            isUnassigned: !res.name,
+            members: []
+          });
+        }
+        byAgentMap.get(key).members.push(u);
+      });
+
+      const sortedGroups = Array.from(byAgentMap.values()).sort((a, b) => {
+        if (a.isUnassigned && !b.isUnassigned) return 1;
+        if (!a.isUnassigned && b.isUnassigned) return -1;
+        return a.label.localeCompare(b.label);
+      });
+
+      sortedGroups.forEach(grp => {
+        const safeKey = String(grp.key).replace(/[^a-zA-Z0-9_-]/g, '_');
+        const nodeId = `indgrp-${safeKey}`;
+        const isOpen = hasActiveFilter ? true : expandedAdminNodes.has(nodeId);
+        const totalClients = grp.members.reduce((sum, m) => sum + countDirectClientsForUser(m), 0);
+        const headerBadge = grp.isUnassigned
+          ? `<span class="inmomas-agent-pill inmomas-agent-pill--unassigned">⚠️ Sin Agente RE/MAX Inmomás asignado</span>`
+          : `<span class="inmomas-agent-pill">🇪🇸 Paraguas Directo Inmomás: ${App.utils.escapeHtml(grp.label)}</span>`;
+
+        standaloneGroupCards.push(`
+          <div class="umbrella-card ${grp.isUnassigned ? 'umbrella-card--direct' : 'umbrella-card--inmomas'} ${isOpen ? 'is-open' : ''}" id="adm-umb-node-${nodeId}" data-umb-node="${nodeId}">
+            <div class="umbrella-card__header" onclick="App.views.admin.toggleUmbrellaNode('${nodeId}')">
+              <div class="umbrella-card__left">
+                <span class="umbrella-chevron">▶</span>
+                <div class="umbrella-card__identity">
+                  <div class="umbrella-card__title-row">
+                    ${headerBadge}
+                    <span style="font-size:0.82rem; color:#475569; font-weight:600;">
+                      <span class="lang-en">Independent Realtors &amp; Collaborators</span>
+                      <span class="lang-es">Realtors y Colaboradores Independientes</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="umbrella-card__right">
+                <span class="umbrella-kpi-pill">👥 ${grp.members.length} Profesionales</span>
+                <span class="umbrella-kpi-pill umbrella-kpi-pill--clients">🏡 ${totalClients} Clientes</span>
+              </div>
+            </div>
+            <div class="umbrella-card__body">
+              <div class="umbrella-leaf-grid">
+                ${grp.members.map(m => renderAdminLeafCard(m, lookupMaps)).join('')}
+              </div>
+            </div>
+          </div>
+        `);
+      });
+    }
+
+    // 4. Internal RE/MAX Inmomás Team & Admins (when visible in filter)
+    const internalTeam = filteredUsers.filter(u => u.role === 'agent_inmomas' || u.role === 'admin');
+    let internalHtml = '';
+    if (internalTeam.length > 0) {
+      const nodeId = 'internal-inmomas-team';
+      const isOpen = hasActiveFilter && document.getElementById('admin-filter-role')?.value === 'agent_inmomas'
+        ? true
+        : expandedAdminNodes.has(nodeId);
+      internalHtml = `
+        <div class="umbrella-group">
+          <div class="umbrella-group__title">
+            <span>🇪🇸 <span class="lang-en">Internal RE/MAX Inmomás Team &amp; Administration</span><span class="lang-es">Equipo Interno RE/MAX Inmomás y Administración</span></span>
+            <span class="umbrella-kpi-pill">${internalTeam.length}</span>
+          </div>
+          <div class="umbrella-card umbrella-card--inmomas ${isOpen ? 'is-open' : ''}" id="adm-umb-node-${nodeId}" data-umb-node="${nodeId}">
+            <div class="umbrella-card__header" onclick="App.views.admin.toggleUmbrellaNode('${nodeId}')">
+              <div class="umbrella-card__left">
+                <span class="umbrella-chevron">▶</span>
+                <div class="umbrella-card__identity">
+                  <span class="umbrella-card__name">🇪🇸 Agentes Locales RE/MAX Inmomás (${internalTeam.filter(x => x.role === 'agent_inmomas').length})</span>
+                  <div class="umbrella-card__meta"><span class="lang-en">Click to inspect assigned umbrellas, regions &amp; personalized guides</span><span class="lang-es">Haz clic para ver agentes internos, regiones y paraguas asignados</span></div>
+                </div>
+              </div>
+              <div class="umbrella-card__right">
+                <span class="umbrella-kpi-pill">🇪🇸 ${internalTeam.length} miembros</span>
+              </div>
+            </div>
+            <div class="umbrella-card__body">
+              <div class="umbrella-leaf-grid">
+                ${internalTeam.map(a => {
+                  const assignedPartnersCount = allUsers.filter(u => {
+                    if (u.id === a.id || u.role === 'admin' || u.role === 'agent_inmomas') return false;
+                    const res = App.utils.resolveAssignedInmomasAgent ? App.utils.resolveAssignedInmomasAgent(u, allUsers, lookupMaps) : null;
+                    return res && (res.id === a.id || (res.name && res.name.toLowerCase() === `${a.firstName || ''} ${a.lastName || ''}`.trim().toLowerCase()));
+                  }).length;
+                  return `
+                    <div class="umbrella-leaf" style="border-left-color:#003f99;">
+                      <div style="min-width:0; flex:1;">
+                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                          <strong>${a.role === 'admin' ? '🛡️' : '🇪🇸'} ${App.utils.escapeHtml(a.firstName || '')} ${App.utils.escapeHtml(a.lastName || '')}</strong>
+                          ${App.utils.getRoleBadge(a.role)}
+                          ${App.utils.getUserStatusBadge(a.status)}
+                        </div>
+                        <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">${App.utils.escapeHtml(a.email || '—')}</div>
+                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:4px;">
+                          ${App.utils.getUserRegionBadgesHtml ? App.utils.getUserRegionBadgesHtml(a) : ''}
+                          ${a.role === 'agent_inmomas' ? `<span class="umbrella-kpi-pill">🌐 ${assignedPartnersCount} en red asignada</span>` : ''}
+                        </div>
+                      </div>
+                      <div style="display:flex; gap:4px; flex-shrink:0;">
+                        ${buildAdminQuickActions(a)}
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    adminUmbrellaInitialized = true;
+
+    let sectionsHtml = '';
+    if (embajadorCards.length > 0) {
+      sectionsHtml += `
+        <div class="umbrella-group">
+          <div class="umbrella-group__title">
+            <span>👑 <span class="lang-en">Ambassador Umbrellas</span><span class="lang-es">Paraguas de Embajadores</span></span>
+            <span class="umbrella-kpi-pill">${embajadorCards.length} <span class="lang-en">Ambassadors</span><span class="lang-es">Embajadores</span></span>
+          </div>
+          ${embajadorCards.join('')}
+        </div>
+      `;
+    }
+
+    if (brokerCards.length > 0) {
+      sectionsHtml += `
+        <div class="umbrella-group">
+          <div class="umbrella-group__title">
+            <span>🏢 <span class="lang-en">Direct Broker Umbrellas (No Ambassador)</span><span class="lang-es">Paraguas de Brokers Directos (Sin Embajador)</span></span>
+            <span class="umbrella-kpi-pill">${brokerCards.length} Brokers</span>
+          </div>
+          ${brokerCards.join('')}
+        </div>
+      `;
+    }
+
+    if (standaloneGroupCards.length > 0) {
+      sectionsHtml += `
+        <div class="umbrella-group">
+          <div class="umbrella-group__title">
+            <span>🏠 <span class="lang-en">Independent Realtors &amp; Collaborators (By RE/MAX Inmomás Agent)</span><span class="lang-es">Realtors y Colaboradores Independientes (Por Agente RE/MAX Inmomás)</span></span>
+            <span class="umbrella-kpi-pill">${standalonePartners.length}</span>
+          </div>
+          ${standaloneGroupCards.join('')}
+        </div>
+      `;
+    }
+
+    sectionsHtml += internalHtml;
+    container.innerHTML = sectionsHtml;
+
+    if (window.App && typeof window.App.updateLangDisplay === 'function') {
+      window.App.updateLangDisplay();
+    }
+  }
+
   /* ── Apply All Filters ── */
   function handleFilters() {
     const roleSelect    = document.getElementById('admin-filter-role');
+    const inmomasSelect = document.getElementById('admin-filter-inmomas-agent');
     const regionSelect  = document.getElementById('admin-filter-region');
     const countrySelect = document.getElementById('admin-filter-country');
     const statusSelect  = document.getElementById('admin-filter-status');
     const searchInput   = document.getElementById('admin-search-input');
 
-    const role    = roleSelect    ? roleSelect.value    : '';
-    const region  = regionSelect  ? regionSelect.value  : '';
-    const country = countrySelect ? countrySelect.value : '';
-    const status  = statusSelect  ? statusSelect.value  : '';
-    const search  = searchInput   ? searchInput.value.toLowerCase().trim() : '';
+    const role         = roleSelect    ? roleSelect.value    : '';
+    const inmomasAgent = inmomasSelect ? inmomasSelect.value : '';
+    const region       = regionSelect  ? regionSelect.value  : '';
+    const country      = countrySelect ? countrySelect.value : '';
+    const status       = statusSelect  ? statusSelect.value  : '';
+    const search       = searchInput   ? searchInput.value.toLowerCase().trim() : '';
 
+    const lookupMaps = App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(allUsers) : null;
     let filtered = [...allUsers];
 
     if (role) {
       filtered = filtered.filter(u => u.role === role);
+    }
+
+    if (inmomasAgent && App.utils && App.utils.resolveAssignedInmomasAgent) {
+      if (inmomasAgent === '__unassigned__') {
+        filtered = filtered.filter(u => {
+          if (u.role === 'admin' || u.role === 'agent_inmomas') return false;
+          const res = App.utils.resolveAssignedInmomasAgent(u, allUsers, lookupMaps);
+          return !res.name;
+        });
+      } else {
+        const targetAgent = allUsers.find(x => x.id === inmomasAgent);
+        const targetNameLower = targetAgent ? `${targetAgent.firstName || ''} ${targetAgent.lastName || ''}`.trim().toLowerCase() : '';
+        filtered = filtered.filter(u => {
+          if (u.id === inmomasAgent) return true;
+          if (u.role === 'admin' || u.role === 'agent_inmomas') return false;
+          const res = App.utils.resolveAssignedInmomasAgent(u, allUsers, lookupMaps);
+          return res.id === inmomasAgent || (targetNameLower && res.name.toLowerCase() === targetNameLower);
+        });
+      }
     }
 
     if (region && App.utils && App.utils.getUserRegions) {
@@ -937,14 +1553,24 @@
       filtered = filtered.filter(u => {
         const fullName = `${u.firstName || ''} ${u.lastName || ''}`.toLowerCase();
         const nat = (App.utils.getUserNationality ? App.utils.getUserNationality(u) : (u.nationality || '')).toLowerCase();
+        const inmomasRes = App.utils.resolveAssignedInmomasAgent ? App.utils.resolveAssignedInmomasAgent(u, allUsers, lookupMaps) : { name: '' };
+        const parents = App.utils.resolveUserUmbrellaParents ? App.utils.resolveUserUmbrellaParents(u, allUsers, lookupMaps) : {};
+        const embName = parents.embajador ? `${parents.embajador.firstName || ''} ${parents.embajador.lastName || ''}`.toLowerCase() : '';
+        const brkName = parents.broker ? `${parents.broker.firstName || ''} ${parents.broker.lastName || ''} ${parents.broker.agencyName || ''}`.toLowerCase() : '';
+
         return fullName.includes(search) ||
                (u.email || '').toLowerCase().includes(search) ||
                (u.agencyName || '').toLowerCase().includes(search) ||
                (u.country || '').toLowerCase().includes(search) ||
-               nat.includes(search);
+               nat.includes(search) ||
+               (inmomasRes.name || '').toLowerCase().includes(search) ||
+               embName.includes(search) ||
+               brkName.includes(search);
       });
     }
 
+    const hasActiveFilter = Boolean(role || inmomasAgent || region || country || status || search);
+    renderUsersUmbrellaAccordion(filtered, hasActiveFilter);
     renderUsersTable(filtered);
   }
 
@@ -1229,13 +1855,25 @@
         `).join('')}
       `;
       const localAgents = allSysUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
+      const modalLookup = App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(allSysUsers) : null;
+      const resolvedInmomas = App.utils.resolveAssignedInmomasAgent
+        ? App.utils.resolveAssignedInmomasAgent(user, allSysUsers, modalLookup)
+        : { id: null, name: '', inherited: false };
+      const directAssignedAgentId = !resolvedInmomas.inherited ? resolvedInmomas.id : null;
       const agentOptions = `
-        <option value="">-- Direct / No Referral --</option>
+        <option value="">-- Sin Agente RE/MAX Inmomás directo --</option>
         ${localAgents.map(a => {
           const code = a.referralCode || a.id;
+          const fullLower = `${a.firstName || ''} ${a.lastName || ''}`.trim().toLowerCase();
+          const isSelected = directAssignedAgentId === a.id ||
+            user.inmomasAgentId === a.id ||
+            user.inmomasAgentCode === code ||
+            user.referredBy === code ||
+            user.referredBy === a.id ||
+            (!directAssignedAgentId && user.inmomasAgentName && String(user.inmomasAgentName).trim().toLowerCase() === fullLower);
           return `
-          <option value="${code}" ${user.referredBy === code ? 'selected' : ''}>
-            ${App.utils.escapeHtml(a.firstName)} ${App.utils.escapeHtml(a.lastName)} (${a.referralCode || 'ID: ' + a.id})
+          <option value="${code}" ${isSelected ? 'selected' : ''}>
+            🇪🇸 ${App.utils.escapeHtml(a.firstName)} ${App.utils.escapeHtml(a.lastName)} (${a.referralCode || 'ID: ' + a.id})
           </option>
         `}).join('')}
       `;
@@ -1365,6 +2003,29 @@
           </div>
           ` : ''}
 
+          ${user.role === 'broker' ? `
+          <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
+            ${(() => {
+              const brkTeam = allSysUsers.filter(u => {
+                if (u.id === user.id || !['realtor', 'colaborador'].includes(u.role)) return false;
+                const p = App.utils.resolveUserUmbrellaParents ? App.utils.resolveUserUmbrellaParents(u, allSysUsers, modalLookup) : {};
+                return p.broker && p.broker.id === user.id;
+              });
+              return `
+                <label style="font-weight: 700; font-size: 0.875rem; color: #003da5; display: block; margin-bottom: 0.5rem;">
+                  🏢 Equipo bajo este Paraguas de Broker (${brkTeam.length} profesionales)
+                </label>
+                <div style="max-height: 130px; overflow-y: auto; font-size: 0.82rem; border: 1px solid #bfdbfe; border-radius: 0.45rem; padding: 0.55rem; background: #eff6ff;">
+                  ${brkTeam.length === 0
+                    ? '<div style="color:#1e40af; text-align:center;">Aún no hay realtors registrados bajo este Broker.</div>'
+                    : '<ul style="margin:0; padding-left:1.1rem; color:#1e293b;">' + brkTeam.map(m => `<li><strong>${App.utils.escapeHtml(m.firstName)} ${App.utils.escapeHtml(m.lastName)}</strong> (${m.role}) — <span style="color:#64748b;">${App.utils.escapeHtml(m.email || '')}</span></li>`).join('') + '</ul>'
+                  }
+                </div>
+              `;
+            })()}
+          </div>
+          ` : ''}
+
           ${['broker', 'realtor', 'colaborador'].includes(user.role) ? `
           <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
             <label style="font-weight: 600; font-size: 0.875rem; color: #92400e; display: block; margin-bottom: 0.5rem;">👑 Asignar Paraguas de Embajador</label>
@@ -1380,33 +2041,39 @@
           
           ${user.role === 'agent_inmomas' ? `
           <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
-            <label style="font-weight: 600; font-size: 0.875rem; color: #374151; display: block; margin-bottom: 0.5rem;">Realtors bajo su paraguas</label>
-            <div style="max-height: 120px; overflow-y: auto; font-size: 0.85rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.5rem; background: #f9fafb; margin-bottom: 0.75rem;">
+            <label style="font-weight: 600; font-size: 0.875rem; color: #374151; display: block; margin-bottom: 0.5rem;">🇪🇸 Profesionales y Paraguas Asignados</label>
+            <div style="max-height: 130px; overflow-y: auto; font-size: 0.85rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; padding: 0.5rem; background: #f9fafb; margin-bottom: 0.75rem;">
               ${(() => {
-                const assigned = allSysUsers.filter(u => u.referredBy === user.referralCode || u.referredBy === user.id || (u.referredBy && u.referredBy.toUpperCase() === (user.referralCode || '').toUpperCase()));
-                if (assigned.length === 0) return '<div style="color: #6b7280; text-align: center;">Ningún realtor asignado aún.</div>';
-                return '<ul style="margin: 0; padding-left: 1rem; color: #374151;">' + assigned.map(r => `<li>${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)} <span style="color:#9ca3af; font-size:0.75rem;">(${r.role})</span></li>`).join('') + '</ul>';
+                const agentFullLower = `${user.firstName || ''} ${user.lastName || ''}`.trim().toLowerCase();
+                const assigned = allSysUsers.filter(u => {
+                  if (u.id === user.id || u.role === 'admin' || u.role === 'agent_inmomas') return false;
+                  const res = App.utils.resolveAssignedInmomasAgent ? App.utils.resolveAssignedInmomasAgent(u, allSysUsers, modalLookup) : null;
+                  return res && (res.id === user.id || (res.name && res.name.toLowerCase() === agentFullLower));
+                });
+                if (assigned.length === 0) return '<div style="color: #6b7280; text-align: center;">Ningún profesional o paraguas asignado aún.</div>';
+                return '<ul style="margin: 0; padding-left: 1rem; color: #374151;">' + assigned.map(r => `<li><strong>${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}</strong> <span style="color:#64748b; font-size:0.75rem;">(${r.role}${r.inmomasAgentId !== user.id && r.referredBy !== user.referralCode && r.referredBy !== user.id ? ' · heredado' : ''})</span></li>`).join('') + '</ul>';
               })()}
             </div>
-            <label style="font-weight: 600; font-size: 0.875rem; color: #374151; display: block; margin-bottom: 0.5rem;">Añadir Realtor al paraguas</label>
+            <label style="font-weight: 600; font-size: 0.875rem; color: #374151; display: block; margin-bottom: 0.5rem;">Vincular Embajador / Broker / Realtor a este Agente Inmomás</label>
             <div style="display: flex; gap: 0.5rem;">
               <select id="agent-assign-realtor-select" class="form-control" style="flex: 1; padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; background-color: white;">
-                <option value="">-- Seleccionar Realtor --</option>
-                ${allSysUsers.filter(u => (u.role === 'realtor' || u.role === 'broker') && u.status === 'active' && u.referredBy !== user.referralCode && u.referredBy !== user.id).map(r => `<option value="${r.id}">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)} (${r.email})</option>`).join('')}
+                <option value="">-- Seleccionar Profesional --</option>
+                ${allSysUsers.filter(u => ['embajador', 'broker', 'realtor', 'colaborador'].includes(u.role) && u.status === 'active' && u.inmomasAgentId !== user.id && u.referredBy !== user.referralCode && u.referredBy !== user.id).map(r => `<option value="${r.id}">[${r.role.toUpperCase()}] ${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)} (${r.email})</option>`).join('')}
               </select>
               <button class="btn btn-primary btn-sm" id="agent-save-realtor-btn">Añadir</button>
             </div>
           </div>
           ` : `
           <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
-            <label style="font-weight: 600; font-size: 0.875rem; color: #374151; display: block; margin-bottom: 0.5rem;">Asignar Agente Inmomás / Referral</label>
+            <label style="font-weight: 700; font-size: 0.875rem; color: #003f99; display: block; margin-bottom: 0.4rem;">🇪🇸 Agente RE/MAX Inmomás Asignado</label>
+            ${resolvedInmomas.inherited ? `<div style="font-size:0.76rem; color:#0369a1; background:#f0f9ff; border:1px dashed #7dd3fc; padding:6px 10px; border-radius:6px; margin-bottom:8px;">Actualmente hereda a <strong>${App.utils.escapeHtml(resolvedInmomas.name)}</strong> vía su ${resolvedInmomas.inheritedFrom}. Puedes asignarle uno específico abajo si lo deseas.</div>` : ''}
             <div style="display: flex; gap: 0.5rem;">
               <select id="user-referral-select" class="form-control" style="flex: 1; padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; background-color: white;">
                 ${agentOptions}
               </select>
               <button class="btn btn-primary btn-sm" id="save-user-referral-btn">Asignar</button>
             </div>
-            <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">Esto asignará el usuario al paraguas del Agente Inmomás seleccionado.</p>
+            <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.45rem;">Asigna el Agente RE/MAX Inmomás de referencia sin alterar su paraguas de Broker o Embajador.</p>
           </div>
           `}
 
@@ -3226,13 +3893,19 @@
       return;
     }
 
+    const lookupMaps = App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(allUsers) : null;
     const headers = [
-      'Date', 'First Name', 'Last Name', 'Email', 'Phone', 'Agency', 'Role', 'Status', 'Nationality', 'Country', 'Regions', 'State', 'Webinar Registered'
+      'Date', 'First Name', 'Last Name', 'Email', 'Phone', 'Agency', 'Role', 'Status', 'Ambassador Umbrella', 'Broker Umbrella', 'RE/MAX Inmomás Agent', 'Nationality', 'Country', 'Regions', 'State', 'Webinar Registered'
     ];
 
     const rows = targetList.map(u => {
       const nat = App.utils.getUserNationality ? App.utils.getUserNationality(u) : (u.nationality || u.country || '');
       const regs = App.utils.getUserRegions ? App.utils.getUserRegions(u).map(r => (App.utils.REGIONS[r] ? App.utils.REGIONS[r].shortEs : r)).join(', ') : '';
+      const parents = App.utils.resolveUserUmbrellaParents ? App.utils.resolveUserUmbrellaParents(u, allUsers, lookupMaps) : {};
+      const embLabel = (parents.embajador && parents.embajador.id !== u.id) ? `${parents.embajador.firstName || ''} ${parents.embajador.lastName || ''}`.trim() : '';
+      const brkLabel = (parents.broker && parents.broker.id !== u.id) ? (`${parents.broker.firstName || ''} ${parents.broker.lastName || ''}`.trim() + (parents.broker.agencyName ? ` (${parents.broker.agencyName})` : '')) : '';
+      const inmomasRes = App.utils.resolveAssignedInmomasAgent ? App.utils.resolveAssignedInmomasAgent(u, allUsers, lookupMaps) : { name: '' };
+
       return [
         u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-US') : '',
         u.firstName || '',
@@ -3242,6 +3915,9 @@
         u.agencyName || u.agency || '',
         u.role || '',
         u.status || '',
+        embLabel,
+        brkLabel,
+        inmomasRes.name ? (inmomasRes.inherited ? `${inmomasRes.name} (vía ${inmomasRes.inheritedFrom})` : inmomasRes.name) : '',
         nat,
         u.country || '',
         regs,
@@ -4752,6 +5428,9 @@
   App.views.admin = {
     initDashboard,
     initUsers,
+    setUsersViewMode,
+    toggleUmbrellaNode,
+    expandAllUmbrellas,
     initClients,
     initNewsletter,
     initWebinar,
