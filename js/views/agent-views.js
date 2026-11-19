@@ -132,6 +132,25 @@
         }
       }
 
+      const copyEmbBtn = document.getElementById('agent-dash-copy-embajador-link');
+      if (copyEmbBtn) {
+        if (isPending) {
+          copyEmbBtn.disabled = true;
+          copyEmbBtn.style.opacity = '0.5';
+          copyEmbBtn.style.cursor = 'not-allowed';
+          copyEmbBtn.onclick = null;
+        } else {
+          copyEmbBtn.disabled = false;
+          copyEmbBtn.style.opacity = '';
+          copyEmbBtn.style.cursor = 'pointer';
+          copyEmbBtn.onclick = () => {
+            const embUrl = `${referralLink}&type=embajador`;
+            App.utils.copyToClipboard(embUrl);
+            App.utils.showToast('👑 Enlace directo de postulación como Embajador copiado al portapapeles', 'success');
+          };
+        }
+      }
+
       const copyClientBtn = document.getElementById('agent-dash-copy-client-link');
       if (copyClientBtn) {
         if (isPending) {
@@ -544,7 +563,8 @@
       display,
       'App.views.agentInmomas.showClientDetail',
       getRealtorName,
-      'App.views.agentInmomas.handleClientDrop'
+      'App.views.agentInmomas.handleClientDrop',
+      { users: allUsers, showUmbrellaSubBadge: true }
     );
   }
 
@@ -659,9 +679,14 @@
       App.utils.showModal({
         title: 'Client Details (Assigned to you)',
         body: `
-          <div style="margin-bottom: 1.5rem;">
-            <h3 style="margin: 0 0 0.25rem;">${App.utils.escapeHtml(client.firstName)} ${App.utils.escapeHtml(client.lastName)}</h3>
-            <div style="margin-bottom: 0.5rem;">${statusBadge}</div>
+          <div style="margin-bottom: 1.5rem; display:flex; justify-content:space-between; align-items:flex-start; gap:8px; flex-wrap:wrap;">
+            <div>
+              <h3 style="margin: 0 0 0.25rem;">${App.utils.escapeHtml(client.firstName)} ${App.utils.escapeHtml(client.lastName)}</h3>
+              <div style="margin-bottom: 0.5rem;">${statusBadge}</div>
+            </div>
+            <div>
+              ${(App.utils && App.utils.renderClientOriginTagBadge) ? App.utils.renderClientOriginTagBadge(client, allUsers, { showUmbrellaSubBadge: true }) : ''}
+            </div>
           </div>
 
           <!-- Financial Settings -->

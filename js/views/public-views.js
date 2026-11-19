@@ -161,7 +161,7 @@ App.views.public = {
 
     const welcomeMsg = document.getElementById('referral-welcome-msg');
     const typeSelector = document.getElementById('referral-type-selector');
-    const typeOptions = document.getElementById('referral-type-options');
+    const typeSelect = document.getElementById('referral-type-select');
     const form = document.getElementById('referral-form');
 
     let referrer = null;
@@ -481,12 +481,17 @@ App.views.public = {
 
       // Build professional type options based on referrer's role
       // NOTE: End Clients now use the dedicated Client Webinar Link (#webinar?ref=CODE) exclusively.
-      // 'embajador' ONLY appears on the Administrator's referral link (referrer.role === 'admin').
+      // 'embajador' appears on Administrator and RE/MAX Inmomás Agent referral links.
       let availableTypes = ['realtor'];
+      const upperRefCode = refCode ? refCode.toUpperCase().trim() : '';
       if (!referrer) {
-        availableTypes = (refCode && refCode.toUpperCase().startsWith('BRK-'))
-          ? ['realtor']
-          : ['realtor', 'broker', 'colaborador'];
+        if (upperRefCode.startsWith('BRK-')) {
+          availableTypes = ['realtor'];
+        } else if (upperRefCode.startsWith('LOC-') || upperRefCode.startsWith('ADM-') || upperRefCode === 'ADMIN-001') {
+          availableTypes = ['embajador', 'broker', 'realtor', 'colaborador'];
+        } else {
+          availableTypes = ['realtor', 'broker', 'colaborador'];
+        }
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
         } else {
@@ -505,6 +510,13 @@ App.views.public = {
             selectedType = 'realtor';
           }
         }
+      } else if (referrer.role === 'agent_inmomas') {
+        availableTypes = ['embajador', 'broker', 'realtor', 'colaborador'];
+        if (availableTypes.includes(requestedType)) {
+          selectedType = requestedType;
+        } else if (!availableTypes.includes(selectedType)) {
+          selectedType = 'realtor';
+        }
       } else if (referrer.role === 'embajador') {
         availableTypes = ['broker', 'realtor', 'colaborador'];
         if (availableTypes.includes(requestedType)) {
@@ -519,7 +531,7 @@ App.views.public = {
         // A Broker invites Realtors to their team
         availableTypes = ['realtor'];
         selectedType = 'realtor';
-      } else if (referrer.role === 'agent_inmomas' || referrer.role === 'colaborador' || referrer.role === 'partner') {
+      } else if (referrer.role === 'colaborador' || referrer.role === 'partner') {
         availableTypes = ['realtor', 'broker', 'colaborador'];
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
@@ -538,7 +550,6 @@ App.views.public = {
       const typeConfig = {
         embajador: {
           icon: '👑',
-          badge: '',
           labelEn: 'Ambassador',
           labelEs: 'Embajador',
           labelFr: 'Ambassadeur',
@@ -546,31 +557,27 @@ App.views.public = {
         },
         client: {
           icon: '👤',
-          badge: '',
-          labelEn: 'Client',
-          labelEs: 'Cliente',
-          labelFr: 'Client',
-          labelEnCa: 'Client'
+          labelEn: 'Client / Buyer',
+          labelEs: 'Cliente / Comprador',
+          labelFr: 'Client / Acheteur',
+          labelEnCa: 'Client / Buyer'
         },
         realtor: {
           icon: '🏠',
-          badge: '',
-          labelEn: 'Realtor',
-          labelEs: 'Realtor',
-          labelFr: 'Conseiller',
-          labelEnCa: 'Realtor'
+          labelEn: 'Agent / Realtor',
+          labelEs: 'Agente / Realtor',
+          labelFr: 'Agent / Conseiller',
+          labelEnCa: 'Agent / Realtor'
         },
         broker: {
           icon: '🏢',
-          badge: 'B2B',
-          labelEn: 'Broker',
-          labelEs: 'Broker',
-          labelFr: 'Courtier',
-          labelEnCa: 'Broker'
+          labelEn: 'Broker / Agency',
+          labelEs: 'Broker / Agencia',
+          labelFr: 'Courtier (Broker)',
+          labelEnCa: 'Broker / Agency'
         },
         agent_inmomas: {
           icon: '🇪🇸',
-          badge: 'Inmomás',
           labelEn: 'RE/MAX Inmomás Agent',
           labelEs: 'Agente RE/MAX Inmomás',
           labelFr: 'Agent RE/MAX Inmomás',
@@ -578,50 +585,44 @@ App.views.public = {
         },
         colaborador: {
           icon: '🤝',
-          badge: '',
-          labelEn: 'Partner',
+          labelEn: 'Collaborator / Partner',
           labelEs: 'Colaborador',
-          labelFr: 'Partenaire',
-          labelEnCa: 'Partner'
+          labelFr: 'Collaborateur / Partenaire',
+          labelEnCa: 'Collaborator / Partner'
         }
       };
 
-      if (availableTypes.length > 1 && typeSelector && typeOptions) {
-        typeSelector.style.display = 'block';
-        const isMultiRow = availableTypes.length > 3;
-        typeSelector.classList.toggle('referral-segmented-wrapper--multi', isMultiRow);
-        typeOptions.classList.toggle('referral-segmented-bar--multi', isMultiRow);
-        typeOptions.innerHTML = availableTypes.map((type) => {
-          const cfg = typeConfig[type] || typeConfig.client;
+      if (typeSelect) {
+        const activeLang = (window.App && typeof window.App.getLanguage === 'function') ? window.App.getLanguage() : 'en';
+        typeSelect.innerHTML = availableTypes.map((type) => {
+          const cfg = typeConfig[type] || typeConfig.realtor;
           const isSelected = type === selectedType;
-          return `
-            <button type="button" class="referral-seg-tab ${isSelected ? 'selected' : ''}" data-type="${type}">
-              <input type="radio" name="referral-contact-type" value="${type}" ${isSelected ? 'checked' : ''} style="display:none;">
-              <span>${cfg.icon}</span>
-              <span class="lang-en">${cfg.labelEn}</span>
-              <span class="lang-es">${cfg.labelEs}</span>
-              <span class="lang-fr">${cfg.labelFr}</span>
-              <span class="lang-en-ca">${cfg.labelEnCa}</span>
-              ${cfg.badge ? `<span class="seg-badge">${cfg.badge}</span>` : ''}
-            </button>`;
+          const txtEn = `${cfg.icon} ${cfg.labelEn}`;
+          const txtEs = `${cfg.icon} ${cfg.labelEs}`;
+          const txtFr = `${cfg.icon} ${cfg.labelFr}`;
+          const txtCa = `${cfg.icon} ${cfg.labelEnCa}`;
+          const initialTxt = activeLang === 'es' ? txtEs : (activeLang === 'fr' ? txtFr : (activeLang === 'en-ca' ? txtCa : txtEn));
+          return `<option value="${type}" data-i18n-en="${txtEn}" data-i18n-es="${txtEs}" data-i18n-fr="${txtFr}" data-i18n-en-ca="${txtCa}" ${isSelected ? 'selected' : ''}>${initialTxt}</option>`;
         }).join('');
+        typeSelect.value = selectedType;
 
-        typeOptions.querySelectorAll('.referral-seg-tab').forEach(tab => {
-          tab.addEventListener('click', function(e) {
-            e.preventDefault();
-            typeOptions.querySelectorAll('.referral-seg-tab').forEach(t => t.classList.remove('selected'));
-            this.classList.add('selected');
-            const radio = this.querySelector('input');
-            if (radio) radio.checked = true;
-            selectedType = this.dataset.type || 'client';
-            updateFieldVisibility(selectedType);
-          });
-        });
-      } else if (typeSelector) {
-        typeSelector.style.display = 'none';
+        typeSelect.onchange = function() {
+          selectedType = this.value || 'realtor';
+          updateFieldVisibility(selectedType);
+          if (window.App && typeof window.App.updateLangDisplay === 'function') {
+            window.App.updateLangDisplay();
+          }
+        };
+      }
+
+      if (typeSelector) {
+        typeSelector.style.display = availableTypes.length > 1 ? '' : 'none';
       }
 
       updateFieldVisibility(selectedType);
+      if (window.App && typeof window.App.updateLangDisplay === 'function') {
+        window.App.updateLangDisplay();
+      }
     }
 
     // ---- Step 2: Try sync first, then async ----
@@ -775,8 +776,9 @@ App.views.public = {
           const inmomasAgent = (form.querySelector('#referral-inmomas-agent')?.value || '').trim();
           const termsChecked = form.querySelector('#referral-terms')?.checked;
 
+          const typeSelEl = form.querySelector('#referral-type-select');
           const typeRadio = document.querySelector('input[name="referral-contact-type"]:checked');
-          const contactType = typeRadio ? typeRadio.value : selectedType;
+          const contactType = (typeSelEl && typeSelEl.value) ? typeSelEl.value : (typeRadio ? typeRadio.value : selectedType);
 
           if (!firstName || !lastName || !email || !phone) {
             App.utils.showToast('Please fill in all required fields.', 'error');
@@ -841,9 +843,12 @@ App.views.public = {
 
             await App.auth.addReferralClient(clientPayload);
           } else {
-            // Strictly enforce that applying as 'embajador' or internal 'agent_inmomas' is only permitted via an Administrator referral link
-            if (contactType === 'embajador' && (!referrer || referrer.role !== 'admin')) {
-              throw new Error('La postulación como Embajador solo está disponible a través del enlace oficial de Administración.');
+            // Enforce that applying as 'embajador' is only permitted via an Administrator or RE/MAX Inmomás Agent referral link
+            const upperCodeCheck = refCode ? refCode.toUpperCase().trim() : '';
+            const allowedEmbajadorReferrer = (referrer && ['admin', 'agent_inmomas'].includes(referrer.role)) ||
+              upperCodeCheck.startsWith('ADM-') || upperCodeCheck.startsWith('LOC-') || upperCodeCheck === 'ADMIN-001';
+            if (contactType === 'embajador' && !allowedEmbajadorReferrer) {
+              throw new Error('La postulación como Embajador solo está disponible a través del enlace de Administración o de un Agente RE/MAX Inmomás.');
             }
             if (contactType === 'agent_inmomas' && (!referrer || referrer.role !== 'admin')) {
               throw new Error('El registro de Agente RE/MAX Inmomás es de uso interno.');
@@ -887,6 +892,10 @@ App.views.public = {
               ? (referrer.role === 'embajador' ? referrer.id : (referrer.embajadorId || null))
               : null;
 
+            const resolvedInmomasName = contactType === 'agent_inmomas'
+              ? null
+              : (inmomasAgent || (referrer && referrer.role === 'agent_inmomas' ? `${referrer.firstName || ''} ${referrer.lastName || ''}`.trim() : null));
+
             const userPayload = {
               email,
               password,
@@ -904,8 +913,10 @@ App.views.public = {
               brokerId: (referrer && referrer.role === 'broker' && contactType === 'realtor') ? referrer.id : null,
               embajadorId: resolvedEmbajadorId,
               referredByAdmin: Boolean(referrer && referrer.role === 'admin'),
-              referredBy: contactType === 'agent_inmomas' ? null : (referrer ? referrer.id : (inmomasAgent || null)),
-              inmomasAgentName: contactType === 'agent_inmomas' ? null : (inmomasAgent || null),
+              referredByAgentInmomas: Boolean((referrer && referrer.role === 'agent_inmomas') || (refCode && refCode.toUpperCase().trim().startsWith('LOC-'))),
+              referredBy: contactType === 'agent_inmomas' ? null : (referrer ? referrer.id : (refCode || inmomasAgent || null)),
+              inmomasAgentId: (referrer && referrer.role === 'agent_inmomas' && contactType !== 'agent_inmomas') ? referrer.id : null,
+              inmomasAgentName: resolvedInmomasName,
               notes: notes || (market ? `Zona: ${market}` : ''),
               termsAccepted: true,
               termsAcceptedAt: new Date().toISOString(),

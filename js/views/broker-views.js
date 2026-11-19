@@ -805,11 +805,19 @@
       brokerClients = await App.auth.getClients({ brokerId: currentUser.id });
 
       const getRealtorName = (realtorId) => {
+        if (!realtorId || realtorId === currentUser.id) return `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || 'Broker Directo';
         const realtor = teamRealtors.find(r => r.id === realtorId);
         return realtor ? `${realtor.firstName} ${realtor.lastName}` : 'Unknown';
       };
 
-      App.utils.renderKanbanBoard('broker-pipeline-board', brokerClients, 'App.views.broker.showClientDetail', getRealtorName);
+      App.utils.renderKanbanBoard(
+        'broker-pipeline-board',
+        brokerClients,
+        'App.views.broker.showClientDetail',
+        getRealtorName,
+        null,
+        { users: [currentUser, ...teamRealtors].filter(Boolean), showUmbrellaSubBadge: false }
+      );
 
     } catch (err) {
       console.error('[Broker] initClients error:', err);
