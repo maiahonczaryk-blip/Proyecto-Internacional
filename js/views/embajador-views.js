@@ -140,12 +140,16 @@
         `;
       }
 
-      // Referral Link Setup (EMB-...)
+      // Professional Umbrella Link & Exclusive Client Webinar Link Setup (EMB-...)
       const isPending = currentUser.status === 'pending';
       const refCode = currentUser.referralCode || 'EMB-DEFAULT';
       const baseReferralLink = isPending ? '' : App.utils.generateReferralLink(refCode);
+      const clientWebinarLink = isPending ? '' : App.utils.generateClientWebinarLink(refCode);
+
       const linkInput = document.getElementById('embajador-dash-referral-link');
       const copyBtn = document.getElementById('embajador-dash-copy-link');
+      const clientLinkInput = document.getElementById('embajador-dash-client-webinar-link');
+      const copyClientBtn = document.getElementById('embajador-dash-copy-client-link');
 
       if (linkInput) {
         if (isPending) {
@@ -163,41 +167,28 @@
         copyBtn.disabled = isPending;
         copyBtn.onclick = isPending ? null : () => {
           App.utils.copyToClipboard(baseReferralLink);
-          App.utils.showToast('🔗 Enlace de Embajador copiado al portapapeles', 'success');
+          App.utils.showToast('🔗 Enlace profesional de Embajador copiado al portapapeles', 'success');
         };
       }
 
-      // Render quick-share buttons for all 4 permitted umbrella variants (NO embajador!)
-      const variantsEl = document.getElementById('embajador-referral-variants');
-      if (variantsEl) {
+      if (clientLinkInput) {
         if (isPending) {
-          variantsEl.innerHTML = '';
+          clientLinkInput.value = 'Enlace pendiente de aprobación por Administración / Link pending Admin approval';
+          clientLinkInput.disabled = true;
+          clientLinkInput.style.color = '#9ca3af';
         } else {
-          const variants = [
-            { type: 'broker', icon: '🏢', labelEn: 'Invite Broker', labelEs: 'Invitar Broker', waFn: `App.utils.shareBrokerPartnerWhatsApp('${baseReferralLink}&type=broker')` },
-            { type: 'realtor', icon: '🏠', labelEn: 'Invite Agent / Realtor', labelEs: 'Invitar Agente / Realtor', waFn: `App.utils.shareRealtorPartnerWhatsApp('${baseReferralLink}&type=realtor')` },
-            { type: 'colaborador', icon: '🤝', labelEn: 'Invite Collaborator', labelEs: 'Invitar Colaborador', waFn: `App.utils.shareColaboradorWhatsApp('${baseReferralLink}&type=colaborador')` },
-            { type: 'client', icon: '🏡', labelEn: 'Invite End Client', labelEs: 'Invitar Cliente Final', waFn: `App.utils.shareWebinarWhatsApp('${baseReferralLink}&type=client')` }
-          ];
-
-          variantsEl.innerHTML = variants.map(v => `
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;">
-              <div style="font-size:0.82rem;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:6px;">
-                <span>${v.icon}</span>
-                <span class="lang-en">${v.labelEn}</span>
-                <span class="lang-es">${v.labelEs}</span>
-              </div>
-              <div style="display:flex;gap:6px;align-items:center;">
-                <button type="button" class="btn btn-outline btn-sm" style="padding:4px 9px;font-size:0.75rem;" onclick="App.views.embajador.copyVariantLink('${v.type}')" title="Copiar enlace directo">
-                  📋 <span class="lang-en">Link</span><span class="lang-es">Enlace</span>
-                </button>
-                <button type="button" class="btn btn-sm" style="padding:4px 9px;font-size:0.75rem;background:#25D366;color:#fff;border:none;" onclick="${v.waFn}" title="Enviar por WhatsApp">
-                  💬 WhatsApp
-                </button>
-              </div>
-            </div>
-          `).join('');
+          clientLinkInput.value = clientWebinarLink;
+          clientLinkInput.disabled = false;
+          clientLinkInput.style.color = '';
         }
+      }
+
+      if (copyClientBtn) {
+        copyClientBtn.disabled = isPending;
+        copyClientBtn.onclick = isPending ? null : () => {
+          App.utils.copyToClipboard(clientWebinarLink);
+          App.utils.showToast('🎙️ Enlace exclusivo de Webinario para Clientes copiado al portapapeles', 'success');
+        };
       }
 
       // Add Client Manually button
@@ -224,12 +215,10 @@
 
   function copyVariantLink(variantType) {
     if (!currentUser || !currentUser.referralCode) return;
-    const allowed = ['broker', 'realtor', 'colaborador', 'client'];
-    if (!allowed.includes(variantType)) return;
-    const url = `${App.utils.generateReferralLink(currentUser.referralCode)}&type=${encodeURIComponent(variantType)}`;
+    const url = variantType === 'client'
+      ? App.utils.generateClientWebinarLink(currentUser.referralCode)
+      : App.utils.generateReferralLink(currentUser.referralCode);
     App.utils.copyToClipboard(url);
-    const names = { broker: 'Broker', realtor: 'Agente / Realtor', colaborador: 'Colaborador', client: 'Cliente Final' };
-    App.utils.showToast(`🔗 Enlace para ${names[variantType]} copiado al portapapeles`, 'success');
   }
 
   function renderDashPipeline(clients) {

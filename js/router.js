@@ -85,22 +85,35 @@ App.router = (function() {
     const searchParams = new URLSearchParams(window.location.search);
     let refCode = searchParams.get('ref');
     let refType = searchParams.get('type');
-    // Also check hash-based ref params (e.g. #referral?ref=CODE&type=client)
-    if (!refCode) {
-      const hash = window.location.hash;
-      const hashQueryIdx = hash.indexOf('?');
-      if (hashQueryIdx >= 0) {
-        const hashParams = new URLSearchParams(hash.substring(hashQueryIdx + 1));
-        refCode = hashParams.get('ref');
-        if (!refType) refType = hashParams.get('type');
-      }
+    let regionParam = searchParams.get('region') || '';
+
+    const rawHash = (window.location.hash || '').replace(/^#/, '');
+    const hashQueryIdx = rawHash.indexOf('?');
+    const hashRouteKey = hashQueryIdx >= 0 ? rawHash.substring(0, hashQueryIdx) : rawHash;
+    if (hashQueryIdx >= 0) {
+      const hashParams = new URLSearchParams(rawHash.substring(hashQueryIdx + 1));
+      if (!refCode) refCode = hashParams.get('ref');
+      if (!refType) refType = hashParams.get('type');
+      if (!regionParam) regionParam = hashParams.get('region') || '';
     }
+
     if (refCode) {
       sessionStorage.setItem('referralCode', refCode);
-      if (refType) {
-        sessionStorage.setItem('referralType', refType);
+      if (hashRouteKey === 'webinar' || refType === 'client') {
+        sessionStorage.setItem('webinarReferralCode', refCode);
+        sessionStorage.setItem('webinarClientInvite', '1');
+        sessionStorage.removeItem('referralType');
+        const cleanWebinarHash = regionParam ? `#webinar?region=${encodeURIComponent(regionParam)}` : '#webinar';
+        window.history.replaceState({}, document.title, window.location.pathname + cleanWebinarHash);
+      } else {
+        sessionStorage.removeItem('webinarClientInvite');
+        if (refType) {
+          sessionStorage.setItem('referralType', refType);
+        } else {
+          sessionStorage.removeItem('referralType');
+        }
+        window.history.replaceState({}, document.title, window.location.pathname + '#referral');
       }
-      window.history.replaceState({}, document.title, window.location.pathname + '#referral');
     }
 
     window.addEventListener('hashchange', handleRouteChange);
@@ -237,21 +250,49 @@ App.router = (function() {
     
     // Strip query parameters for route matching
     const queryIndex = hash.indexOf('?');
-    const routeKey = queryIndex >= 0 ? hash.substring(0, queryIndex) : hash;
-    const queryString = queryIndex >= 0 ? hash.substring(queryIndex + 1) : '';
+    let routeKey = queryIndex >= 0 ? hash.substring(0, queryIndex) : hash;
+    let queryString = queryIndex >= 0 ? hash.substring(queryIndex + 1) : '';
 
-    // Capture ref code from hash-based referral links (e.g. #referral?ref=CODE&type=realtor)
+    // Capture ref code from hash-based Client Webinar links (#webinar?ref=CODE)
+    if (routeKey === 'webinar' && queryString) {
+      const hashParams = new URLSearchParams(queryString);
+      const refParam = hashParams.get('ref');
+      const regionParam = hashParams.get('region') || '';
+      if (refParam) {
+        sessionStorage.setItem('referralCode', refParam);
+        sessionStorage.setItem('webinarReferralCode', refParam);
+        sessionStorage.setItem('webinarClientInvite', '1');
+        const cleanWebinarHash = regionParam ? `#webinar?region=${encodeURIComponent(regionParam)}` : '#webinar';
+        queryString = regionParam ? `region=${encodeURIComponent(regionParam)}` : '';
+        window.history.replaceState({}, document.title, window.location.pathname + cleanWebinarHash);
+      }
+    }
+
+    // Capture ref code from hash-based Professional referral links (e.g. #referral?ref=CODE)
     if (routeKey === 'referral' && queryString) {
       const hashParams = new URLSearchParams(queryString);
       const refParam = hashParams.get('ref');
       const typeParam = hashParams.get('type');
       if (refParam) {
         sessionStorage.setItem('referralCode', refParam);
-        if (typeParam) {
-          sessionStorage.setItem('referralType', typeParam);
+        if (typeParam === 'client') {
+          // Legacy client referral links redirect seamlessly to the dedicated Client Webinar page
+          sessionStorage.setItem('webinarReferralCode', refParam);
+          sessionStorage.setItem('webinarClientInvite', '1');
+          sessionStorage.removeItem('referralType');
+          routeKey = 'webinar';
+          queryString = '';
+          window.history.replaceState({}, document.title, window.location.pathname + '#webinar');
+        } else {
+          sessionStorage.removeItem('webinarClientInvite');
+          if (typeParam) {
+            sessionStorage.setItem('referralType', typeParam);
+          } else {
+            sessionStorage.removeItem('referralType');
+          }
+          // Clean the URL to remove the ref param
+          window.history.replaceState({}, document.title, window.location.pathname + '#referral');
         }
-        // Clean the URL to remove the ref param
-        window.history.replaceState({}, document.title, window.location.pathname + '#referral');
       }
     }
 

@@ -150,13 +150,22 @@ App.views.public = {
      ============================================ */
   initReferralForm: function() {
     const refCode = sessionStorage.getItem('referralCode');
+    const rawRequestedType = sessionStorage.getItem('referralType') || '';
+    if (rawRequestedType === 'client') {
+      if (refCode) sessionStorage.setItem('webinarReferralCode', refCode);
+      sessionStorage.setItem('webinarClientInvite', '1');
+      sessionStorage.removeItem('referralType');
+      App.router.navigateTo('webinar', true);
+      return;
+    }
+
     const welcomeMsg = document.getElementById('referral-welcome-msg');
     const typeSelector = document.getElementById('referral-type-selector');
     const typeOptions = document.getElementById('referral-type-options');
     const form = document.getElementById('referral-form');
 
     let referrer = null;
-    const requestedType = sessionStorage.getItem('referralType') || 'client';
+    const requestedType = rawRequestedType || 'realtor';
     let selectedType = requestedType;
 
     // Populate international country options & RE/MAX Inmomás region checkboxes in #referral-professional-fields
@@ -470,14 +479,14 @@ App.views.public = {
       const profConsentBox = document.getElementById('referral-webinar-consent');
       if (profConsentBox) profConsentBox.checked = true;
 
-      // Build type options based on referrer's role
-      // NOTE: 'embajador' ONLY appears on the Administrator's referral link (referrer.role === 'admin').
-      // An Embajador's referral link includes all umbrella variants ('broker', 'realtor', 'colaborador', 'client') EXCEPT 'embajador'.
-      let availableTypes = ['realtor', 'client'];
+      // Build professional type options based on referrer's role
+      // NOTE: End Clients now use the dedicated Client Webinar Link (#webinar?ref=CODE) exclusively.
+      // 'embajador' ONLY appears on the Administrator's referral link (referrer.role === 'admin').
+      let availableTypes = ['realtor'];
       if (!referrer) {
         availableTypes = (refCode && refCode.toUpperCase().startsWith('BRK-'))
-          ? ['realtor', 'client']
-          : ['realtor', 'broker', 'colaborador', 'client'];
+          ? ['realtor']
+          : ['realtor', 'broker', 'colaborador'];
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
         } else {
@@ -489,7 +498,7 @@ App.views.public = {
           availableTypes = ['agent_inmomas'];
           selectedType = 'agent_inmomas';
         } else {
-          availableTypes = ['embajador', 'broker', 'realtor', 'colaborador', 'client'];
+          availableTypes = ['embajador', 'broker', 'realtor', 'colaborador'];
           if (availableTypes.includes(requestedType)) {
             selectedType = requestedType;
           } else if (!availableTypes.includes(selectedType)) {
@@ -497,36 +506,28 @@ App.views.public = {
           }
         }
       } else if (referrer.role === 'embajador') {
-        availableTypes = ['broker', 'realtor', 'colaborador', 'client'];
+        availableTypes = ['broker', 'realtor', 'colaborador'];
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
         } else if (!availableTypes.includes(selectedType)) {
           selectedType = 'realtor';
         }
       } else if (referrer.role === 'realtor') {
-        availableTypes = ['realtor', 'client'];
-        if (availableTypes.includes(requestedType)) {
-          selectedType = requestedType;
-        } else if (!availableTypes.includes(selectedType)) {
-          selectedType = 'realtor';
-        }
+        availableTypes = ['realtor'];
+        selectedType = 'realtor';
       } else if (referrer.role === 'broker') {
-        // A Broker cannot have another Broker registered underneath them
-        availableTypes = ['realtor', 'client'];
-        if (availableTypes.includes(requestedType)) {
-          selectedType = requestedType;
-        } else if (!availableTypes.includes(selectedType)) {
-          selectedType = 'realtor';
-        }
+        // A Broker invites Realtors to their team
+        availableTypes = ['realtor'];
+        selectedType = 'realtor';
       } else if (referrer.role === 'agent_inmomas' || referrer.role === 'colaborador' || referrer.role === 'partner') {
-        availableTypes = ['realtor', 'broker', 'colaborador', 'client'];
+        availableTypes = ['realtor', 'broker', 'colaborador'];
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
         } else if (!availableTypes.includes(selectedType)) {
           selectedType = 'realtor';
         }
       } else {
-        availableTypes = ['realtor', 'broker', 'colaborador', 'client'];
+        availableTypes = ['realtor', 'broker', 'colaborador'];
         if (availableTypes.includes(requestedType)) {
           selectedType = requestedType;
         } else {
@@ -980,15 +981,21 @@ App.views.public = {
         }
       } catch (_) {}
 
-      const regionalCfg = (requestedRegion && App.auth && App.auth.getRegionalWebinarConfig)
-        ? App.auth.getRegionalWebinarConfig(settings, requestedRegion)
+      const isClientWebinarInvite = Boolean(
+        sessionStorage.getItem('webinarClientInvite') === '1' ||
+        sessionStorage.getItem('webinarReferralCode')
+      );
+      const forcedType = isClientWebinarInvite ? 'b2c' : null;
+
+      const regionalCfg = ((requestedRegion || forcedType) && App.auth && App.auth.getRegionalWebinarConfig)
+        ? App.auth.getRegionalWebinarConfig(settings, requestedRegion || 'north_america', forcedType)
         : null;
 
-      const activeType = regionalCfg ? regionalCfg.activeType : (settings.activeType || 'b2c');
+      const activeType = forcedType || (regionalCfg ? regionalCfg.activeType : (settings.activeType || 'b2c'));
       const config = regionalCfg ? { ...(settings[activeType] || settings.b2c || {}), ...regionalCfg } : (settings[activeType] || settings.b2c || {});
-      const dateStr = regionalCfg ? regionalCfg.date : (settings.date || config.date || '2026-09-18');
-      const timeStr = regionalCfg ? regionalCfg.time : (settings.time || config.time || '12:00');
-      const spots = regionalCfg ? regionalCfg.spots : (settings.spotsAvailable || config.spots || 25);
+      const dateStr = regionalCfg ? regionalCfg.date : (settings[activeType]?.date || settings.date || config.date || '2026-09-18');
+      const timeStr = regionalCfg ? regionalCfg.time : (settings[activeType]?.time || settings.time || config.time || '12:00');
+      const spots = regionalCfg ? regionalCfg.spots : (settings[activeType]?.spots || settings.spotsAvailable || config.spots || 25);
 
       // ── Date Formatting ──
       const [y, m, d] = dateStr.split('-').map(Number);
@@ -1469,10 +1476,88 @@ App.views.public = {
       countrySelect.addEventListener('change', () => populateStates(countrySelect.value));
     }
 
-    // ---- "How did you hear" → show/hide Referrer Name / Collaborator fields ----
+    // ---- Personalized Client Webinar Link Referrer Resolution & Branding ----
     const hearSelect        = document.getElementById('webinar-how-heard');
+    const hearGroup         = document.getElementById('webinar-how-heard-group');
     const referrerWrap      = document.getElementById('webinar-referrer-wrap');
     const collaboratorWrap  = document.getElementById('webinar-collaborator-wrap');
+
+    const activeWebinarRefCode = (
+      sessionStorage.getItem('webinarReferralCode') ||
+      (sessionStorage.getItem('webinarClientInvite') === '1' ? sessionStorage.getItem('referralCode') : '') ||
+      ''
+    ).trim();
+
+    async function resolveWebinarReferrer(code) {
+      if (!code) return null;
+      if (code === 'UCI') return { id: 'UCI', firstName: 'UCI', lastName: '', agencyName: 'UCI', role: 'partner', referralCode: 'UCI' };
+      if (code === 'Fuster & Associates') return { id: 'Fuster & Associates', firstName: 'Fuster', lastName: '& Associates', agencyName: 'Fuster & Associates', role: 'partner', referralCode: 'Fuster & Associates' };
+      if (code === 'Inmomás Holidays') return { id: 'Inmomás Holidays', firstName: 'Inmomás', lastName: 'Holidays', agencyName: 'Inmomás Holidays', role: 'partner', referralCode: 'Inmomás Holidays' };
+
+      if (App.demoData && Array.isArray(App.demoData.users)) {
+        const demoRef = App.demoData.users.find(u => u.referralCode === code);
+        if (demoRef && (App.demoMode || !App.db)) return { ...demoRef };
+      }
+
+      if (!App.demoMode && App.db) {
+        try {
+          const snap = await App.db.collection('users').where('referralCode', '==', code).limit(1).get();
+          if (!snap.empty) {
+            const doc = snap.docs[0];
+            const refData = { id: doc.id, ...doc.data() };
+            if ((!refData.agencyLogo || !refData.agencyName) && refData.brokerId) {
+              try {
+                const bDoc = await App.db.collection('users').doc(refData.brokerId).get();
+                if (bDoc.exists) {
+                  const bData = bDoc.data();
+                  if (!refData.agencyName && bData.agencyName) refData.agencyName = bData.agencyName;
+                  if (!refData.agencyLogo && bData.agencyLogo) refData.agencyLogo = bData.agencyLogo;
+                }
+              } catch (_) {}
+            }
+            return refData;
+          }
+        } catch (err) {
+          console.warn('[Webinar] Referrer Firestore lookup warning:', err);
+        }
+      }
+
+      if (App.demoData && Array.isArray(App.demoData.users)) {
+        const fallbackRef = App.demoData.users.find(u => u.referralCode === code);
+        if (fallbackRef) return { ...fallbackRef };
+      }
+      return null;
+    }
+
+    if (activeWebinarRefCode) {
+      // Hide manual "How did you hear?" selector since invitation comes from a direct Client Webinar Link
+      if (hearGroup) hearGroup.style.display = 'none';
+      if (hearSelect) hearSelect.required = false;
+      if (referrerWrap) referrerWrap.style.display = 'none';
+      if (collaboratorWrap) collaboratorWrap.style.display = 'none';
+
+      resolveWebinarReferrer(activeWebinarRefCode).then(refObj => {
+        window._currentWebinarReferrer = refObj || null;
+        if (refObj) {
+          App.views.public.renderPartnerBranding(refObj, 'webinar');
+        }
+      });
+    } else {
+      window._currentWebinarReferrer = null;
+      App.views.public.renderPartnerBranding(null, 'webinar');
+      if (hearGroup) hearGroup.style.display = '';
+      if (hearSelect) hearSelect.required = true;
+    }
+
+    // Reset form/success panels if revisiting view
+    const resetSuccessPanel = document.getElementById('webinar-success-panel');
+    const resetFormPanel = document.getElementById('webinar-form-panel') || document.getElementById('webinar-form-body');
+    if (resetSuccessPanel && resetFormPanel) {
+      resetSuccessPanel.style.display = 'none';
+      resetFormPanel.style.display = '';
+    }
+
+    // ---- "How did you hear" → show/hide Referrer Name / Collaborator fields ----
 
     // Populate collaborator dropdown from active users with roles colaborador | realtor | broker
     async function populateCollaboratorDropdown() {
@@ -1592,6 +1677,12 @@ App.views.public = {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('webinar-submit-btn');
+      const restoreBtn = () => {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '🎙️ <span class="lang-en">Reserve My Free Spot Now</span><span class="lang-es">Reservar Mi Plaza Gratuita Ahora</span><span class="lang-fr">Réserver Ma Place Gratuite Maintenant</span><span class="lang-en-ca">Reserve My Free Spot Now</span>';
+        }
+      };
       if (btn) { btn.disabled = true; btn.innerHTML = '<span style="opacity:.7">Registering…</span>'; }
 
       try {
@@ -1603,9 +1694,19 @@ App.views.public = {
         const agency       = get('webinar-agency');
         const country      = get('webinar-country');
         const state        = get('webinar-state');
-        const howHeard     = get('webinar-how-heard');
+        const rawHowHeard  = get('webinar-how-heard');
         const referrerName = get('webinar-referrer-name');
         const gdpr         = document.getElementById('webinar-gdpr')?.checked;
+
+        const refCode = (
+          sessionStorage.getItem('webinarReferralCode') ||
+          sessionStorage.getItem('referralCode') ||
+          ''
+        ).trim();
+        const isClientInvite = Boolean(
+          refCode || sessionStorage.getItem('webinarClientInvite') === '1'
+        );
+        const howHeard = refCode ? 'Referral Link' : rawHowHeard;
 
         // Collaborator selection
         const collabSel    = document.getElementById('webinar-collaborator-name');
@@ -1614,69 +1715,51 @@ App.views.public = {
         const collaboratorRole = collabSel?.selectedOptions?.[0]?.dataset?.userRole || null;
         const collaboratorCode = collabSel?.selectedOptions?.[0]?.dataset?.referralCode || null;
 
-        if (!firstName || !lastName || !phone || !email || !agency || !country || !state || !howHeard) {
+        if (!firstName || !lastName || !phone || !email || !agency || !country || !state || (!refCode && !howHeard)) {
           App.utils.showToast('Please fill in all required fields.', 'error');
-          if (btn) { btn.disabled = false; btn.textContent = 'Register Now'; }
+          restoreBtn();
           return;
         }
         if (!gdpr) {
           App.utils.showToast('Please accept the data protection policy to continue.', 'error');
-          if (btn) { btn.disabled = false; btn.textContent = 'Register Now'; }
+          restoreBtn();
           return;
         }
-        if (howHeard === 'agent' && !referrerName) {
+        if (!refCode && howHeard === 'agent' && !referrerName) {
           App.utils.showToast('Please enter or select the name of the referring agent.', 'error');
-          if (btn) { btn.disabled = false; btn.textContent = 'Register Now'; }
+          restoreBtn();
           return;
         }
-        if (howHeard === 'collaborator' && !collaboratorName) {
+        if (!refCode && howHeard === 'collaborator' && !collaboratorName) {
           App.utils.showToast('Please select your Realtor / Broker from the list.', 'error');
-          if (btn) { btn.disabled = false; btn.textContent = 'Register Now'; }
+          restoreBtn();
           return;
         }
 
-        // ---- Resolve referral link context (agent who shared the link) ----
-        const refCode = sessionStorage.getItem('referralCode');
-        let agentReferralCode = null;
+        // ---- Resolve referral link context (user who shared the Client Webinar Link) ----
+        let resolvedRefObj    = window._currentWebinarReferrer || null;
+        let agentReferralCode = refCode || null;
         let agentReferrerId   = null;
         let agentReferrerName = null;
         let agentReferrerRole = null;
 
-        // If howHeard === 'collaborator', use the selected collaborator as the referrer attribution
-        if (howHeard === 'collaborator' && collaboratorName) {
+        if (refCode && !resolvedRefObj) {
+          resolvedRefObj = await resolveWebinarReferrer(refCode);
+        }
+
+        if (resolvedRefObj) {
+          agentReferralCode = resolvedRefObj.referralCode || refCode;
+          agentReferrerId   = resolvedRefObj.id || null;
+          agentReferrerName = `${resolvedRefObj.firstName || ''} ${resolvedRefObj.lastName || ''}`.trim() || resolvedRefObj.agencyName || refCode;
+          agentReferrerRole = resolvedRefObj.role || null;
+        } else if (!refCode && howHeard === 'collaborator' && collaboratorName) {
           agentReferralCode = collaboratorCode  || null;
           agentReferrerId   = collaboratorId    || null;
           agentReferrerName = collaboratorName;
           agentReferrerRole = collaboratorRole  || 'realtor';
-        } else if (refCode) {
-          if (App.demoMode && App.demoData && App.demoData.users) {
-            const ref = App.demoData.users.find(u => u.referralCode === refCode);
-            if (ref) {
-              agentReferralCode = ref.referralCode;
-              agentReferrerId   = ref.id;
-              agentReferrerName = `${ref.firstName} ${ref.lastName}`;
-              agentReferrerRole = ref.role;
-            }
-          } else if (!App.demoMode && App.db) {
-            try {
-              const snap = await App.db.collection('users')
-                .where('referralCode', '==', refCode)
-                .limit(1)
-                .get();
-              if (!snap.empty) {
-                const doc = snap.docs[0];
-                agentReferralCode = doc.data().referralCode;
-                agentReferrerId   = doc.id;
-                agentReferrerName = `${doc.data().firstName} ${doc.data().lastName}`;
-                agentReferrerRole = doc.data().role;
-              }
-            } catch (lookupErr) {
-              console.warn('[Webinar] Agent referral lookup failed:', lookupErr);
-            }
-          }
         }
 
-        // ---- Get Current Active Webinar Settings (with Regional Parallel Support) ----
+        // ---- Get Current Active Webinar Settings (forcing B2C when opened via Client Webinar Link) ----
         const settings = (App.auth && App.auth.getWebinarSettings)
           ? await App.auth.getWebinarSettings()
           : (App.auth && App.auth.getDefaultWebinarSettings ? App.auth.getDefaultWebinarSettings() : null);
@@ -1692,23 +1775,29 @@ App.views.public = {
           ? App.utils.resolveRegionFromCountry(country)
           : '';
         const targetWebinarRegion = urlRegion || resolvedCountryRegion || 'north_america';
+        const forcedType = isClientInvite ? 'b2c' : null;
         const regionalCfg = (App.auth && App.auth.getRegionalWebinarConfig && settings)
-          ? App.auth.getRegionalWebinarConfig(settings, targetWebinarRegion)
+          ? App.auth.getRegionalWebinarConfig(settings, targetWebinarRegion, forcedType)
           : null;
 
-        const activeType = regionalCfg ? regionalCfg.activeType : (settings?.activeType || 'b2c');
+        const activeType = forcedType || (regionalCfg ? regionalCfg.activeType : (settings?.activeType || 'b2c'));
         const typeConfig = regionalCfg || (settings ? (settings[activeType] || settings.b2c) : null);
         const webinarTitle = typeConfig?.title || (activeType === 'b2b' ? 'Beyond Borders' : 'Spain Unlocked');
-        const webinarDate = typeConfig?.date || settings?.date || '2026-09-18';
+        const webinarDate = typeConfig?.date || settings?.[activeType]?.date || settings?.date || '2026-10-29';
         const webinarLanguage = typeConfig?.language || 'en';
 
         // Determine referrerName for the record
-        let finalReferrerName = '';
-        if (howHeard === 'agent') finalReferrerName = referrerName;
-        else if (howHeard === 'collaborator') finalReferrerName = collaboratorName;
+        let finalReferrerName = agentReferrerName || '';
+        if (!finalReferrerName) {
+          if (howHeard === 'agent') finalReferrerName = referrerName;
+          else if (howHeard === 'collaborator') finalReferrerName = collaboratorName;
+        }
 
+        // 1. Save Webinar Registration
         await App.auth.saveWebinarRegistration({
-          firstName, lastName, phone, email, agency, country, state,
+          firstName, lastName, phone, email, agency,
+          clientInterest: activeType === 'b2c' ? agency : undefined,
+          country, state,
           region: resolvedCountryRegion || targetWebinarRegion,
           webinarRegion: targetWebinarRegion,
           webinarLanguage: webinarLanguage,
@@ -1718,28 +1807,106 @@ App.views.public = {
           webinarType: activeType.toUpperCase(),
           webinarDate: webinarDate,
           gdprConsent: true,
+          role:             activeType === 'b2c' ? 'client' : 'realtor',
+          contactType:      activeType === 'b2c' ? 'client' : 'realtor',
           referralCode:     agentReferralCode || null,
           referrerId:       agentReferrerId   || null,
+          agentReferrerId:  agentReferrerId   || null,
           agentReferrerName: agentReferrerName || null,
           agentReferrerRole: agentReferrerRole || null,
           source:           agentReferralCode ? 'referral' : 'direct'
         });
 
+        // 2. Protect & Register Client in Referrer's CRM / Pipeline automatically (when B2C / Client Webinar Link)
+        if (activeType === 'b2c' && App.auth && typeof App.auth.addReferralClient === 'function') {
+          const clientPayload = {
+            firstName,
+            lastName,
+            email,
+            phone,
+            country,
+            currentLocation: state && state !== 'International' ? `${state}, ${country}` : country,
+            region: resolvedCountryRegion || targetWebinarRegion,
+            budget: 'TBD',
+            interestArea: '—',
+            timeline: '—',
+            objective: agency || 'Interés en España (Webinario)',
+            notes: `Inscrito al Webinario (${webinarTitle} · ${webinarDate}). Objetivo: ${agency}`,
+            needsUCI: refCode === 'UCI',
+            needsFuster: refCode === 'Fuster & Associates',
+            needsHolidays: refCode === 'Inmomás Holidays',
+            termsAccepted: true,
+            termsAcceptedAt: new Date().toISOString(),
+            source: agentReferralCode ? 'webinar_referral' : 'webinar',
+            historyNote: agentReferralCode
+              ? `Inscrito vía enlace exclusivo de Webinario de Clientes (${agentReferralCode})`
+              : 'Inscrito directamente al Webinario B2C'
+          };
+
+          if (resolvedRefObj) {
+            clientPayload.referredBy = resolvedRefObj.id;
+            clientPayload.embajadorId = resolvedRefObj.role === 'embajador'
+              ? resolvedRefObj.id
+              : (resolvedRefObj.embajadorId || null);
+
+            if (resolvedRefObj.role === 'broker') {
+              clientPayload.brokerId = resolvedRefObj.id;
+            } else if (resolvedRefObj.role === 'realtor') {
+              clientPayload.realtorId = resolvedRefObj.id;
+              clientPayload.realtorName = agentReferrerName;
+              clientPayload.brokerId = resolvedRefObj.brokerId || null;
+            } else if (resolvedRefObj.role === 'agent_inmomas') {
+              clientPayload.localAgentId = resolvedRefObj.id;
+              clientPayload.localAgentName = agentReferrerName;
+              clientPayload.inmomasAgentName = agentReferrerName;
+            } else if (resolvedRefObj.role === 'partner') {
+              clientPayload.referredBy = resolvedRefObj.id || refCode;
+            }
+          } else if (howHeard === 'collaborator' && collaboratorId) {
+            clientPayload.referredBy = collaboratorId;
+            if (collaboratorRole === 'realtor') {
+              clientPayload.realtorId = collaboratorId;
+              clientPayload.realtorName = collaboratorName;
+            } else if (collaboratorRole === 'broker') {
+              clientPayload.brokerId = collaboratorId;
+            } else if (collaboratorRole === 'embajador') {
+              clientPayload.embajadorId = collaboratorId;
+            }
+          } else if (howHeard === 'agent' && referrerName) {
+            clientPayload.referredBy = referrerName;
+            clientPayload.localAgentName = referrerName;
+            clientPayload.inmomasAgentName = referrerName;
+          } else if (refCode) {
+            clientPayload.referredBy = refCode;
+          }
+
+          await App.auth.addReferralClient(clientPayload, {
+            skipWebinarAutoEnroll: true,
+            silentNotifications: true
+          });
+        }
+
+        sessionStorage.removeItem('webinarReferralCode');
+        sessionStorage.removeItem('webinarClientInvite');
+        sessionStorage.removeItem('referralCode');
+
         // Show success panel
         const successPanel = document.getElementById('webinar-success-panel');
-        const formPanel    = document.getElementById('webinar-form-panel');
+        const formPanel    = document.getElementById('webinar-form-panel') || document.getElementById('webinar-form-body');
         if (successPanel && formPanel) {
           formPanel.style.display = 'none';
           successPanel.style.display = 'flex';
+          form.reset();
         } else {
           App.utils.showToast(`🎉 You are registered! See you on ${webinarDate}.`, 'success');
           form.reset();
         }
+        restoreBtn();
 
       } catch (err) {
         console.error('[Webinar] Registration error:', err);
         App.utils.showToast('Error submitting registration: ' + err.message, 'error');
-        if (btn) { btn.disabled = false; btn.textContent = 'Register Now'; }
+        restoreBtn();
       }
     });
   },

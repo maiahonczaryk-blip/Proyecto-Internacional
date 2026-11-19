@@ -218,6 +218,7 @@
           currentUser.referralCode = 'ADM-INMOMAS';
         }
         const referralLink = App.utils.generateReferralLink(currentUser.referralCode);
+        const clientWebinarLink = App.utils.generateClientWebinarLink(currentUser.referralCode);
         const linkInput = document.getElementById('admin-dash-referral-link');
         if (linkInput) {
           linkInput.value = referralLink;
@@ -225,11 +226,19 @@
         const copyBtn = document.getElementById('admin-dash-copy-link');
         if (copyBtn) {
           copyBtn.onclick = () => {
-            if (linkInput) {
-              linkInput.select();
-              document.execCommand('copy');
-              App.utils.showToast('Admin referral link copied to clipboard!', 'success');
-            }
+            App.utils.copyToClipboard(referralLink);
+            App.utils.showToast('🔗 Enlace profesional de Administración copiado al portapapeles', 'success');
+          };
+        }
+        const clientLinkInput = document.getElementById('admin-dash-client-webinar-link');
+        if (clientLinkInput) {
+          clientLinkInput.value = clientWebinarLink;
+        }
+        const copyClientBtn = document.getElementById('admin-dash-copy-client-link');
+        if (copyClientBtn) {
+          copyClientBtn.onclick = () => {
+            App.utils.copyToClipboard(clientWebinarLink);
+            App.utils.showToast('🎙️ Enlace exclusivo de Webinario para Clientes copiado al portapapeles', 'success');
           };
         }
         const copyEmbBtn = document.getElementById('admin-dash-copy-embajador-link');
@@ -243,8 +252,7 @@
         const waEmbBtn = document.getElementById('admin-dash-wa-embajador-link');
         if (waEmbBtn) {
           waEmbBtn.onclick = () => {
-            const embUrl = `${referralLink}&type=embajador`;
-            App.utils.shareEmbajadorWhatsApp(embUrl);
+            App.utils.shareEmbajadorWhatsApp(referralLink);
           };
         }
         const copyMasBtn = document.getElementById('admin-dash-copy-mas-agent-link');

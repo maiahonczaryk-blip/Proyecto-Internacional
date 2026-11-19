@@ -102,9 +102,12 @@
       setTextById('realtor-stat-sales',       completedSales.length);
       setTextById('realtor-stat-commissions', App.utils.formatCurrency(totalRealtorComm));
 
-      // Referral link
+      // Professional Colleague Link & Exclusive Client Webinar Link
       const isPending = currentUser.status === 'pending';
-      const referralLink = isPending ? '' : App.utils.generateReferralLink(currentUser.referralCode || 'REA-DEFAULT');
+      const refCode = currentUser.referralCode || 'REA-DEFAULT';
+      const referralLink = isPending ? '' : App.utils.generateReferralLink(refCode);
+      const clientWebinarLink = isPending ? '' : App.utils.generateClientWebinarLink(refCode);
+
       const linkInput = document.getElementById('realtor-dash-referral-link');
       if (linkInput) {
         if (isPending) {
@@ -120,7 +123,22 @@
         }
       }
 
-      // Copy button handler
+      const clientLinkInput = document.getElementById('realtor-dash-client-webinar-link');
+      if (clientLinkInput) {
+        if (isPending) {
+          clientLinkInput.value = 'Enlace pendiente de aprobación por el Administrador / Link pending admin approval';
+          clientLinkInput.disabled = true;
+          clientLinkInput.style.color = '#9ca3af';
+          clientLinkInput.style.fontStyle = 'italic';
+        } else {
+          clientLinkInput.value = clientWebinarLink;
+          clientLinkInput.disabled = false;
+          clientLinkInput.style.color = '';
+          clientLinkInput.style.fontStyle = '';
+        }
+      }
+
+      // Copy button handlers
       const copyBtn = document.getElementById('realtor-dash-copy-link');
       if (copyBtn) {
         if (isPending) {
@@ -133,11 +151,26 @@
           copyBtn.style.opacity = '';
           copyBtn.style.cursor = 'pointer';
           copyBtn.onclick = () => {
-            if (linkInput) {
-              linkInput.select();
-              document.execCommand('copy');
-              App.utils.showToast('Referral link copied to clipboard!', 'success');
-            }
+            App.utils.copyToClipboard(referralLink);
+            App.utils.showToast('🔗 Enlace profesional copiado al portapapeles', 'success');
+          };
+        }
+      }
+
+      const copyClientBtn = document.getElementById('realtor-dash-copy-client-link');
+      if (copyClientBtn) {
+        if (isPending) {
+          copyClientBtn.disabled = true;
+          copyClientBtn.style.opacity = '0.5';
+          copyClientBtn.style.cursor = 'not-allowed';
+          copyClientBtn.onclick = null;
+        } else {
+          copyClientBtn.disabled = false;
+          copyClientBtn.style.opacity = '';
+          copyClientBtn.style.cursor = 'pointer';
+          copyClientBtn.onclick = () => {
+            App.utils.copyToClipboard(clientWebinarLink);
+            App.utils.showToast('🎙️ Enlace exclusivo de Webinario para Clientes copiado al portapapeles', 'success');
           };
         }
       }
@@ -370,9 +403,11 @@
       realtorClients = await App.auth.getClients({ referredBy: currentUser.id });
 
       const isPending = currentUser.status === 'pending';
-      const referralLink = isPending ? '' : App.utils.generateReferralLink(currentUser.referralCode || 'REA-DEFAULT');
+      const refCode = currentUser.referralCode || 'REA-DEFAULT';
+      const referralLink = isPending ? '' : App.utils.generateReferralLink(refCode);
+      const clientWebinarLink = isPending ? '' : App.utils.generateClientWebinarLink(refCode);
 
-      // Display referral link
+      // Display professional referral link
       const linkDisplay = document.getElementById('realtor-referral-link-display');
       if (linkDisplay) {
         if (isPending) {
@@ -388,7 +423,23 @@
         }
       }
 
-      // Copy button
+      // Display exclusive client webinar link
+      const clientLinkDisplay = document.getElementById('realtor-client-webinar-link-display');
+      if (clientLinkDisplay) {
+        if (isPending) {
+          clientLinkDisplay.value = 'Enlace pendiente de aprobación por el Administrador';
+          clientLinkDisplay.disabled = true;
+          clientLinkDisplay.style.color = '#9ca3af';
+          clientLinkDisplay.style.fontStyle = 'italic';
+        } else {
+          clientLinkDisplay.value = clientWebinarLink;
+          clientLinkDisplay.disabled = false;
+          clientLinkDisplay.style.color = '';
+          clientLinkDisplay.style.fontStyle = '';
+        }
+      }
+
+      // Copy buttons
       const copyBtn = document.getElementById('realtor-copy-referral-btn');
       if (copyBtn) {
         if (isPending) {
@@ -404,6 +455,21 @@
         }
       }
 
+      const copyClientWebinarBtn = document.getElementById('realtor-copy-client-webinar-btn');
+      if (copyClientWebinarBtn) {
+        if (isPending) {
+          copyClientWebinarBtn.disabled = true;
+          copyClientWebinarBtn.style.opacity = '0.5';
+          copyClientWebinarBtn.style.cursor = 'not-allowed';
+          copyClientWebinarBtn.onclick = null;
+        } else {
+          copyClientWebinarBtn.disabled = false;
+          copyClientWebinarBtn.style.opacity = '';
+          copyClientWebinarBtn.style.cursor = '';
+          copyClientWebinarBtn.onclick = () => App.utils.copyToClipboard(clientWebinarLink);
+        }
+      }
+
       // Referral stats
       const totalReferred = realtorClients.length;
       const activeInPipeline = realtorClients.filter(c => !['completed', 'closed'].includes(c.status)).length;
@@ -415,7 +481,7 @@
       setTextById('referral-stat-converted',  converted);
       setTextById('referral-stat-conversion', conversionRate + '%');
 
-      // QR Code placeholder
+      // QR Code placeholder (highlights Client Webinar Link)
       const qrContainer = document.getElementById('referral-qr-code');
       if (qrContainer) {
         if (isPending) {
@@ -432,9 +498,9 @@
           qrContainer.innerHTML = `
             <div style="border: 2px dashed #d1d5db; border-radius: 0.75rem; padding: 2rem; text-align: center; background: #f9fafb;">
               <div style="font-size: 3rem; margin-bottom: 0.75rem;">📱</div>
-              <div style="font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">QR Code</div>
+              <div style="font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Client Webinar Link</div>
               <div style="font-size: 0.75rem; color: #6b7280; word-break: break-all; padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 0.375rem;">
-                ${App.utils.escapeHtml(referralLink)}
+                ${App.utils.escapeHtml(clientWebinarLink)}
               </div>
               <p style="font-size: 0.75rem; color: #9ca3af; margin: 0.75rem 0 0;">
                 QR code generation can be integrated with a library like <strong>qrcode.js</strong>

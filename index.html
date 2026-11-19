@@ -1863,16 +1863,16 @@
             </div>
 
             <h2 id="referral-form-title" style="font-size: 1.45rem; font-weight: 800; margin-bottom: 6px; text-align: center; color: var(--text-primary);">
-              <span class="lang-en">Buy &amp; Invest in Spain</span>
-              <span class="lang-es">Comprar e Invertir en España</span>
-              <span class="lang-fr">Acheter et Investir en Espagne</span>
-              <span class="lang-en-ca">Buy &amp; Invest in Spain</span>
+              <span class="lang-en">Realtor Partner Registration</span>
+              <span class="lang-es">Registro de Agente / Profesional</span>
+              <span class="lang-fr">Inscription Professionnel Partenaire</span>
+              <span class="lang-en-ca">Realtor Partner Registration</span>
             </h2>
             <p id="referral-welcome-msg" style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.4; margin: 0 auto; max-width: 480px; text-align: center;">
-              <span class="lang-en">Personalized advisory with Spain's top real estate advisors</span>
-              <span class="lang-es">Asesoría personalizada con los mejores agentes de España</span>
-              <span class="lang-fr">Conseil personnalisé avec les meilleurs agents en Espagne</span>
-              <span class="lang-en-ca">Personalized advisory with Spain's top real estate advisors</span>
+              <span class="lang-en">Join our international referral network in Spain</span>
+              <span class="lang-es">Únete a nuestra red internacional de profesionales en España</span>
+              <span class="lang-fr">Rejoignez notre réseau international en Espagne</span>
+              <span class="lang-en-ca">Join our international referral network in Spain</span>
             </p>
           </div>
 
@@ -2638,6 +2638,14 @@
 
             <!-- Form Body -->
             <div id="webinar-form-body" style="padding:32px 36px;">
+              <!-- Personalized Referrer & Agency Branding Card (populated dynamically when opened via Client Webinar Link) -->
+              <div id="webinar-partner-branding" style="display: none; margin: 0 0 22px; padding: 14px 18px; border-radius: 14px; background: linear-gradient(135deg, rgba(225, 29, 72, 0.05) 0%, rgba(0, 63, 153, 0.07) 100%); border: 1.5px solid rgba(225, 29, 72, 0.22); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04); text-align: center;">
+                <div id="webinar-partner-logo-wrap" style="display: none; justify-content: center; align-items: center; margin-bottom: 10px;">
+                  <img id="webinar-partner-logo" src="" alt="Agency Logo" style="max-height: 58px; max-width: 210px; width: auto; height: auto; object-fit: contain; border-radius: 6px;">
+                </div>
+                <div id="webinar-partner-attribution" style="font-size: 0.92rem; color: #111827; line-height: 1.45;"></div>
+              </div>
+
               <form id="webinar-register-form" novalidate>
 
                 <div class="form-row">
@@ -2740,7 +2748,7 @@
                   </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="webinar-how-heard-group">
                   <label for="webinar-how-heard" style="font-weight:600;font-size:.83rem;color:#374151;margin-bottom:6px;display:block;">
                     <span class="lang-en">How did you hear about this webinar? *</span>
                     <span class="lang-es">&iquest;C&oacute;mo te enteraste del webinar? *</span>
@@ -3157,16 +3165,16 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
   <script src="js/notifications.js?v=20261112_v1"></script>
   <script src="js/firebase-config.js?v=20261112_v1"></script>
-  <script src="js/utils.js?v=20261112_v1"></script>
-  <script src="js/auth-service.js?v=20261112_v1"></script>
-  <script src="js/router.js?v=20261112_v1"></script>
-  <script src="js/views/public-views.js?v=20261119_v1"></script>
+  <script src="js/utils.js?v=20261119_v2"></script>
+  <script src="js/auth-service.js?v=20261119_v2"></script>
+  <script src="js/router.js?v=20261119_v2"></script>
+  <script src="js/views/public-views.js?v=20261119_v2"></script>
   <script src="js/views/auth-views.js?v=20261112_v1"></script>
-  <script src="js/views/admin-views.js?v=20261112_v1"></script>
-  <script src="js/views/embajador-views.js?v=20261112_v1"></script>
-  <script src="js/views/broker-views.js?v=20261109_v5"></script>
-  <script src="js/views/realtor-views.js?v=20261026_v1"></script>
-  <script src="js/views/agent-views.js?v=20261026_v1"></script>
+  <script src="js/views/admin-views.js?v=20261119_v2"></script>
+  <script src="js/views/embajador-views.js?v=20261119_v2"></script>
+  <script src="js/views/broker-views.js?v=20261119_v2"></script>
+  <script src="js/views/realtor-views.js?v=20261119_v2"></script>
+  <script src="js/views/agent-views.js?v=20261119_v2"></script>
   <script src="js/referral-agreement.js?v=20261112_v1"></script>
   <script src="js/main.js?v=20261109_v4"></script>
   <script>

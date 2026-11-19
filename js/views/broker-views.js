@@ -110,10 +110,11 @@
       const leads = await App.auth.getDossierLeads();
       renderDossierLeads(leads);
 
-      // Referral link
+      // Professional Team Link & Exclusive Client Webinar Link
       const isPending = currentUser.status === 'pending';
       const refCode = currentUser.referralCode || 'BRK-DEFAULT';
       const referralLink = isPending ? '' : App.utils.generateReferralLink(refCode);
+      const clientWebinarLink = isPending ? '' : App.utils.generateClientWebinarLink(refCode);
 
       const linkInput = document.getElementById('broker-dash-referral-link');
       if (linkInput) {
@@ -130,7 +131,22 @@
         }
       }
 
-      // Copy button handler
+      const clientLinkInput = document.getElementById('broker-dash-client-webinar-link');
+      if (clientLinkInput) {
+        if (isPending) {
+          clientLinkInput.value = 'Enlace pendiente de aprobación / Pending admin approval';
+          clientLinkInput.disabled = true;
+          clientLinkInput.style.color = '#9ca3af';
+          clientLinkInput.style.fontStyle = 'italic';
+        } else {
+          clientLinkInput.value = clientWebinarLink;
+          clientLinkInput.disabled = false;
+          clientLinkInput.style.color = '';
+          clientLinkInput.style.fontStyle = '';
+        }
+      }
+
+      // Copy button handlers
       const copyBtn = document.getElementById('broker-dash-copy-link');
       if (copyBtn) {
         if (isPending) {
@@ -144,7 +160,25 @@
           copyBtn.style.cursor = 'pointer';
           copyBtn.onclick = () => {
             App.utils.copyToClipboard(referralLink);
-            App.utils.showToast('Referral link copied to clipboard!', 'success');
+            App.utils.showToast('🔗 Enlace profesional copiado al portapapeles', 'success');
+          };
+        }
+      }
+
+      const copyClientBtn = document.getElementById('broker-dash-copy-client-link');
+      if (copyClientBtn) {
+        if (isPending) {
+          copyClientBtn.disabled = true;
+          copyClientBtn.style.opacity = '0.5';
+          copyClientBtn.style.cursor = 'not-allowed';
+          copyClientBtn.onclick = null;
+        } else {
+          copyClientBtn.disabled = false;
+          copyClientBtn.style.opacity = '';
+          copyClientBtn.style.cursor = 'pointer';
+          copyClientBtn.onclick = () => {
+            App.utils.copyToClipboard(clientWebinarLink);
+            App.utils.showToast('🎙️ Enlace exclusivo de Webinario para Clientes copiado al portapapeles', 'success');
           };
         }
       }
