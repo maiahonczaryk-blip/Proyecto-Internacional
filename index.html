@@ -856,6 +856,7 @@
               <h4><span class="lang-en">Contact</span><span class="lang-es">Contacto</span><span class="lang-fr">Contact</span><span class="lang-en-ca">Contact</span></h4>
               <div class="footer-links">
                 <a href="mailto:jose.martinez@remax.es">jose.martinez@remax.es</a>
+                <a href="tel:+34647861968">+34 647 86 19 68</a>
                 <a href="https://www.remaxinmomas.com" target="_blank">www.remaxinmomas.com</a>
               </div>
             </div>
@@ -1867,13 +1868,6 @@
             </p>
           </div>
 
-          <!-- Contact type selector -->
-          <div id="referral-type-selector" class="referral-segmented-wrapper" style="display:none;">
-            <div id="referral-type-options" class="referral-segmented-bar">
-              <!-- Segmented tabs injected by JS -->
-            </div>
-          </div>
-
           <!-- ==================== WEBINAR SPOTLIGHT SHOWCASE BANNER (CLIENTS & INVESTORS) ==================== -->
           <div id="referral-client-webinar-banner" class="luxury-webinar-pass luxury-webinar-pass--client" style="display:none;">
             <div class="pass-badge-row">
@@ -1904,6 +1898,18 @@
           </div>
 
           <form id="referral-form">
+            <!-- Category / User Type Dropdown (shown dynamically when multiple roles apply) -->
+            <div class="form-group" id="referral-type-selector" style="display:none;">
+              <label for="referral-type-select">
+                <span class="lang-en">Category / Profile</span>
+                <span class="lang-es">Categoría / Tipo de Usuario</span>
+                <span class="lang-fr">Catégorie / Type d'utilisateur</span>
+                <span class="lang-en-ca">Category / Profile</span> *
+              </label>
+              <select id="referral-type-select" name="referral-contact-type">
+                <!-- Options injected dynamically by JS based on referrer role -->
+              </select>
+            </div>
             <!-- Row 1: Name -->
             <div class="form-row">
               <div class="form-group">
@@ -3116,18 +3122,18 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
   <script src="js/notifications.js?v=20261119_v4"></script>
-  <script src="js/firebase-config.js?v=20261119_v3"></script>
-  <script src="js/utils.js?v=20261119_v5"></script>
-  <script src="js/auth-service.js?v=20261119_v5"></script>
+  <script src="js/firebase-config.js?v=20261119_v4"></script>
+  <script src="js/utils.js?v=20261119_v10"></script>
+  <script src="js/auth-service.js?v=20261119_v11"></script>
   <script src="js/router.js?v=20261119_v3"></script>
-  <script src="js/views/public-views.js?v=20261119_v3"></script>
+  <script src="js/views/public-views.js?v=20261119_v11"></script>
   <script src="js/views/auth-views.js?v=20261119_v3"></script>
-  <script src="js/views/admin-views.js?v=20261119_v5"></script>
-  <script src="js/views/embajador-views.js?v=20261119_v4"></script>
-  <script src="js/views/broker-views.js?v=20261119_v3"></script>
+  <script src="js/views/admin-views.js?v=20261119_v10"></script>
+  <script src="js/views/embajador-views.js?v=20261119_v10"></script>
+  <script src="js/views/broker-views.js?v=20261119_v10"></script>
   <script src="js/views/realtor-views.js?v=20261119_v3"></script>
-  <script src="js/views/agent-views.js?v=20261119_v3"></script>
-  <script src="js/referral-agreement.js?v=20261119_v3"></script>
+  <script src="js/views/agent-views.js?v=20261119_v11"></script>
+  <script src="js/referral-agreement.js?v=20261119_v4"></script>
   <script src="js/main.js?v=20261119_v3"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {

@@ -605,11 +605,223 @@ App.utils.getClientTagBadge = function(tag) {
   }
 };
 
-App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFnName, getRealtorNameFn = null, onDropCallbackGlobalFnName = null) {
+/* ---- Client Referral Origin & Commission Channel Resolution ---- */
+App.utils.resolveClientOriginInfo = function(client, allUsers = [], maps = null) {
+  const empty = {
+    channel: 'direct_inmomas', // 'direct_embajador' | 'via_broker' | 'via_realtor' | 'via_colaborador' | 'via_partner' | 'direct_inmomas'
+    hasEmbajadorUmbrella: false,
+    embajadorId: null,
+    embajadorName: '',
+    brokerId: null,
+    brokerName: '',
+    referrerId: null,
+    referrerName: '',
+    referrerRole: ''
+  };
+  if (!client) return empty;
+
+  const lk = maps || (App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(allUsers || []) : { byId: new Map(), byCode: new Map(), byEmail: new Map() });
+  const findUser = (val) => {
+    if (!val) return null;
+    const raw = String(val).trim();
+    return lk.byId.get(raw) || lk.byCode.get(raw.toUpperCase()) || lk.byEmail.get(raw.toLowerCase()) || null;
+  };
+  const fullNameOf = (u) => u ? (`${u.firstName || ''} ${u.lastName || ''}`.trim() || u.agencyName || '') : '';
+
+  // 1. Pre-enriched umbrella client records (from getUmbrellaData in Embajador portal)
+  if (client._isDirectFromEmbajador === true || client._originMemberRole === 'embajador') {
+    const embU = findUser(client.embajadorId || client._originMemberId);
+    const embName = fullNameOf(embU) || (client._originMemberName && client._originMemberName !== 'Directo (Embajador)' ? client._originMemberName : '');
+    return {
+      ...empty,
+      channel: 'direct_embajador',
+      hasEmbajadorUmbrella: true,
+      embajadorId: client.embajadorId || client._originMemberId || null,
+      embajadorName: embName,
+      referrerId: client._originMemberId || client.embajadorId || null,
+      referrerName: embName || 'Directo Embajador',
+      referrerRole: 'embajador'
+    };
+  }
+
+  if (client._originMemberRole && ['broker', 'realtor', 'colaborador'].includes(client._originMemberRole)) {
+    const embU = findUser(client.embajadorId);
+    const brkU = findUser(client.brokerId);
+    return {
+      ...empty,
+      channel: `via_${client._originMemberRole}`,
+      hasEmbajadorUmbrella: true,
+      embajadorId: client.embajadorId || (embU ? embU.id : null),
+      embajadorName: fullNameOf(embU),
+      brokerId: client.brokerId || (brkU ? brkU.id : null),
+      brokerName: client._originBrokerName || fullNameOf(brkU),
+      referrerId: client._originMemberId || null,
+      referrerName: client._originMemberName || client.realtorName || '',
+      referrerRole: client._originMemberRole
+    };
+  }
+
+  // 2. General resolution from allUsers (Admin, Agente Inmomás, Broker, Realtor portals)
+  const partnerLiterals = new Set(['UCI', 'FUSTER & ASSOCIATES', 'INMOMÁS HOLIDAYS', 'INMOMAS HOLIDAYS']);
+  const rawRefStr = String(client.referredBy || '').trim();
+  if (rawRefStr && partnerLiterals.has(rawRefStr.toUpperCase())) {
+    return {
+      ...empty,
+      channel: 'via_partner',
+      referrerName: rawRefStr,
+      referrerRole: 'partner'
+    };
+  }
+
+  const realtorUser = findUser(client.realtorId);
+  const refUser = findUser(client.referredBy);
+  const brokerUser = findUser(client.brokerId);
+  const embUser = findUser(client.embajadorId);
+  const manualUser = findUser(client.addedManuallyBy);
+
+  const externalRoles = new Set(['realtor', 'broker', 'colaborador', 'embajador', 'partner']);
+  let originUser = null;
+  if (realtorUser && externalRoles.has(realtorUser.role)) {
+    originUser = realtorUser;
+  } else if (refUser && externalRoles.has(refUser.role)) {
+    originUser = refUser;
+  } else if (brokerUser && brokerUser.role === 'broker') {
+    originUser = brokerUser;
+  } else if (embUser && embUser.role === 'embajador') {
+    originUser = embUser;
+  } else if (manualUser && externalRoles.has(manualUser.role)) {
+    originUser = manualUser;
+  }
+
+  const parents = (originUser && App.utils.resolveUserUmbrellaParents)
+    ? App.utils.resolveUserUmbrellaParents(originUser, allUsers, lk)
+    : { embajador: null, broker: null };
+
+  const resolvedEmb = (embUser && embUser.role === 'embajador' ? embUser : null) ||
+    parents.embajador ||
+    (originUser && originUser.role === 'embajador' ? originUser : null);
+
+  const resolvedBrk = (brokerUser && brokerUser.role === 'broker' ? brokerUser : null) ||
+    parents.broker ||
+    (originUser && originUser.role === 'broker' ? originUser : null);
+
+  if (originUser) {
+    const role = originUser.role;
+    const channelMap = {
+      embajador: 'direct_embajador',
+      broker: 'via_broker',
+      realtor: 'via_realtor',
+      colaborador: 'via_colaborador',
+      partner: 'via_partner'
+    };
+    return {
+      channel: channelMap[role] || 'direct_inmomas',
+      hasEmbajadorUmbrella: Boolean(resolvedEmb || client.embajadorId),
+      embajadorId: (resolvedEmb && resolvedEmb.id) || client.embajadorId || null,
+      embajadorName: fullNameOf(resolvedEmb),
+      brokerId: (resolvedBrk && resolvedBrk.id) || client.brokerId || null,
+      brokerName: fullNameOf(resolvedBrk),
+      referrerId: originUser.id,
+      referrerName: fullNameOf(originUser) || client.realtorName || '',
+      referrerRole: role
+    };
+  }
+
+  // Fallback when user doc is not loaded in memory (e.g. Realtor view with null allUsers)
+  if (client.realtorId || client.realtorName) {
+    return {
+      ...empty,
+      channel: 'via_realtor',
+      hasEmbajadorUmbrella: Boolean(client.embajadorId),
+      embajadorId: client.embajadorId || null,
+      brokerId: client.brokerId || null,
+      referrerId: client.realtorId || client.referredBy || null,
+      referrerName: client.realtorName || '',
+      referrerRole: 'realtor'
+    };
+  }
+  if (client.brokerId) {
+    return {
+      ...empty,
+      channel: 'via_broker',
+      hasEmbajadorUmbrella: Boolean(client.embajadorId),
+      embajadorId: client.embajadorId || null,
+      brokerId: client.brokerId,
+      referrerId: client.brokerId,
+      referrerRole: 'broker'
+    };
+  }
+  if (client.embajadorId) {
+    return {
+      ...empty,
+      channel: 'direct_embajador',
+      hasEmbajadorUmbrella: true,
+      embajadorId: client.embajadorId,
+      referrerId: client.embajadorId,
+      referrerName: 'Directo Embajador',
+      referrerRole: 'embajador'
+    };
+  }
+
+  return empty;
+};
+
+App.utils.renderClientOriginTagBadge = function(client, allUsers = [], opts = {}) {
+  const { maps = null, showUmbrellaSubBadge = true, compact = false } = opts;
+  const info = App.utils.resolveClientOriginInfo(client, allUsers, maps);
+
+  const pillBase = `font-weight:700; font-size:${compact ? '0.68rem' : '0.72rem'}; padding:${compact ? '2px 7px' : '3px 9px'}; border-radius:999px; display:inline-flex; align-items:center; gap:4px; white-space:nowrap; line-height:1.25;`;
+
+  let primaryBadge = '';
+  if (info.channel === 'direct_embajador') {
+    primaryBadge = `<span class="client-origin-tag client-origin-tag--direct-embajador" title="Cliente directo del Embajador — Comisión directa de Embajador (sin intermediario)" style="${pillBase} background:linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color:#92400e; border:1.5px solid #f59e0b; box-shadow:0 1px 3px rgba(245,158,11,0.22);"><span>👑</span> <span class="lang-en">Ambassador Direct</span><span class="lang-es">Directo Embajador</span></span>`;
+  } else if (info.channel === 'via_broker') {
+    primaryBadge = `<span class="client-origin-tag client-origin-tag--broker" title="Cliente referido por Broker — Liquidación vía Broker" style="${pillBase} background:linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color:#1e3a8a; border:1.5px solid #3b82f6; box-shadow:0 1px 2px rgba(37,99,235,0.14);"><span>🏢</span> <span class="lang-en">Broker Referral</span><span class="lang-es">Referido Broker</span></span>`;
+  } else if (info.channel === 'via_realtor') {
+    primaryBadge = `<span class="client-origin-tag client-origin-tag--realtor" title="Cliente referido por Agente / Realtor" style="${pillBase} background:linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); color:#065f46; border:1.5px solid #10b981; box-shadow:0 1px 2px rgba(16,185,129,0.14);"><span>🏠</span> <span class="lang-en">Agent Referral</span><span class="lang-es">Referido Agente</span></span>`;
+  } else if (info.channel === 'via_colaborador') {
+    primaryBadge = `<span class="client-origin-tag client-origin-tag--colaborador" title="Cliente referido por Colaborador" style="${pillBase} background:linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); color:#5b21b6; border:1.5px solid #8b5cf6; box-shadow:0 1px 2px rgba(139,92,246,0.14);"><span>🤝</span> <span class="lang-en">Collaborator Referral</span><span class="lang-es">Referido Colaborador</span></span>`;
+  } else if (info.channel === 'via_partner') {
+    primaryBadge = `<span class="client-origin-tag client-origin-tag--partner" title="Cliente referido por Partner Institucional" style="${pillBase} background:#e0f2fe; color:#0369a1; border:1.5px solid #38bdf8;"><span>🏛️</span> <span class="lang-en">Partner Referral</span><span class="lang-es">Referido Partner</span></span>`;
+  } else {
+    primaryBadge = `<span class="client-origin-tag client-origin-tag--direct-inmomas" title="Cliente directo RE/MAX Inmomás (sin comisión de referido externo)" style="${pillBase} background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;"><span>🇪🇸</span> <span class="lang-en">Direct Inmomás</span><span class="lang-es">Directo Inmomás</span></span>`;
+  }
+
+  let umbrellaSub = '';
+  if (showUmbrellaSubBadge && info.hasEmbajadorUmbrella && info.channel !== 'direct_embajador') {
+    const embTip = info.embajadorName
+      ? `Incluido además en el Paraguas del Embajador ${App.utils.escapeHtml(info.embajadorName)} (cobra referido + paraguas)`
+      : 'Incluido además en Paraguas de Embajador (cobra referido + paraguas)';
+    umbrellaSub = `<span title="${embTip}" style="font-weight:700; font-size:0.66rem; padding:2px 6px; border-radius:999px; background:#fffbeb; color:#b45309; border:1px solid #f59e0b; display:inline-flex; align-items:center; gap:3px; white-space:nowrap;">👑 <span class="lang-en">Umbrella</span><span class="lang-es">Paraguas</span></span>`;
+  }
+
+  let manualClassificationBadge = '';
+  if (client && client.tag === 'realtor_network') {
+    manualClassificationBadge = `<span style="font-weight:700; font-size:0.65rem; padding:2px 6px; border-radius:6px; background:rgba(239,68,68,0.1); color:#b91c1c; border:1px solid rgba(239,68,68,0.28); white-space:nowrap;">⚠️ <span class="lang-en">Pro Lead</span><span class="lang-es">Red Profesional</span></span>`;
+  }
+
+  return `<span style="display:inline-flex; align-items:center; gap:4px; flex-wrap:wrap;">${primaryBadge}${umbrellaSub}${manualClassificationBadge}</span>`;
+};
+
+App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFnName, getRealtorNameFn = null, onDropCallbackGlobalFnName = null, options = {}) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
   const isInteractive = !!onDropCallbackGlobalFnName;
+  const usersPool = Array.isArray(options.users) ? options.users : [];
+  const showUmbrellaSubBadge = options.showUmbrellaSubBadge !== false;
+  const lookupMaps = (usersPool.length > 0 && App.utils._buildUserLookupMaps)
+    ? App.utils._buildUserLookupMaps(usersPool)
+    : null;
+
+  const originAccentMap = {
+    direct_embajador: '#f59e0b',
+    via_broker: '#2563eb',
+    via_realtor: '#10b981',
+    via_colaborador: '#7c3aed',
+    via_partner: '#0284c7',
+    direct_inmomas: '#94a3b8'
+  };
 
   const columns = App.utils.PIPELINE_COLUMNS.map(col => {
     const colClients = clients.filter(c => col.statuses.includes(c.status));
@@ -618,26 +830,57 @@ App.utils.renderKanbanBoard = function(containerId, clients, onCardClickGlobalFn
       const lastUpdate = (c.statusHistory && c.statusHistory.length > 0)
         ? c.statusHistory[c.statusHistory.length - 1].date
         : c.createdAt;
-        
-      const realtorLabel = getRealtorNameFn ? `<div style="font-size: 0.75rem; color: #4f46e5; margin-bottom: 0.25rem; font-weight: 600;">👤 ${App.utils.escapeHtml(getRealtorNameFn(c.referredBy))}</div>` : '';
-      
+
+      const originInfo = App.utils.resolveClientOriginInfo(c, usersPool, lookupMaps);
+      const originTagHtml = App.utils.renderClientOriginTagBadge(c, usersPool, {
+        maps: lookupMaps,
+        showUmbrellaSubBadge,
+        compact: true
+      });
+
+      let referrerLineHtml = '';
+      if (originInfo.channel === 'direct_embajador') {
+        const embLabel = originInfo.embajadorName
+          ? `${App.utils.escapeHtml(originInfo.embajadorName)}`
+          : (getRealtorNameFn ? App.utils.escapeHtml(getRealtorNameFn(c.referredBy || c.embajadorId)) : 'Embajador');
+        referrerLineHtml = `<div style="font-size: 0.75rem; color: #92400e; margin-bottom: 0.25rem; font-weight: 700; display:flex; align-items:center; gap:4px;">👑 ${embLabel}</div>`;
+      } else if (originInfo.channel === 'via_broker') {
+        const brkLabel = originInfo.referrerName || originInfo.brokerName || (getRealtorNameFn ? getRealtorNameFn(c.brokerId || c.referredBy) : 'Broker');
+        referrerLineHtml = `<div style="font-size: 0.75rem; color: #1e40af; margin-bottom: 0.25rem; font-weight: 700; display:flex; align-items:center; gap:4px; flex-wrap:wrap;"><span>🏢 ${App.utils.escapeHtml(brkLabel)}</span>${showUmbrellaSubBadge && originInfo.embajadorName ? `<span style="color:#b45309; font-weight:600;">· 👑 ${App.utils.escapeHtml(originInfo.embajadorName)}</span>` : ''}</div>`;
+      } else if (originInfo.channel === 'via_realtor') {
+        const agLabel = originInfo.referrerName || (getRealtorNameFn ? getRealtorNameFn(c.realtorId || c.referredBy) : '');
+        if (agLabel && agLabel !== 'Unknown') {
+          referrerLineHtml = `<div style="font-size: 0.75rem; color: #047857; margin-bottom: 0.25rem; font-weight: 700; display:flex; align-items:center; gap:4px; flex-wrap:wrap;"><span>🏠 ${App.utils.escapeHtml(agLabel)}</span>${originInfo.brokerName ? `<span style="color:#1e40af; font-weight:600;">· 🏢 ${App.utils.escapeHtml(originInfo.brokerName)}</span>` : ''}${showUmbrellaSubBadge && originInfo.embajadorName ? `<span style="color:#b45309; font-weight:600;">· 👑 ${App.utils.escapeHtml(originInfo.embajadorName)}</span>` : ''}</div>`;
+        }
+      } else if (originInfo.channel === 'via_colaborador') {
+        const colabLabel = originInfo.referrerName || (getRealtorNameFn ? getRealtorNameFn(c.referredBy) : 'Colaborador');
+        referrerLineHtml = `<div style="font-size: 0.75rem; color: #5b21b6; margin-bottom: 0.25rem; font-weight: 700; display:flex; align-items:center; gap:4px; flex-wrap:wrap;"><span>🤝 ${App.utils.escapeHtml(colabLabel)}</span>${showUmbrellaSubBadge && originInfo.embajadorName ? `<span style="color:#b45309; font-weight:600;">· 👑 ${App.utils.escapeHtml(originInfo.embajadorName)}</span>` : ''}</div>`;
+      } else if (getRealtorNameFn) {
+        const fallbackLbl = getRealtorNameFn(c.referredBy);
+        if (fallbackLbl && fallbackLbl !== 'Unknown' && fallbackLbl !== 'Directo / Sin asignar') {
+          referrerLineHtml = `<div style="font-size: 0.75rem; color: #475569; margin-bottom: 0.25rem; font-weight: 600;">👤 ${App.utils.escapeHtml(fallbackLbl)}</div>`;
+        }
+      }
+
       const localAgentName = c.localAgentName
         ? App.utils.escapeHtml(c.localAgentName)
         : '<span class="lang-en">Unassigned</span><span class="lang-es">Sin asignar</span>';
       const agentLabel = `<div style="font-size: 0.75rem; color: #b45309; margin-bottom: 0.25rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">🇪🇸 ${localAgentName}</div>`;
 
-      const clientTag = c.tag || App.utils.getClientTag(c);
-      const tagBadge = App.utils.getClientTagBadge ? App.utils.getClientTagBadge(clientTag) : '';
+      const leftAccent = originAccentMap[originInfo.channel] || '#94a3b8';
+      const cardBg = originInfo.channel === 'direct_embajador'
+        ? 'linear-gradient(180deg, rgba(254, 243, 199, 0.28) 0%, var(--bg-card) 48%)'
+        : 'var(--bg-card)';
 
       return `
-        <div class="pipeline-card" style="cursor: ${isInteractive ? 'grab' : 'pointer'}; margin-bottom: 0.75rem; background: var(--bg-card); border-radius: var(--radius-sm); padding: 12px; box-shadow: var(--shadow-sm); border-top: 3px solid ${App.utils.columnColors[col.key]}; transition: transform 0.2s;"
+        <div class="pipeline-card" style="cursor: ${isInteractive ? 'grab' : 'pointer'}; margin-bottom: 0.75rem; background: ${cardBg}; border-radius: var(--radius-sm); padding: 12px; box-shadow: var(--shadow-sm); border-top: 3px solid ${App.utils.columnColors[col.key]}; border-left: 4px solid ${leftAccent}; transition: transform 0.2s;"
              draggable="${isInteractive ? 'true' : 'false'}"
              ${isInteractive ? `ondragstart="App.utils.handleDragStart(event, '${c.id}')" ondragend="App.utils.handleDragEnd(event)"` : ''}
              onclick="${onCardClickGlobalFnName}('${c.id}')">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 6px;">
-            <div style="flex: 1;">${realtorLabel}</div>
-            <div>${tagBadge}</div>
+          <div style="margin-bottom: 0.45rem;">
+            ${originTagHtml}
           </div>
+          ${referrerLineHtml}
           ${agentLabel}
           <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.35rem; color: var(--text-primary);">
             ${App.utils.escapeHtml(c._displayName || `${c.firstName || ''} ${c.lastName || ''}`.trim() || c.name || c._anonCode || '—')}

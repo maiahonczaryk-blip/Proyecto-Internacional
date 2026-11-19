@@ -64,15 +64,73 @@ App.auth = (function() {
     }
   }
 
+  const JOSE_MARTINEZ_PHONE = '+34 647 86 19 68';
+  const JOSE_LEGACY_PHONES = new Set([
+    '', '647861968', '+34647861968', '+34 647 861 968',
+    '966665651', '+34966665651', '+34 966 665 651', '+34 966 66 56 51'
+  ]);
+
+  function isJoseMartinezAccountObj(u) {
+    if (!u || typeof u !== 'object') return false;
+    const emailLower = String(u.email || '').trim().toLowerCase();
+    const refCode = String(u.referralCode || '').trim();
+    return (
+      emailLower === 'jose.martinez@remax.es' ||
+      emailLower === 'spainconnection0@remax.es' ||
+      refCode === 'LOC-MARTINEZ -GBPi' ||
+      refCode === 'ADM-MARTINEZ' ||
+      u.id === 'GBPiUDjC5RVLru7Paw6T14iSD0k1' ||
+      u.id === 'zDEjaxADVwN8p7j7B6JUW9ZqKwj2' ||
+      u.id === '4IoN50fO9HPIJrdc9IQI2867ka13' ||
+      u.id === 'admin-002' ||
+      u.id === 'admin-003'
+    );
+  }
+
+  function isSuperAdminProfile(email, fullName = '') {
+    const emailLower = String(email || '').trim().toLowerCase();
+    const fullNameLower = String(fullName || '').toLowerCase();
+    return (
+      emailLower === 'maia.honczaryk@remax.es' ||
+      emailLower === 'jose.martinez@remax.es' ||
+      emailLower === 'spainconnection0@gmail.com' ||
+      emailLower === 'inmomas@remax.es' ||
+      emailLower === 'admin@remax-inmomas.com' ||
+      (fullNameLower.includes('maia') && (fullNameLower.includes('honczaryk') || fullNameLower.includes('belen') || fullNameLower.includes('belón')))
+    );
+  }
+
+  function getSuperAdminReferralCode(email) {
+    const emailLower = String(email || '').trim().toLowerCase();
+    return emailLower === 'jose.martinez@remax.es' ? 'ADM-MARTINEZ' : 'ADM-INMOMAS';
+  }
+
   function normalizeUserRoleObj(u) {
     if (!u || typeof u !== 'object') return u;
+    const emailLower = String(u.email || '').trim().toLowerCase();
     const rawRole = String(u.role || '').trim().toLowerCase();
-    if (rawRole === 'ambassador' || rawRole === 'embajador') {
+    if (emailLower === 'jose.martinez@remax.es' || emailLower === 'maia.honczaryk@remax.es') {
+      u.role = 'admin';
+      if (u.status !== 'active') u.status = 'active';
+    } else if (rawRole === 'ambassador' || rawRole === 'embajador') {
       u.role = 'embajador';
     } else if (rawRole !== 'admin' && u.referralCode && String(u.referralCode).trim().toUpperCase().startsWith('EMB-')) {
       u.role = 'embajador';
     } else if (rawRole) {
       u.role = rawRole;
+    }
+
+    if (isJoseMartinezAccountObj(u)) {
+      const curPhone = String(u.phone || '').trim();
+      if (JOSE_LEGACY_PHONES.has(curPhone)) {
+        u.phone = JOSE_MARTINEZ_PHONE;
+      }
+      if (u.buyerGuide && typeof u.buyerGuide === 'object') {
+        const curMobile = String(u.buyerGuide.mobile || '').trim();
+        if (JOSE_LEGACY_PHONES.has(curMobile)) {
+          u.buyerGuide = { ...u.buyerGuide, mobile: JOSE_MARTINEZ_PHONE };
+        }
+      }
     }
     return u;
   }
@@ -123,18 +181,13 @@ App.auth = (function() {
                 currentUser = normalizeUserRoleObj({ id: firebaseUser.uid, email: firebaseUser.email, ...userData });
                 if (!currentUser.email) currentUser.email = firebaseUser.email;
 
-                // Super Admin auto-elevation and normalization for Maia Honczaryk
+                // Super Admin auto-elevation and normalization
                 const emailLower = (currentUser.email || '').toLowerCase().trim();
                 const fullNameLower = `${currentUser.firstName || ''} ${currentUser.lastName || ''} ${currentUser.name || ''}`.toLowerCase();
-                const isMaiaAccount = (
-                  emailLower === 'maia.honczaryk@remax.es' ||
-                  emailLower === 'spainconnection0@gmail.com' ||
-                  emailLower === 'inmomas@remax.es' ||
-                  emailLower === 'admin@remax-inmomas.com' ||
-                  (fullNameLower.includes('maia') && (fullNameLower.includes('honczaryk') || fullNameLower.includes('belen') || fullNameLower.includes('belón')))
-                );
+                const isSuperAdmin = isSuperAdminProfile(emailLower, fullNameLower);
 
-                if (isMaiaAccount) {
+                if (isSuperAdmin) {
+                  const defaultRefCode = getSuperAdminReferralCode(emailLower);
                   let needUpdate = false;
                   const updates = {};
                   if (currentUser.role !== 'admin') {
@@ -148,14 +201,14 @@ App.auth = (function() {
                     needUpdate = true;
                   }
                   if (!currentUser.referralCode || currentUser.referralCode.startsWith('BRK-') || currentUser.referralCode.startsWith('REA-')) {
-                    currentUser.referralCode = 'ADM-INMOMAS';
-                    updates.referralCode = 'ADM-INMOMAS';
+                    currentUser.referralCode = defaultRefCode;
+                    updates.referralCode = defaultRefCode;
                     needUpdate = true;
                   }
                   if (needUpdate) {
                     try {
                       await App.db.collection('users').doc(firebaseUser.uid).update(updates);
-                      console.info('[Auth] Maia SuperAdmin profile normalized in Firestore.');
+                      console.info('[Auth] SuperAdmin profile normalized in Firestore.');
                     } catch(e) {
                       console.warn('[Auth] Firestore update for SuperAdmin sync:', e);
                     }
@@ -206,11 +259,12 @@ App.auth = (function() {
       throw new Error('Invalid role selected.');
     }
 
-    // Security check: 'embajador' applications are strictly restricted to the Admin referral link
-    if (role === 'embajador' && !data.referredByAdmin) {
+    // Security check: 'embajador' applications are restricted to Admin or RE/MAX Inmomás Agent referral links
+    if (role === 'embajador' && !data.referredByAdmin && !data.referredByAgentInmomas) {
       const refStr = String(referredBy || '').toUpperCase().trim();
-      if (!refStr.startsWith('ADM-') && refStr !== 'ADMIN-001') {
-        throw new Error('Ambassador applications are exclusively available via an Administrator invitation link.');
+      const validPrefix = refStr.startsWith('ADM-') || refStr.startsWith('LOC-') || refStr === 'ADMIN-001';
+      if (!validPrefix && !data.inmomasAgentId) {
+        throw new Error('Ambassador applications are exclusively available via an Administrator or RE/MAX Inmomás Agent invitation link.');
       }
     }
 
@@ -278,6 +332,7 @@ App.auth = (function() {
         termsAcceptedAt: data.termsAcceptedAt || new Date().toISOString(),
         newsletterConsent: data.newsletterConsent || false,
         newsletterConsentAt: data.newsletterConsent ? new Date().toISOString() : null,
+        inmomasAgentId: data.inmomasAgentId || null,
         inmomasAgentName: data.inmomasAgentName || null,
         notes: data.notes || '',
         referredBy: referredBy || data.inmomasAgentName || null,
@@ -329,17 +384,11 @@ App.auth = (function() {
 
       const emailLower = email.toLowerCase().trim();
       const fullNameLower = `${firstName || ''} ${lastName || ''}`.toLowerCase();
-      const isMaiaAccount = (
-        emailLower === 'maia.honczaryk@remax.es' ||
-        emailLower === 'spainconnection0@gmail.com' ||
-        emailLower === 'inmomas@remax.es' ||
-        emailLower === 'admin@remax-inmomas.com' ||
-        (fullNameLower.includes('maia') && (fullNameLower.includes('honczaryk') || fullNameLower.includes('belen') || fullNameLower.includes('belón')))
-      );
+      const isMaiaAccount = isSuperAdminProfile(emailLower, fullNameLower);
 
       const finalRole = isMaiaAccount ? 'admin' : role;
       const finalStatus = isMaiaAccount ? 'active' : 'pending';
-      const finalReferralCode = isMaiaAccount ? 'ADM-INMOMAS' : `${getPrefixForRole(role)}-${lastName.toUpperCase()}-${uid.substring(0, 4)}`;
+      const finalReferralCode = isMaiaAccount ? getSuperAdminReferralCode(emailLower) : `${getPrefixForRole(role)}-${lastName.toUpperCase()}-${uid.substring(0, 4)}`;
 
       // Resolve umbrella embajadorId from referrer (ID or referralCode) or selected broker
       let resolvedEmbajadorId = data.embajadorId || null;
@@ -401,6 +450,7 @@ App.auth = (function() {
         termsAcceptedAt: data.termsAcceptedAt || new Date().toISOString(),
         newsletterConsent: data.newsletterConsent || false,
         newsletterConsentAt: data.newsletterConsent ? new Date().toISOString() : null,
+        inmomasAgentId: data.inmomasAgentId || null,
         inmomasAgentName: data.inmomasAgentName || null,
         notes: data.notes || '',
         referredBy: referredBy || data.inmomasAgentName || null,
@@ -510,18 +560,13 @@ App.auth = (function() {
           console.log('[Auth] Auto-generated referralCode:', userData.referralCode);
         }
 
-        // Super Admin auto-elevation and normalization for Maia Honczaryk
+        // Super Admin auto-elevation and normalization
         const emailLower = (userData.email || credential.user.email || '').toLowerCase().trim();
         const fullNameLower = `${userData.firstName || ''} ${userData.lastName || ''} ${userData.name || ''}`.toLowerCase();
-        const isMaiaAccount = (
-          emailLower === 'maia.honczaryk@remax.es' ||
-          emailLower === 'spainconnection0@gmail.com' ||
-          emailLower === 'inmomas@remax.es' ||
-          emailLower === 'admin@remax-inmomas.com' ||
-          (fullNameLower.includes('maia') && (fullNameLower.includes('honczaryk') || fullNameLower.includes('belen') || fullNameLower.includes('belón')))
-        );
+        const isSuperAdmin = isSuperAdminProfile(emailLower, fullNameLower);
 
-        if (isMaiaAccount) {
+        if (isSuperAdmin) {
+          const defaultRefCode = getSuperAdminReferralCode(emailLower);
           let needUpdate = false;
           const updates = {};
           if (userData.role !== 'admin') {
@@ -535,8 +580,8 @@ App.auth = (function() {
             needUpdate = true;
           }
           if (!userData.referralCode || userData.referralCode.startsWith('BRK-') || userData.referralCode.startsWith('REA-')) {
-            userData.referralCode = 'ADM-INMOMAS';
-            updates.referralCode = 'ADM-INMOMAS';
+            userData.referralCode = defaultRefCode;
+            updates.referralCode = defaultRefCode;
             needUpdate = true;
           }
           if (needUpdate) {
@@ -1404,7 +1449,7 @@ App.auth = (function() {
   async function getAllUsers(filters = {}) {
     if (App.demoMode) {
       let users = [...App.demoData.users].map(u => {
-        const copy = { ...u };
+        const copy = normalizeUserRoleObj({ ...u });
         delete copy.password;
         return copy;
       });
@@ -1421,7 +1466,20 @@ App.auth = (function() {
       if (filters.brokerId) query = query.where('brokerId', '==', filters.brokerId);
       
       const snapshot = await query.get();
-      return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      return snapshot.docs.map(doc => {
+        const raw = { ...doc.data(), id: doc.id };
+        if (currentUser && currentUser.role === 'admin' && isJoseMartinezAccountObj(raw)) {
+          const rawPhone = String(raw.phone || '').trim();
+          const rawMobile = raw.buyerGuide && typeof raw.buyerGuide === 'object' ? String(raw.buyerGuide.mobile || '').trim() : null;
+          const patch = {};
+          if (JOSE_LEGACY_PHONES.has(rawPhone)) patch.phone = JOSE_MARTINEZ_PHONE;
+          if (rawMobile !== null && JOSE_LEGACY_PHONES.has(rawMobile)) patch['buyerGuide.mobile'] = JOSE_MARTINEZ_PHONE;
+          if (Object.keys(patch).length) {
+            doc.ref.update(patch).catch(() => {});
+          }
+        }
+        return normalizeUserRoleObj(raw);
+      });
     }
   }
 
@@ -1429,12 +1487,12 @@ App.auth = (function() {
     if (App.demoMode) {
       const user = App.demoData.users.find(u => u.id === userId);
       if (!user) return null;
-      const copy = { ...user };
+      const copy = normalizeUserRoleObj({ ...user });
       delete copy.password;
       return copy;
     } else {
       const doc = await App.db.collection('users').doc(userId).get();
-      return doc.exists ? { ...doc.data(), id: doc.id } : null;
+      return doc.exists ? normalizeUserRoleObj({ ...doc.data(), id: doc.id }) : null;
     }
   }
 
@@ -1490,7 +1548,8 @@ App.auth = (function() {
       _isDirectFromEmbajador: Boolean(c._isDirectFromEmbajador),
       _originMemberId: c._originMemberId || null,
       _originMemberName: c._originMemberName || '',
-      _originMemberRole: c._originMemberRole || ''
+      _originMemberRole: c._originMemberRole || '',
+      _originBrokerName: c._originBrokerName || ''
     };
   }
 
@@ -3459,19 +3518,42 @@ App.auth = (function() {
       );
 
       if (inUmbrella) {
-        const originKey = c.realtorId || c.referredBy || c.brokerId || c.addedManuallyBy || embajadorId;
-        const originUser = userById.get(originKey) ||
-          (originKey ? userByRefCode.get(String(originKey).toUpperCase().trim()) : null);
-        const isDirect = !originUser || originUser.id === embajadorId;
+        let subMember = null;
+        if (c.realtorId && umbrellaMembersMap.has(c.realtorId)) {
+          subMember = umbrellaMembersMap.get(c.realtorId);
+        } else if (c.referredBy) {
+          if (umbrellaMembersMap.has(c.referredBy)) {
+            subMember = umbrellaMembersMap.get(c.referredBy);
+          } else if (refCodeUpper) {
+            for (const m of umbrellaMembersMap.values()) {
+              if (m.referralCode && String(m.referralCode).toUpperCase().trim() === refCodeUpper) {
+                subMember = m;
+                break;
+              }
+            }
+          }
+        }
+        if (!subMember && c.brokerId && umbrellaMembersMap.has(c.brokerId)) {
+          subMember = umbrellaMembersMap.get(c.brokerId);
+        }
+        if (!subMember && c.addedManuallyBy && umbrellaMembersMap.has(c.addedManuallyBy)) {
+          subMember = umbrellaMembersMap.get(c.addedManuallyBy);
+        }
+
+        const isDirect = !subMember;
+        const originBrokerName = (!isDirect && subMember.role === 'realtor' && subMember._umbrellaParentRole === 'broker')
+          ? (subMember._umbrellaParentName || '')
+          : '';
 
         umbrellaClients.push({
           ...c,
           _isDirectFromEmbajador: isDirect,
-          _originMemberId: originUser ? originUser.id : embajadorId,
+          _originMemberId: isDirect ? embajadorId : subMember.id,
           _originMemberName: isDirect
             ? 'Directo (Embajador)'
-            : (`${originUser.firstName || ''} ${originUser.lastName || ''}`.trim() || c.realtorName || 'Miembro Paraguas'),
-          _originMemberRole: isDirect ? 'embajador' : (originUser.role || 'realtor')
+            : (`${subMember.firstName || ''} ${subMember.lastName || ''}`.trim() || c.realtorName || 'Miembro Paraguas'),
+          _originMemberRole: isDirect ? 'embajador' : (subMember.role || 'realtor'),
+          _originBrokerName: originBrokerName
         });
       }
     }
