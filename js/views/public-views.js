@@ -507,6 +507,15 @@ App.views.public = {
 
       if (referrer) {
         console.log('[Referral] Referrer found:', referrer.firstName, referrer.lastName, '(' + referrer.role + ')');
+        const referrerFullName = `${referrer.firstName || ''} ${referrer.lastName || ''}`.trim() || referrer.agencyName || '';
+        if (referrerFullName) {
+          const dynamicTitle = `Referral Link — ${referrerFullName}`;
+          document.title = `${dynamicTitle} | The Spain Connection`;
+          const ogTitleMeta = document.querySelector('meta[property="og:title"]');
+          if (ogTitleMeta) ogTitleMeta.setAttribute('content', dynamicTitle);
+          const twTitleMeta = document.querySelector('meta[name="twitter:title"]');
+          if (twTitleMeta) twTitleMeta.setAttribute('content', dynamicTitle);
+        }
 
         const clientBannerInviteeEl = document.getElementById('referral-client-banner-invitee');
         if (clientBannerInviteeEl) {

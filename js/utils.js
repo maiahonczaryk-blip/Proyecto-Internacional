@@ -173,20 +173,23 @@ App.utils.copyToClipboard = async function(text) {
 /* ---- Referral Links ---- */
 App.utils.generateReferralLink = function(referralCode) {
   // Strictly for Professional / Partner network invitations
+  // Uses /referral?ref=... so WhatsApp & social crawlers resolve the person's name server-side
   const prodUrl = 'https://thespainconnection.com';
-  return `${prodUrl}/index.html#referral?ref=${encodeURIComponent(referralCode || '')}`;
+  const code = encodeURIComponent(referralCode || '');
+  return code ? `${prodUrl}/referral?ref=${code}` : `${prodUrl}/referral`;
 };
 
 App.utils.generateClientWebinarLink = function(referralCode) {
   // Strictly for End Clients to sign up for the B2C Webinar & be protected in CRM
   const prodUrl = 'https://thespainconnection.com';
-  return `${prodUrl}/index.html#webinar?ref=${encodeURIComponent(referralCode || '')}`;
+  const code = encodeURIComponent(referralCode || '');
+  return code ? `${prodUrl}/webinar?ref=${code}` : `${prodUrl}/webinar`;
 };
 
 /* ---- Share Webinar & Partner Helpers ---- */
 App.utils.getClientWebinarShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
-  const link = referralLink || (user?.referralCode ? App.utils.generateClientWebinarLink(user.referralCode) : 'https://thespainconnection.com/index.html#webinar');
+  const link = referralLink || (user?.referralCode ? App.utils.generateClientWebinarLink(user.referralCode) : 'https://thespainconnection.com/webinar');
   const lang = (document.documentElement.lang || 'en').toLowerCase();
   if (lang.startsWith('es')) {
     return `🇪🇸 ¡Hola! Te comparto mi invitación exclusiva y gratuita al próximo webinario de The Spain Connection sobre cómo comprar propiedad, mudarse e invertir con total seguridad en España.\n\n📌 Respaldo legal, fiscal, hipotecario e inmobiliario completo en destino.\n\n🎙️ Reserva tu plaza gratuita en el webinario aquí: ${link}`;
@@ -196,7 +199,7 @@ App.utils.getClientWebinarShareMessage = function(referralLink) {
 
 App.utils.getPartnerNetworkShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
-  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#referral');
+  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/referral');
   const lang = (document.documentElement.lang || 'en').toLowerCase();
   if (lang.startsWith('es')) {
     return `🤝 ¡Hola! Te invito a unirte a nuestra red internacional de profesionales inmobiliarios (Brokers, Agentes/Realtors y Colaboradores) en España a través de The Spain Connection · RE/MAX Inmomás, con soporte legal, fiscal e inmobiliario integral para tus clientes.\n\n🔗 Regístrate como profesional colaborador aquí: ${link}`;
@@ -260,7 +263,7 @@ App.utils.shareBrokerPartnerWhatsApp = function(customLink) {
 
 App.utils.getColaboradorShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
-  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#referral');
+  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/referral');
   const lang = (document.documentElement.lang || 'en').toLowerCase();
   if (lang.startsWith('es')) {
     return `🤝 ¡Hola! Te invito a registrarte como Colaborador Estratégico de The Spain Connection para referir clientes interesados en comprar o invertir en España con respaldo legal, fiscal e inmobiliario integral.\n\n🔗 Activa tu cuenta de Colaborador aquí: ${link}`;
@@ -276,7 +279,7 @@ App.utils.shareColaboradorWhatsApp = function(customLink) {
 
 App.utils.getEmbajadorShareMessage = function(referralLink) {
   const user = App.auth ? App.auth.getCurrentUser() : null;
-  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/index.html#referral');
+  const link = referralLink || (user?.referralCode ? App.utils.generateReferralLink(user.referralCode) : 'https://thespainconnection.com/referral');
   const lang = (document.documentElement.lang || 'en').toLowerCase();
   if (lang.startsWith('es')) {
     return `👑 ¡Hola! Te comparto la invitación ejecutiva exclusiva para postularte como Embajador de The Spain Connection · RE/MAX Inmomás y liderar tu propia red de Brokers, Agentes, Colaboradores y Clientes hacia España.\n\n🔗 Postúlate como Embajador aquí: ${link}`;

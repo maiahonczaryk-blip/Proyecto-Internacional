@@ -1,4 +1,25 @@
 {
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "rewrites": [
+    {
+      "source": "/referral",
+      "destination": "/api/referral-og"
+    },
+    {
+      "source": "/referral/",
+      "destination": "/api/referral-og"
+    },
+    {
+      "source": "/r/:code",
+      "destination": "/api/referral-og?ref=:code"
+    },
+    {
+      "source": "/webinar",
+      "destination": "/api/referral-og?mode=webinar"
+    },
+    {
+      "source": "/webinar/",
+      "destination": "/api/referral-og?mode=webinar"
+    }
+  ]
 }
-
