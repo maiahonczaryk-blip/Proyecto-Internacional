@@ -385,9 +385,9 @@ App.router = (function() {
         const mobileAvatarEl = document.getElementById('mobile-user-avatar');
         
         const roleLabels = {
-          admin: 'Admin · Broker RE/MAX MÁS',
+          admin: 'Admin · Broker RE/MAX Inmomás',
           embajador: '👑 Embajador',
-          agent_inmomas: '🇪🇸 Agente RE/MAX MÁS',
+          agent_inmomas: '🇪🇸 Agente RE/MAX Inmomás',
           colaborador: 'Colaborador',
           broker: 'Broker Portal',
           realtor: 'Realtor Portal',
