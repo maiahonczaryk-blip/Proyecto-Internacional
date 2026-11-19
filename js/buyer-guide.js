@@ -238,10 +238,11 @@ App.buyerGuide = (function() {
 
   function getGuideData(user, overrides) {
     const g = (user && user.buyerGuide) || {};
+    const profileName = `${(user && user.firstName) || ''} ${(user && user.lastName) || ''}`.trim();
     const data = {
       role: (user && user.role) || 'agent_inmomas',
       agencyName: (user && user.agencyName) || '',
-      name: `${(user && user.firstName) || ''} ${(user && user.lastName) || ''}`.trim(),
+      name: g.name || profileName,
       title: g.title || '',
       mobile: g.mobile || (user && user.phone) || '',
       email: g.email || (user && user.email) || '',
@@ -493,9 +494,9 @@ App.buyerGuide = (function() {
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(205px, 1fr)); gap:0.75rem;">
               <div>
                 <label style="${labelStyle}">
-                  <span class="lang-en">Name on Guide</span><span class="lang-es">Nombre en la Guía</span>
+                  <span class="lang-en">Name on Guide *</span><span class="lang-es">Nombre en la Guía *</span>
                 </label>
-                <input type="text" value="${esc(data.name)}" disabled style="${inputStyle} background:#f1f5f9; color:#64748b;" title="Tomado de tu perfil / Taken from your profile">
+                <input type="text" id="${uid}-name" value="${esc(data.name)}" placeholder="Nombre y Apellido" maxlength="70" style="${inputStyle}">
               </div>
               <div>
                 <label style="${labelStyle}">
@@ -567,6 +568,7 @@ App.buyerGuide = (function() {
     };
 
     const readForm = () => ({
+      name: $('name').value,
       title: $('title').value,
       mobile: $('mobile').value,
       email: $('email').value,
@@ -604,6 +606,7 @@ App.buyerGuide = (function() {
       if (!d || d.userId !== user.id || d.sourceUid === uid || !d.buyerGuide) return;
       user.buyerGuide = d.buyerGuide;
       currentPhoto = d.buyerGuide.photo || user.profileImage || null;
+      if ($('name')) $('name').value = d.buyerGuide.name || `${user.firstName || ''} ${user.lastName || ''}`.trim();
       if ($('title')) $('title').value = d.buyerGuide.title || '';
       if ($('mobile')) $('mobile').value = d.buyerGuide.mobile || user.phone || '';
       if ($('email')) $('email').value = d.buyerGuide.email || user.email || '';
@@ -628,7 +631,7 @@ App.buyerGuide = (function() {
       }
     };
 
-    ['title', 'mobile', 'email', 'website'].forEach(k => $(k).addEventListener('input', refreshUI));
+    ['name', 'title', 'mobile', 'email', 'website'].forEach(k => $(k).addEventListener('input', refreshUI));
 
     $('save-btn').onclick = async () => {
       const btn = $('save-btn');

@@ -260,6 +260,62 @@
             App.utils.showToast('🇪🇸 Enlace de registro interno para Agente RE/MAX Inmomás copiado al portapapeles', 'success');
           };
         }
+
+        // 3b. Personalized Buyer Guide on Admin Dashboard (Admin's own guide + quick switcher for any professional)
+        const adminDashGuideWrap = document.getElementById('admin-dash-buyer-guide');
+        if (adminDashGuideWrap && App.buyerGuide) {
+          const freshAdmin = allUsers.find(u => u.id === currentUser.id) || currentUser;
+          const eligibleUsers = allUsers
+            .filter(u => u.id !== freshAdmin.id && ['agent_inmomas', 'embajador', 'broker', 'realtor', 'colaborador', 'admin'].includes(u.role))
+            .sort((a, b) => `${a.firstName || ''} ${a.lastName || ''}`.localeCompare(`${b.firstName || ''} ${b.lastName || ''}`));
+
+          const roleShort = {
+            admin: 'Admin',
+            agent_inmomas: 'Agente Inmomás',
+            embajador: 'Embajador',
+            broker: 'Broker',
+            realtor: 'Realtor',
+            colaborador: 'Colaborador'
+          };
+
+          const selectorOpts = [
+            `<option value="${App.utils.escapeHtml(freshAdmin.id)}">🛡️ Mi Guía de Administración (${App.utils.escapeHtml(`${freshAdmin.firstName || ''} ${freshAdmin.lastName || ''}`.trim() || freshAdmin.email)})</option>`,
+            ...eligibleUsers.map(u => {
+              const uName = `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email || u.id;
+              const rLbl = roleShort[u.role] || u.role;
+              return `<option value="${App.utils.escapeHtml(u.id)}">[${App.utils.escapeHtml(rLbl)}] ${App.utils.escapeHtml(uName)}${u.agencyName ? ' · ' + App.utils.escapeHtml(u.agencyName) : ''}</option>`;
+            })
+          ].join('');
+
+          adminDashGuideWrap.innerHTML = `
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+              <div style="font-size:0.84rem; font-weight:700; color:#334155;">
+                👤 <span class="lang-en">Generate / Edit Buyer's Guide for:</span><span class="lang-es">Generar / Editar Guía del Comprador para:</span>
+              </div>
+              <select id="admin-dash-guide-user-select" class="form-select" style="width:auto; min-width:280px; max-width:100%; padding:7px 32px 7px 12px; font-size:0.85rem; font-weight:600; border-radius:9px; margin-bottom:0;">
+                ${selectorOpts}
+              </select>
+            </div>
+            <div id="admin-dash-buyer-guide-editor"></div>
+          `;
+
+          const editorTarget = document.getElementById('admin-dash-buyer-guide-editor');
+          const guideUserSel = document.getElementById('admin-dash-guide-user-select');
+          const mountSelectedGuide = (selectedId) => {
+            const chosen = selectedId === freshAdmin.id
+              ? freshAdmin
+              : (allUsers.find(u => u.id === selectedId) || freshAdmin);
+            App.buyerGuide.renderEditor(editorTarget, chosen, {
+              admin: chosen.id !== freshAdmin.id,
+              uid: 'admin-dash-' + chosen.id
+            });
+          };
+
+          mountSelectedGuide(freshAdmin.id);
+          if (guideUserSel) {
+            guideUserSel.onchange = (e) => mountSelectedGuide(e.target.value);
+          }
+        }
       }
 
       // 8. Check pending Contract / Fiscal Data notifications for Admin Dashboard alert & sidebar badge
