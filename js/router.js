@@ -32,6 +32,7 @@ App.router = (function() {
     'admin/users':     { view: 'view-admin-users',     role: 'admin',  sidebar: 'admin', title: 'Manage Users' },
     'admin/clients':   { view: 'view-admin-clients',   role: 'admin',  sidebar: 'admin', title: 'Clients' },
     'admin/agreements':{ view: 'view-admin-agreements',role: 'admin',  sidebar: 'admin', title: 'Referral Agreements' },
+    'admin/marketing': { view: 'view-marketing-lab',   role: 'admin',  sidebar: 'admin', title: 'Marketing Lab' },
     'admin/newsletter':{ view: 'view-admin-newsletter',role: 'admin',  sidebar: 'admin', title: 'Newsletter' },
     'admin/webinar':   { view: 'view-admin-webinar',   role: 'admin',  sidebar: 'admin', title: 'Webinar Registrations' },
     'admin/unified':   { view: 'view-admin-unified',   role: 'admin',  sidebar: 'admin', title: 'Unified Directory' },
@@ -41,6 +42,7 @@ App.router = (function() {
     'embajador/network':   { view: 'view-embajador-network',   role: 'embajador', sidebar: 'embajador', title: 'My Umbrella Network' },
     'embajador/clients':   { view: 'view-embajador-clients',   role: 'embajador', sidebar: 'embajador', title: 'Umbrella Clients' },
     'embajador/webinar':   { view: 'view-embajador-webinar',   role: 'embajador', sidebar: 'embajador', title: 'Webinar Registrations' },
+    'embajador/marketing': { view: 'view-marketing-lab',       role: 'embajador', sidebar: 'embajador', title: 'Marketing Lab' },
     'embajador/documents': { view: 'view-embajador-documents', role: 'embajador', sidebar: 'embajador', title: 'Documents & Agreement' },
     'embajador/finances':  { view: 'view-embajador-finances',  role: 'embajador', sidebar: 'embajador', title: 'Finances & Commissions' },
 
@@ -48,6 +50,7 @@ App.router = (function() {
     'broker/dashboard': { view: 'view-broker-dashboard', role: 'broker', sidebar: 'broker', title: 'Broker Dashboard' },
     'broker/team':      { view: 'view-broker-team',      role: 'broker', sidebar: 'broker', title: 'My Team' },
     'broker/clients':   { view: 'view-broker-clients',   role: 'broker', sidebar: 'broker', title: 'Clients' },
+    'broker/marketing': { view: 'view-marketing-lab',    role: 'broker', sidebar: 'broker', title: 'Marketing Lab' },
     'broker/documents': { view: 'view-broker-documents', role: 'broker', sidebar: 'broker', title: 'Documents' },
     'broker/finances':  { view: 'view-broker-finances',  role: 'broker', sidebar: 'broker', title: 'Finances' },
 
@@ -55,12 +58,14 @@ App.router = (function() {
     'realtor/dashboard': { view: 'view-realtor-dashboard', role: 'realtor', sidebar: 'realtor', title: 'My Dashboard' },
     'realtor/clients':   { view: 'view-realtor-clients',   role: 'realtor', sidebar: 'realtor', title: 'My Clients' },
     'realtor/referral':  { view: 'view-realtor-referral',  role: 'realtor', sidebar: 'realtor', title: 'Referral Tools' },
+    'realtor/marketing': { view: 'view-marketing-lab',     role: 'realtor', sidebar: 'realtor', title: 'Marketing Lab' },
     'realtor/documents': { view: 'view-realtor-documents', role: 'realtor', sidebar: 'realtor', title: 'Documents' },
     'realtor/finances':  { view: 'view-realtor-finances',  role: 'realtor', sidebar: 'realtor', title: 'Finances' },
 
     // Agente Inmomás routes
     'agent_inmomas/dashboard': { view: 'view-agent-dashboard', role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Dashboard' },
     'agent_inmomas/clients':   { view: 'view-agent-clients',   role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Clients' },
+    'agent_inmomas/marketing': { view: 'view-marketing-lab',   role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Marketing Lab' },
     'agent_inmomas/finances':  { view: 'view-agent-finances',  role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Finances' },
     'agent_inmomas/webinar':   { view: 'view-agent-webinar',   role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Webinar Registrations' },
     'agent_inmomas/partners':  { view: 'view-agent-partners',  role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'My Partners' },
@@ -68,13 +73,15 @@ App.router = (function() {
     // Colaborador routes
     'colaborador/dashboard': { view: 'view-agent-dashboard',       role: 'colaborador', sidebar: 'colaborador', title: 'Dashboard' },
     'colaborador/clients':   { view: 'view-agent-clients',         role: 'colaborador', sidebar: 'colaborador', title: 'Clients' },
+    'colaborador/marketing': { view: 'view-marketing-lab',         role: 'colaborador', sidebar: 'colaborador', title: 'Marketing Lab' },
     'colaborador/documents': { view: 'view-colaborador-documents', role: 'colaborador', sidebar: 'colaborador', title: 'Documents & Agreement' },
     'colaborador/finances':  { view: 'view-agent-finances',        role: 'colaborador', sidebar: 'colaborador', title: 'Finances' },
     'colaborador/webinar':   { view: 'view-agent-webinar',         role: 'colaborador', sidebar: 'colaborador', title: 'Webinar Registrations' },
     'colaborador/partners':  { view: 'view-agent-partners',        role: 'colaborador', sidebar: 'colaborador', title: 'My Partners' },
 
     // Partner routes
-    'partner/dashboard': { view: 'view-partner-dashboard', role: 'partner', sidebar: 'partner', title: 'Partner Dashboard' }
+    'partner/dashboard': { view: 'view-partner-dashboard', role: 'partner', sidebar: 'partner', title: 'Partner Dashboard' },
+    'partner/marketing': { view: 'view-marketing-lab',     role: 'partner', sidebar: 'partner', title: 'Marketing Lab' }
   };
 
   let currentRoute = null;
@@ -577,6 +584,7 @@ App.router = (function() {
       'admin/users':       () => App.views.admin && App.views.admin.initUsers(),
       'admin/clients':     () => App.views.admin && App.views.admin.initClients(),
       'admin/agreements':  () => App.views.admin && App.views.admin.initAgreementsView(),
+      'admin/marketing':   () => App.marketingLab && App.marketingLab.initView(),
       'admin/newsletter':  () => App.views.admin && App.views.admin.initNewsletter(),
       'admin/webinar':    () => App.views.admin && App.views.admin.initWebinar(),
       'admin/unified':    () => App.views.admin && App.views.admin.initUnified(),
@@ -584,31 +592,37 @@ App.router = (function() {
       'embajador/network':   () => App.views.embajador && App.views.embajador.initNetwork(),
       'embajador/clients':   () => App.views.embajador && App.views.embajador.initClients(),
       'embajador/webinar':   () => App.views.embajador && App.views.embajador.initWebinar(),
+      'embajador/marketing': () => App.marketingLab && App.marketingLab.initView(),
       'embajador/documents': () => App.views.embajador && App.views.embajador.initDocuments(),
       'embajador/finances':  () => App.views.embajador && App.views.embajador.initFinances(),
       'webinar':          () => App.views.public && App.views.public.initWebinarRegister(),
       'broker/dashboard':  () => App.views.broker && App.views.broker.initDashboard(),
       'broker/team':       () => App.views.broker && App.views.broker.initTeam(),
       'broker/clients':    () => App.views.broker && App.views.broker.initClients(),
+      'broker/marketing':  () => App.marketingLab && App.marketingLab.initView(),
       'broker/documents':  () => App.views.broker && App.views.broker.initDocuments(),
       'broker/finances':   () => App.views.broker && App.views.broker.initFinances(),
       'realtor/dashboard': () => App.views.realtor && App.views.realtor.initDashboard(),
       'realtor/clients':   () => App.views.realtor && App.views.realtor.initClients(),
       'realtor/referral':  () => App.views.realtor && App.views.realtor.initReferral(),
+      'realtor/marketing': () => App.marketingLab && App.marketingLab.initView(),
       'realtor/documents': () => App.views.realtor && App.views.realtor.initDocuments(),
       'realtor/finances':  () => App.views.realtor && App.views.realtor.initFinances(),
       'agent_inmomas/dashboard': () => App.views.agentInmomas && App.views.agentInmomas.initDashboard(),
       'agent_inmomas/clients':   () => App.views.agentInmomas && App.views.agentInmomas.initClients(),
+      'agent_inmomas/marketing': () => App.marketingLab && App.marketingLab.initView(),
       'agent_inmomas/finances':  () => App.views.agentInmomas && App.views.agentInmomas.initFinances(),
       'agent_inmomas/webinar':   () => App.views.agentInmomas && App.views.agentInmomas.initWebinar(),
       'agent_inmomas/partners':  () => App.views.agentInmomas && App.views.agentInmomas.initPartners(),
       'colaborador/dashboard': () => App.views.agentInmomas && App.views.agentInmomas.initDashboard(),
       'colaborador/clients':   () => App.views.agentInmomas && App.views.agentInmomas.initClients(),
+      'colaborador/marketing': () => App.marketingLab && App.marketingLab.initView(),
       'colaborador/documents': () => App.views.agentInmomas && App.views.agentInmomas.initDocuments(),
       'colaborador/finances':  () => App.views.agentInmomas && App.views.agentInmomas.initFinances(),
       'colaborador/webinar':   () => App.views.agentInmomas && App.views.agentInmomas.initWebinar(),
       'colaborador/partners':  () => App.views.agentInmomas && App.views.agentInmomas.initPartners(),
       'partner/dashboard': () => App.views.partner && App.views.partner.initDashboard(),
+      'partner/marketing': () => App.marketingLab && App.marketingLab.initView(),
       'profile':           () => App.views.auth && App.views.auth.initProfile(),
       'survey':            () => App.views.public && App.views.public.initSurvey && App.views.public.initSurvey()
     };

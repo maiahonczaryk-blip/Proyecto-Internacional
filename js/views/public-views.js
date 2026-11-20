@@ -565,6 +565,8 @@ App.views.public = {
       const upperRefCode = refCode ? refCode.toUpperCase().trim() : '';
       if (!referrer) {
         if (upperRefCode.startsWith('BRK-')) {
+          availableTypes = ['realtor', 'colaborador'];
+        } else if (upperRefCode.startsWith('REA-')) {
           availableTypes = ['realtor'];
         } else if (upperRefCode.startsWith('LOC-') || upperRefCode.startsWith('ADM-') || upperRefCode === 'ADMIN-001') {
           availableTypes = ['embajador', 'broker', 'realtor', 'colaborador'];
@@ -607,9 +609,13 @@ App.views.public = {
         availableTypes = ['realtor'];
         selectedType = 'realtor';
       } else if (referrer.role === 'broker') {
-        // A Broker invites Realtors to their team
-        availableTypes = ['realtor'];
-        selectedType = 'realtor';
+        // A Broker can link both Realtors and Collaborators (10%) to their structure
+        availableTypes = ['realtor', 'colaborador'];
+        if (availableTypes.includes(requestedType)) {
+          selectedType = requestedType;
+        } else if (!availableTypes.includes(selectedType)) {
+          selectedType = 'realtor';
+        }
       } else if (referrer.role === 'colaborador' || referrer.role === 'partner') {
         availableTypes = ['realtor', 'broker', 'colaborador'];
         if (availableTypes.includes(requestedType)) {
@@ -935,6 +941,9 @@ App.views.public = {
             if (contactType === 'broker' && ((referrer && referrer.role === 'broker') || (refCode && refCode.toUpperCase().startsWith('BRK-')))) {
               throw new Error('Un Broker no puede registrar a otro Broker debajo de su estructura.');
             }
+            if (contactType === 'colaborador' && ((referrer && referrer.role === 'realtor') || (refCode && refCode.toUpperCase().startsWith('REA-')))) {
+              throw new Error('Un Colaborador puede operar directamente o bajo un Broker o Embajador, pero no puede estar debajo de un Agente.');
+            }
 
             agencyName = form.querySelector('#referral-agencyName')?.value.trim() || '';
             if (!agencyName && contactType === 'agent_inmomas') {
@@ -989,7 +998,7 @@ App.views.public = {
               region: selectedRegions[0] || '',
               regions: selectedRegions,
               role: contactType,
-              brokerId: (referrer && referrer.role === 'broker' && contactType === 'realtor') ? referrer.id : null,
+              brokerId: (referrer && referrer.role === 'broker' && ['realtor', 'colaborador'].includes(contactType)) ? referrer.id : null,
               embajadorId: resolvedEmbajadorId,
               referredByAdmin: Boolean(referrer && referrer.role === 'admin'),
               referredByAgentInmomas: Boolean((referrer && referrer.role === 'agent_inmomas') || (refCode && refCode.toUpperCase().trim().startsWith('LOC-'))),

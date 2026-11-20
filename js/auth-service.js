@@ -268,6 +268,14 @@ App.auth = (function() {
       }
     }
 
+    // Hierarchy rule: A Colaborador can be direct, under a Broker, or under an Embajador — NEVER under an Agent (Realtor)
+    if (role === 'colaborador' && referredBy) {
+      const refStr = String(referredBy || '').toUpperCase().trim();
+      if (refStr.startsWith('REA-')) {
+        throw new Error('Un Colaborador puede operar directamente o bajo un Broker o Embajador, pero no puede estar vinculado debajo de un Agente.');
+      }
+    }
+
     const getPrefixForRole = (r) => {
       if (r === 'admin') return 'ADM';
       if (r === 'embajador') return 'EMB';
@@ -286,15 +294,19 @@ App.auth = (function() {
 
       // Resolve umbrella embajadorId from referrer or selected broker if applicable
       let resolvedEmbajadorId = data.embajadorId || null;
+      const cleanReferredBy = referredBy || data.inmomasAgentName || null;
       if (!resolvedEmbajadorId && referredBy && role !== 'embajador') {
         const refUser = App.demoData.users.find(u =>
           u.id === referredBy || (u.referralCode && u.referralCode.toUpperCase() === String(referredBy).toUpperCase())
         );
         if (refUser) {
+          if (role === 'colaborador' && refUser.role === 'realtor') {
+            throw new Error('Un Colaborador puede operar directamente o bajo un Broker o Embajador, pero no puede estar vinculado debajo de un Agente.');
+          }
           resolvedEmbajadorId = refUser.role === 'embajador' ? refUser.id : (refUser.embajadorId || null);
         }
       }
-      if (brokerId && role === 'realtor') {
+      if (brokerId && ['realtor', 'colaborador'].includes(role)) {
         const selBroker = App.demoData.users.find(u => u.id === brokerId);
         if (selBroker) {
           if (!resolvedEmbajadorId && selBroker.embajadorId) {
@@ -311,7 +323,7 @@ App.auth = (function() {
         password,
         role,
         status: 'pending',
-        brokerStatus: role === 'realtor' && brokerId ? 'pending' : null,
+        brokerStatus: ['realtor', 'colaborador'].includes(role) && brokerId ? 'pending' : null,
         firstName,
         lastName,
         agencyName: agencyName || '',
@@ -335,7 +347,7 @@ App.auth = (function() {
         inmomasAgentId: data.inmomasAgentId || null,
         inmomasAgentName: data.inmomasAgentName || null,
         notes: data.notes || '',
-        referredBy: referredBy || data.inmomasAgentName || null,
+        referredBy: cleanReferredBy,
         source: source || null,
         createdAt: new Date().toISOString()
       };
@@ -392,12 +404,17 @@ App.auth = (function() {
 
       // Resolve umbrella embajadorId from referrer (ID or referralCode) or selected broker
       let resolvedEmbajadorId = data.embajadorId || null;
+      let cleanReferredBy = referredBy || data.inmomasAgentName || null;
       if (!resolvedEmbajadorId && referredBy && finalRole !== 'embajador' && finalRole !== 'admin') {
         try {
           const refDoc = await App.db.collection('users').doc(referredBy).get();
           if (refDoc.exists) {
             const rData = refDoc.data();
-            resolvedEmbajadorId = rData.role === 'embajador' ? refDoc.id : (rData.embajadorId || null);
+            if (finalRole === 'colaborador' && rData.role === 'realtor') {
+              cleanReferredBy = data.inmomasAgentName || null;
+            } else {
+              resolvedEmbajadorId = rData.role === 'embajador' ? refDoc.id : (rData.embajadorId || null);
+            }
           } else {
             const byCodeSnap = await App.db.collection('users')
               .where('referralCode', '==', String(referredBy).trim().toUpperCase())
@@ -406,12 +423,16 @@ App.auth = (function() {
             if (!byCodeSnap.empty) {
               const rDoc = byCodeSnap.docs[0];
               const rData = rDoc.data();
-              resolvedEmbajadorId = rData.role === 'embajador' ? rDoc.id : (rData.embajadorId || null);
+              if (finalRole === 'colaborador' && rData.role === 'realtor') {
+                cleanReferredBy = data.inmomasAgentName || null;
+              } else {
+                resolvedEmbajadorId = rData.role === 'embajador' ? rDoc.id : (rData.embajadorId || null);
+              }
             }
           }
         } catch (_) {}
       }
-      if (brokerId && finalRole === 'realtor') {
+      if (brokerId && ['realtor', 'colaborador'].includes(finalRole)) {
         try {
           const bDoc = await App.db.collection('users').doc(brokerId).get();
           if (bDoc.exists) {
@@ -429,7 +450,7 @@ App.auth = (function() {
         email: emailLower,
         role: finalRole,
         status: finalStatus,
-        brokerStatus: finalRole === 'realtor' && brokerId ? 'pending' : null,
+        brokerStatus: ['realtor', 'colaborador'].includes(finalRole) && brokerId ? 'pending' : null,
         firstName,
         lastName,
         agencyName: agencyName || (isMaiaAccount ? 'RE/MAX Inmomás' : ''),
@@ -453,7 +474,7 @@ App.auth = (function() {
         inmomasAgentId: data.inmomasAgentId || null,
         inmomasAgentName: data.inmomasAgentName || null,
         notes: data.notes || '',
-        referredBy: referredBy || data.inmomasAgentName || null,
+        referredBy: cleanReferredBy,
         source: source || null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -698,10 +719,18 @@ App.auth = (function() {
       throw new Error('Invalid role selected.');
     }
 
-    if (role === 'embajador' && !data.referredByAdmin) {
+    if (role === 'embajador' && !data.referredByAdmin && !data.referredByAgentInmomas) {
       const refStr = String(referredBy || '').toUpperCase().trim();
-      if (!refStr.startsWith('ADM-') && refStr !== 'ADMIN-001') {
-        throw new Error('Ambassador applications are exclusively available via an Administrator invitation link.');
+      const validPrefix = refStr.startsWith('ADM-') || refStr.startsWith('LOC-') || refStr === 'ADMIN-001';
+      if (!validPrefix && !data.inmomasAgentId) {
+        throw new Error('Ambassador applications are exclusively available via an Administrator or RE/MAX Inmomás Agent invitation link.');
+      }
+    }
+
+    if (role === 'colaborador' && referredBy) {
+      const refStr = String(referredBy || '').toUpperCase().trim();
+      if (refStr.startsWith('REA-')) {
+        throw new Error('Un Colaborador puede operar directamente o bajo un Broker o Embajador, pero no puede estar vinculado debajo de un Agente.');
       }
     }
 
@@ -714,7 +743,7 @@ App.auth = (function() {
         email: mockEmail,
         role,
         status: 'pending',
-        brokerStatus: role === 'realtor' && brokerId ? 'pending' : null,
+        brokerStatus: ['realtor', 'colaborador'].includes(role) && brokerId ? 'pending' : null,
         firstName: mockFirstName,
         lastName: mockLastName,
         agencyName: agencyName || '',
@@ -798,7 +827,7 @@ App.auth = (function() {
         email: firebaseUser.email.toLowerCase(),
         role,
         status: 'pending',
-        brokerStatus: role === 'realtor' && brokerId ? 'pending' : null,
+        brokerStatus: ['realtor', 'colaborador'].includes(role) && brokerId ? 'pending' : null,
         firstName: finalFirstName,
         lastName: finalLastName,
         agencyName: agencyName || '',
@@ -931,6 +960,14 @@ App.auth = (function() {
       if (cleanRole === 'embajador' || cleanRole === 'admin') {
         user.embajadorId = null;
       }
+      if (cleanRole === 'colaborador' && user.referredBy) {
+        const refObj = App.demoData.users.find(u => u.id === user.referredBy || (u.referralCode && u.referralCode.toUpperCase() === String(user.referredBy).toUpperCase()));
+        if (refObj && refObj.role === 'realtor') {
+          user.referredBy = user.inmomasAgentName || null;
+        } else if (String(user.referredBy).toUpperCase().startsWith('REA-')) {
+          user.referredBy = user.inmomasAgentName || null;
+        }
+      }
       if (user.referralCode) {
         const parts = user.referralCode.split('-');
         if (parts.length > 1) {
@@ -977,6 +1014,18 @@ App.auth = (function() {
         };
         if (cleanRole === 'embajador' || cleanRole === 'admin') {
           updatePayload.embajadorId = null;
+        }
+        if (cleanRole === 'colaborador' && userData.referredBy) {
+          if (String(userData.referredBy).toUpperCase().startsWith('REA-')) {
+            updatePayload.referredBy = userData.inmomasAgentName || null;
+          } else {
+            try {
+              const rDoc = await App.db.collection('users').doc(userData.referredBy).get();
+              if (rDoc.exists && (rDoc.data() || {}).role === 'realtor') {
+                updatePayload.referredBy = userData.inmomasAgentName || null;
+              }
+            } catch (_) {}
+          }
         }
         await docRef.update(updatePayload);
         if (currentUser && currentUser.id === userId) {
@@ -1068,24 +1117,33 @@ App.auth = (function() {
       updatedAt: new Date().toISOString()
     };
 
+    try {
+      localStorage.setItem('remax_buyer_guide_' + userId, JSON.stringify(buyerGuide));
+    } catch (e) { /* localStorage quota */ }
+
     if (App.demoMode) {
       const u = App.demoData.users.find(usr => usr.id === userId);
-      if (!u) throw new Error('User not found.');
-      u.buyerGuide = buyerGuide;
-      u.updatedAt = buyerGuide.updatedAt;
-      saveDemoData();
+      if (u) {
+        u.buyerGuide = buyerGuide;
+        u.updatedAt = buyerGuide.updatedAt;
+        saveDemoData();
+      }
+    } else if (App.db && App.firebaseAuth && App.firebaseAuth.currentUser) {
+      try {
+        await App.db.collection('users').doc(userId).set({
+          buyerGuide,
+          updatedAt: buyerGuide.updatedAt
+        }, { merge: true });
+      } catch (fbErr) {
+        console.warn('[Auth] Cloud sync for buyerGuide skipped (using local cache):', fbErr && (fbErr.code || fbErr.message || fbErr));
+      }
     } else {
-      await App.db.collection('users').doc(userId).update({
-        buyerGuide,
-        updatedAt: buyerGuide.updatedAt
-      });
+      console.warn('[Auth] No active Firebase Auth session for buyerGuide sync; saved locally.');
     }
 
     if (currentUser && currentUser.id === userId) {
       currentUser.buyerGuide = buyerGuide;
-      if (App.demoMode) {
-        try { localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser)); } catch (e) { /* quota */ }
-      }
+      try { localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser)); } catch (e) { /* quota */ }
       notifyAuthChange();
     }
     return buyerGuide;
@@ -1758,13 +1816,20 @@ App.auth = (function() {
     
     const totalCommission = sPrice * (feePct / 100);
     const realtorAmount = totalCommission * (refPct / 100);
-    const agentAmount = totalCommission * ((100 - refPct) / 100);
-    const brokerAmount = totalCommission * 0.10; // referring broker standard share (10%)
 
     if (App.demoMode) {
       const client = App.demoData.clients.find(c => c.id === clientId);
       if (!client) throw new Error('Client not found.');
       
+      const hasEmbajador = Boolean(client.embajadorId);
+      const embajadorSharePct = hasEmbajador ? 15 : 0;
+      const embajadorAmount = hasEmbajador ? (totalCommission * 0.15) : 0;
+      const agentSharePct = Math.max(0, 100 - refPct - embajadorSharePct);
+      const agentAmount = totalCommission * (agentSharePct / 100);
+      const hasBroker = Boolean(client.brokerId);
+      const brokerSharePct = hasBroker ? refPct : 0;
+      const brokerAmount = hasBroker ? realtorAmount : 0;
+
       client.salePrice = sPrice;
       client.agencyFeePct = feePct;
       client.referralSharePct = refPct;
@@ -1777,19 +1842,23 @@ App.auth = (function() {
           clientName: `${client.firstName} ${client.lastName}`,
           realtorId: client.referredBy,
           brokerId: client.brokerId,
+          embajadorId: client.embajadorId || null,
           createdAt: new Date().toISOString()
         };
         App.demoData.commissions.push(comm);
       }
 
       comm.agentId = client.localAgentId;
+      comm.embajadorId = client.embajadorId || null;
       comm.salePrice = sPrice;
       comm.totalCommission = totalCommission;
       comm.realtorSharePct = refPct;
       comm.realtorAmount = realtorAmount;
-      comm.agentSharePct = 100 - refPct;
+      comm.embajadorSharePct = embajadorSharePct;
+      comm.embajadorAmount = embajadorAmount;
+      comm.agentSharePct = agentSharePct;
       comm.agentAmount = agentAmount;
-      comm.brokerSharePct = 10;
+      comm.brokerSharePct = brokerSharePct;
       comm.brokerAmount = brokerAmount;
       comm.propertyAddress = client.interestArea || 'Spain Deal';
 
@@ -1810,6 +1879,15 @@ App.auth = (function() {
       const doc = await clientRef.get();
       if (!doc.exists) throw new Error('Client not found.');
       const client = doc.data();
+
+      const hasEmbajador = Boolean(client.embajadorId);
+      const embajadorSharePct = hasEmbajador ? 15 : 0;
+      const embajadorAmount = hasEmbajador ? (totalCommission * 0.15) : 0;
+      const agentSharePct = Math.max(0, 100 - refPct - embajadorSharePct);
+      const agentAmount = totalCommission * (agentSharePct / 100);
+      const hasBroker = Boolean(client.brokerId);
+      const brokerSharePct = hasBroker ? refPct : 0;
+      const brokerAmount = hasBroker ? realtorAmount : 0;
 
       await clientRef.update({
         salePrice: sPrice,
@@ -1840,9 +1918,11 @@ App.auth = (function() {
         totalCommission,
         realtorSharePct: refPct,
         realtorAmount,
-        agentSharePct: 100 - refPct,
+        embajadorSharePct,
+        embajadorAmount,
+        agentSharePct,
         agentAmount,
-        brokerSharePct: 10,
+        brokerSharePct,
         brokerAmount,
         propertyAddress: client.interestArea || 'Spain Deal',
         status: commStatus,
@@ -3477,9 +3557,9 @@ App.auth = (function() {
       }
       if (u.referredBy) {
         const byId = userById.get(u.referredBy);
-        if (byId && byId.role !== 'agent_inmomas') return byId;
+        if (byId && byId.role !== 'agent_inmomas' && !(u.role === 'colaborador' && byId.role === 'realtor')) return byId;
         const byCode = userByRefCode.get(String(u.referredBy).toUpperCase().trim());
-        if (byCode && byCode.role !== 'agent_inmomas') return byCode;
+        if (byCode && byCode.role !== 'agent_inmomas' && !(u.role === 'colaborador' && byCode.role === 'realtor')) return byCode;
       }
       if (u.embajadorId && userById.has(u.embajadorId)) {
         return userById.get(u.embajadorId);

@@ -47,6 +47,7 @@
       const hasSubmittedData = (agreementStatus === 'data_submitted' || agreementStatus === 'uploaded');
       
       if (warningEl) {
+        const isDirectAgent = !(currentUser && (currentUser.brokerId || currentUser.brokerNameManual));
         if (hasSigned) {
           warningEl.style.display = 'none';
         } else if (hasSubmittedData) {
@@ -56,16 +57,16 @@
               <span style="font-size:2rem;">📋</span>
               <div>
                 <div style="font-weight:700; color:#1e40af; font-size:1.05rem;">
-                  <span class="lang-en">Fiscal &amp; Bank Details Received — Preparing Contract</span>
-                  <span class="lang-es">Datos Fiscales y Bancarios Recibidos — Preparando Contrato</span>
-                  <span class="lang-fr">Données Fiscales et Bancaires Reçues — Préparation du Contrat</span>
-                  <span class="lang-en-ca">Fiscal &amp; Bank Details Received — Preparing Contract</span>
+                  <span class="lang-en">Fiscal &amp; Bank Details Received — Preparing ${isDirectAgent ? 'Direct Agent Contract (15%)' : 'Brokerage Contract (25%)'}</span>
+                  <span class="lang-es">Datos Fiscales y Bancarios Recibidos — Preparando ${isDirectAgent ? 'Acuerdo Directo de Agente (15%)' : 'Acuerdo vía Broker (25%)'}</span>
+                  <span class="lang-fr">Données Fiscales et Bancaires Reçues — Préparation du Contrat (${isDirectAgent ? '15%' : '25%'})</span>
+                  <span class="lang-en-ca">Fiscal &amp; Bank Details Received — Preparing ${isDirectAgent ? 'Direct Agent Contract (15%)' : 'Brokerage Contract (25%)'}</span>
                 </div>
                 <div style="font-size:0.85rem; color:#1d4ed8; margin-top:4px;">
-                  <span class="lang-en">Our administration team is preparing your joint Collaboration Agreement externally and will present it to you and your Broker for signature shortly. Review your details in <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a>.</span>
-                  <span class="lang-es">Nuestro equipo de administración está redactando el Contrato de Colaboración Conjunta de forma externa y os lo presentará a ti y a tu Broker en breve para la firma. Puedes revisar tus datos en <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documentos</a>.</span>
-                  <span class="lang-fr">Notre équipe prépare votre Contrat de Collaboration et vous le présentera ainsi qu'à votre Broker sous peu. Vérifiez vos données dans <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a>.</span>
-                  <span class="lang-en-ca">Our administration team is preparing your joint Collaboration Agreement externally and will present it to you and your Broker for signature shortly. Review your details in <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a>.</span>
+                  <span class="lang-en">${isDirectAgent ? 'Our administration team is preparing your Direct Agent Agreement (15% referral fee) and will send it to you for signature shortly.' : 'Our administration team is preparing your joint Collaboration Agreement (25% via Broker) and will present it to you and your Broker for signature shortly.'} Review your details in <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a>.</span>
+                  <span class="lang-es">${isDirectAgent ? 'Nuestro equipo de administración está preparando tu Acuerdo Directo de Agente (15% directo al agente) y te lo enviará en breve para la firma.' : 'Nuestro equipo de administración está redactando el Acuerdo de Colaboración vía Broker (25% agencia) y os lo presentará a ti y a tu Broker en breve para la firma.'} Puedes revisar tus datos en <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documentos</a>.</span>
+                  <span class="lang-fr">${isDirectAgent ? 'Notre équipe prépare votre Accord Direct d\'Agent (15%) et vous l\'enverra sous peu.' : 'Notre équipe prépare votre Contrat de Collaboration via Broker (25%) et vous le présentera sous peu.'} Vérifiez vos données dans <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a>.</span>
+                  <span class="lang-en-ca">${isDirectAgent ? 'Our administration team is preparing your Direct Agent Agreement (15% referral fee) and will send it to you for signature shortly.' : 'Our administration team is preparing your joint Collaboration Agreement (25% via Broker) and will present it to you and your Broker for signature shortly.'} Review your details in <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a>.</span>
                 </div>
               </div>
             </div>`;
@@ -76,16 +77,16 @@
               <span style="font-size:2rem;">⚠️</span>
               <div>
                 <div style="font-weight:700; color:#92400e; font-size:1.05rem;">
-                  <span class="lang-en">Company Fiscal &amp; Bank Details Required for Contract</span>
-                  <span class="lang-es">Datos Fiscales y Bancarios Requeridos para el Contrato</span>
-                  <span class="lang-fr">Données Fiscales et Bancaires Requises pour le Contrat</span>
-                  <span class="lang-en-ca">Company Fiscal &amp; Bank Details Required for Contract</span>
+                  <span class="lang-en">${isDirectAgent ? 'Direct Agent Fiscal &amp; Bank Details Required (15% Agreement)' : 'Company Fiscal &amp; Bank Details Required (25% via Broker)'}</span>
+                  <span class="lang-es">${isDirectAgent ? 'Datos Fiscales y Bancarios Requeridos (Acuerdo Directo Agente · 15%)' : 'Datos Fiscales y Bancarios Requeridos (Acuerdo vía Broker · 25%)'}</span>
+                  <span class="lang-fr">Données Fiscales et Bancaires Requises (${isDirectAgent ? 'Accord Direct 15%' : 'Accord Broker 25%'})</span>
+                  <span class="lang-en-ca">${isDirectAgent ? 'Direct Agent Fiscal &amp; Bank Details Required (15% Agreement)' : 'Company Fiscal &amp; Bank Details Required (25% via Broker)'}</span>
                 </div>
                 <div style="font-size:0.85rem; color:#78350f; margin-top:4px;">
-                  <span class="lang-en">To prepare your joint Collaboration Agreement externally, please go to <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> and complete the company fiscal and corporate bank details (provided by your Broker).</span>
-                  <span class="lang-es">Para que preparemos el Contrato de Colaboración Conjunta de forma externa, ve a <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documentos</a> y completa los datos fiscales de la empresa y cuenta bancaria (facilitados por tu Broker).</span>
-                  <span class="lang-fr">Pour que nous préparions votre Contrat de Collaboration, rendez-vous dans <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> et complétez les données fiscales et bancaires fournies par votre Broker.</span>
-                  <span class="lang-en-ca">To prepare your joint Collaboration Agreement externally, please go to <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> and complete the company fiscal and corporate bank details (provided by your Broker).</span>
+                  <span class="lang-en">${isDirectAgent ? 'To formalize your Direct Agent Agreement (15% paid directly to you), please go to <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> and complete your fiscal and bank details.' : 'To prepare your Collaboration Agreement (25% via Brokerage), please go to <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> and complete the brokerage fiscal and corporate bank details.'}</span>
+                  <span class="lang-es">${isDirectAgent ? 'Para formalizar tu Acuerdo Directo con Agente (15% abonado directamente al agente), ve a <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documentos</a> y completa tus datos fiscales y bancarios.' : 'Para redactar tu Acuerdo vía Broker (25% agencia), ve a <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documentos</a> y completa los datos fiscales y bancarios de tu Agencia.'}</span>
+                  <span class="lang-fr">${isDirectAgent ? 'Pour formaliser votre Accord Direct d\'Agent (15%), rendez-vous dans <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> et complétez vos coordonnées.' : 'Pour préparer votre Accord via Broker (25%), rendez-vous dans <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> et complétez les données de votre Agence.'}</span>
+                  <span class="lang-en-ca">${isDirectAgent ? 'To formalize your Direct Agent Agreement (15% paid directly to you), please go to <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> and complete your fiscal and bank details.' : 'To prepare your Collaboration Agreement (25% via Brokerage), please go to <a href="#realtor/documents" style="font-weight:700; color:#003f99; text-decoration:underline;">Documents</a> and complete the brokerage fiscal and corporate bank details.'}</span>
                 </div>
               </div>
             </div>`;
@@ -198,10 +199,10 @@
         App.referralBranding.renderEditor(realtorDashBranding, currentUser, { compact: true });
       }
 
-      // Personalized Buyer Guide
+      // Marketing Lab Quick Access
       const realtorDashGuide = document.getElementById('realtor-dash-buyer-guide');
-      if (realtorDashGuide && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
-        App.buyerGuide.renderEditor(realtorDashGuide, currentUser);
+      if (realtorDashGuide && App.marketingLab) {
+        App.marketingLab.renderQuickCard(realtorDashGuide, currentUser, { route: 'realtor/marketing' });
       }
 
       // Mini pipeline summary
@@ -516,10 +517,10 @@
         App.referralBranding.renderEditor(realtorRefBranding, currentUser, { compact: true });
       }
 
-      // Personalized Buyer Guide in Referral Tools
+      // Centralized in Marketing Lab (#realtor/marketing)
       const realtorRefGuide = document.getElementById('realtor-referral-buyer-guide');
-      if (realtorRefGuide && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
-        App.buyerGuide.renderEditor(realtorRefGuide, currentUser);
+      if (realtorRefGuide) {
+        realtorRefGuide.style.display = 'none';
       }
 
       // QR Code placeholder (highlights Client Webinar Link)
@@ -628,8 +629,8 @@
       renderUploadSection();
 
       const realtorDocsGuide = document.getElementById('realtor-docs-buyer-guide');
-      if (realtorDocsGuide && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
-        App.buyerGuide.renderEditor(realtorDocsGuide, currentUser);
+      if (realtorDocsGuide) {
+        realtorDocsGuide.style.display = 'none';
       }
 
     } catch (err) {
@@ -792,7 +793,7 @@
 
     // Average buyer-side commission rate: 5%
     const commRate = 0.05;
-    const realtorShareRate = 0.25;
+    const realtorShareRate = (currentUser && (currentUser.brokerId || currentUser.brokerNameManual)) ? 0.25 : 0.15;
 
     // Expected conversion rate based on historical data
     const totalClients = clients.length || 1;
@@ -825,7 +826,7 @@
         </div>
         <p style="font-size: 0.75rem; color: #9ca3af; margin: 0; font-style: italic;">
           * Based on ${projectedSales} projected sale${projectedSales !== 1 ? 's' : ''} from ${activeClients.length} active client${activeClients.length !== 1 ? 's' : ''},
-          with an average sale price of ${App.utils.formatCurrency(avgSalePrice)} and a ${realtorShareRate * 100}% referral commission rate on ${commRate * 100}% buyer-side commission.
+          with an average sale price of ${App.utils.formatCurrency(avgSalePrice)} and a ${Math.round(realtorShareRate * 100)}% referral commission rate on ${Math.round(commRate * 100)}% buyer-side commission.
         </p>
       </div>
     `;

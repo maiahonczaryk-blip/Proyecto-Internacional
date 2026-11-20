@@ -268,7 +268,7 @@ add_field_row(t2, "Broker of Record / Corredor:", "José Martínez Sánchez")
 add_field_row(t2, "Office Address / Dirección:", "Carrer Conrado del Campo 16, 03204, Elche (Alicante), Spain")
 add_field_row(t2, "CIF (Tax ID) / NIF:", "B-54829767")
 add_field_row(t2, "Contact Email / Correo:", "jose.martinez@remax.es")
-add_field_row(t2, "Office Phone / Teléfono:", "+34 966 665 651")
+add_field_row(t2, "Office Phone / Teléfono:", "+34 647 86 19 68")
 shade_table(t2)
 
 # Clauses
@@ -391,7 +391,7 @@ add_signature_block(
 
 add_footer_text(
     "Megagestión Servicios Inmobiliarios • Carrer Conrado del Campo 16, 03204, Elche (Alicante), Spain\n"
-    "CIF: B-54829767 • jose.martinez@remax.es • +34 966 665 651\n"
+    "CIF: B-54829767 • jose.martinez@remax.es • +34 647 86 19 68\n"
     "© 2026 Megagestión Servicios Inmobiliarios. All Rights Reserved."
 )
 
@@ -577,7 +577,7 @@ pBdr = parse_xml(
 )
 pPr.append(pBdr)
 rf = p_foot.add_run(
-    "Megagestión Servicios Inmobiliarios • CIF: B-54829767 • jose.martinez@remax.es • +34 966 665 651\n"
+    "Megagestión Servicios Inmobiliarios • CIF: B-54829767 • jose.martinez@remax.es • +34 647 86 19 68\n"
     "This Annex is an integral part of the Master Referral Agreement / "
     "Este Anexo forma parte integral del Acuerdo Marco de Referidos."
 )

@@ -60,12 +60,15 @@
     return umbrella;
   }
 
-  function getRolePill(role) {
+  function getRolePill(role, memberObj) {
+    const hasBroker = Boolean(memberObj && (memberObj.brokerId || memberObj.brokerNameManual));
     const map = {
-      embajador:   { icon: '👑', labelEn: 'Ambassador Direct', labelEs: 'Directo Embajador', bg: 'rgba(245,158,11,0.16)', color: '#92400e', border: 'rgba(217,119,6,0.38)' },
-      broker:      { icon: '🏢', labelEn: 'Broker', labelEs: 'Broker', bg: 'rgba(0,67,255,0.1)', color: '#002dae', border: 'rgba(0,67,255,0.25)' },
-      realtor:     { icon: '🏠', labelEn: 'Realtor / Agent', labelEs: 'Agente / Realtor', bg: 'rgba(16,185,129,0.12)', color: '#047857', border: 'rgba(16,185,129,0.28)' },
-      colaborador: { icon: '🤝', labelEn: 'Collaborator', labelEs: 'Colaborador', bg: 'rgba(124,58,237,0.12)', color: '#5b21b6', border: 'rgba(139,92,246,0.3)' },
+      embajador:   { icon: '👑', labelEn: 'Ambassador Direct · 25%', labelEs: 'Directo Embajador · 25%', bg: 'rgba(245,158,11,0.16)', color: '#92400e', border: 'rgba(217,119,6,0.38)' },
+      broker:      { icon: '🏢', labelEn: 'Broker · 25%', labelEs: 'Broker · 25%', bg: 'rgba(0,67,255,0.1)', color: '#002dae', border: 'rgba(0,67,255,0.25)' },
+      realtor:     hasBroker
+        ? { icon: '🏠', labelEn: 'Agent via Broker · 25%', labelEs: 'Agente vía Broker · 25%', bg: 'rgba(16,185,129,0.12)', color: '#047857', border: 'rgba(16,185,129,0.28)' }
+        : { icon: '🏠', labelEn: 'Direct Agent · 15%', labelEs: 'Agente Directo · 15%', bg: 'rgba(16,185,129,0.12)', color: '#047857', border: 'rgba(16,185,129,0.28)' },
+      colaborador: { icon: '🤝', labelEn: 'Collaborator · 10%', labelEs: 'Colaborador · 10%', bg: 'rgba(124,58,237,0.12)', color: '#5b21b6', border: 'rgba(139,92,246,0.3)' },
       client:      { icon: '🏡', labelEn: 'Client', labelEs: 'Cliente Final', bg: 'rgba(124,58,237,0.1)', color: '#6d28d9', border: 'rgba(124,58,237,0.22)' }
     };
     const cfg = map[role] || { icon: '👤', labelEn: role || 'Member', labelEs: role || 'Miembro', bg: '#f1f5f9', color: '#475569', border: '#cbd5e1' };
@@ -232,8 +235,8 @@
       }
 
       const dashGuideEl = document.getElementById('embajador-dash-buyer-guide');
-      if (dashGuideEl && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
-        App.buyerGuide.renderEditor(dashGuideEl, currentUser);
+      if (dashGuideEl && App.marketingLab) {
+        App.marketingLab.renderQuickCard(dashGuideEl, currentUser, { route: 'embajador/marketing' });
       }
 
       renderDashPipeline(data.clients);
@@ -305,7 +308,7 @@
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-            ${getRolePill(m.role)}
+            ${getRolePill(m.role, m)}
             ${App.utils.getUserStatusBadge(m.status)}
           </div>
         </div>`;
@@ -1577,8 +1580,8 @@
     currentUser = App.auth.getCurrentUser();
     if (!currentUser) return;
     const docsGuideEl = document.getElementById('embajador-docs-buyer-guide');
-    if (docsGuideEl && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
-      App.buyerGuide.renderEditor(docsGuideEl, currentUser);
+    if (docsGuideEl) {
+      docsGuideEl.style.display = 'none';
     }
     const container = document.getElementById('embajador-contract-section');
     if (container && App.utils && typeof App.utils.renderContractDataSection === 'function') {

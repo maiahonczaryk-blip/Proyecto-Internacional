@@ -93,32 +93,6 @@
         }
       }
 
-      // Load data scoped to this broker
-      teamRealtors     = await App.auth.getAllUsers({ brokerId: currentUser.id, role: 'realtor' });
-      brokerClients    = await App.auth.getClients({ brokerId: currentUser.id });
-      brokerCommissions = await App.auth.getCommissions({ brokerId: currentUser.id });
-
-      // Count metrics
-      const approvedRealtors = teamRealtors.filter(r => r.status === 'active');
-      const completedSales   = brokerCommissions.filter(c => c.status === 'paid' || c.status === 'pending_payment');
-      const totalBrokerComm  = brokerCommissions.reduce((sum, c) => sum + (c.brokerAmount || 0), 0);
-
-      // Update stat cards
-      setTextById('broker-stat-realtors',    approvedRealtors.length);
-      setTextById('broker-stat-clients',     brokerClients.length);
-      setTextById('broker-stat-sales',       completedSales.length);
-      setTextById('broker-stat-commissions', App.utils.formatCurrency(totalBrokerComm));
-
-      // Team overview
-      renderTeamOverview(approvedRealtors);
-
-      // Recent clients (latest 5)
-      renderRecentClients(brokerClients);
-
-      // Dossier downloads (leads)
-      const leads = await App.auth.getDossierLeads();
-      renderDossierLeads(leads);
-
       // Professional Team Link & Exclusive Client Webinar Link
       const isPending = currentUser.status === 'pending';
       const refCode = currentUser.referralCode || 'BRK-DEFAULT';
@@ -210,11 +184,42 @@
         App.referralBranding.renderEditor(brokerDashBranding, currentUser, { compact: true });
       }
 
-      // Personalized Buyer Guide
+      // Marketing Lab Quick Access
       const brokerDashGuide = document.getElementById('broker-dash-buyer-guide');
-      if (brokerDashGuide && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
-        App.buyerGuide.renderEditor(brokerDashGuide, currentUser);
+      if (brokerDashGuide && App.marketingLab) {
+        App.marketingLab.renderQuickCard(brokerDashGuide, currentUser, { route: 'broker/marketing' });
       }
+
+      // Load data scoped to this broker (includes linked Realtors and Collaborators)
+      const [allBrokerTeam, loadedClients, loadedComms, leads] = await Promise.all([
+        App.auth.getAllUsers({ brokerId: currentUser.id }).catch(() => []),
+        App.auth.getClients({ brokerId: currentUser.id }).catch(() => []),
+        App.auth.getCommissions({ brokerId: currentUser.id }).catch(() => []),
+        App.auth.getDossierLeads().catch(() => [])
+      ]);
+      teamRealtors      = (allBrokerTeam || []).filter(u => ['realtor', 'colaborador'].includes(u.role));
+      brokerClients     = loadedClients || [];
+      brokerCommissions = loadedComms || [];
+
+      // Count metrics
+      const approvedRealtors = teamRealtors.filter(r => r.status === 'active');
+      const completedSales   = brokerCommissions.filter(c => c.status === 'paid' || c.status === 'pending_payment');
+      const totalBrokerComm  = brokerCommissions.reduce((sum, c) => sum + (c.brokerAmount || c.realtorAmount || 0), 0);
+
+      // Update stat cards
+      setTextById('broker-stat-realtors',    approvedRealtors.length);
+      setTextById('broker-stat-clients',     brokerClients.length);
+      setTextById('broker-stat-sales',       completedSales.length);
+      setTextById('broker-stat-commissions', App.utils.formatCurrency(totalBrokerComm));
+
+      // Team overview
+      renderTeamOverview(approvedRealtors);
+
+      // Recent clients (latest 5)
+      renderRecentClients(brokerClients);
+
+      // Dossier downloads (leads)
+      renderDossierLeads(leads || []);
 
     } catch (err) {
       console.error('[Broker] initDashboard error:', err);
@@ -350,7 +355,7 @@
 
       const lookupMaps = App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(allSysUsers) : null;
       teamRealtors = allSysUsers.filter(u => {
-        if (u.id === currentUser.id || u.role !== 'realtor') return false;
+        if (u.id === currentUser.id || !['realtor', 'colaborador'].includes(u.role)) return false;
         if (u.brokerId === currentUser.id) return true;
         if (App.utils.resolveUserUmbrellaParents) {
           const p = App.utils.resolveUserUmbrellaParents(u, allSysUsers, lookupMaps);
@@ -807,7 +812,8 @@
         await App.utils.renderUserRegionalBanner('broker-regional-banner', currentUser);
       }
 
-      teamRealtors  = await App.auth.getAllUsers({ brokerId: currentUser.id, role: 'realtor' });
+      const allBrokerTeam = await App.auth.getAllUsers({ brokerId: currentUser.id });
+      teamRealtors  = allBrokerTeam.filter(u => ['realtor', 'colaborador'].includes(u.role));
       brokerClients = await App.auth.getClients({ brokerId: currentUser.id });
 
       const getRealtorName = (realtorId) => {
@@ -939,19 +945,21 @@
       }
 
       const brokerDocsGuide = document.getElementById('broker-docs-buyer-guide');
-      if (brokerDocsGuide && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
-        App.buyerGuide.renderEditor(brokerDocsGuide, currentUser);
+      if (brokerDocsGuide) {
+        brokerDocsGuide.style.display = 'none';
       }
 
       const container = document.getElementById('broker-documents-content');
       if (!container) return;
 
-      teamRealtors = await App.auth.getAllUsers({ brokerId: currentUser.id, role: 'realtor' });
+      const allBrokerDocsTeam = await App.auth.getAllUsers({ brokerId: currentUser.id });
+      teamRealtors = allBrokerDocsTeam.filter(u => ['realtor', 'colaborador'].includes(u.role));
 
       const teamDocsHtml = teamRealtors.length === 0
         ? `<div class="empty-state"><div class="empty-state__icon">👥</div><p class="empty-state__text">No team members yet.</p></div>`
         : `<div class="team-cards-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:1rem;">
              ${teamRealtors.map(r => {
+               const isColab = r.role === 'colaborador';
                const rStatus = r.agreementStatus || 'none';
                const badge = rStatus === 'signed'
                  ? '<span class="badge badge--approved">Firmado / Signed ✅</span>'
@@ -962,22 +970,22 @@
                  ? `<p style="margin:0; color:#10b981;">Firmado el / Signed on: ${App.utils.formatDate(r.agreementSignedAt)}</p>`
                  : (rStatus === 'data_submitted' || rStatus === 'uploaded')
                    ? `<p style="margin:0; color:#1d4ed8;">Datos fiscales y bancarios enviados — preparando contrato externo</p>`
-                   : `<p style="margin:0; color:#f59e0b;">Pendiente de completar datos fiscales/bancarios o firma conjunta</p>`;
+                   : `<p style="margin:0; color:#f59e0b;">Pendiente de completar datos fiscales/bancarios o firma</p>`;
                return `
                <div class="glass-card" style="padding:1.25rem;">
                  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
                    <div>
                      <div style="font-weight:600; font-size:1rem;">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}</div>
-                     <div style="font-size:0.8rem; color:#6b7280;">Realtor</div>
+                     <div style="font-size:0.8rem; color:#6b7280;">${isColab ? '🤝 Colaborador (10% a éxito)' : '🏠 Agente / Realtor (25% vía Agencia)'}</div>
                    </div>
                    ${badge}
                  </div>
                  <div style="font-size:0.85rem; color:#374151;">
-                   <p style="margin:0 0 0.5rem;"><strong>Contrato:</strong> Acuerdo de Colaboración de Agente / Realtor (25%)</p>
+                   <p style="margin:0 0 0.5rem;"><strong>Contrato:</strong> ${isColab ? 'Acuerdo de Colaborador (10% a éxito)' : 'Acuerdo de Colaboración vía Agencia (25%)'}</p>
                    ${detail}
                    <div style="margin-top:0.85rem; padding-top:0.75rem; border-top:1px solid #e5e7eb;">
-                     <button type="button" class="btn btn-outline btn-sm" style="width:100%; border-color:#047857; color:#047857; background:#ecfdf5; font-weight:700;" onclick="App.views.broker.exportRealtorAgreement('${r.id}')">
-                       🏠 <span class="lang-en">Export Realtor Agreement (Word .doc)</span><span class="lang-es">Exportar Acuerdo de Agente / Realtor (Word .doc)</span><span class="lang-fr">Exporter Accord Agent (Word .doc)</span><span class="lang-en-ca">Export Realtor Agreement (Word .doc)</span>
+                     <button type="button" class="btn btn-outline btn-sm" style="width:100%; border-color:${isColab ? '#5b21b6' : '#047857'}; color:${isColab ? '#5b21b6' : '#047857'}; background:${isColab ? '#f5f3ff' : '#ecfdf5'}; font-weight:700;" onclick="App.views.broker.exportRealtorAgreement('${r.id}')">
+                       ${isColab ? '🤝' : '🏠'} <span class="lang-en">Export ${isColab ? 'Collaborator (10%)' : 'Realtor (25%)'} Agreement (.doc)</span><span class="lang-es">Exportar Acuerdo de ${isColab ? 'Colaborador (10%)' : 'Agente vía Agencia (25%)'} (.doc)</span><span class="lang-fr">Exporter Accord (${isColab ? '10%' : '25%'}) (.doc)</span><span class="lang-en-ca">Export ${isColab ? 'Collaborator (10%)' : 'Realtor (25%)'} Agreement (.doc)</span>
                      </button>
                    </div>
                  </div>
@@ -1041,10 +1049,11 @@
       brokerCommissions = await App.auth.getCommissions({ brokerId: currentUser.id });
 
       // Calculate summary metrics
-      const totalComm   = brokerCommissions.reduce((s, c) => s + (c.brokerAmount || 0), 0);
-      const paidComm    = brokerCommissions.filter(c => c.status === 'paid').reduce((s, c) => s + (c.brokerAmount || 0), 0);
-      const pendingComm = brokerCommissions.filter(c => c.status === 'pending_payment').reduce((s, c) => s + (c.brokerAmount || 0), 0);
-      const projComm    = brokerCommissions.filter(c => c.status === 'projected').reduce((s, c) => s + (c.brokerAmount || 0), 0);
+      const getBrkAmt = (c) => c.brokerAmount || c.realtorAmount || 0;
+      const totalComm   = brokerCommissions.reduce((s, c) => s + getBrkAmt(c), 0);
+      const paidComm    = brokerCommissions.filter(c => c.status === 'paid').reduce((s, c) => s + getBrkAmt(c), 0);
+      const pendingComm = brokerCommissions.filter(c => c.status === 'pending_payment').reduce((s, c) => s + getBrkAmt(c), 0);
+      const projComm    = brokerCommissions.filter(c => c.status === 'projected').reduce((s, c) => s + getBrkAmt(c), 0);
 
       // Update summary stat cards
       setTextById('broker-fin-total',     App.utils.formatCurrency(totalComm));
@@ -1087,8 +1096,8 @@
           <td style="font-size: 0.85rem;">${App.utils.escapeHtml(c.propertyAddress || '—')}</td>
           <td>${App.utils.formatCurrency(c.salePrice)}</td>
           <td>${App.utils.formatCurrency(c.totalCommission)}</td>
-          <td style="text-align: center;">${c.brokerSharePct}%</td>
-          <td style="font-weight: 600;">${App.utils.formatCurrency(c.brokerAmount)}</td>
+          <td style="text-align: center;">${c.brokerSharePct || c.realtorSharePct || 25}%</td>
+          <td style="font-weight: 600;">${App.utils.formatCurrency(c.brokerAmount || c.realtorAmount || 0)}</td>
           <td>${statusBadge}</td>
           <td style="font-size: 0.85rem; color: #6b7280;">${App.utils.formatDate(c.closingDate || c.createdAt)}</td>
         </tr>
@@ -1235,6 +1244,10 @@
     const broker = currentUser || App.auth.getCurrentUser();
     if (!realtor) {
       App.utils.showToast('Realtor no encontrado.', 'error');
+      return;
+    }
+    if (realtor.role === 'colaborador') {
+      App.generateReferralAgreementDoc(realtor);
       return;
     }
     // Use realtor's own contractCompanyData if submitted, otherwise fall back to Broker's company data

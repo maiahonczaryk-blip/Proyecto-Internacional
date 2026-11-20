@@ -265,60 +265,11 @@
           };
         }
 
-        // 3b. Personalized Buyer Guide on Admin Dashboard (Admin's own guide + quick switcher for any professional)
+        // 3b. Quick Access to Marketing & Document Customization Lab on Admin Dashboard
         const adminDashGuideWrap = document.getElementById('admin-dash-buyer-guide');
-        if (adminDashGuideWrap && App.buyerGuide) {
+        if (adminDashGuideWrap && App.marketingLab) {
           const freshAdmin = allUsers.find(u => u.id === currentUser.id) || currentUser;
-          const eligibleUsers = allUsers
-            .filter(u => u.id !== freshAdmin.id && ['agent_inmomas', 'embajador', 'broker', 'realtor', 'colaborador', 'admin'].includes(u.role))
-            .sort((a, b) => `${a.firstName || ''} ${a.lastName || ''}`.localeCompare(`${b.firstName || ''} ${b.lastName || ''}`));
-
-          const roleShort = {
-            admin: 'Admin',
-            agent_inmomas: 'Agente Inmomás',
-            embajador: 'Embajador',
-            broker: 'Broker',
-            realtor: 'Realtor',
-            colaborador: 'Colaborador'
-          };
-
-          const selectorOpts = [
-            `<option value="${App.utils.escapeHtml(freshAdmin.id)}">🛡️ Mi Guía de Administración (${App.utils.escapeHtml(`${freshAdmin.firstName || ''} ${freshAdmin.lastName || ''}`.trim() || freshAdmin.email)})</option>`,
-            ...eligibleUsers.map(u => {
-              const uName = `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email || u.id;
-              const rLbl = roleShort[u.role] || u.role;
-              return `<option value="${App.utils.escapeHtml(u.id)}">[${App.utils.escapeHtml(rLbl)}] ${App.utils.escapeHtml(uName)}${u.agencyName ? ' · ' + App.utils.escapeHtml(u.agencyName) : ''}</option>`;
-            })
-          ].join('');
-
-          adminDashGuideWrap.innerHTML = `
-            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
-              <div style="font-size:0.84rem; font-weight:700; color:#334155;">
-                👤 <span class="lang-en">Generate / Edit Buyer's Guide for:</span><span class="lang-es">Generar / Editar Guía del Comprador para:</span>
-              </div>
-              <select id="admin-dash-guide-user-select" class="form-select" style="width:auto; min-width:280px; max-width:100%; padding:7px 32px 7px 12px; font-size:0.85rem; font-weight:600; border-radius:9px; margin-bottom:0;">
-                ${selectorOpts}
-              </select>
-            </div>
-            <div id="admin-dash-buyer-guide-editor"></div>
-          `;
-
-          const editorTarget = document.getElementById('admin-dash-buyer-guide-editor');
-          const guideUserSel = document.getElementById('admin-dash-guide-user-select');
-          const mountSelectedGuide = (selectedId) => {
-            const chosen = selectedId === freshAdmin.id
-              ? freshAdmin
-              : (allUsers.find(u => u.id === selectedId) || freshAdmin);
-            App.buyerGuide.renderEditor(editorTarget, chosen, {
-              admin: chosen.id !== freshAdmin.id,
-              uid: 'admin-dash-' + chosen.id
-            });
-          };
-
-          mountSelectedGuide(freshAdmin.id);
-          if (guideUserSel) {
-            guideUserSel.onchange = (e) => mountSelectedGuide(e.target.value);
-          }
+          App.marketingLab.renderQuickCard(adminDashGuideWrap, freshAdmin, { route: 'admin/marketing' });
         }
       }
 
@@ -2132,7 +2083,7 @@
       `;
       const availableBrokers = allSysUsers.filter(u => u.role === 'broker' && u.status !== 'rejected' && u.id !== user.id);
       const brokerOptions = `
-        <option value="">-- Sin Broker (Agente Directo / Independiente) --</option>
+        <option value="">-- Sin Broker (Directo: 15 % Agente / 10 % Colaborador) --</option>
         ${availableBrokers.map(b => `
           <option value="${b.id}" ${currentBrkId === b.id ? 'selected' : ''}>
             🏢 ${App.utils.escapeHtml(b.firstName)} ${App.utils.escapeHtml(b.lastName)}${b.agencyName ? ' — ' + App.utils.escapeHtml(b.agencyName) : ''}
@@ -2198,7 +2149,7 @@
           </div>
 
           ${['embajador', 'colaborador', 'broker', 'realtor'].includes(user.role) ? (() => {
-            const uVar = (App.utils && App.utils.getAgreementVariantMeta) ? App.utils.getAgreementVariantMeta(user.role) : { icon: '📄', docNameEs: 'Acuerdo de Colaboración', exportBtnEs: 'Exportar Acuerdo (Word .doc)', roleLabelEs: user.role, accentColor: '#1e3a8a', accentBg: '#eff6ff', accentBorder: '#93c5fd' };
+            const uVar = (App.utils && App.utils.getAgreementVariantMeta) ? App.utils.getAgreementVariantMeta(user.role, user) : { icon: '📄', docNameEs: 'Acuerdo de Colaboración', exportBtnEs: 'Exportar Acuerdo (Word .doc)', roleLabelEs: user.role, accentColor: '#1e3a8a', accentBg: '#eff6ff', accentBorder: '#93c5fd' };
             return `
             <div style="background:${uVar.accentBg}; border:1px solid ${uVar.accentBorder}; border-radius:0.5rem; padding:0.9rem; margin-top:1rem; font-size:0.82rem;">
               <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:${user.contractCompanyData ? '0.6rem' : '0'};">
@@ -2302,32 +2253,32 @@
                 const p = App.utils.resolveUserUmbrellaParents ? App.utils.resolveUserUmbrellaParents(u, allSysUsers, modalLookup) : {};
                 return p.broker && p.broker.id === user.id;
               });
-              const candidateRealtors = allSysUsers.filter(u => u.role === 'realtor' && u.status !== 'rejected' && u.brokerId !== user.id);
+              const candidateRealtors = allSysUsers.filter(u => ['realtor', 'colaborador'].includes(u.role) && u.status !== 'rejected' && u.brokerId !== user.id);
               return `
                 <label style="font-weight: 700; font-size: 0.875rem; color: #003da5; display: block; margin-bottom: 0.5rem;">
                   🏢 Equipo bajo este Paraguas de Broker (${brkTeam.length} profesionales)
                 </label>
                 <div style="max-height: 130px; overflow-y: auto; font-size: 0.82rem; border: 1px solid #bfdbfe; border-radius: 0.45rem; padding: 0.55rem; background: #eff6ff; margin-bottom: 0.75rem;">
                   ${brkTeam.length === 0
-                    ? '<div style="color:#1e40af; text-align:center;">Aún no hay realtors registrados bajo este Broker.</div>'
-                    : '<ul style="margin:0; padding-left:1.1rem; color:#1e293b;">' + brkTeam.map(m => `<li><strong>${App.utils.escapeHtml(m.firstName)} ${App.utils.escapeHtml(m.lastName)}</strong> (${m.role}) — <span style="color:#64748b;">${App.utils.escapeHtml(m.email || '')}</span></li>`).join('') + '</ul>'
+                    ? '<div style="color:#1e40af; text-align:center;">Aún no hay agentes ni colaboradores registrados bajo este Broker.</div>'
+                    : '<ul style="margin:0; padding-left:1.1rem; color:#1e293b;">' + brkTeam.map(m => `<li><strong>${App.utils.escapeHtml(m.firstName)} ${App.utils.escapeHtml(m.lastName)}</strong> (${m.role === 'colaborador' ? 'Colaborador · 10%' : 'Agente · 25% Agencia'}) — <span style="color:#64748b;">${App.utils.escapeHtml(m.email || '')}</span></li>`).join('') + '</ul>'
                   }
                 </div>
-                <label style="font-weight: 600; font-size: 0.82rem; color: #1e3a8a; display: block; margin-bottom: 0.4rem;">Añadir Agente / Realtor a este Broker</label>
+                <label style="font-weight: 600; font-size: 0.82rem; color: #1e3a8a; display: block; margin-bottom: 0.4rem;">Añadir Agente o Colaborador a este Broker</label>
                 <div style="display: flex; gap: 0.5rem;">
                   <select id="broker-assign-realtor-select" class="form-control" style="flex: 1; padding: 0.375rem 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.84rem; background-color: white;">
-                    <option value="">-- Seleccionar Agente / Realtor --</option>
-                    ${candidateRealtors.map(r => `<option value="${r.id}">${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}${r.agencyName ? ' · ' + App.utils.escapeHtml(r.agencyName) : ''} (${App.utils.escapeHtml(r.email)})</option>`).join('')}
+                    <option value="">-- Seleccionar Agente o Colaborador --</option>
+                    ${candidateRealtors.map(r => `<option value="${r.id}">[${r.role === 'colaborador' ? 'Colaborador 10%' : 'Agente'}] ${App.utils.escapeHtml(r.firstName)} ${App.utils.escapeHtml(r.lastName)}${r.agencyName ? ' · ' + App.utils.escapeHtml(r.agencyName) : ''} (${App.utils.escapeHtml(r.email)})</option>`).join('')}
                   </select>
                   <button type="button" class="btn btn-primary btn-sm" id="broker-save-realtor-btn">Vincular</button>
                 </div>
-                <p style="font-size: 0.74rem; color: #64748b; margin-top: 0.35rem;">Si el agente ya estaba en el paraguas de un Embajador, este Broker se adjuntará automáticamente a ese mismo paraguas.</p>
+                <p style="font-size: 0.74rem; color: #64748b; margin-top: 0.35rem;">Si el profesional ya estaba en el paraguas de un Embajador, este Broker se adjuntará automáticamente a ese mismo paraguas.</p>
               `;
             })()}
           </div>
           ` : ''}
 
-          ${user.role === 'realtor' ? `
+          ${['realtor', 'colaborador'].includes(user.role) ? `
           <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem; margin-top: 1rem;">
             <label style="font-weight: 600; font-size: 0.875rem; color: #003da5; display: block; margin-bottom: 0.5rem;">🏢 Asignar Oficina / Paraguas de Broker</label>
             <div style="display: flex; gap: 0.5rem;">
@@ -2336,7 +2287,7 @@
               </select>
               <button type="button" class="btn btn-primary btn-sm" id="save-user-broker-btn">Vincular Broker</button>
             </div>
-            <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.4rem;">Si este agente entró con link de Embajador y luego se registra su Broker, al asignarlo aquí el Broker queda adjunto al paraguas del Embajador.</p>
+            <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.4rem;">${user.role === 'colaborador' ? 'Un Colaborador (10% a éxito) puede operar directamente, bajo un Broker o bajo un Embajador (nunca debajo de un Agente).' : 'Si no tiene Broker asignado, opera con Acuerdo Directo de Agente (15%). Con Broker asignado, opera vía Agencia (25%).'}</p>
           </div>
           ` : ''}
 
@@ -3195,7 +3146,7 @@
               </div>
               <div>
                 <label style="font-size: 0.75rem; color: #374151; font-weight: 600; display: block; margin-bottom: 4px;">Referral Share %</label>
-                <input type="number" id="financial-referral-pct" class="form-input" style="margin-bottom: 0; padding: 6px 8px; font-size: 0.85rem;" value="${client.referralSharePct || 25}">
+                <input type="number" id="financial-referral-pct" class="form-input" style="margin-bottom: 0; padding: 6px 8px; font-size: 0.85rem;" value="${client.referralSharePct !== undefined ? client.referralSharePct : ((App.utils && App.utils.getDefaultReferralSharePct) ? App.utils.getDefaultReferralSharePct(client, allUsers) : 25)}">
               </div>
             </div>
             <button class="btn btn-primary btn-sm" onclick="App.views.admin.handleSaveFinancials('${client.id}')" style="background: #059669; border-color: #059669; width: 100%;">
@@ -5020,9 +4971,9 @@
   }
 
   /* ── Dedicated Agreements View ── */
-  function getAdminAgreementVariant(role) {
+  function getAdminAgreementVariant(role, userObj) {
     if (App.utils && typeof App.utils.getAgreementVariantMeta === 'function') {
-      return App.utils.getAgreementVariantMeta(role);
+      return App.utils.getAgreementVariantMeta(role, userObj);
     }
     return {
       role: role || 'broker',
@@ -5050,10 +5001,10 @@
     const prevVal = sel.value || '';
     const contractRoles = ['embajador', 'colaborador', 'broker', 'realtor'];
     const groupLabels = {
-      embajador: '👑 Usuarios Registrados — Embajadores',
-      colaborador: '🤝 Usuarios Registrados — Colaboradores',
-      broker: '🏢 Usuarios Registrados — Brokers',
-      realtor: '🏠 Usuarios Registrados — Agentes / Realtors'
+      embajador: '👑 Usuarios Registrados — Embajadores (+15% Red)',
+      colaborador: '🤝 Usuarios Registrados — Colaboradores (10% a éxito)',
+      broker: '🏢 Usuarios Registrados — Brokers (25%)',
+      realtor: '🏠 Usuarios Registrados — Agentes (15% Directo / 25% vía Broker)'
     };
 
     let userGroupsHtml = '';
@@ -5062,9 +5013,9 @@
         .filter(u => u && String(u.role || '').toLowerCase() === rKey && u.status !== 'rejected')
         .sort((a, b) => `${a.firstName || ''} ${a.lastName || ''}`.localeCompare(`${b.firstName || ''} ${b.lastName || ''}`));
       if (rUsers.length === 0) return;
-      const vMeta = getAdminAgreementVariant(rKey);
       userGroupsHtml += `<optgroup label="${App.utils.escapeHtml(groupLabels[rKey])}">`;
       rUsers.forEach(u => {
+        const vMeta = getAdminAgreementVariant(rKey, u);
         const uName = `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email || u.id;
         const agencySuffix = (u.contractCompanyData && u.contractCompanyData.companyLegalName) || u.agencyName;
         const statusHint = u.agreementSigned || u.agreementStatus === 'signed'
@@ -5077,10 +5028,11 @@
 
     const templatesHtml = `
       <optgroup label="📄 Plantillas en Blanco según Rol">
-        <option value="template:embajador">👑 Plantilla en Blanco — Acuerdo de Embajador</option>
-        <option value="template:colaborador">🤝 Plantilla en Blanco — Acuerdo de Colaborador</option>
-        <option value="template:broker">🏢 Plantilla en Blanco — Acuerdo Marco de Broker</option>
-        <option value="template:realtor">🏠 Plantilla en Blanco — Acuerdo de Agente / Realtor</option>
+        <option value="template:embajador">👑 Plantilla en Blanco — Acuerdo de Embajador (+15%)</option>
+        <option value="template:colaborador">🤝 Plantilla en Blanco — Acuerdo de Colaborador (10% a éxito)</option>
+        <option value="template:broker">🏢 Plantilla en Blanco — Acuerdo Marco de Broker (25%)</option>
+        <option value="template:realtor_direct">🏠 Plantilla en Blanco — Acuerdo Directo de Agente (15%)</option>
+        <option value="template:realtor_broker">🏠 Plantilla en Blanco — Acuerdo de Agente vía Broker (25%)</option>
       </optgroup>
     `;
 
@@ -5125,7 +5077,7 @@
       }
     }
 
-    const vMeta = getAdminAgreementVariant(role);
+    const vMeta = getAdminAgreementVariant(role, targetUser);
 
     if (badgeEl) {
       badgeEl.style.background = vMeta.accentBg;
@@ -5249,7 +5201,7 @@
     list.innerHTML = notifications.map(n => {
       const matchedUser = (allUsers || []).find(usr => usr.id === n.userId);
       const effectiveRole = (matchedUser && matchedUser.role) || n.userRole || 'realtor';
-      const vMeta = getAdminAgreementVariant(effectiveRole);
+      const vMeta = getAdminAgreementVariant(effectiveRole, matchedUser);
       const cd = n.contractCompanyData || {};
       const hasFiscalData = Boolean(cd.companyLegalName || cd.taxId || cd.bankAccountNumber);
       const isVirtualNotif = String(n.id || '').startsWith('user_notif_');
@@ -5340,7 +5292,7 @@
     }
 
     tbody.innerHTML = users.map(u => {
-      const vMeta = getAdminAgreementVariant(u.role);
+      const vMeta = getAdminAgreementVariant(u.role, u);
       const cd = u.contractCompanyData || {};
       const companySummary = cd.companyLegalName
         ? `<div><strong>${App.utils.escapeHtml(cd.companyLegalName)}</strong></div><div style="font-size:0.75rem;color:#6b7280;">ID: ${App.utils.escapeHtml(cd.taxId || '—')} · ${App.utils.escapeHtml(cd.country || cd.fiscalCountry || '')}</div>`
