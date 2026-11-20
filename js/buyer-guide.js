@@ -29,6 +29,7 @@ App.buyerGuide = (function() {
         broker: 'Broker Inmobiliario',
         realtor: 'Agente Inmobiliario / Realtor',
         colaborador: 'Colaborador Oficial',
+        partner: 'Partner Oficial',
         agent_inmomas: 'Agente Inmobiliario',
         admin: 'Dirección Internacional'
       },
@@ -47,6 +48,7 @@ App.buyerGuide = (function() {
         broker: 'Real Estate Broker',
         realtor: 'Real Estate Agent / Realtor',
         colaborador: 'Official Partner',
+        partner: 'Official Partner',
         agent_inmomas: 'Real Estate Agent',
         admin: 'International Advisory'
       },
@@ -65,6 +67,7 @@ App.buyerGuide = (function() {
         broker: 'Real Estate Broker',
         realtor: 'Real Estate Agent / Realtor',
         colaborador: 'Official Partner',
+        partner: 'Official Partner',
         agent_inmomas: 'Real Estate Agent',
         admin: 'International Advisory'
       },
@@ -83,6 +86,7 @@ App.buyerGuide = (function() {
         broker: 'Courtier Immobilier',
         realtor: 'Agent Immobilier',
         colaborador: 'Partenaire Officiel',
+        partner: 'Partenaire Officiel',
         agent_inmomas: 'Agent Immobilier',
         admin: 'Direction Internationale'
       },
@@ -93,7 +97,7 @@ App.buyerGuide = (function() {
     }
   };
 
-  const ALLOWED_ROLES = ['embajador', 'broker', 'realtor', 'colaborador', 'agent_inmomas', 'admin'];
+  const ALLOWED_ROLES = ['embajador', 'broker', 'realtor', 'colaborador', 'partner', 'agent_inmomas', 'admin'];
 
   function canUse(user) {
     return !!(user && ALLOWED_ROLES.includes(user.role));
@@ -111,21 +115,21 @@ App.buyerGuide = (function() {
 
   // Coordenadas (puntos PDF, origen ARRIBA-izquierda; página A4 594.96 x 841.92)
   const LAYOUT = {
-    // Pág. 13 — bloque de firma dentro de la tarjeta blanca de la carta
+    // Pág. 15 — bloque de firma dentro de la tarjeta blanca de la carta
     sig: {
-      cover: { x: 47, top: 393, right: 346, bottom: 497 },
+      cover: { x: 47, top: 380, right: 346, bottom: 497 },
       photo: { x: 56, top: 400, size: 60 },
       textX: 128,
       textMaxWidth: 212,
       name: 414, title: 428, lines: [444, 457, 470]
     },
-    // Pág. 14 — tarjeta sobre los botones de contacto
+    // Pág. 16 — tarjeta sobre los botones de contacto
     card: {
-      x: 97.5, top: 508, width: 400, height: 158, radius: 14,
-      photo: { x: 120, top: 535, size: 104 },
+      x: 97.5, top: 500, width: 400, height: 166, radius: 14,
+      photo: { x: 120, top: 531, size: 104 },
       textX: 248,
       textMaxWidth: 232,
-      label: 548, name: 571, title: 587, lines: [610, 625, 640]
+      label: 544, name: 567, title: 583, lines: [606, 621, 636]
     }
   };
 
@@ -152,7 +156,7 @@ App.buyerGuide = (function() {
     return pdfLibPromise;
   }
 
-  const TEMPLATE_VERSION = '20261119_v5';
+  const TEMPLATE_VERSION = '20261119_v6';
 
   function loadTemplate(lang) {
     const cfg = LANGS[lang] || LANGS.es;
@@ -197,7 +201,7 @@ App.buyerGuide = (function() {
     });
   }
 
-  /** Recorta en cuadrado (sesgado hacia la cara en retratos) y reduce a 640px JPEG (ligero para Firestore). */
+  /** Recorta en cuadrado (sesgado hacia la cara en retratos) y reduce a 480px JPEG (ligero para Firestore y caché local). */
   async function processPhotoFile(file) {
     if (!file || !/^image\//.test(file.type)) throw new Error('Selecciona un archivo de imagen (JPG o PNG).');
     if (file.size > 15 * 1024 * 1024) throw new Error('La imagen es demasiado grande (máx. 15MB).');
@@ -205,7 +209,7 @@ App.buyerGuide = (function() {
     const side = Math.min(img.width, img.height);
     const sx = (img.width - side) / 2;
     const sy = img.height > img.width ? Math.max(0, (img.height - side) * 0.2) : (img.height - side) / 2;
-    const OUT = 640;
+    const OUT = 480;
     const canvas = document.createElement('canvas');
     canvas.width = OUT; canvas.height = OUT;
     const ctx = canvas.getContext('2d');
@@ -213,7 +217,7 @@ App.buyerGuide = (function() {
     ctx.fillRect(0, 0, OUT, OUT);
     ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img, sx, sy, side, side, 0, 0, OUT, OUT);
-    return canvas.toDataURL('image/jpeg', 0.86);
+    return canvas.toDataURL('image/jpeg', 0.84);
   }
 
   /** Convierte la foto en un PNG circular (con transparencia) para el PDF. */
@@ -236,8 +240,28 @@ App.buyerGuide = (function() {
 
   /* ---------- Data ---------- */
 
+  function loadLocalGuideCache(userId) {
+    if (!userId) return null;
+    try {
+      const raw = localStorage.getItem('remax_buyer_guide_' + userId);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function saveLocalGuideCache(userId, guideObj) {
+    if (!userId || !guideObj) return;
+    try {
+      localStorage.setItem('remax_buyer_guide_' + userId, JSON.stringify(guideObj));
+    } catch (e) { /* quota */ }
+  }
+
   function getGuideData(user, overrides) {
-    const g = (user && user.buyerGuide) || {};
+    const remote = (user && user.buyerGuide) || {};
+    const local = (user && user.id) ? (loadLocalGuideCache(user.id) || {}) : {};
+    const preferLocal = !!(local.updatedAt && (!remote.updatedAt || local.updatedAt >= remote.updatedAt));
+    const g = preferLocal ? Object.assign({}, remote, local) : Object.assign({}, local, remote);
     const profileName = `${(user && user.firstName) || ''} ${(user && user.lastName) || ''}`.trim();
     const data = {
       role: (user && user.role) || 'agent_inmomas',
@@ -313,7 +337,7 @@ App.buyerGuide = (function() {
           const u = action && action.get(PDFName.of('URI'));
           uri = u ? (u.decodeText ? u.decodeText() : String(u)) : '';
         } catch (e) { /* not a link */ }
-        if (/jose\.martinez|remaxinmomas\.com/i.test(uri)) return;
+        if (/jose\.martinez|remaxinmomas\.com|647861968/i.test(uri)) return;
         keep.push(ref);
       });
       page.node.set(PDFName.of('Annots'), keep);
@@ -417,21 +441,39 @@ App.buyerGuide = (function() {
   }
 
   function triggerDownload(bytes, fileName) {
-    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const pdfBytes = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
+    a.style.display = 'none';
     a.href = url;
     a.download = fileName;
     document.body.appendChild(a);
     a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    setTimeout(() => {
+      a.remove();
+      URL.revokeObjectURL(url);
+    }, 60000);
   }
 
   async function download(user, lang = 'es', overrides) {
     const data = getGuideData(user, overrides);
     const bytes = await generatePdf(data, lang);
     triggerDownload(bytes, fileNameFor(data, lang));
+  }
+
+  async function openInNewTab(user, lang = 'es', overrides, targetWin = null) {
+    const data = getGuideData(user, overrides);
+    const bytes = await generatePdf(data, lang);
+    const pdfBytes = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    if (targetWin && !targetWin.closed) {
+      targetWin.location.href = url;
+    } else {
+      window.open(url, '_blank', 'noopener');
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
   }
 
   /* ---------- Editor UI (Dashboards, Documentos, Perfil y Admin) ---------- */
@@ -535,6 +577,9 @@ App.buyerGuide = (function() {
               <button type="button" class="btn btn-primary" id="${uid}-download-btn" style="font-weight:700;">
                 📥 <span class="lang-en">Download Personalized Guide (PDF)</span><span class="lang-es">Descargar Guía Personalizada (PDF)</span>
               </button>
+              <button type="button" class="btn btn-outline" id="${uid}-open-pdf-btn" style="background:#fff; font-weight:600;">
+                📄 <span class="lang-en">Open PDF in Tab</span><span class="lang-es">Abrir PDF en Pestaña</span>
+              </button>
               <button type="button" class="btn btn-outline" id="${uid}-save-btn" style="background:#fff;">
                 💾 <span class="lang-en">Save Details</span><span class="lang-es">Guardar Datos</span>
               </button>
@@ -592,7 +637,26 @@ App.buyerGuide = (function() {
     };
 
     const save = async (silent) => {
-      const saved = await App.auth.updateBuyerGuideProfile(user.id, readForm());
+      const formPayload = readForm();
+      const fallbackSaved = {
+        name: String(formPayload.name || '').trim(),
+        title: String(formPayload.title || '').trim(),
+        mobile: String(formPayload.mobile || '').trim(),
+        email: String(formPayload.email || '').trim(),
+        website: String(formPayload.website || '').trim(),
+        photo: formPayload.photo || null,
+        updatedAt: new Date().toISOString()
+      };
+      saveLocalGuideCache(user.id, fallbackSaved);
+
+      let saved = fallbackSaved;
+      if (App.auth && typeof App.auth.updateBuyerGuideProfile === 'function') {
+        try {
+          saved = await App.auth.updateBuyerGuideProfile(user.id, formPayload);
+        } catch (err) {
+          console.warn('[BuyerGuide] Cloud save fallback to local cache:', err);
+        }
+      }
       user.buyerGuide = saved;
       window.dispatchEvent(new CustomEvent('buyerGuideUpdated', {
         detail: { userId: user.id, sourceUid: uid, buyerGuide: saved }
@@ -643,7 +707,8 @@ App.buyerGuide = (function() {
     $('download-btn').onclick = async () => {
       const btn = $('download-btn');
       const old = btn.innerHTML;
-      const missing = getMissing(getGuideData(user, readForm()));
+      const formValues = readForm();
+      const missing = getMissing(getGuideData(user, formValues));
       if (missing.length) {
         App.utils.showToast('Completa antes: ' + missing.map(m => m.es).join(', '), 'error');
         return;
@@ -651,8 +716,12 @@ App.buyerGuide = (function() {
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Generando guía PDF...';
       try {
-        await save(true);
-        await download(user, $('lang').value);
+        try {
+          await save(true);
+        } catch (saveErr) {
+          console.warn('[BuyerGuide] Save skipped during download:', saveErr);
+        }
+        await download(user, $('lang').value, formValues);
         App.utils.showToast('Guía personalizada generada y descargada 📘', 'success');
       } catch (err) {
         console.error('[BuyerGuide] Error:', err);
@@ -663,6 +732,39 @@ App.buyerGuide = (function() {
         syncLangVisibility();
       }
     };
+
+    const openPdfBtn = $('open-pdf-btn');
+    if (openPdfBtn) {
+      openPdfBtn.onclick = async () => {
+        const old = openPdfBtn.innerHTML;
+        const formValues = readForm();
+        const missing = getMissing(getGuideData(user, formValues));
+        if (missing.length) {
+          App.utils.showToast('Completa antes: ' + missing.map(m => m.es).join(', '), 'error');
+          return;
+        }
+        const preWin = window.open('about:blank', '_blank');
+        openPdfBtn.disabled = true;
+        openPdfBtn.innerHTML = '<span class="spinner"></span> Abriendo PDF...';
+        try {
+          try {
+            await save(true);
+          } catch (saveErr) {
+            console.warn('[BuyerGuide] Save skipped during open:', saveErr);
+          }
+          await openInNewTab(user, $('lang').value, formValues, preWin);
+          App.utils.showToast('Guía personalizada abierta en una nueva pestaña 📄', 'success');
+        } catch (err) {
+          if (preWin && !preWin.closed) preWin.close();
+          console.error('[BuyerGuide] Open error:', err);
+          App.utils.showToast(err.message || 'Error al abrir la guía.', 'error');
+        } finally {
+          openPdfBtn.disabled = false;
+          openPdfBtn.innerHTML = old;
+          syncLangVisibility();
+        }
+      };
+    }
 
     refreshUI();
   }
@@ -675,7 +777,13 @@ App.buyerGuide = (function() {
     getMissing,
     generatePdf,
     download,
+    openInNewTab,
     renderEditor,
-    processPhotoFile
+    processPhotoFile,
+    loadPdfLib,
+    circlePngBytes,
+    saveLocalGuideCache,
+    pdfSafe,
+    triggerDownload
   };
 })();

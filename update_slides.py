@@ -19,7 +19,7 @@ agents_html = """
           <div style="font-size:.5rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Broker RE/MAX Inmomás</div>
           <div style="font-size:.55rem;color:var(--charcoal);line-height:1.4;">
             <div>📧 jose.martinez@remax.es</div>
-            <div>📞 +34 966 665 651</div>
+            <div>📞 +34 647 86 19 68</div>
           </div>
         </div>
       </div>

@@ -46,9 +46,10 @@
       }
 
       // Load data scoped to this local agent or colaborador
-      const clientFilter = currentUser.role === 'colaborador' ? { referredBy: currentUser.id } : { localAgentId: currentUser.id };
+      const isColaborador = currentUser.role === 'colaborador';
+      const clientFilter = isColaborador ? { referredBy: currentUser.id } : { localAgentId: currentUser.id };
       agentClients = await App.auth.getClients(clientFilter);
-      agentCommissions = await App.auth.getCommissions({ agentId: currentUser.id });
+      agentCommissions = await App.auth.getCommissions(isColaborador ? { realtorId: currentUser.id } : { agentId: currentUser.id });
       allUsers = await App.auth.getAllUsers();
       const freshMe = allUsers.find(u => u.id === currentUser.id) || currentUser;
 
@@ -60,7 +61,7 @@
       // Calculate metrics
       const activeCount = agentClients.filter(c => !['completed', 'closed'].includes(c.status)).length;
       const closedCount = agentClients.filter(c => ['completed', 'closed'].includes(c.status)).length;
-      const totalEarned = agentCommissions.reduce((sum, c) => sum + (c.agentAmount || 0), 0);
+      const totalEarned = agentCommissions.reduce((sum, c) => sum + (isColaborador ? (c.realtorAmount || 0) : (c.agentAmount || 0)), 0);
 
       // Update stat cards
       setTextById('agent-stat-clients', agentClients.length);
@@ -134,20 +135,33 @@
 
       const copyEmbBtn = document.getElementById('agent-dash-copy-embajador-link');
       if (copyEmbBtn) {
-        if (isPending) {
-          copyEmbBtn.disabled = true;
-          copyEmbBtn.style.opacity = '0.5';
-          copyEmbBtn.style.cursor = 'not-allowed';
-          copyEmbBtn.onclick = null;
+        const embCard = copyEmbBtn.closest('.glass-card') || copyEmbBtn.parentElement;
+        if (isColaborador) {
+          if (embCard && embCard !== copyEmbBtn.closest('.dashboard-section')) {
+            embCard.style.display = 'none';
+          } else {
+            copyEmbBtn.style.display = 'none';
+          }
         } else {
-          copyEmbBtn.disabled = false;
-          copyEmbBtn.style.opacity = '';
-          copyEmbBtn.style.cursor = 'pointer';
-          copyEmbBtn.onclick = () => {
-            const embUrl = `${referralLink}&type=embajador`;
-            App.utils.copyToClipboard(embUrl);
-            App.utils.showToast('👑 Enlace directo de postulación como Embajador copiado al portapapeles', 'success');
-          };
+          if (embCard && embCard !== copyEmbBtn.closest('.dashboard-section')) {
+            embCard.style.display = '';
+          }
+          copyEmbBtn.style.display = '';
+          if (isPending) {
+            copyEmbBtn.disabled = true;
+            copyEmbBtn.style.opacity = '0.5';
+            copyEmbBtn.style.cursor = 'not-allowed';
+            copyEmbBtn.onclick = null;
+          } else {
+            copyEmbBtn.disabled = false;
+            copyEmbBtn.style.opacity = '';
+            copyEmbBtn.style.cursor = 'pointer';
+            copyEmbBtn.onclick = () => {
+              const embUrl = `${referralLink}&type=embajador`;
+              App.utils.copyToClipboard(embUrl);
+              App.utils.showToast('👑 Enlace directo de postulación como Embajador copiado al portapapeles', 'success');
+            };
+          }
         }
       }
 
@@ -190,10 +204,11 @@
         }
       }
 
-      // Personalized Buyer Guide (RE/MAX Inmomás Agents & Collaborators)
+      // Marketing Lab Quick Access (RE/MAX Inmomás Agents & Collaborators)
       const agentDashGuide = document.getElementById('agent-dash-buyer-guide');
-      if (agentDashGuide && App.buyerGuide && App.buyerGuide.canUse(freshMe || currentUser)) {
-        App.buyerGuide.renderEditor(agentDashGuide, freshMe || currentUser);
+      if (agentDashGuide && App.marketingLab) {
+        const activeUser = freshMe || currentUser;
+        App.marketingLab.renderQuickCard(agentDashGuide, activeUser, { route: `${activeUser.role}/marketing` });
       }
 
     } catch (err) {
@@ -700,6 +715,11 @@
             </div>
           </div>
 
+          ${currentUser && currentUser.role === 'colaborador' ? `
+          <div style="background: rgba(91, 33, 182, 0.05); border: 1px solid rgba(91, 33, 182, 0.15); padding: 14px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.85rem; color: #4c1d95;">
+            🤝 <strong>Acuerdo de Colaborador (10% a éxito):</strong> Tus honorarios por referido equivalen al <strong>10%</strong> de la comisión bruta del lado comprador efectivamente cobrada tras el cierre ante Notario.
+          </div>
+          ` : `
           <!-- Financial Settings -->
           <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.15); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
             <h4 style="margin: 0 0 12px; font-size: 0.9rem; color: #059669; text-transform: uppercase; font-weight: 600;">💰 Financial Settings (Configuración Financiera)</h4>
@@ -714,7 +734,7 @@
               </div>
               <div>
                 <label style="font-size: 0.75rem; color: #374151; font-weight: 600; display: block; margin-bottom: 4px;">Referral Share %</label>
-                <input type="number" id="financial-referral-pct" class="form-input" style="margin-bottom: 0; padding: 6px 8px; font-size: 0.85rem;" value="${client.referralSharePct || 25}">
+                <input type="number" id="financial-referral-pct" class="form-input" style="margin-bottom: 0; padding: 6px 8px; font-size: 0.85rem;" value="${client.referralSharePct !== undefined ? client.referralSharePct : ((App.utils && App.utils.getDefaultReferralSharePct) ? App.utils.getDefaultReferralSharePct(client, allUsers) : 25)}">
               </div>
             </div>
             <button class="btn btn-primary btn-sm" onclick="App.views.agentInmomas.handleSaveFinancials('${client.id}')" style="background: #059669; border-color: #059669; width: 100%;">
@@ -722,7 +742,7 @@
             </button>
           </div>
 
-          <div style="background: white; border-radius: 0.5rem; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top: 1rem;">
+          <div style="background: white; border-radius: 0.5rem; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top: 1rem; margin-bottom: 1rem;">
             <h4 style="margin: 0 0 1rem; font-size: 0.9rem; color: #374151; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem;">🤝 Partner Access</h4>
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
               <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #4b5563; cursor: pointer;">
@@ -742,6 +762,7 @@
               💾 Save Partners
             </button>
           </div>
+          `}
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.875rem; margin-bottom: 1.5rem;">
             <div>
@@ -832,13 +853,15 @@
       currentUser = App.auth.getCurrentUser();
       if (!currentUser) return;
 
-      agentCommissions = await App.auth.getCommissions({ agentId: currentUser.id });
+      const isColaborador = currentUser.role === 'colaborador';
+      agentCommissions = await App.auth.getCommissions(isColaborador ? { realtorId: currentUser.id } : { agentId: currentUser.id });
 
       // Calculate summary metrics
-      const totalEarned = agentCommissions.reduce((sum, c) => sum + (c.agentAmount || 0), 0);
-      const paidEarned = agentCommissions.filter(c => c.status === 'paid').reduce((sum, c) => sum + (c.agentAmount || 0), 0);
+      const getAmt = (c) => isColaborador ? (c.realtorAmount || 0) : (c.agentAmount || 0);
+      const totalEarned = agentCommissions.reduce((sum, c) => sum + getAmt(c), 0);
+      const paidEarned = agentCommissions.filter(c => c.status === 'paid').reduce((sum, c) => sum + getAmt(c), 0);
       const pendingEarned = agentCommissions.filter(c => c.status === 'pending_payment' || c.status === 'projected')
-                                            .reduce((sum, c) => sum + (c.agentAmount || 0), 0);
+                                            .reduce((sum, c) => sum + getAmt(c), 0);
 
       // Update summary cards
       setTextById('agent-fin-total', App.utils.formatCurrency(totalEarned));
@@ -873,10 +896,27 @@
       return;
     }
 
+    const isColaborador = currentUser && currentUser.role === 'colaborador';
     tbody.innerHTML = commissions.map(c => {
       const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(c.status)}">${App.utils.getStatusLabel(c.status)}</span>`;
 
-      // Spain share is the remaining commission (usually 75%)
+      if (isColaborador) {
+        const colPct = c.realtorSharePct || 10;
+        const colAmt = c.realtorAmount !== undefined ? c.realtorAmount : ((c.totalCommission || 0) * (colPct / 100));
+        return `
+          <tr>
+            <td style="font-weight: 500;">${App.utils.escapeHtml(c.clientName)}</td>
+            <td style="font-size: 0.85rem;">${App.utils.escapeHtml(c.propertyAddress || '—')}</td>
+            <td>${App.utils.formatCurrency(c.salePrice)}</td>
+            <td>${App.utils.formatCurrency(c.totalCommission)}</td>
+            <td style="text-align: center;">${colPct}%</td>
+            <td style="font-weight: 600; color: #10b981;">${App.utils.formatCurrency(colAmt)}</td>
+            <td>${statusBadge}</td>
+          </tr>
+        `;
+      }
+
+      // Spain share is the remaining commission
       const spainCommAmount = c.totalCommission - (c.realtorAmount || 0);
 
       return `
@@ -1045,8 +1085,8 @@
     if (!currentUser) return;
 
     const docsGuideEl = document.getElementById('colaborador-docs-buyer-guide');
-    if (docsGuideEl && App.buyerGuide && App.buyerGuide.canUse(currentUser)) {
-      App.buyerGuide.renderEditor(docsGuideEl, currentUser);
+    if (docsGuideEl) {
+      docsGuideEl.style.display = 'none';
     }
 
     const contractContainer = document.getElementById('colaborador-contract-section');

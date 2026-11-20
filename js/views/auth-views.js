@@ -458,12 +458,14 @@ App.views.auth = {
       }
     }
 
-    // 7b. Personalized Buyer Guide (All Professionals + Admins)
+    // 7b. Marketing Lab Quick Card on Profile (centralized in #<role>/marketing)
     const guideSection = document.getElementById('profile-buyer-guide-section');
     if (guideSection) {
       const canUseGuide = App.buyerGuide && App.buyerGuide.canUse(user);
       guideSection.style.display = canUseGuide ? 'block' : 'none';
-      if (canUseGuide) App.buyerGuide.renderEditor(guideSection, user);
+      if (canUseGuide && App.marketingLab) {
+        App.marketingLab.renderQuickCard(guideSection, user, { route: `${user.role}/marketing` });
+      }
     }
 
     // 8. Calculate and Display Dynamic Statistics
@@ -607,20 +609,22 @@ App.views.auth = {
             </div>
           `;
         } else if (user.role === 'agent_inmomas' || user.role === 'colaborador') {
-          const clientFilter = user.role === 'colaborador' ? { referredBy: user.id } : { localAgentId: user.id };
+          const isColab = user.role === 'colaborador';
+          const clientFilter = isColab ? { referredBy: user.id } : { localAgentId: user.id };
           const clients = await App.auth.getClients(clientFilter);
-          const commissions = await App.auth.getCommissions({ agentId: user.id });
+          const commissions = await App.auth.getCommissions(isColab ? { realtorId: user.id } : { agentId: user.id });
 
           const activeClients = clients.filter(c => c.status !== 'closed' && c.status !== 'rejected').length;
           const closedClients = clients.filter(c => c.status === 'closed').length;
 
+          const getStatAmt = (c) => isColab ? (c.realtorAmount || 0) : (c.agentAmount || 0);
           const totalProjected = commissions
-            .filter(c => c.status === 'projected')
-            .reduce((sum, c) => sum + (c.agentAmount || 0), 0);
+            .filter(c => c.status === 'projected' || c.status === 'pending_payment')
+            .reduce((sum, c) => sum + getStatAmt(c), 0);
 
           const totalPaid = commissions
             .filter(c => c.status === 'paid')
-            .reduce((sum, c) => sum + (c.agentAmount || 0), 0);
+            .reduce((sum, c) => sum + getStatAmt(c), 0);
 
           statsHTML = `
             <div class="profile-stat-card">
@@ -719,19 +723,30 @@ App.views.auth = {
       // Populate brokers
       const brokerSelect = newForm.querySelector('#register-broker');
       if (brokerSelect) {
-        brokerSelect.innerHTML = '<option value="">Independent / No broker</option>';
-        const brokers = App.demoData.users.filter(u => u.role === 'broker' && u.status === 'active');
-        brokers.forEach(b => {
-          const opt = document.createElement('option');
-          opt.value = b.id;
-          opt.textContent = `${b.firstName} ${b.lastName} - ${b.agencyName || 'Independent'}`;
-          brokerSelect.appendChild(opt);
-        });
-        // Add 'Other' option at the end
-        const otherOpt = document.createElement('option');
-        otherOpt.value = 'other';
-        otherOpt.textContent = 'Otro / Other (enter manually)';
-        brokerSelect.appendChild(otherOpt);
+        const populateBrokerSelect = (brokersList) => {
+          const currentVal = brokerSelect.value;
+          brokerSelect.innerHTML = '<option value="">Acuerdo Directo con Agente (15%) / Sin Broker</option>';
+          brokersList.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b.id;
+            opt.textContent = `${b.firstName} ${b.lastName} - ${b.agencyName || 'Brokerage (25%)'}`;
+            brokerSelect.appendChild(opt);
+          });
+          const otherOpt = document.createElement('option');
+          otherOpt.value = 'other';
+          otherOpt.textContent = 'Otro Broker / Agencia (introducir manualmente — 25%)';
+          brokerSelect.appendChild(otherOpt);
+          if (currentVal) brokerSelect.value = currentVal;
+        };
+
+        const initialBrokers = (App.demoData && App.demoData.users ? App.demoData.users : []).filter(u => u.role === 'broker' && u.status === 'active');
+        populateBrokerSelect(initialBrokers);
+        if (App.auth && typeof App.auth.getAllUsers === 'function') {
+          App.auth.getAllUsers({ role: 'broker' }).then(list => {
+            const activeBrokers = (list || []).filter(u => u.role === 'broker' && u.status === 'active');
+            if (activeBrokers.length > 0) populateBrokerSelect(activeBrokers);
+          }).catch(() => {});
+        }
 
         // Show/hide manual fields when 'other' is selected
         const brokerManualGroup = newForm.querySelector('#broker-manual-group');

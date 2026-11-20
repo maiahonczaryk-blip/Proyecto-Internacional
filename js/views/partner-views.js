@@ -48,6 +48,11 @@ App.views.partner = (function() {
         App.referralBranding.renderEditor(partnerDashBranding, user, { compact: true });
       }
 
+      const partnerMarketingQuick = document.getElementById('partner-dash-marketing-lab');
+      if (partnerMarketingQuick && App.marketingLab) {
+        App.marketingLab.renderQuickCard(partnerMarketingQuick, user, { route: 'partner/marketing' });
+      }
+
       // Account Settings / Email Logic
       const emailInput = document.getElementById('partner-email');
       const saveEmailBtn = document.getElementById('btn-partner-save-email');
