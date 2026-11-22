@@ -1,0 +1,4 @@
+# Artefactos generados (voces, fragmentos, vistas previas y vídeos finales)
+build/
+salida/
+__pycache__/

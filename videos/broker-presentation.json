@@ -1,0 +1,23 @@
+{
+ "id": "broker-presentation",
+ "width": 1920,
+ "height": 1080,
+ "fps": 30,
+ "duration": 107.2,
+ "card": {
+  "x": 120,
+  "y": 740,
+  "w": 1080,
+  "h": 210,
+  "r": 26,
+  "t0": 99.674,
+  "animDur": 0.75,
+  "dist": 46
+ },
+ "sceneEnd": 102.85,
+ "wipe": {
+  "trans": 0.8,
+  "skew": 300,
+  "ext": 460
+ }
+}
