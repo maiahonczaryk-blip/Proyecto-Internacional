@@ -1071,6 +1071,9 @@ App.marketingLab = (function() {
           </div>
         </div>
       ` : ''}
+
+      <!-- 4. VÍDEOS PERSONALIZADOS (EN) -->
+      <div id="${uid}-videos"></div>
     `;
 
     const $ = (suffix) => container.querySelector(`#${uid}-${suffix}`);
@@ -1318,6 +1321,34 @@ App.marketingLab = (function() {
       window.removeEventListener('buyerGuideUpdated', onGuideSync);
       window.removeEventListener('agencyBrandingUpdated', onBrandingSync);
     };
+
+    // Vídeos personalizados: la tarjeta de contacto final se genera con la identidad del usuario
+    if (App.marketingVideos && $('videos')) {
+      App.marketingVideos.renderSection($('videos'), targetUser, {
+        isAdminViewer,
+        getCardData: () => {
+          const d = App.buyerGuide.getGuideData(targetUser, readForm());
+          if (App.buyerGuide.getMissing(d).length) return null;
+          return {
+            name: App.buyerGuide.pdfSafe(d.name),
+            title: getEffectiveTitle(Object.assign({}, d, { agencyName: targetUser.agencyName || '' }), 'en'),
+            mobile: d.mobile,
+            email: d.email,
+            photo: d.photo,
+            agencyLogo: targetUser.agencyLogo || null
+          };
+        },
+        onMissing: () => {
+          const missing = App.buyerGuide.getMissing(App.buyerGuide.getGuideData(targetUser, readForm()));
+          const msg = isEnglishUI()
+            ? 'Please complete first: ' + missing.map(m => m.en).join(', ')
+            : 'Completa antes en el Paso 1: ' + missing.map(m => m.es).join(', ');
+          if (App.utils) App.utils.showToast(msg, 'error');
+          if (!currentPhoto && $('photo-btn')) $('photo-btn').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        },
+        beforeExport: () => persistIdentity(true)
+      });
+    }
 
     refreshStatus();
   }

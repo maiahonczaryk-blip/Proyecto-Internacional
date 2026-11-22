@@ -1,0 +1,23 @@
+{
+ "id": "ambassador-presentation",
+ "width": 1920,
+ "height": 1080,
+ "fps": 30,
+ "duration": 95.514,
+ "card": {
+  "x": 120,
+  "y": 740,
+  "w": 1080,
+  "h": 210,
+  "r": 26,
+  "t0": 86.184,
+  "animDur": 0.75,
+  "dist": 46
+ },
+ "sceneEnd": 91.164,
+ "wipe": {
+  "trans": 0.8,
+  "skew": 300,
+  "ext": 460
+ }
+}
