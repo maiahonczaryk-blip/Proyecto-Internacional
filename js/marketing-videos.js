@@ -16,7 +16,7 @@
 window.App = window.App || {};
 
 App.marketingVideos = (function () {
-  const VERSION = '20261123_v2';
+  const VERSION = '20261123_v3';
   const BASE = 'videos/';
   const PAD = 46; // margen de sombra (igual que el motor de render)
 
@@ -551,7 +551,6 @@ App.marketingVideos = (function () {
     if (!list.length) { container.innerHTML = ''; return; }
     const hasWebCodecs = !!(window.VideoEncoder && window.VideoDecoder);
     const lang = curLang();
-    const langBtn = (code, label) => `<button type="button" data-video-lang="${code}" style="border:none; cursor:pointer; padding:6px 12px; font-size:0.78rem; font-weight:700; border-radius:999px; ${lang === code ? 'background:#0672C5; color:#fff;' : 'background:transparent; color:#334155;'}">${label}</button>`;
 
     container.innerHTML = `
       <div class="dashboard-section" style="margin-top:1.5rem;">
@@ -563,15 +562,9 @@ App.marketingVideos = (function () {
             <span class="lang-en">Explainer Videos With Your Contact Card</span>
             <span class="lang-es">Vídeos explicativos con tu tarjeta de contacto</span>
           </h2>
-          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:6px 0 8px;">
-            <span style="font-size:0.78rem; font-weight:700; color:#475569;"><span class="lang-en">Video language:</span><span class="lang-es">Idioma del vídeo:</span></span>
-            <div style="display:inline-flex; gap:2px; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:999px; padding:3px;">
-              ${langBtn('en', '🇺🇸 English')}${langBtn('es', '🇪🇸 Español')}
-            </div>
-          </div>
           <p style="margin:0; font-size:0.83rem; color:#475569;">
-            <span class="lang-en">Animated 1080p videos with voice-over. When exported, the closing scene shows your photo, name, role, phone and email.</span>
-            <span class="lang-es">Vídeos animados en 1080p con voz en off. Al exportarlos, la escena final muestra tu foto, nombre, cargo, teléfono y email.</span>
+            <span class="lang-en">Animated 1080p videos with voice-over, available in English and Spanish. When exported, the closing scene shows your photo, name, role, phone and email.</span>
+            <span class="lang-es">Vídeos animados en 1080p con voz en off, disponibles en español y en inglés. Al exportarlos, la escena final muestra tu foto, nombre, cargo, teléfono y email.</span>
           </p>
           ${hasWebCodecs ? '' : `<p style="margin:8px 0 0; font-size:0.78rem; color:#92400e; background:#fef3c7; border:1px solid #fde68a; border-radius:8px; padding:6px 10px; display:inline-block;">
             ⏱️ <span class="lang-en">Your browser will record the video in real time (keep this tab open). For a faster export use Chrome, Edge or Safari 17+.</span>
@@ -580,7 +573,7 @@ App.marketingVideos = (function () {
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1.15rem;">
           ${list.map(v0 => { const v = localized(v0, lang); return `
             <div style="background:#fff; border:1px solid #e2e8f0; border-top:4px solid ${v.accent}; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 4px 14px rgba(15,23,42,0.04);">
-              <button type="button" data-video-preview="${esc(v.baseId)}" style="position:relative; border:none; padding:0; cursor:pointer; background:#0c1c30; aspect-ratio:16/9; display:block;">
+              <button type="button" data-video-preview="${esc(v.baseId)}" data-lang="${lang}" style="position:relative; border:none; padding:0; cursor:pointer; background:#0c1c30; aspect-ratio:16/9; display:block;">
                 <img src="${BASE}${esc(v.id)}.jpg?v=${VERSION}" alt="" loading="lazy" style="width:100%; height:100%; object-fit:cover; display:block;">
                 <span style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
                   <span style="width:58px; height:58px; border-radius:50%; background:rgba(254,137,51,0.95); color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.4rem; box-shadow:0 6px 18px rgba(0,0,0,0.3);">▶</span>
@@ -592,13 +585,21 @@ App.marketingVideos = (function () {
                   <h3 style="margin:0 0 6px; font-size:1.02rem; font-weight:800; color:#0f172a;">${v.icon} <span class="lang-en">${esc(v.titleEn)}</span><span class="lang-es">${esc(v.titleEs)}</span></h3>
                   <p style="margin:0; font-size:0.8rem; color:#475569; line-height:1.45;"><span class="lang-en">${esc(v.descEn)}</span><span class="lang-es">${esc(v.descEs)}</span></p>
                 </div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; padding-top:8px; border-top:1px solid #f1f5f9;">
-                  <button type="button" class="btn btn-primary btn-sm" data-video-export="${esc(v.baseId)}" style="flex:1; justify-content:center; font-weight:700; padding:9px 14px; border-radius:9px;">
-                    🎬 <span class="lang-en">Export With My Name</span><span class="lang-es">Exportar con mi nombre</span>
-                  </button>
-                  <button type="button" class="btn btn-outline btn-sm" data-video-preview="${esc(v.baseId)}" style="background:#fff; font-weight:600; padding:9px 13px; border-radius:9px;">
-                    👁️ <span class="lang-en">Preview</span><span class="lang-es">Vista previa</span>
-                  </button>
+                <div style="display:flex; flex-direction:column; gap:8px; padding-top:8px; border-top:1px solid #f1f5f9;">
+                  <div style="font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#64748b;">🎬 <span class="lang-en">Export with my name</span><span class="lang-es">Exportar con mi nombre</span></div>
+                  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-primary btn-sm" data-video-export="${esc(v.baseId)}" data-lang="es" style="flex:1; min-width:130px; justify-content:center; font-weight:700; padding:9px 10px; border-radius:9px;">
+                      🇪🇸 <span class="lang-en">Download in Spanish</span><span class="lang-es">Descargar en español</span>
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm" data-video-export="${esc(v.baseId)}" data-lang="en" style="flex:1; min-width:130px; justify-content:center; font-weight:700; padding:9px 10px; border-radius:9px;">
+                      🇺🇸 <span class="lang-en">Download in English</span><span class="lang-es">Descargar en inglés</span>
+                    </button>
+                  </div>
+                  <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                    <span style="font-size:0.78rem; font-weight:600; color:#475569;">👁️ <span class="lang-en">Preview:</span><span class="lang-es">Vista previa:</span></span>
+                    <button type="button" class="btn btn-outline btn-sm" data-video-preview="${esc(v.baseId)}" data-lang="es" style="background:#fff; font-weight:600; padding:6px 11px; border-radius:8px; font-size:0.78rem;">🇪🇸 ES</button>
+                    <button type="button" class="btn btn-outline btn-sm" data-video-preview="${esc(v.baseId)}" data-lang="en" style="background:#fff; font-weight:600; padding:6px 11px; border-radius:8px; font-size:0.78rem;">🇺🇸 EN</button>
+                  </div>
                 </div>
                 <div data-video-progress="${esc(v.baseId)}" style="display:none; height:8px; border-radius:999px; background:#e2e8f0; overflow:hidden;">
                   <div style="height:100%; width:0%; background:linear-gradient(90deg, #0672C5, #fe8933); transition:width 0.2s ease;"></div>
@@ -618,7 +619,7 @@ App.marketingVideos = (function () {
       btn.addEventListener('click', async () => {
         const d = getData();
         if (!d) return;
-        try { await openPreview(btn.getAttribute('data-video-preview'), d, lang); }
+        try { await openPreview(btn.getAttribute('data-video-preview'), d, btn.getAttribute('data-lang') || lang); }
         catch (err) { if (App.utils) App.utils.showToast(err.message || 'Preview error', 'error'); }
       });
     });
@@ -632,7 +633,8 @@ App.marketingVideos = (function () {
         const bar = container.querySelector(`[data-video-progress="${id}"]`);
         const fill = bar && bar.firstElementChild;
         const oldHtml = btn.innerHTML;
-        btn.disabled = true;
+        const siblings = container.querySelectorAll(`[data-video-export="${id}"]`);
+        siblings.forEach(b => { b.disabled = true; });
         if (bar) bar.style.display = 'block';
         const setP = (p) => {
           const pct = Math.round(p * 100);
@@ -641,25 +643,18 @@ App.marketingVideos = (function () {
         };
         setP(0);
         try {
-          const { blob, fileName } = await exportPersonalized(id, d, setP, lang);
+          const { blob, fileName } = await exportPersonalized(id, d, setP, btn.getAttribute('data-lang') || lang);
           downloadBlob(blob, fileName);
           if (App.utils) App.utils.showToast(isEn() ? 'Personalized video downloaded 🎬' : 'Vídeo personalizado descargado 🎬', 'success');
         } catch (err) {
           console.error('[MarketingVideos] export error:', err);
           if (App.utils) App.utils.showToast((isEn() ? 'Could not create the video: ' : 'No se pudo crear el vídeo: ') + (err.message || err), 'error');
         } finally {
-          btn.disabled = false;
+          siblings.forEach(b => { b.disabled = false; });
           btn.innerHTML = oldHtml;
           if (bar) { bar.style.display = 'none'; if (fill) fill.style.width = '0%'; }
           if (window.App && typeof window.App.updateLangDisplay === 'function') window.App.updateLangDisplay();
         }
-      });
-    });
-
-    container.querySelectorAll('[data-video-lang]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        selectedLang = btn.getAttribute('data-video-lang');
-        renderSection(container, user, opts);
       });
     });
 
