@@ -183,15 +183,8 @@
         }
       }
 
-      // Manual Add Client button
-      const addBtnContainer = document.getElementById('agent-dash-add-client-btn');
-      if (addBtnContainer) {
-        addBtnContainer.innerHTML = `
-          <button class="btn btn-primary" onclick="App.views.agentInmomas.showAddClientModal()" style="display: flex; align-items: center; gap: 8px; padding: 0.65rem 1.25rem; font-size: 0.9rem; border-radius: 8px; background: linear-gradient(135deg, #0043ff, #0066ff); border: none; box-shadow: 0 2px 8px rgba(0,67,255,0.2);">
-            <span style="font-size: 1.1rem;">➕</span> Add Client Manually
-          </button>
-        `;
-      }
+      // Manual Add Client button is rendered statically in app.html
+      // (#agent-dash-add-client-btn) so it is always available even if data loading fails.
 
       // Referral Link Logo & Brand Customizer (Colaboradores)
       const agentDashBranding = document.getElementById('agent-dash-referral-branding');
@@ -936,16 +929,16 @@
   /* ── Add Client Manually Modal ── */
   function showAddClientModal() {
     App.utils.showModal({
-      title: '➕ Add Client Manually',
+      title: '➕ Registrar Cliente Manualmente / Register Client Manually',
       body: `
         <form id="manual-client-form" style="display: grid; gap: 1rem;">
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div>
-              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">First Name *</label>
+              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">First Name / Nombre *</label>
               <input type="text" id="mc-firstName" class="form-input" placeholder="John" required style="margin-bottom: 0;">
             </div>
             <div>
-              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Last Name *</label>
+              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Last Name / Apellido *</label>
               <input type="text" id="mc-lastName" class="form-input" placeholder="Smith" required style="margin-bottom: 0;">
             </div>
           </div>
@@ -955,8 +948,8 @@
               <input type="email" id="mc-email" class="form-input" placeholder="john@example.com" required style="margin-bottom: 0;">
             </div>
             <div>
-              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Phone *</label>
-              <input type="tel" id="mc-phone" class="form-input" placeholder="+1 555 123 4567" required style="margin-bottom: 0;">
+              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Phone / Teléfono</label>
+              <input type="tel" id="mc-phone" class="form-input" placeholder="+1 555 123 4567" style="margin-bottom: 0;">
             </div>
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -986,8 +979,8 @@
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div>
-              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Timeline *</label>
-              <select id="mc-timeline" class="form-input" required style="margin-bottom: 0;">
+              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Timeline / Plazo</label>
+              <select id="mc-timeline" class="form-input" style="margin-bottom: 0;">
                 <option value="">Select timeline / Seleccionar plazo</option>
                 <option value="0 a 6 meses">0 a 6 meses / 0 to 6 months</option>
                 <option value="6 a 12 meses">6 a 12 meses / 6 to 12 months</option>
@@ -995,8 +988,8 @@
               </select>
             </div>
             <div>
-              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Objective *</label>
-              <select id="mc-objective" class="form-input" required style="margin-bottom: 0;">
+              <label style="font-size: 0.8rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px;">Objective / Objetivo</label>
+              <select id="mc-objective" class="form-input" style="margin-bottom: 0;">
                 <option value="">Select objective</option>
                 <option value="Mudarse a España">Mudarse a España</option>
                 <option value="Invertir en España">Invertir en España</option>
@@ -1026,8 +1019,8 @@
         </form>
       `,
       footer: `
-        <button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Cancel</button>
-        <button class="btn btn-primary btn-sm" onclick="App.views.agentInmomas.handleAddClient()" style="margin-left: 0.5rem;">Save Client</button>
+        <button class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Cancelar / Cancel</button>
+        <button type="button" id="mc-save-btn" class="btn btn-primary btn-sm" onclick="App.views.agentInmomas.handleAddClient()" style="margin-left: 0.5rem;">Guardar Cliente / Save Client</button>
       `
     });
   }
@@ -1040,18 +1033,17 @@
     const timeline = document.getElementById('mc-timeline')?.value;
     const objective = document.getElementById('mc-objective')?.value;
 
-    if (!firstName || !lastName || !email || !phone) {
-      App.utils.showToast('Please fill in all required fields (Name, Email, Phone).', 'error');
+    if (!firstName || !lastName || !email) {
+      App.utils.showToast('Completa los campos obligatorios: Nombre, Apellido y Email. / Please fill in First Name, Last Name and Email.', 'error');
       return;
     }
-    if (!timeline) {
-      App.utils.showToast('Please select a timeline.', 'error');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      App.utils.showToast('El email no es válido. / Invalid email address.', 'error');
       return;
     }
-    if (!objective) {
-      App.utils.showToast('Please select an objective.', 'error');
-      return;
-    }
+
+    const saveBtn = document.getElementById('mc-save-btn');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.style.opacity = '0.6'; }
 
     try {
       await App.auth.addClientManually({
@@ -1071,11 +1063,17 @@
       });
 
       App.utils.closeModal();
-      App.utils.showToast('Client added successfully! 🎉', 'success');
-      initDashboard(); // Refresh dashboard
+      App.utils.showToast('✅ Cliente registrado correctamente / Client registered successfully! 🎉', 'success');
+      const route = (App.router && App.router.getCurrentRoute) ? App.router.getCurrentRoute() : '';
+      if (route && route.endsWith('/clients')) {
+        initClients();
+      } else {
+        initDashboard();
+      }
     } catch (err) {
       console.error('[Agent] handleAddClient error:', err);
-      App.utils.showToast('Error adding client: ' + err.message, 'error');
+      App.utils.showToast('Error al registrar el cliente / Error adding client: ' + err.message, 'error');
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.style.opacity = ''; }
     }
   }
 

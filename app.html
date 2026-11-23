@@ -2016,7 +2016,12 @@
           <div id="agent-dash-referral-branding" style="display: none;"></div>
         </div>
         <!-- Manual Add Client Button -->
-        <div id="agent-dash-add-client-btn" style="margin-top: 16px;"></div>
+        <div id="agent-dash-add-client-btn" style="margin-top: 16px;">
+          <button type="button" class="btn btn-primary" onclick="App.views.agentInmomas.showAddClientModal()" style="display: inline-flex; align-items: center; gap: 8px; padding: 0.65rem 1.25rem; font-size: 0.9rem; border-radius: 8px; background: linear-gradient(135deg, #0043ff, #0066ff); border: none; box-shadow: 0 2px 8px rgba(0,67,255,0.2);">
+            <span style="font-size: 1.1rem;">➕</span>
+            <span class="lang-en">Register Client Manually</span><span class="lang-es">Registrar Cliente Manualmente</span>
+          </button>
+        </div>
         <!-- Personalized Buyer Guide -->
         <div class="dashboard-section" id="agent-dash-buyer-guide"></div>
         <div class="dashboard-grid-2col">
@@ -2065,6 +2070,9 @@
               <option value="">🌍 Todas las Regiones</option>
             </select>
             <input type="text" id="agent-client-search" class="form-input" oninput="App.views.agentInmomas.filterClients()" placeholder="🔍 Buscar cliente o país..." style="margin-bottom:0; min-width:200px; font-size:0.85rem; padding:7px 12px;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="App.views.agentInmomas.showAddClientModal()" style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; font-size:0.85rem; border-radius:8px; white-space:nowrap;">
+              ➕ <span class="lang-en">Register Client</span><span class="lang-es">Registrar Cliente</span>
+            </button>
           </div>
         </div>
         <div id="agent-pipeline-board" class="pipeline-board"></div>
@@ -3159,7 +3167,7 @@
   <script src="js/views/embajador-views.js?v=20261120_v12"></script>
   <script src="js/views/broker-views.js?v=20261120_v14"></script>
   <script src="js/views/realtor-views.js?v=20261120_v8"></script>
-  <script src="js/views/agent-views.js?v=20261120_v14"></script>
+  <script src="js/views/agent-views.js?v=20261123_v15"></script>
   <script src="js/views/partner-views.js?v=20261120_v5"></script>
   <script src="js/referral-agreement.js?v=20261119_v6"></script>
   <script src="js/main.js?v=20261119_v3"></script>
