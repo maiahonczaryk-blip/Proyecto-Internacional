@@ -1,0 +1,23 @@
+{
+ "id": "realtor-presentation-es",
+ "width": 1920,
+ "height": 1080,
+ "fps": 30,
+ "duration": 103.626,
+ "card": {
+  "x": 120,
+  "y": 740,
+  "w": 1080,
+  "h": 210,
+  "r": 26,
+  "t0": 94.703,
+  "animDur": 0.75,
+  "dist": 46
+ },
+ "sceneEnd": 99.276,
+ "wipe": {
+  "trans": 0.8,
+  "skew": 300,
+  "ext": 460
+ }
+}

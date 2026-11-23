@@ -1,0 +1,23 @@
+{
+ "id": "what-is-the-spain-connection-es",
+ "width": 1920,
+ "height": 1080,
+ "fps": 30,
+ "duration": 132.16,
+ "card": {
+  "x": 120,
+  "y": 660,
+  "w": 1000,
+  "h": 240,
+  "r": 26,
+  "t0": 121.785,
+  "animDur": 0.75,
+  "dist": 46
+ },
+ "sceneEnd": 127.81,
+ "wipe": {
+  "trans": 0.8,
+  "skew": 300,
+  "ext": 460
+ }
+}
