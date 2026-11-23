@@ -9891,3 +9891,8 @@ textarea:focus-visible {
 
 
 
+
+/* Wide modal (agreement previews) */
+.modal.modal--wide {
+  max-width: min(960px, 95vw);
+}

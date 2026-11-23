@@ -289,6 +289,29 @@
     await renderPartners();
   }
 
+  /* ── Partners (Embajadores, Brokers, Realtors, Colaboradores) linked to an Inmomás agent ── */
+  function getLinkedPartners(allUsers, me, lookupMaps) {
+    if (!me) return [];
+    const maps = lookupMaps || (App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(allUsers) : null);
+    const agentFullLower = `${me.firstName || ''} ${me.lastName || ''}`.trim().toLowerCase();
+    return allUsers.filter(u => {
+      if (!['embajador', 'broker', 'realtor', 'colaborador'].includes(u.role)) return false;
+
+      if (App.utils && App.utils.resolveAssignedInmomasAgent) {
+        const res = App.utils.resolveAssignedInmomasAgent(u, allUsers, maps);
+        if (res.id === me.id || (res.name && res.name.toLowerCase() === agentFullLower)) {
+          return true;
+        }
+      }
+      if (u.referredBy && u.referredBy === me.id) return true;
+      if (u.referredBy && me.referralCode && u.referredBy.toUpperCase() === me.referralCode.toUpperCase()) return true;
+      if (u.referredBy && me.email && u.referredBy.toLowerCase() === me.email.toLowerCase()) return true;
+      if (u.source && me.email && u.source.toLowerCase() === me.email.toLowerCase()) return true;
+
+      return false;
+    });
+  }
+
   async function renderPartners() {
     const tbody = document.getElementById('agent-partners-table-body');
     if (!tbody) return;
@@ -301,24 +324,7 @@
       
       // Filter embajadores/brokers/realtors/colaboradores linked to this RE/MAX Inmomás agent
       const lookupMaps = App.utils._buildUserLookupMaps ? App.utils._buildUserLookupMaps(allUsers) : null;
-      const agentFullLower = `${freshCurrentUser.firstName || ''} ${freshCurrentUser.lastName || ''}`.trim().toLowerCase();
-
-      let linkedPartners = allUsers.filter(u => {
-        if (!['embajador', 'broker', 'realtor', 'colaborador'].includes(u.role)) return false;
-
-        if (App.utils && App.utils.resolveAssignedInmomasAgent) {
-          const res = App.utils.resolveAssignedInmomasAgent(u, allUsers, lookupMaps);
-          if (res.id === freshCurrentUser.id || (res.name && res.name.toLowerCase() === agentFullLower)) {
-            return true;
-          }
-        }
-        if (u.referredBy && u.referredBy === freshCurrentUser.id) return true;
-        if (u.referredBy && freshCurrentUser.referralCode && u.referredBy.toUpperCase() === freshCurrentUser.referralCode.toUpperCase()) return true;
-        if (u.referredBy && freshCurrentUser.email && u.referredBy.toLowerCase() === freshCurrentUser.email.toLowerCase()) return true;
-        if (u.source && freshCurrentUser.email && u.source.toLowerCase() === freshCurrentUser.email.toLowerCase()) return true;
-
-        return false;
-      });
+      let linkedPartners = getLinkedPartners(allUsers, freshCurrentUser, lookupMaps);
 
       if (regFilter && App.utils && App.utils.getUserRegions) {
         linkedPartners = linkedPartners.filter(p => App.utils.getUserRegions(p).includes(regFilter));
@@ -1077,6 +1083,192 @@
     }
   }
 
+  /* ── Agent Inmomás Documents (#agent_inmomas/documents) ──
+     • Collaboration agreement models (templates) for every partner type
+     • Documents (agreements + fiscal data status) of the partners registered under this agent */
+  let docsPartners = [];
+  let docsAllUsers = [];
+
+  const AGREEMENT_TEMPLATES = [
+    { role: 'embajador',      icon: '👑', color: '#92400e', bg: '#fffbeb', en: 'Ambassador Umbrella Agreement', es: 'Acuerdo de Embajador y Red Paraguas', fee: '25% + 15%' },
+    { role: 'broker',         icon: '🏢', color: '#1e40af', bg: '#eff6ff', en: 'Broker / Agency Master Agreement', es: 'Acuerdo Marco de Agencia / Broker', fee: '25%' },
+    { role: 'realtor_direct', icon: '🏠', color: '#047857', bg: '#ecfdf5', en: 'Direct Realtor Agreement', es: 'Acuerdo de Agente / Realtor Directo', fee: '15%' },
+    { role: 'realtor_broker', icon: '🏘️', color: '#0f766e', bg: '#f0fdfa', en: 'Realtor via Agency Agreement', es: 'Acuerdo de Agente vía Agencia', fee: '25%' },
+    { role: 'colaborador',    icon: '🤝', color: '#5b21b6', bg: '#f5f3ff', en: 'Strategic Collaborator Agreement', es: 'Acuerdo de Colaborador Estratégico', fee: '10%' }
+  ];
+
+  async function initAgentDocuments() {
+    currentUser = App.auth.getCurrentUser();
+    if (!currentUser) return;
+    const esc = App.utils.escapeHtml;
+
+    // 1. Agreement models
+    const tplContainer = document.getElementById('agent-docs-templates');
+    if (tplContainer) {
+      tplContainer.innerHTML = `
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:1rem;">
+          ${AGREEMENT_TEMPLATES.map(t => `
+            <div class="glass-card" style="padding:1.1rem; border-left:4px solid ${t.color};">
+              <div style="font-size:1.4rem;">${t.icon}</div>
+              <div style="font-weight:700; font-size:0.95rem; margin:4px 0 2px; color:${t.color};">
+                <span class="lang-en">${t.en}</span><span class="lang-es">${t.es}</span>
+              </div>
+              <div style="font-size:0.78rem; color:#6b7280; margin-bottom:0.85rem;">
+                <span class="lang-en">Model / template</span><span class="lang-es">Modelo / plantilla</span> · ${t.fee}
+              </div>
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                <button type="button" class="btn btn-sm" style="flex:1; background:${t.bg}; color:${t.color}; border:1px solid ${t.color}; font-weight:700;" onclick="App.views.agentInmomas.previewAgreementTemplate('${t.role}')">
+                  👁️ <span class="lang-en">View</span><span class="lang-es">Ver</span>
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" style="flex:1;" onclick="App.views.agentInmomas.downloadAgreementTemplate('${t.role}')">
+                  ⬇️ .doc
+                </button>
+              </div>
+            </div>`).join('')}
+        </div>`;
+    }
+
+    // 2. Documents of partners registered under this agent
+    const listContainer = document.getElementById('agent-docs-partners');
+    if (!listContainer) return;
+    listContainer.innerHTML = `<p style="color:#6b7280; font-size:0.85rem;">⏳ <span class="lang-en">Loading...</span><span class="lang-es">Cargando...</span></p>`;
+
+    try {
+      docsAllUsers = await App.auth.getAllUsers();
+      const me = docsAllUsers.find(u => u.id === currentUser.id) || currentUser;
+      docsPartners = getLinkedPartners(docsAllUsers, me);
+      renderAgentDocsPartners();
+    } catch (err) {
+      console.error('[Agent] initAgentDocuments error:', err);
+      listContainer.innerHTML = `<p style="color:#ef4444;">Error cargando documentos / Error loading documents.</p>`;
+    }
+  }
+
+  function renderAgentDocsPartners() {
+    const listContainer = document.getElementById('agent-docs-partners');
+    if (!listContainer) return;
+    const esc = App.utils.escapeHtml;
+    const q = (document.getElementById('agent-docs-search')?.value || '').toLowerCase().trim();
+    const statusFilter = document.getElementById('agent-docs-filter-status')?.value || '';
+
+    let list = [...docsPartners];
+    if (q) {
+      list = list.filter(p => `${p.firstName || ''} ${p.lastName || ''} ${p.email || ''} ${p.agencyName || ''}`.toLowerCase().includes(q));
+    }
+    if (statusFilter) {
+      list = list.filter(p => getAgreementState(p) === statusFilter);
+    }
+
+    if (list.length === 0) {
+      listContainer.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state__icon">📂</div>
+          <p class="empty-state__text">
+            <span class="lang-en">No registered partners with documents match your filters.</span>
+            <span class="lang-es">No hay registrados a tu nombre que coincidan con los filtros.</span>
+          </p>
+        </div>`;
+      return;
+    }
+
+    const roleLabel = (r) => r === 'embajador' ? '👑 Embajador' : r === 'broker' ? '🏢 Broker' : r === 'colaborador' ? '🤝 Colaborador' : '🏠 Realtor';
+
+    listContainer.innerHTML = `
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:1rem;">
+        ${list.map(p => {
+          const state = getAgreementState(p);
+          const badge = state === 'signed'
+            ? '<span class="badge badge--approved">Firmado / Signed ✅</span>'
+            : state === 'data_submitted'
+              ? '<span class="badge badge--pending" style="background:#dbeafe; color:#1e40af;">Datos Enviados 📋</span>'
+              : '<span class="badge badge--pending">Pendiente ⚠️</span>';
+          const cd = p.contractCompanyData || {};
+          const hasFiscal = Boolean(cd.companyLegalName || cd.taxId || cd.fiscalAddress);
+          const detail = state === 'signed'
+            ? `<span class="lang-en">Signed on</span><span class="lang-es">Firmado el</span>: ${App.utils.formatDate(p.agreementSignedAt)}`
+            : state === 'data_submitted'
+              ? `<span class="lang-en">Fiscal & bank data submitted — contract in preparation</span><span class="lang-es">Datos fiscales y bancarios enviados — contrato en preparación</span>`
+              : `<span class="lang-en">Pending fiscal/bank data or signature</span><span class="lang-es">Pendiente de datos fiscales/bancarios o firma</span>`;
+          const safeId = esc(String(p.id)).replace(/'/g, '&#39;');
+          return `
+            <div class="glass-card" style="padding:1.15rem;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:0.6rem;">
+                <div>
+                  <div style="font-weight:700; font-size:0.98rem;">${esc(p.firstName || '')} ${esc(p.lastName || '')}</div>
+                  <div style="font-size:0.78rem; color:#6b7280;">${roleLabel(p.role)}${p.agencyName ? ' · ' + esc(p.agencyName) : ''}</div>
+                  <div style="font-size:0.75rem; color:#94a3b8;">${esc(p.email || '')}</div>
+                </div>
+                ${badge}
+              </div>
+              <div style="font-size:0.8rem; color:#374151; margin-bottom:0.5rem;">${detail}</div>
+              <div style="font-size:0.78rem; color:#374151; background:#f8fafc; border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; margin-bottom:0.75rem;">
+                <strong><span class="lang-en">Fiscal data</span><span class="lang-es">Datos fiscales</span>:</strong>
+                ${hasFiscal
+                  ? `${esc(cd.companyLegalName || '—')}${cd.taxId ? ' · ' + esc(cd.taxId) : ''}${cd.fiscalAddress ? '<br>' + esc(cd.fiscalAddress) : ''}`
+                  : '<span style="color:#f59e0b;">—</span>'}
+              </div>
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap; padding-top:0.6rem; border-top:1px solid #e5e7eb;">
+                <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="App.views.agentInmomas.previewPartnerAgreement('${safeId}')">
+                  👁️ <span class="lang-en">View Agreement</span><span class="lang-es">Ver Acuerdo</span>
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" style="flex:1;" onclick="App.views.agentInmomas.downloadPartnerAgreement('${safeId}')">
+                  ⬇️ .doc
+                </button>
+              </div>
+            </div>`;
+        }).join('')}
+      </div>`;
+  }
+
+  function getAgreementState(u) {
+    if (u.agreementSigned || u.agreementStatus === 'signed') return 'signed';
+    if (u.agreementStatus === 'data_submitted' || u.agreementStatus === 'uploaded') return 'data_submitted';
+    return 'pending';
+  }
+
+  function resolvePartnerAgreementArgs(partnerId) {
+    const p = docsPartners.find(u => String(u.id) === String(partnerId));
+    if (!p) return null;
+    if (p.role === 'realtor' && p.brokerId) {
+      const broker = docsAllUsers.find(u => u.id === p.brokerId);
+      const hasOwn = p.contractCompanyData && (p.contractCompanyData.companyLegalName || p.contractCompanyData.taxId);
+      return [hasOwn ? p : (broker || p), p];
+    }
+    return [p, null];
+  }
+
+  function ensureGenerator() {
+    if (typeof App.generateReferralAgreementDoc !== 'function') {
+      App.utils.showToast('Generador de acuerdos no disponible.', 'error');
+      return false;
+    }
+    return true;
+  }
+
+  function previewAgreementTemplate(role) {
+    if (!ensureGenerator()) return;
+    App.generateReferralAgreementDoc({ isTemplate: true, templateRole: role }, null, { preview: true });
+  }
+
+  function downloadAgreementTemplate(role) {
+    if (!ensureGenerator()) return;
+    App.generateReferralAgreementDoc({ isTemplate: true, templateRole: role });
+  }
+
+  function previewPartnerAgreement(partnerId) {
+    if (!ensureGenerator()) return;
+    const args = resolvePartnerAgreementArgs(partnerId);
+    if (!args) { App.utils.showToast('Registro no encontrado.', 'error'); return; }
+    App.generateReferralAgreementDoc(args[0], args[1], { preview: true });
+  }
+
+  function downloadPartnerAgreement(partnerId) {
+    if (!ensureGenerator()) return;
+    const args = resolvePartnerAgreementArgs(partnerId);
+    if (!args) { App.utils.showToast('Registro no encontrado.', 'error'); return; }
+    App.generateReferralAgreementDoc(args[0], args[1]);
+  }
+
   /* ── Documents & Collaborator Agreement (#colaborador/documents) ── */
   async function initDocuments() {
     currentUser = App.auth.getCurrentUser();
@@ -1109,6 +1301,12 @@
     initClients,
     filterClients,
     initDocuments,
+    initAgentDocuments,
+    renderAgentDocsPartners,
+    previewAgreementTemplate,
+    downloadAgreementTemplate,
+    previewPartnerAgreement,
+    downloadPartnerAgreement,
     initFinances,
     initWebinar,
     renderWebinarRegistrations,

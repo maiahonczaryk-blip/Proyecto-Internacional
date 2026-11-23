@@ -478,6 +478,7 @@
       <a href="#agent_inmomas/dashboard" class="sidebar-link"><span class="sidebar-link__icon">📊</span> Dashboard</a>
       <a href="#agent_inmomas/clients" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> <span class="lang-en">Clients</span><span class="lang-es">Clientes</span></a>
       <a href="#agent_inmomas/marketing" class="sidebar-link"><span class="sidebar-link__icon">🎨</span> <span class="lang-en">Marketing Lab</span><span class="lang-es">Laboratorio de Marketing</span></a>
+      <a href="#agent_inmomas/documents" class="sidebar-link"><span class="sidebar-link__icon">📄</span> <span class="lang-en">Documents</span><span class="lang-es">Documentos</span></a>
       <a href="#agent_inmomas/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> <span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></a>
       <a href="#agent_inmomas/webinar" class="sidebar-link"><span class="sidebar-link__icon">🎙️</span> <span class="lang-en">Webinar</span><span class="lang-es">Webinar</span></a>
       <a href="#agent_inmomas/partners" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> <span class="lang-en">My Realtors</span><span class="lang-es">Mis Realtors</span></a>
@@ -599,6 +600,7 @@
         <a href="#agent_inmomas/dashboard" class="mobile-section-pill"><span class="mobile-section-pill__icon">📊</span><span>Panel</span></a>
         <a href="#agent_inmomas/clients" class="mobile-section-pill"><span class="mobile-section-pill__icon">🤝</span><span><span class="lang-en">Clients</span><span class="lang-es">Clientes</span></span></a>
         <a href="#agent_inmomas/marketing" class="mobile-section-pill"><span class="mobile-section-pill__icon">🎨</span><span>Marketing</span></a>
+        <a href="#agent_inmomas/documents" class="mobile-section-pill"><span class="mobile-section-pill__icon">📄</span><span><span class="lang-en">Docs</span><span class="lang-es">Documentos</span></span></a>
         <a href="#agent_inmomas/finances" class="mobile-section-pill"><span class="mobile-section-pill__icon">💰</span><span><span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></span></a>
         <a href="#agent_inmomas/webinar" class="mobile-section-pill"><span class="mobile-section-pill__icon">🎙️</span><span>Webinar</span></a>
         <a href="#agent_inmomas/partners" class="mobile-section-pill"><span class="mobile-section-pill__icon">👥</span><span>Realtors</span></a>
@@ -2079,6 +2081,38 @@
       </div>
     </div>
 
+    <!-- ==================== VIEW: AGENT DOCUMENTS ==================== -->
+    <div id="view-agent-documents" class="app-view">
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <h1>📄 <span class="lang-en">Documents &amp; Agreements</span><span class="lang-es">Documentos y Acuerdos</span></h1>
+          <p class="dashboard-subtitle">
+            <span class="lang-en">View the collaboration agreement models and the documents of the partners registered under your name.</span>
+            <span class="lang-es">Visualiza los modelos de acuerdo de colaboración y los documentos de los registrados a tu nombre.</span>
+          </p>
+        </div>
+        <div class="dashboard-section">
+          <h2>📑 <span class="lang-en">Collaboration Agreement Models</span><span class="lang-es">Modelos de Acuerdo de Colaboración</span></h2>
+          <div id="agent-docs-templates"></div>
+        </div>
+        <div class="dashboard-section">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+            <h2 style="margin:0;">🗂️ <span class="lang-en">Documents of My Registered Partners</span><span class="lang-es">Documentos de mis Registrados</span></h2>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+              <select id="agent-docs-filter-status" class="form-select" onchange="App.views.agentInmomas.renderAgentDocsPartners()" style="margin-bottom:0; min-width:170px; font-size:0.85rem; padding:7px 10px;">
+                <option value="">📋 Todos los estados</option>
+                <option value="signed">✅ Firmado</option>
+                <option value="data_submitted">📋 Datos enviados</option>
+                <option value="pending">⚠️ Pendiente</option>
+              </select>
+              <input type="text" id="agent-docs-search" class="form-input" oninput="App.views.agentInmomas.renderAgentDocsPartners()" placeholder="🔍 Buscar nombre o email..." style="margin-bottom:0; min-width:200px; font-size:0.85rem; padding:7px 12px;">
+            </div>
+          </div>
+          <div id="agent-docs-partners"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ==================== VIEW: AGENT FINANCES ==================== -->
     <div id="view-agent-finances" class="app-view">
       <div class="dashboard-content">
@@ -3011,6 +3045,10 @@
         <span class="dashboard-bnav-icon">🤝</span>
         <span class="lang-en">Clients</span><span class="lang-es">Clientes</span>
       </a>
+      <a href="#agent_inmomas/documents" class="dashboard-bnav-item">
+        <span class="dashboard-bnav-icon">📄</span>
+        <span class="lang-en">Docs</span><span class="lang-es">Docs</span>
+      </a>
       <a href="#agent_inmomas/finances" class="dashboard-bnav-item">
         <span class="dashboard-bnav-icon">💰</span>
         <span class="lang-en">Finances</span><span class="lang-es">Finanzas</span>
@@ -3159,17 +3197,17 @@
   <script src="js/auth-service.js?v=20261119_v14"></script>
   <script src="js/buyer-guide.js?v=20261120_v11"></script>
   <script src="js/marketing-lab.js?v=20261122_v2"></script>
-  <script src="js/marketing-videos.js?v=20261123_v2"></script>
+  <script src="js/marketing-videos.js?v=20261122_v1"></script>
   <script src="js/referral-branding.js?v=20261119_v2"></script>
-  <script src="js/router.js?v=20261120_v9"></script>
+  <script src="js/router.js?v=20261123_v10"></script>
   <script src="js/views/auth-views.js?v=20261120_v10"></script>
   <script src="js/views/admin-views.js?v=20261120_v13"></script>
   <script src="js/views/embajador-views.js?v=20261120_v12"></script>
   <script src="js/views/broker-views.js?v=20261120_v14"></script>
   <script src="js/views/realtor-views.js?v=20261120_v8"></script>
-  <script src="js/views/agent-views.js?v=20261123_v15"></script>
+  <script src="js/views/agent-views.js?v=20261123_v16"></script>
   <script src="js/views/partner-views.js?v=20261120_v5"></script>
-  <script src="js/referral-agreement.js?v=20261119_v6"></script>
+  <script src="js/referral-agreement.js?v=20261123_v7"></script>
   <script src="js/main.js?v=20261119_v3"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
