@@ -314,8 +314,9 @@
    * to Embajador, Colaborador, Broker, or Realtor.
    * @param {Object} userData - User profile object (or { isTemplate: true, templateRole: 'embajador'|'colaborador'|'broker'|'realtor' })
    * @param {Object} agentData - Optional Referring Agent object (e.g. when a Broker exports a team Realtor's agreement)
+   * @param {Object} options - Optional { preview: true } to display the agreement in a modal instead of downloading
    */
-  App.generateReferralAgreementDoc = function(userData, agentData) {
+  App.generateReferralAgreementDoc = function(userData, agentData, options) {
     const isTemplate = Boolean(userData && userData.isTemplate);
     const sessionUser = (App.auth && typeof App.auth.getCurrentUser === 'function') ? App.auth.getCurrentUser() : null;
     const user = isTemplate ? {} : (userData || sessionUser || {});
@@ -605,11 +606,36 @@
           .replace(/[^a-zA-Z0-9À-ÿ]+/g, '_')
           .replace(/^_+|_+$/g, '');
 
+    const fileName = `${cfg.filePrefix}_${slugSource}_${new Date().toISOString().slice(0,10)}.doc`;
+
+    // Preview mode: show the agreement inside a modal (read-only) with an optional download button
+    if (options && options.preview) {
+      App._lastAgreementPreview = { userData, agentData };
+      const iframeId = 'agreement-preview-frame';
+      if (App.utils && typeof App.utils.showModal === 'function') {
+        App.utils.showModal({
+          title: `👁️ ${esc(cfg.docTitleEs)}`,
+          className: 'modal--wide',
+          body: `<iframe id="${iframeId}" title="Vista previa del acuerdo" style="width:100%; height:70vh; border:1px solid #e5e7eb; border-radius:8px; background:#fff;"></iframe>`,
+          footer: `
+            <button type="button" class="btn btn-outline btn-sm" onclick="App.utils.closeModal()">Cerrar / Close</button>
+            <button type="button" class="btn btn-primary btn-sm" style="margin-left:0.5rem;" onclick="App.generateReferralAgreementDoc(App._lastAgreementPreview.userData, App._lastAgreementPreview.agentData)">⬇️ Descargar Word (.doc)</button>
+          `
+        });
+        const frame = document.getElementById(iframeId);
+        if (frame) frame.srcdoc = html;
+      } else {
+        const w = window.open('', '_blank');
+        if (w) { w.document.open(); w.document.write(html); w.document.close(); }
+      }
+      return;
+    }
+
     const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href     = url;
-    a.download = `${cfg.filePrefix}_${slugSource}_${new Date().toISOString().slice(0,10)}.doc`;
+    a.download = fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
