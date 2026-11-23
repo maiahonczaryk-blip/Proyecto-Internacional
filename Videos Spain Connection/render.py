@@ -51,6 +51,12 @@ LAB_IDS = {
     "brokers_en": "broker-presentation",
     "realtor_en": "realtor-presentation",
     "ambassador_en": "ambassador-presentation",
+    # Versiones en español (mismo id + sufijo "-es")
+    "overview_es": "what-is-the-spain-connection-es",
+    "guide_es": "buyers-guide-es",
+    "brokers_es": "broker-presentation-es",
+    "realtor_es": "realtor-presentation-es",
+    "ambassador_es": "ambassador-presentation-es",
 }
 LAB_DIR = os.path.join(motor.ROOT, "videos")
 

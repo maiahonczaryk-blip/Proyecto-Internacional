@@ -1,7 +1,7 @@
 /* ============================================
    The Spain Connection — Vídeos Personalizados (Laboratorio de Marketing)
    ============================================
-   Cada vídeo oficial (EN) se publica en /videos como:
+   Cada vídeo oficial se publica en /videos en inglés (<id>) y en español (<id>-es) como:
      · <id>.mp4  → vídeo base SIN la tarjeta de contacto (hueco limpio en la escena final)
      · <id>.json → posición, tiempos y animación exactos de la tarjeta
      · <id>.jpg  → póster
@@ -16,46 +16,46 @@
 window.App = window.App || {};
 
 App.marketingVideos = (function () {
-  const VERSION = '20261122_v1';
+  const VERSION = '20261123_v2';
   const BASE = 'videos/';
   const PAD = 46; // margen de sombra (igual que el motor de render)
 
   const VIDEOS = [
     {
-      id: 'what-is-the-spain-connection', icon: '🌍', accent: '#0672C5', duration: '1:59',
-      fileName: 'What_is_The_Spain_Connection',
+      id: 'what-is-the-spain-connection', icon: '🌍', accent: '#0672C5', duration: '1:59', durationEs: '2:12',
+      fileName: 'What_is_The_Spain_Connection', fileNameEs: 'Que_es_The_Spain_Connection',
       titleEn: 'What is The Spain Connection?', titleEs: '¿Qué es The Spain Connection?',
       descEn: 'The big picture: why Spain, how the platform works, our partners (RE/MAX Inmomás, Fuster, UCI, Inmomás Holidays) and every role — brokers, realtors, ambassadors & collaborators.',
       descEs: 'La visión general: por qué España, cómo funciona la plataforma, los socios (RE/MAX Inmomás, Fuster, UCI, Inmomás Holidays) y el rol de brokers, realtors, embajadores y colaboradores.',
       roles: 'all'
     },
     {
-      id: 'buyers-guide', icon: '📘', accent: '#fe8933', duration: '1:56',
-      fileName: 'Buyers_Guide_The_Spain_Connection',
+      id: 'buyers-guide', icon: '📘', accent: '#fe8933', duration: '1:56', durationEs: '2:14',
+      fileName: 'Buyers_Guide_The_Spain_Connection', fileNameEs: 'Guia_del_Comprador_The_Spain_Connection',
       titleEn: "Buyer's Guide — Your Home in Spain", titleEs: 'Guía del Comprador — Tu casa en España',
       descEn: 'For your buyers: lifestyle, cost of living, new builds, the buying process, costs & taxes, visas and the partner team.',
       descEs: 'Para tus compradores: estilo de vida, coste de vida, obra nueva, proceso de compra, costes e impuestos, visados y el equipo de socios.',
       roles: 'all'
     },
     {
-      id: 'broker-presentation', icon: '🏢', accent: '#0672C5', duration: '1:47',
-      fileName: 'Broker_Presentation_The_Spain_Connection',
+      id: 'broker-presentation', icon: '🏢', accent: '#0672C5', duration: '1:47', durationEs: '1:58',
+      fileName: 'Broker_Presentation_The_Spain_Connection', fileNameEs: 'Presentacion_Brokers_The_Spain_Connection',
       titleEn: 'Broker Presentation', titleEs: 'Presentación para Brokers',
       descEn: 'Turnkey Spain division for brokerages: 3-step model, broker portal, VIP trips and the 25% buyer-side commission.',
       descEs: 'División llave en mano para agencias: modelo en 3 pasos, portal del broker, viajes VIP y el 25 % de la comisión de compra.',
       roles: ['admin', 'agent_inmomas', 'embajador', 'broker']
     },
     {
-      id: 'realtor-presentation', icon: '🏠', accent: '#059669', duration: '1:31',
-      fileName: 'Realtor_Presentation_The_Spain_Connection',
+      id: 'realtor-presentation', icon: '🏠', accent: '#059669', duration: '1:31', durationEs: '1:44',
+      fileName: 'Realtor_Presentation_The_Spain_Connection', fileNameEs: 'Presentacion_Realtors_The_Spain_Connection',
       titleEn: 'Realtor Presentation', titleEs: 'Presentación para Realtors',
       descEn: 'For agents & Realtors®: refer with your link, we handle Spain, you earn 15% direct (or via your broker).',
       descEs: 'Para agentes y Realtors®: refieren con su enlace, nosotros gestionamos España y cobran un 15 % directo (o vía su broker).',
       roles: ['admin', 'agent_inmomas', 'embajador', 'broker', 'realtor', 'colaborador']
     },
     {
-      id: 'ambassador-presentation', icon: '👑', accent: '#d97706', duration: '1:35',
-      fileName: 'Ambassador_Presentation_The_Spain_Connection',
+      id: 'ambassador-presentation', icon: '👑', accent: '#d97706', duration: '1:35', durationEs: '1:43',
+      fileName: 'Ambassador_Presentation_The_Spain_Connection', fileNameEs: 'Presentacion_Embajadores_The_Spain_Connection',
       titleEn: 'Ambassador Presentation', titleEs: 'Presentación para Embajadores',
       descEn: 'Executive program: build an umbrella network of brokers, agents & buyers — 15% net across it, 25% on direct buyers.',
       descEs: 'Programa ejecutivo: construir una red paraguas de brokers, agentes y compradores — 15 % neto sobre la red y 25 % por comprador directo.',
@@ -74,6 +74,21 @@ App.marketingVideos = (function () {
   const eo3 = (p) => 1 - Math.pow(1 - p, 3);
   const eio = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  /* ---------- Idioma del vídeo (EN / ES) ---------- */
+  let selectedLang = null; // null → sigue el idioma de la interfaz
+  const curLang = () => selectedLang || (isEn() ? 'en' : 'es');
+  /** Devuelve el vídeo con el id de recurso del idioma elegido (<id> o <id>-es). */
+  function localized(video, lang) {
+    const es = (lang || curLang()) === 'es';
+    return Object.assign({}, video, {
+      id: es ? `${video.id}-es` : video.id,
+      baseId: video.id,
+      lang: es ? 'es' : 'en',
+      fileName: es ? (video.fileNameEs || video.fileName) + '_ES' : video.fileName + '_EN',
+      duration: es ? (video.durationEs || video.duration) : video.duration
+    });
+  }
 
   function videosForRole(role, isAdminViewer) {
     return VIDEOS.filter(v => isAdminViewer || v.roles === 'all' || v.roles.includes(role));
@@ -148,7 +163,7 @@ App.marketingVideos = (function () {
   }
 
   /** Devuelve un canvas (w+2·PAD × h+2·PAD) con sombra + tarjeta blanca personalizada. */
-  async function buildCardCanvas(data, card) {
+  async function buildCardCanvas(data, card, lang) {
     const { w, h } = card;
     const r = card.r || 26;
     const cv = document.createElement('canvas');
@@ -209,7 +224,7 @@ App.marketingVideos = (function () {
     ctx.fillStyle = C.blue;
     ctx.font = `700 17px ${FONT}`;
     ctx.textBaseline = 'alphabetic';
-    drawTracked(ctx, 'YOUR DIRECT CONTACT', tx, top + 22, 2.6);
+    drawTracked(ctx, (lang || curLang()) === 'es' ? 'TU CONTACTO DIRECTO' : 'YOUR DIRECT CONTACT', tx, top + 22, 2.6);
 
     ctx.fillStyle = C.navy;
     fitFont(ctx, data.name, 800, 42, textW, 24);
@@ -460,11 +475,12 @@ App.marketingVideos = (function () {
     return { blob: new Blob(parts, { type: mimeType || 'video/webm' }), ext: /mp4/.test(mimeType) ? 'mp4' : 'webm' };
   }
 
-  async function exportPersonalized(videoId, data, onProgress = () => {}) {
-    const video = VIDEOS.find(v => v.id === videoId);
-    if (!video) throw new Error('Unknown video');
-    const meta = await loadMeta(videoId);
-    const cardCanvas = await buildCardCanvas(data, meta.card);
+  async function exportPersonalized(videoId, data, onProgress = () => {}, lang) {
+    const base = VIDEOS.find(v => v.id === videoId);
+    if (!base) throw new Error('Unknown video');
+    const video = localized(base, lang);
+    const meta = await loadMeta(video.id);
+    const cardCanvas = await buildCardCanvas(data, meta.card, video.lang);
     let blob, ext = 'mp4';
     if (window.VideoEncoder && window.VideoDecoder && window.VideoFrame) {
       blob = await exportWithWebCodecs(video, meta, cardCanvas, onProgress);
@@ -488,16 +504,16 @@ App.marketingVideos = (function () {
 
   /* ---------- 5. Vista previa (vídeo + tarjeta superpuesta en vivo) ---------- */
 
-  async function openPreview(videoId, data) {
-    const video = VIDEOS.find(v => v.id === videoId);
-    const meta = await loadMeta(videoId);
-    const cardCanvas = await buildCardCanvas(data, meta.card);
+  async function openPreview(videoId, data, lang) {
+    const video = localized(VIDEOS.find(v => v.id === videoId), lang);
+    const meta = await loadMeta(video.id);
+    const cardCanvas = await buildCardCanvas(data, meta.card, video.lang);
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed; inset:0; z-index:9999; background:rgba(8,18,32,0.82); display:flex; align-items:center; justify-content:center; padding:24px;';
     overlay.innerHTML = `
       <div style="width:min(1100px, 100%); background:#0c1c30; border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.45);">
         <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; color:#fff;">
-          <strong style="font-size:0.95rem;">${video.icon} ${esc(isEn() ? video.titleEn : video.titleEs)} · <span style="color:#FFB37A;">${esc(data.name)}</span></strong>
+          <strong style="font-size:0.95rem;">${video.icon} ${esc(video.lang === 'es' ? video.titleEs : video.titleEn)} · <span style="color:#FFB37A;">${esc(data.name)}</span></strong>
           <button type="button" data-close style="background:transparent; border:none; color:#fff; font-size:1.4rem; cursor:pointer; line-height:1;">×</button>
         </div>
         <div style="position:relative; aspect-ratio:16/9; background:#000;">
@@ -534,6 +550,8 @@ App.marketingVideos = (function () {
     const list = videosForRole(user.role, !!opts.isAdminViewer);
     if (!list.length) { container.innerHTML = ''; return; }
     const hasWebCodecs = !!(window.VideoEncoder && window.VideoDecoder);
+    const lang = curLang();
+    const langBtn = (code, label) => `<button type="button" data-video-lang="${code}" style="border:none; cursor:pointer; padding:6px 12px; font-size:0.78rem; font-weight:700; border-radius:999px; ${lang === code ? 'background:#0672C5; color:#fff;' : 'background:transparent; color:#334155;'}">${label}</button>`;
 
     container.innerHTML = `
       <div class="dashboard-section" style="margin-top:1.5rem;">
@@ -542,9 +560,15 @@ App.marketingVideos = (function () {
             🎬 <span class="lang-en">PERSONALIZED VIDEOS · THE SPAIN CONNECTION</span><span class="lang-es">VÍDEOS PERSONALIZADOS · THE SPAIN CONNECTION</span>
           </div>
           <h2 style="margin:0 0 4px; font-size:1.16rem; font-weight:800; color:var(--text-primary, #0f172a);">
-            <span class="lang-en">Explainer Videos With Your Contact Card (English)</span>
-            <span class="lang-es">Vídeos explicativos con tu tarjeta de contacto (en inglés)</span>
+            <span class="lang-en">Explainer Videos With Your Contact Card</span>
+            <span class="lang-es">Vídeos explicativos con tu tarjeta de contacto</span>
           </h2>
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:6px 0 8px;">
+            <span style="font-size:0.78rem; font-weight:700; color:#475569;"><span class="lang-en">Video language:</span><span class="lang-es">Idioma del vídeo:</span></span>
+            <div style="display:inline-flex; gap:2px; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:999px; padding:3px;">
+              ${langBtn('en', '🇺🇸 English')}${langBtn('es', '🇪🇸 Español')}
+            </div>
+          </div>
           <p style="margin:0; font-size:0.83rem; color:#475569;">
             <span class="lang-en">Animated 1080p videos with voice-over. When exported, the closing scene shows your photo, name, role, phone and email.</span>
             <span class="lang-es">Vídeos animados en 1080p con voz en off. Al exportarlos, la escena final muestra tu foto, nombre, cargo, teléfono y email.</span>
@@ -554,14 +578,14 @@ App.marketingVideos = (function () {
             <span class="lang-es">Tu navegador grabará el vídeo en tiempo real (mantén esta pestaña abierta). Para exportar más rápido usa Chrome, Edge o Safari 17+.</span></p>`}
         </div>
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1.15rem;">
-          ${list.map(v => `
+          ${list.map(v0 => { const v = localized(v0, lang); return `
             <div style="background:#fff; border:1px solid #e2e8f0; border-top:4px solid ${v.accent}; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 4px 14px rgba(15,23,42,0.04);">
-              <button type="button" data-video-preview="${esc(v.id)}" style="position:relative; border:none; padding:0; cursor:pointer; background:#0c1c30; aspect-ratio:16/9; display:block;">
+              <button type="button" data-video-preview="${esc(v.baseId)}" style="position:relative; border:none; padding:0; cursor:pointer; background:#0c1c30; aspect-ratio:16/9; display:block;">
                 <img src="${BASE}${esc(v.id)}.jpg?v=${VERSION}" alt="" loading="lazy" style="width:100%; height:100%; object-fit:cover; display:block;">
                 <span style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
                   <span style="width:58px; height:58px; border-radius:50%; background:rgba(254,137,51,0.95); color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.4rem; box-shadow:0 6px 18px rgba(0,0,0,0.3);">▶</span>
                 </span>
-                <span style="position:absolute; right:10px; bottom:10px; background:rgba(12,28,48,0.85); color:#fff; font-size:0.72rem; font-weight:700; padding:3px 8px; border-radius:6px;">🇺🇸 EN · ${esc(v.duration)}</span>
+                <span style="position:absolute; right:10px; bottom:10px; background:rgba(12,28,48,0.85); color:#fff; font-size:0.72rem; font-weight:700; padding:3px 8px; border-radius:6px;">${v.lang === 'es' ? '🇪🇸 ES' : '🇺🇸 EN'} · ${esc(v.duration)}</span>
               </button>
               <div style="padding:1rem 1.15rem 1.15rem; display:flex; flex-direction:column; gap:10px; flex:1; justify-content:space-between;">
                 <div>
@@ -569,18 +593,18 @@ App.marketingVideos = (function () {
                   <p style="margin:0; font-size:0.8rem; color:#475569; line-height:1.45;"><span class="lang-en">${esc(v.descEn)}</span><span class="lang-es">${esc(v.descEs)}</span></p>
                 </div>
                 <div style="display:flex; gap:8px; flex-wrap:wrap; padding-top:8px; border-top:1px solid #f1f5f9;">
-                  <button type="button" class="btn btn-primary btn-sm" data-video-export="${esc(v.id)}" style="flex:1; justify-content:center; font-weight:700; padding:9px 14px; border-radius:9px;">
+                  <button type="button" class="btn btn-primary btn-sm" data-video-export="${esc(v.baseId)}" style="flex:1; justify-content:center; font-weight:700; padding:9px 14px; border-radius:9px;">
                     🎬 <span class="lang-en">Export With My Name</span><span class="lang-es">Exportar con mi nombre</span>
                   </button>
-                  <button type="button" class="btn btn-outline btn-sm" data-video-preview="${esc(v.id)}" style="background:#fff; font-weight:600; padding:9px 13px; border-radius:9px;">
+                  <button type="button" class="btn btn-outline btn-sm" data-video-preview="${esc(v.baseId)}" style="background:#fff; font-weight:600; padding:9px 13px; border-radius:9px;">
                     👁️ <span class="lang-en">Preview</span><span class="lang-es">Vista previa</span>
                   </button>
                 </div>
-                <div data-video-progress="${esc(v.id)}" style="display:none; height:8px; border-radius:999px; background:#e2e8f0; overflow:hidden;">
+                <div data-video-progress="${esc(v.baseId)}" style="display:none; height:8px; border-radius:999px; background:#e2e8f0; overflow:hidden;">
                   <div style="height:100%; width:0%; background:linear-gradient(90deg, #0672C5, #fe8933); transition:width 0.2s ease;"></div>
                 </div>
               </div>
-            </div>`).join('')}
+            </div>`; }).join('')}
         </div>
       </div>`;
 
@@ -594,7 +618,7 @@ App.marketingVideos = (function () {
       btn.addEventListener('click', async () => {
         const d = getData();
         if (!d) return;
-        try { await openPreview(btn.getAttribute('data-video-preview'), d); }
+        try { await openPreview(btn.getAttribute('data-video-preview'), d, lang); }
         catch (err) { if (App.utils) App.utils.showToast(err.message || 'Preview error', 'error'); }
       });
     });
@@ -617,7 +641,7 @@ App.marketingVideos = (function () {
         };
         setP(0);
         try {
-          const { blob, fileName } = await exportPersonalized(id, d, setP);
+          const { blob, fileName } = await exportPersonalized(id, d, setP, lang);
           downloadBlob(blob, fileName);
           if (App.utils) App.utils.showToast(isEn() ? 'Personalized video downloaded 🎬' : 'Vídeo personalizado descargado 🎬', 'success');
         } catch (err) {
@@ -629,6 +653,13 @@ App.marketingVideos = (function () {
           if (bar) { bar.style.display = 'none'; if (fill) fill.style.width = '0%'; }
           if (window.App && typeof window.App.updateLangDisplay === 'function') window.App.updateLangDisplay();
         }
+      });
+    });
+
+    container.querySelectorAll('[data-video-lang]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedLang = btn.getAttribute('data-video-lang');
+        renderSection(container, user, opts);
       });
     });
 
