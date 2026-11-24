@@ -41,6 +41,10 @@ App.views.public = {
         <span class="lang-es">Enlace personalizado de <strong>${App.utils.escapeHtml(fullName)}</strong></span>
         <span class="lang-fr">Lien personnalisé de <strong>${App.utils.escapeHtml(fullName)}</strong></span>
         <span class="lang-en-ca">Personalized link of <strong>${App.utils.escapeHtml(fullName)}</strong></span>
+        <span class="lang-fr-eu">Lien partenaire personnalisé de <strong>${App.utils.escapeHtml(fullName)}</strong></span>
+        <span class="lang-nl">Persoonlijke verwijzingslink van <strong>${App.utils.escapeHtml(fullName)}</strong></span>
+        <span class="lang-sv">Personlig partnerlänk från <strong>${App.utils.escapeHtml(fullName)}</strong></span>
+        <span class="lang-bg">Персонален партньорски линк на <strong>${App.utils.escapeHtml(fullName)}</strong></span>
       </div>
       ${showAgency ? `
       <div style="margin-top: 4px; font-size: 0.88rem; color: var(--text-secondary);">
@@ -48,6 +52,10 @@ App.views.public = {
         <span class="lang-es">Pertenece a la agencia: <strong style="color: var(--primary);">${App.utils.escapeHtml(agency)}</strong></span>
         <span class="lang-fr">Appartient à l'agence : <strong style="color: var(--primary);">${App.utils.escapeHtml(agency)}</strong></span>
         <span class="lang-en-ca">Belongs to agency: <strong style="color: var(--primary);">${App.utils.escapeHtml(agency)}</strong></span>
+        <span class="lang-fr-eu">Cabinet / Agence : <strong style="color: var(--primary);">${App.utils.escapeHtml(agency)}</strong></span>
+        <span class="lang-nl">Aangesloten kantoor: <strong style="color: var(--primary);">${App.utils.escapeHtml(agency)}</strong></span>
+        <span class="lang-sv">Tillhör byrå: <strong style="color: var(--primary);">${App.utils.escapeHtml(agency)}</strong></span>
+        <span class="lang-bg">Агенция / Компания: <strong style="color: var(--primary);">${App.utils.escapeHtml(agency)}</strong></span>
       </div>
       ` : ''}
     `;
@@ -64,9 +72,16 @@ App.views.public = {
     const applyIntakeReferrer = (referrer) => {
       if (!referrer) return;
       App.views.public.renderPartnerBranding(referrer, 'intake');
-      if (welcomeMsg) {
-        welcomeMsg.innerHTML = `<span class="lang-en">Welcome! You've been referred by <strong>${App.utils.escapeHtml(referrer.firstName || '')} ${App.utils.escapeHtml(referrer.lastName || '')}</strong>.</span>
-                                <span class="lang-es">¡Bienvenido! Has sido referido por <strong>${App.utils.escapeHtml(referrer.firstName || '')} ${App.utils.escapeHtml(referrer.lastName || '')}</strong>.</span>`;
+      const rName = `${App.utils.escapeHtml(referrer.firstName || '')} ${App.utils.escapeHtml(referrer.lastName || '')}`.trim();
+      if (welcomeMsg && rName) {
+        welcomeMsg.innerHTML = `<span class="lang-en">Welcome! You've been referred by <strong>${rName}</strong>.</span>
+                                <span class="lang-es">¡Bienvenido! Has sido referido por <strong>${rName}</strong>.</span>
+                                <span class="lang-fr">Bienvenue ! Vous êtes recommandé(e) par <strong>${rName}</strong>.</span>
+                                <span class="lang-en-ca">Welcome! You've been referred by <strong>${rName}</strong>.</span>
+                                <span class="lang-fr-eu">Bienvenue ! Votre dossier est recommandé par <strong>${rName}</strong>.</span>
+                                <span class="lang-nl">Welkom! Je bent persoonlijk doorverwezen door <strong>${rName}</strong>.</span>
+                                <span class="lang-sv">Välkommen! Du har hänvisats av <strong>${rName}</strong>.</span>
+                                <span class="lang-bg">Добре дошли! Вие сте препоръчани от <strong>${rName}</strong>.</span>`;
       }
     };
 
@@ -276,92 +291,124 @@ App.views.public = {
 
       if (type === 'client') {
         if (formTitle) {
-          formTitle.innerHTML = `<span class="lang-en">Buy &amp; Invest in Spain</span><span class="lang-es">Comprar e Invertir en España</span><span class="lang-fr">Acheter et Investir en Espagne</span><span class="lang-en-ca">Buy &amp; Invest in Spain</span>`;
+          formTitle.innerHTML = `<span class="lang-en">Buy &amp; Invest in Spain</span><span class="lang-es">Comprar e Invertir en España</span><span class="lang-fr">Acheter et Investir en Espagne</span><span class="lang-en-ca">Buy &amp; Invest in Spain</span><span class="lang-fr-eu">Acheter &amp; Investir en Espagne</span><span class="lang-nl">Kopen &amp; Investeren in Spanje</span><span class="lang-sv">Köpa Bostad &amp; Investera i Spanien</span><span class="lang-bg">Покупка и инвестиция в Испания</span>`;
         }
         if (welcomeMsg) {
           welcomeMsg.innerHTML = refName
             ? `<span class="lang-en">Complimentary invitation from <strong>${refName}</strong> · The Spain Connection</span>
                <span class="lang-es">Invitación de cortesía de <strong>${refName}</strong> · The Spain Connection</span>
                <span class="lang-fr">Invitation offerte par <strong>${refName}</strong> · The Spain Connection</span>
-               <span class="lang-en-ca">Complimentary invitation from <strong>${refName}</strong> · The Spain Connection</span>`
+               <span class="lang-en-ca">Complimentary invitation from <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-fr-eu">Invitation personnelle offerte par <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-nl">Persoonlijke uitnodiging van <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-sv">Personlig inbjudan från <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-bg">Лична покана от <strong>${refName}</strong> · The Spain Connection</span>`
             : `<span class="lang-en">Personalized advisory with Spain's top real estate advisors</span>
                <span class="lang-es">Asesoría personalizada con los mejores agentes de España</span>
                <span class="lang-fr">Conseil personnalisé avec les meilleurs agents en Espagne</span>
-               <span class="lang-en-ca">Personalized advisory with Spain's top real estate advisors</span>`;
+               <span class="lang-en-ca">Personalized advisory with Spain's top real estate advisors</span>
+               <span class="lang-fr-eu">Accompagnement sur mesure avec nos conseillers et juristes en Espagne</span>
+               <span class="lang-nl">Persoonlijk aankoopadvies met onze specialisten in Spanje</span>
+               <span class="lang-sv">Personlig rådgivning med våra fastighetsspecialister i Spanien</span>
+               <span class="lang-bg">Индивидуална консултация с нашите експерти в Испания</span>`;
         }
         if (submitBtn) {
-          submitBtn.innerHTML = `<span class="lang-en">Send Request</span><span class="lang-es">Enviar Solicitud</span><span class="lang-fr">Envoyer la Demande</span><span class="lang-en-ca">Send Request</span>`;
+          submitBtn.innerHTML = `<span class="lang-en">Send Request</span><span class="lang-es">Enviar Solicitud</span><span class="lang-fr">Envoyer la Demande</span><span class="lang-en-ca">Send Request</span><span class="lang-fr-eu">Envoyer ma demande</span><span class="lang-nl">Aanvraag versturen</span><span class="lang-sv">Skicka förfrågan</span><span class="lang-bg">Изпрати запитване</span>`;
         }
       } else if (type === 'realtor') {
         if (formTitle) {
-          formTitle.innerHTML = `<span class="lang-en">Realtor Partner Registration</span><span class="lang-es">Registro de Agente / Realtor</span><span class="lang-fr">Inscription Agent Partenaire</span><span class="lang-en-ca">Realtor Partner Registration</span>`;
+          formTitle.innerHTML = `<span class="lang-en">Realtor Partner Registration</span><span class="lang-es">Registro de Agente / Realtor</span><span class="lang-fr">Inscription Agent Partenaire</span><span class="lang-en-ca">Realtor Partner Registration</span><span class="lang-fr-eu">Inscription Mandataire / Agent Partenaire</span><span class="lang-nl">Registratie Partnermakelaar / Adviseur</span><span class="lang-sv">Registrering av Partnermäklare</span><span class="lang-bg">Регистрация на брокер партньор</span>`;
         }
         if (welcomeMsg) {
           welcomeMsg.innerHTML = refName
             ? `<span class="lang-en">Invited by <strong>${refName}</strong> · The Spain Connection</span>
                <span class="lang-es">Invitado/a por <strong>${refName}</strong> · The Spain Connection</span>
                <span class="lang-fr">Invité(e) par <strong>${refName}</strong> · The Spain Connection</span>
-               <span class="lang-en-ca">Invited by <strong>${refName}</strong> · The Spain Connection</span>`
+               <span class="lang-en-ca">Invited by <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-fr-eu">Sur invitation de <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-nl">Uitgenodigd door <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-sv">Inbjuden av <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-bg">По покана на <strong>${refName}</strong> · The Spain Connection</span>`
             : `<span class="lang-en">Join our international referral network in Spain</span>
                <span class="lang-es">Únete a nuestra red internacional de referidos en España</span>
                <span class="lang-fr">Rejoignez notre réseau international en Espagne</span>
-               <span class="lang-en-ca">Join our international referral network in Spain</span>`;
+               <span class="lang-en-ca">Join our international referral network in Spain</span>
+               <span class="lang-fr-eu">Rejoignez notre réseau d'apporteurs d'affaires en Espagne</span>
+               <span class="lang-nl">Sluit je aan bij ons internationale partnernetwerk in Spanje</span>
+               <span class="lang-sv">Anslut dig till vårt internationella partnernätverk i Spanien</span>
+               <span class="lang-bg">Присъединете се към нашата международна мрежа в Испания</span>`;
         }
         if (submitBtn) {
-          submitBtn.innerHTML = `<span class="lang-en">Register as Realtor</span><span class="lang-es">Registrarse como Agente</span><span class="lang-fr">S'inscrire comme Agent</span><span class="lang-en-ca">Register as Realtor</span>`;
+          submitBtn.innerHTML = `<span class="lang-en">Register as Realtor</span><span class="lang-es">Registrarse como Agente</span><span class="lang-fr">S'inscrire comme Agent</span><span class="lang-en-ca">Register as Realtor</span><span class="lang-fr-eu">S'inscrire comme partenaire</span><span class="lang-nl">Registreren als partnermakelaar</span><span class="lang-sv">Registrera som partnermäklare</span><span class="lang-bg">Регистрация като брокер партньор</span>`;
         }
       } else if (type === 'broker') {
         if (formTitle) {
-          formTitle.innerHTML = `<span class="lang-en">Brokerage Partner Registration</span><span class="lang-es">Registro de Brokerage / Agencia</span><span class="lang-fr">Inscription Agence Partenaire</span><span class="lang-en-ca">Brokerage Partner Registration</span>`;
+          formTitle.innerHTML = `<span class="lang-en">Brokerage Partner Registration</span><span class="lang-es">Registro de Brokerage / Agencia</span><span class="lang-fr">Inscription Agence Partenaire</span><span class="lang-en-ca">Brokerage Partner Registration</span><span class="lang-fr-eu">Inscription Agence / Cabinet Partenaire</span><span class="lang-nl">Registratie Makelaarskantoor</span><span class="lang-sv">Registrering av Mäklarbyrå</span><span class="lang-bg">Регистрация на агенция за имоти</span>`;
         }
         if (welcomeMsg) {
           welcomeMsg.innerHTML = refName
             ? `<span class="lang-en">Strategic Partnership with <strong>${refName}</strong> · The Spain Connection</span>
                <span class="lang-es">Alianza Estratégica con <strong>${refName}</strong> · The Spain Connection</span>
                <span class="lang-fr">Partenariat Stratégique avec <strong>${refName}</strong> · The Spain Connection</span>
-               <span class="lang-en-ca">Strategic Partnership with <strong>${refName}</strong> · The Spain Connection</span>`
+               <span class="lang-en-ca">Strategic Partnership with <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-fr-eu">Partenariat stratégique avec <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-nl">Strategisch partnerschap met <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-sv">Strategiskt partnerskap med <strong>${refName}</strong> · The Spain Connection</span>
+               <span class="lang-bg">Стратегическо партньорство с <strong>${refName}</strong> · The Spain Connection</span>`
             : `<span class="lang-en">Register your Brokerage</span>
                <span class="lang-es">Registra tu Brokerage / Agencia</span>
                <span class="lang-fr">Inscrivez votre Agence</span>
-               <span class="lang-en-ca">Register your Brokerage</span>`;
+               <span class="lang-en-ca">Register your Brokerage</span>
+               <span class="lang-fr-eu">Référencez votre agence ou cabinet (25 % de rétrocession)</span>
+               <span class="lang-nl">Registreer je makelaarskantoor (25% partnervergoeding)</span>
+               <span class="lang-sv">Registrera din mäklarbyrå (25 % partnerprovision)</span>
+               <span class="lang-bg">Регистрирайте Вашата агенция (25% партньорска комисиона)</span>`;
         }
         if (submitBtn) {
-          submitBtn.innerHTML = `<span class="lang-en">Register Brokerage</span><span class="lang-es">Registrar Brokerage</span><span class="lang-fr">Inscrire l'Agence</span><span class="lang-en-ca">Register Brokerage</span>`;
+          submitBtn.innerHTML = `<span class="lang-en">Register Brokerage</span><span class="lang-es">Registrar Brokerage</span><span class="lang-fr">Inscrire l'Agence</span><span class="lang-en-ca">Register Brokerage</span><span class="lang-fr-eu">Inscrire mon agence</span><span class="lang-nl">Makelaarskantoor registreren</span><span class="lang-sv">Registrera mäklarbyrå</span><span class="lang-bg">Регистрирай агенция</span>`;
         }
       } else if (type === 'embajador') {
         if (formTitle) {
-          formTitle.innerHTML = `<span class="lang-en">Ambassador Application</span><span class="lang-es">Postulación como Embajador</span><span class="lang-fr">Candidature Ambassadeur</span><span class="lang-en-ca">Ambassador Application</span>`;
+          formTitle.innerHTML = `<span class="lang-en">Ambassador Application</span><span class="lang-es">Postulación como Embajador</span><span class="lang-fr">Candidature Ambassadeur</span><span class="lang-en-ca">Ambassador Application</span><span class="lang-fr-eu">Candidature Ambassadeur Régional</span><span class="lang-nl">Aanmelding als Regio-Ambassadeur</span><span class="lang-sv">Ansökan som Regionambassadör</span><span class="lang-bg">Кандидатура за регионален посланик</span>`;
         }
         if (welcomeMsg) {
           welcomeMsg.innerHTML = refName
             ? `<span class="lang-en">Executive invitation from <strong>${refName}</strong> · Lead your own umbrella of Brokers, Realtors, Collaborators &amp; Clients</span>
                <span class="lang-es">Invitación ejecutiva de <strong>${refName}</strong> · Lidera tu propio paraguas de Brokers, Agentes, Colaboradores y Clientes</span>
                <span class="lang-fr">Invitation exécutive de <strong>${refName}</strong> · Dirigez votre réseau de Courtiers, Agents, Partenaires et Clients</span>
-               <span class="lang-en-ca">Executive invitation from <strong>${refName}</strong> · Lead your own umbrella of Brokers, Realtors, Collaborators &amp; Clients</span>`
+               <span class="lang-en-ca">Executive invitation from <strong>${refName}</strong> · Lead your own umbrella of Brokers, Realtors, Collaborators &amp; Clients</span>
+               <span class="lang-fr-eu">Invitation exécutive de <strong>${refName}</strong> · Développez votre propre réseau d'agences, mandataires et CGP</span>
+               <span class="lang-nl">Directie-uitnodiging van <strong>${refName}</strong> · Bouw je eigen netwerk van kantoren, makelaars en adviseurs</span>
+               <span class="lang-sv">Exekutiv inbjudan från <strong>${refName}</strong> · Led ditt eget nätverk av mäklarbyråer, rådgivare och kunder</span>
+               <span class="lang-bg">Изпълнителна покана от <strong>${refName}</strong> · Изградете собствена мрежа от агенции, брокери и клиенти</span>`
             : `<span class="lang-en">Apply as Official Ambassador · The Spain Connection</span>
                <span class="lang-es">Postúlate como Embajador Oficial · The Spain Connection</span>
                <span class="lang-fr">Postuler comme Ambassadeur Officiel · The Spain Connection</span>
-               <span class="lang-en-ca">Apply as Official Ambassador · The Spain Connection</span>`;
+               <span class="lang-en-ca">Apply as Official Ambassador · The Spain Connection</span>
+               <span class="lang-fr-eu">Postuler comme Ambassadeur Officiel · The Spain Connection</span>
+               <span class="lang-nl">Meld je aan als Officieel Ambassadeur · The Spain Connection</span>
+               <span class="lang-sv">Ansök som Officiell Ambassadör · The Spain Connection</span>
+               <span class="lang-bg">Кандидатствайте като Официален Посланик · The Spain Connection</span>`;
         }
         if (submitBtn) {
-          submitBtn.innerHTML = `<span class="lang-en">Apply as Ambassador</span><span class="lang-es">Postularse como Embajador</span><span class="lang-fr">Postuler comme Ambassadeur</span><span class="lang-en-ca">Apply as Ambassador</span>`;
+          submitBtn.innerHTML = `<span class="lang-en">Apply as Ambassador</span><span class="lang-es">Postularse como Embajador</span><span class="lang-fr">Postuler comme Ambassadeur</span><span class="lang-en-ca">Apply as Ambassador</span><span class="lang-fr-eu">Soumettre ma candidature</span><span class="lang-nl">Aanmelden als Ambassadeur</span><span class="lang-sv">Ansök som Ambassadör</span><span class="lang-bg">Кандидатствай като посланик</span>`;
         }
       } else if (type === 'agent_inmomas') {
         if (formTitle) {
-          formTitle.innerHTML = `<span class="lang-en">RE/MAX Inmomás Agent Registration</span><span class="lang-es">Registro de Agente RE/MAX Inmomás</span><span class="lang-fr">Inscription Agent RE/MAX Inmomás</span><span class="lang-en-ca">RE/MAX Inmomás Agent Registration</span>`;
+          formTitle.innerHTML = `<span class="lang-en">RE/MAX Inmomás Agent Registration</span><span class="lang-es">Registro de Agente RE/MAX Inmomás</span><span class="lang-fr">Inscription Agent RE/MAX Inmomás</span><span class="lang-en-ca">RE/MAX Inmomás Agent Registration</span><span class="lang-fr-eu">Inscription Conseiller RE/MAX Inmomás</span><span class="lang-nl">Registratie RE/MAX Inmomás-adviseur</span><span class="lang-sv">Registrering RE/MAX Inmomás-rådgivare</span><span class="lang-bg">Регистрация на консултант RE/MAX Inmomás</span>`;
         }
         if (welcomeMsg) {
-          welcomeMsg.innerHTML = `<span class="lang-en">Select your nationality and target region(s) to activate your regional RE/MAX Inmomás CRM</span><span class="lang-es">Indica tu nacionalidad y región(es) de mercado para activar tu panel regional de RE/MAX Inmomás</span><span class="lang-fr">Indiquez votre nationalité et vos régions pour activer votre CRM RE/MAX Inmomás</span><span class="lang-en-ca">Select your nationality and target region(s) to activate your RE/MAX Inmomás CRM</span>`;
+          welcomeMsg.innerHTML = `<span class="lang-en">Select your nationality and target region(s) to activate your regional RE/MAX Inmomás CRM</span><span class="lang-es">Indica tu nacionalidad y región(es) de mercado para activar tu panel regional de RE/MAX Inmomás</span><span class="lang-fr">Indiquez votre nationalité et vos régions pour activer votre CRM RE/MAX Inmomás</span><span class="lang-en-ca">Select your nationality and target region(s) to activate your RE/MAX Inmomás CRM</span><span class="lang-fr-eu">Indiquez votre pays et vos régions cibles pour activer votre espace CRM RE/MAX Inmomás</span><span class="lang-nl">Kies je land en marktregio's om je RE/MAX Inmomás CRM te activeren</span><span class="lang-sv">Välj land och marknadsregioner för att aktivera ditt RE/MAX Inmomás CRM</span><span class="lang-bg">Изберете държава и пазарни региони за активация на Вашия RE/MAX Inmomás CRM</span>`;
         }
         if (submitBtn) {
-          submitBtn.innerHTML = `<span class="lang-en">Register RE/MAX Inmomás Agent</span><span class="lang-es">Registrar Agente RE/MAX Inmomás</span><span class="lang-fr">Inscrire Agent RE/MAX Inmomás</span><span class="lang-en-ca">Register RE/MAX Inmomás Agent</span>`;
+          submitBtn.innerHTML = `<span class="lang-en">Register RE/MAX Inmomás Agent</span><span class="lang-es">Registrar Agente RE/MAX Inmomás</span><span class="lang-fr">Inscrire Agent RE/MAX Inmomás</span><span class="lang-en-ca">Register RE/MAX Inmomás Agent</span><span class="lang-fr-eu">Inscrire Conseiller RE/MAX Inmomás</span><span class="lang-nl">RE/MAX Inmomás-adviseur registreren</span><span class="lang-sv">Registrera RE/MAX Inmomás-rådgivare</span><span class="lang-bg">Регистрирай консултант RE/MAX Inmomás</span>`;
         }
       } else {
         if (formTitle) {
-          formTitle.innerHTML = `<span class="lang-en">Partner Registration</span><span class="lang-es">Registro de Colaborador</span><span class="lang-fr">Inscription Partenaire</span><span class="lang-en-ca">Partner Registration</span>`;
+          formTitle.innerHTML = `<span class="lang-en">Partner Registration</span><span class="lang-es">Registro de Colaborador</span><span class="lang-fr">Inscription Partenaire</span><span class="lang-en-ca">Partner Registration</span><span class="lang-fr-eu">Inscription Apporteur d'Affaires / CGP</span><span class="lang-nl">Registratie Samenwerkingspartner</span><span class="lang-sv">Registrering av Samarbetspartner</span><span class="lang-bg">Регистрация на партньор</span>`;
         }
         if (submitBtn) {
-          submitBtn.innerHTML = `<span class="lang-en">Submit Application</span><span class="lang-es">Enviar Solicitud</span><span class="lang-fr">Soumettre la Demande</span><span class="lang-en-ca">Submit Application</span>`;
+          submitBtn.innerHTML = `<span class="lang-en">Submit Application</span><span class="lang-es">Enviar Solicitud</span><span class="lang-fr">Soumettre la Demande</span><span class="lang-en-ca">Submit Application</span><span class="lang-fr-eu">Envoyer ma demande</span><span class="lang-nl">Aanmelding versturen</span><span class="lang-sv">Skicka ansökan</span><span class="lang-bg">Изпрати заявка</span>`;
         }
       }
 
@@ -528,12 +575,17 @@ App.views.public = {
 
         const clientBannerInviteeEl = document.getElementById('referral-client-banner-invitee');
         if (clientBannerInviteeEl) {
+          const rFull = `${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}`.trim();
           clientBannerInviteeEl.innerHTML = `
             <span>✨</span>
-            <span class="lang-en">VIP invitation courtesy of <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
-            <span class="lang-es">Invitación VIP de cortesía de <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
-            <span class="lang-fr">Invitation VIP offerte par <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
-            <span class="lang-en-ca">VIP invitation courtesy of <strong>${App.utils.escapeHtml(referrer.firstName)} ${App.utils.escapeHtml(referrer.lastName)}</strong></span>
+            <span class="lang-en">VIP invitation courtesy of <strong>${rFull}</strong></span>
+            <span class="lang-es">Invitación VIP de cortesía de <strong>${rFull}</strong></span>
+            <span class="lang-fr">Invitation VIP offerte par <strong>${rFull}</strong></span>
+            <span class="lang-en-ca">VIP invitation courtesy of <strong>${rFull}</strong></span>
+            <span class="lang-fr-eu">Invitation VIP personnelle de <strong>${rFull}</strong></span>
+            <span class="lang-nl">Persoonlijke VIP-uitnodiging van <strong>${rFull}</strong></span>
+            <span class="lang-sv">Personlig VIP-inbjudan från <strong>${rFull}</strong></span>
+            <span class="lang-bg">Лична VIP покана от <strong>${rFull}</strong></span>
           `;
         }
 
@@ -630,42 +682,66 @@ App.views.public = {
           labelEn: 'Ambassador',
           labelEs: 'Embajador',
           labelFr: 'Ambassadeur',
-          labelEnCa: 'Ambassador'
+          labelEnCa: 'Ambassador',
+          labelFrEu: 'Ambassadeur Régional',
+          labelNl: 'Regio-Ambassadeur',
+          labelSv: 'Regionambassadör',
+          labelBg: 'Регионален Посланик'
         },
         client: {
           icon: '👤',
           labelEn: 'Client / Buyer',
           labelEs: 'Cliente / Comprador',
           labelFr: 'Client / Acheteur',
-          labelEnCa: 'Client / Buyer'
+          labelEnCa: 'Client / Buyer',
+          labelFrEu: 'Acquéreur / Investisseur',
+          labelNl: 'Koper / Belegger',
+          labelSv: 'Köpare / Investerare',
+          labelBg: 'Купувач / Инвеститор'
         },
         realtor: {
           icon: '🏠',
           labelEn: 'Agent / Realtor',
           labelEs: 'Agente / Realtor',
           labelFr: 'Agent / Conseiller',
-          labelEnCa: 'Agent / Realtor'
+          labelEnCa: 'Agent / Realtor',
+          labelFrEu: 'Mandataire / Agent Immobilier',
+          labelNl: 'Makelaar / Aankoopadviseur',
+          labelSv: 'Fastighetsmäklare / Rådgivare',
+          labelBg: 'Брокер / Имотен консултант'
         },
         broker: {
           icon: '🏢',
           labelEn: 'Broker / Agency',
           labelEs: 'Broker / Agencia',
           labelFr: 'Courtier (Broker)',
-          labelEnCa: 'Broker / Agency'
+          labelEnCa: 'Broker / Agency',
+          labelFrEu: 'Agence Immobilière / Directeur',
+          labelNl: 'Makelaarskantoor / Directie',
+          labelSv: 'Fastighetsmäklarbyrå',
+          labelBg: 'Агенция за имоти / Управител'
         },
         agent_inmomas: {
           icon: '🇪🇸',
           labelEn: 'RE/MAX Inmomás Agent',
           labelEs: 'Agente RE/MAX Inmomás',
           labelFr: 'Agent RE/MAX Inmomás',
-          labelEnCa: 'RE/MAX Inmomás Agent'
+          labelEnCa: 'RE/MAX Inmomás Agent',
+          labelFrEu: 'Conseiller RE/MAX Inmomás',
+          labelNl: 'RE/MAX Inmomás-adviseur',
+          labelSv: 'RE/MAX Inmomás-rådgivare',
+          labelBg: 'Консултант RE/MAX Inmomás'
         },
         colaborador: {
           icon: '🤝',
           labelEn: 'Collaborator / Partner',
           labelEs: 'Colaborador',
           labelFr: 'Collaborateur / Partenaire',
-          labelEnCa: 'Collaborator / Partner'
+          labelEnCa: 'Collaborator / Partner',
+          labelFrEu: 'Apporteur d\'Affaires / CGP',
+          labelNl: 'Financieel Adviseur / Partner',
+          labelSv: 'Samarbetspartner / Rådgivare',
+          labelBg: 'Бизнес партньор / Консултант'
         }
       };
 
@@ -674,12 +750,18 @@ App.views.public = {
         typeSelect.innerHTML = availableTypes.map((type) => {
           const cfg = typeConfig[type] || typeConfig.realtor;
           const isSelected = type === selectedType;
-          const txtEn = `${cfg.icon} ${cfg.labelEn}`;
-          const txtEs = `${cfg.icon} ${cfg.labelEs}`;
-          const txtFr = `${cfg.icon} ${cfg.labelFr}`;
-          const txtCa = `${cfg.icon} ${cfg.labelEnCa}`;
-          const initialTxt = activeLang === 'es' ? txtEs : (activeLang === 'fr' ? txtFr : (activeLang === 'en-ca' ? txtCa : txtEn));
-          return `<option value="${type}" data-i18n-en="${txtEn}" data-i18n-es="${txtEs}" data-i18n-fr="${txtFr}" data-i18n-en-ca="${txtCa}" ${isSelected ? 'selected' : ''}>${initialTxt}</option>`;
+          const txtMap = {
+            en: `${cfg.icon} ${cfg.labelEn}`,
+            es: `${cfg.icon} ${cfg.labelEs}`,
+            fr: `${cfg.icon} ${cfg.labelFr}`,
+            'en-ca': `${cfg.icon} ${cfg.labelEnCa}`,
+            'fr-eu': `${cfg.icon} ${cfg.labelFrEu}`,
+            nl: `${cfg.icon} ${cfg.labelNl}`,
+            sv: `${cfg.icon} ${cfg.labelSv}`,
+            bg: `${cfg.icon} ${cfg.labelBg}`
+          };
+          const initialTxt = txtMap[activeLang] || txtMap.en;
+          return `<option value="${type}" data-i18n-en="${txtMap.en}" data-i18n-es="${txtMap.es}" data-i18n-fr="${txtMap.fr}" data-i18n-en-ca="${txtMap['en-ca']}" data-i18n-fr-eu="${txtMap['fr-eu']}" data-i18n-nl="${txtMap.nl}" data-i18n-sv="${txtMap.sv}" data-i18n-bg="${txtMap.bg}" ${isSelected ? 'selected' : ''}>${initialTxt}</option>`;
         }).join('');
         typeSelect.value = selectedType;
 
@@ -743,6 +825,10 @@ App.views.public = {
           const cDateObj = new Date(Date.UTC(cy, cm - 1, cd, 12, 0, 0));
           const monthsEn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
           const monthsFullEs = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+          const monthsShortFr = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+          const monthsShortNl = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+          const monthsShortSv = ['jan','feb','mars','apr','maj','juni','juli','aug','sep','okt','nov','dec'];
+          const monthsShortBg = ['яну','фев','мар','апр','май','юни','юли','авг','сеп','окт','ное','дек'];
 
           const cmIdx = cDateObj.getUTCMonth();
           const cdNum = cDateObj.getUTCDate();
@@ -770,7 +856,7 @@ App.views.public = {
 
           const cDateVal = document.getElementById('client-webinar-date-val');
           if (cDateVal) {
-            cDateVal.innerHTML = `<span class="lang-en">${cdNum} ${monthsEn[cmIdx]} ${cyNum}</span><span class="lang-es">${cdNum} de ${monthsFullEs[cmIdx]}, ${cyNum}</span><span class="lang-en-ca">${cdNum} ${monthsEn[cmIdx]} ${cyNum}</span>`;
+            cDateVal.innerHTML = `<span class="lang-en">${cdNum} ${monthsEn[cmIdx]} ${cyNum}</span><span class="lang-es">${cdNum} de ${monthsFullEs[cmIdx]}, ${cyNum}</span><span class="lang-fr">${cdNum} ${monthsShortFr[cmIdx]} ${cyNum}</span><span class="lang-en-ca">${cdNum} ${monthsEn[cmIdx]} ${cyNum}</span><span class="lang-fr-eu">${cdNum} ${monthsShortFr[cmIdx]} ${cyNum}</span><span class="lang-nl">${cdNum} ${monthsShortNl[cmIdx]} ${cyNum}</span><span class="lang-sv">${cdNum} ${monthsShortSv[cmIdx]} ${cyNum}</span><span class="lang-bg">${cdNum} ${monthsShortBg[cmIdx]} ${cyNum}</span>`;
           }
 
           const cTimeVal = document.getElementById('client-webinar-time-val');
@@ -1045,7 +1131,7 @@ App.views.public = {
         } finally {
           if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<span class="lang-en">Submit</span><span class="lang-es">Enviar</span>';
+            submitBtn.innerHTML = '<span class="lang-en">Submit</span><span class="lang-es">Enviar</span><span class="lang-fr">Envoyer</span><span class="lang-en-ca">Submit</span><span class="lang-fr-eu">Envoyer</span><span class="lang-nl">Versturen</span><span class="lang-sv">Skicka</span><span class="lang-bg">Изпрати</span>';
           }
         }
       });
@@ -1102,10 +1188,16 @@ App.views.public = {
       const monthsEn = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       const monthsEs = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
       const monthsFr = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+      const monthsNl = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+      const monthsSv = ['januari','februari','mars','april','maj','juni','juli','augusti','september','oktober','november','december'];
+      const monthsBg = ['януари','февруари','март','април','май','юни','юли','август','септември','октомври','ноември','декември'];
 
       const daysEn = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
       const daysEs = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
       const daysFr = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+      const daysNl = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+      const daysSv = ['Söndag','Måndag','Tisdag','Onsdag','Torsdag','Fredag','Lördag'];
+      const daysBg = ['Неделя','Понеделник','Вторник','Сряда','Четвъртък','Петък','Събота'];
 
       const dayOfWeek = dateObj.getUTCDay();
       const monthIndex = dateObj.getUTCMonth();
@@ -1115,10 +1207,16 @@ App.views.public = {
       const formattedDateEn = `${monthsEn[monthIndex]} ${dayNum}, ${yearNum}`;
       const formattedDateEs = `${dayNum} de ${monthsEs[monthIndex]}, ${yearNum}`;
       const formattedDateFr = `${dayNum} ${monthsFr[monthIndex]} ${yearNum}`;
+      const formattedDateNl = `${dayNum} ${monthsNl[monthIndex]} ${yearNum}`;
+      const formattedDateSv = `${dayNum} ${monthsSv[monthIndex]} ${yearNum}`;
+      const formattedDateBg = `${dayNum} ${monthsBg[monthIndex]} ${yearNum} г.`;
 
       const dayDateEn = `${daysEn[dayOfWeek]}, ${monthsEn[monthIndex]} ${dayNum}, ${yearNum}`;
       const dayDateEs = `${daysEs[dayOfWeek]}, ${dayNum} de ${monthsEs[monthIndex]} de ${yearNum}`;
       const dayDateFr = `${daysFr[dayOfWeek]} ${dayNum} ${monthsFr[monthIndex]} ${yearNum}`;
+      const dayDateNl = `${daysNl[dayOfWeek]} ${dayNum} ${monthsNl[monthIndex]} ${yearNum}`;
+      const dayDateSv = `${daysSv[dayOfWeek]} ${dayNum} ${monthsSv[monthIndex]} ${yearNum}`;
+      const dayDateBg = `${daysBg[dayOfWeek]}, ${dayNum} ${monthsBg[monthIndex]} ${yearNum} г.`;
 
       // ── Timezone Conversions (handles Spain CET/CEST vs North America DST) ──
       const [hourRef, minRef] = timeStr.split(':').map(Number);
@@ -1142,10 +1240,16 @@ App.views.public = {
       const nyUtcOffset = isUSWinterTime ? -5 : -4;    // EST = -5, EDT = -4
       const diffHours = spainUtcOffset - nyUtcOffset;  // 5 hours during Oct 25–31, 6 hours otherwise
       const spainTzLabel = isSpainWinterTime ? 'CET' : 'CEST';
+      const bgTzLabel = isSpainWinterTime ? 'EET' : 'EEST';
 
       const cestTime = formatTime12(hourRef, minRef);
       const cestHour24 = hourRef;
-      const cestTime24 = minRef === 0 ? `${cestHour24}:00 h` : `${cestHour24}:${String(minRef).padStart(2, '0')} h`;
+      const minPad = String(minRef).padStart(2, '0');
+      const cestTime24 = minRef === 0 ? `${cestHour24}:00 h` : `${cestHour24}:${minPad} h`;
+      const euTimeFr = `${cestHour24}h${minPad}`;
+      const euTime24 = `${String(cestHour24).padStart(2, '0')}:${minPad}`;
+      const bgHour24 = (cestHour24 + 1) % 24;
+      const bgTime24 = `${String(bgHour24).padStart(2, '0')}:${minPad} ч.`;
       const adtTime = formatTime12((hourRef - (diffHours - 1) + 24) % 24, minRef);
       const edtTime = formatTime12((hourRef - diffHours + 24) % 24, minRef);
       const cdtTime = formatTime12((hourRef - (diffHours + 1) + 24) % 24, minRef);
@@ -1208,12 +1312,29 @@ App.views.public = {
         const targetDescEn = activeType === 'b2b' ? 'Free for Agents & Brokers' : 'Free for Buyers & Investors';
         const targetDescEs = activeType === 'b2b' ? 'Gratuito para Agentes y Brokers' : 'Gratuito para Compradores e Inversores';
         const targetDescFr = activeType === 'b2b' ? 'Gratuit pour Agents & Courtiers' : 'Gratuit pour Acheteurs & Investisseurs';
+        const targetDescFrEu = activeType === 'b2b' ? 'Gratuit Agences & CGP' : 'Accès Gratuit Acquéreurs';
+        const targetDescNl = activeType === 'b2b' ? 'Gratis voor Makelaars' : 'Gratis voor Kopers & Beleggers';
+        const targetDescSv = activeType === 'b2b' ? 'Kostnadsfritt för Mäklare' : 'Kostnadsfritt för Bostadsköpare';
+        const targetDescBg = activeType === 'b2b' ? 'Безплатно за агенции и брокери' : 'Безплатно за купувачи и инвеститори';
+
+        const tpFrEu = config.titlePrefix['fr-eu'] || config.titlePrefix.fr || config.titlePrefix.en;
+        const thFrEu = config.titleHighlight['fr-eu'] || config.titleHighlight.fr || config.titleHighlight.en;
+        const tpNl = config.titlePrefix.nl || config.titlePrefix.en;
+        const thNl = config.titleHighlight.nl || config.titleHighlight.en;
+        const tpSv = config.titlePrefix.sv || config.titlePrefix.en;
+        const thSv = config.titleHighlight.sv || config.titleHighlight.en;
+        const tpBg = config.titlePrefix.bg || config.titlePrefix.en;
+        const thBg = config.titleHighlight.bg || config.titleHighlight.en;
 
         bannerTextEl.innerHTML = `
           <span class="lang-en">🎙️ <strong>${config.titlePrefix.en} ${config.titleHighlight.en}</strong> &nbsp;&middot;&nbsp; ${monthsEn[monthIndex]} ${dayNum}<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime} Spain &nbsp;&middot;&nbsp; ${targetDescEn}</span></span>
           <span class="lang-es">🎙️ <strong>${config.titlePrefix.es} ${config.titleHighlight.es}</strong> &nbsp;&middot;&nbsp; ${dayNum} ${monthsEs[monthIndex]}<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime24} España &nbsp;&middot;&nbsp; ${targetDescEs}</span></span>
           <span class="lang-fr">🎙️ <strong>${config.titlePrefix.fr} ${config.titleHighlight.fr}</strong> &nbsp;&middot;&nbsp; ${dayNum} ${monthsFr[monthIndex]}<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime24} Espagne &nbsp;&middot;&nbsp; ${targetDescFr}</span></span>
           <span class="lang-en-ca">🎙️ <strong>${config.titlePrefix['en-ca'] || config.titlePrefix.en} ${config.titleHighlight['en-ca'] || config.titleHighlight.en}</strong> &nbsp;&middot;&nbsp; ${monthsEn[monthIndex]} ${dayNum}<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; ${edtTime} / ${cestTime} Spain &nbsp;&middot;&nbsp; ${targetDescEn}</span></span>
+          <span class="lang-fr-eu">🎙️ <strong>${tpFrEu} ${thFrEu}</strong> &nbsp;&middot;&nbsp; ${dayNum} ${monthsFr[monthIndex]}<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; ${euTimeFr} ${spainTzLabel} (Paris / Bruxelles) &nbsp;&middot;&nbsp; ${targetDescFrEu}</span></span>
+          <span class="lang-nl">🎙️ <strong>${tpNl} ${thNl}</strong> &nbsp;&middot;&nbsp; ${dayNum} ${monthsNl[monthIndex]}<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; ${euTime24} uur ${spainTzLabel} (NL / BE) &nbsp;&middot;&nbsp; ${targetDescNl}</span></span>
+          <span class="lang-sv">🎙️ <strong>${tpSv} ${thSv}</strong> &nbsp;&middot;&nbsp; ${dayNum} ${monthsSv[monthIndex]}<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; kl. ${euTime24} ${spainTzLabel} (Sverige) &nbsp;&middot;&nbsp; ${targetDescSv}</span></span>
+          <span class="lang-bg">🎙️ <strong>${tpBg} ${thBg}</strong> &nbsp;&middot;&nbsp; ${dayNum} ${monthsBg[monthIndex]}<span class="webinar-banner-extra"> &nbsp;&middot;&nbsp; ${bgTime24} ${bgTzLabel} (България) &nbsp;&middot;&nbsp; ${targetDescBg}</span></span>
         `;
       }
 
@@ -1225,6 +1346,10 @@ App.views.public = {
           <span class="lang-es">Solo ${spots} plazas</span>
           <span class="lang-fr">${spots} places seulement</span>
           <span class="lang-en-ca">${spots} spots only</span>
+          <span class="lang-fr-eu">${spots} places max.</span>
+          <span class="lang-nl">Slechts ${spots} plaatsen</span>
+          <span class="lang-sv">Endast ${spots} platser</span>
+          <span class="lang-bg">Само ${spots} места</span>
         `;
       }
 
@@ -1236,6 +1361,10 @@ App.views.public = {
           <span class="lang-es">🔴 WEBINAR EN VIVO<span class="webinar-band-extra"> &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Masterclass Exclusiva para Agentes y Brokers de EE.UU., Canadá y PR' : 'Vivir, Mudarse e Invertir en España'}</span> &nbsp;&middot;&nbsp; ${formattedDateEs} &nbsp;&middot;&nbsp; Registro GRATUITO</span>
           <span class="lang-fr">🔴 WEBINAIRE EN DIRECT<span class="webinar-band-extra"> &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Masterclass Exclusive pour Courtiers et Agents' : 'Vivre et Investir en Espagne'}</span> &nbsp;&middot;&nbsp; ${formattedDateFr} &nbsp;&middot;&nbsp; Inscription GRATUITE</span>
           <span class="lang-en-ca">🔴 LIVE WEBINAR<span class="webinar-band-extra"> &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Exclusive Masterclass for North American Realtors' : 'Living, Moving & Investing in Spain'}</span> &nbsp;&middot;&nbsp; ${formattedDateEn} &nbsp;&middot;&nbsp; FREE Registration</span>
+          <span class="lang-fr-eu">🔴 CONFÉRENCE EN DIRECT<span class="webinar-band-extra"> &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Réseau Partenaire Agences, Mandataires & CGP' : 'Acheter, S\'installer & Investir sur la Costa Blanca'}</span> &nbsp;&middot;&nbsp; ${formattedDateFr} &nbsp;&middot;&nbsp; Accès GRATUIT</span>
+          <span class="lang-nl">🔴 LIVE WEBINAR<span class="webinar-band-extra"> &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Partnersessie voor Makelaars & Financieel Adviseurs' : 'Zorgeloos Kopen, Wonen & Verhuren in Spanje'}</span> &nbsp;&middot;&nbsp; ${formattedDateNl} &nbsp;&middot;&nbsp; GRATIS Aanmelding</span>
+          <span class="lang-sv">🔴 LIVE WEBBINARIUM<span class="webinar-band-extra"> &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Partnerwebbinarium för Svenska Fastighetsmäklare' : 'Tryggt Bostadsköp, Juridik & Boende i Spanien'}</span> &nbsp;&middot;&nbsp; ${formattedDateSv} &nbsp;&middot;&nbsp; Kostnadsfritt</span>
+          <span class="lang-bg">🔴 УЕБИНАР НА ЖИВО<span class="webinar-band-extra"> &nbsp;&middot;&nbsp; 🇪🇸 ${activeType === 'b2b' ? 'Партньорска среща за агенции и брокери от България' : 'Покупка на имот, правна сигурност и доходност в Испания'}</span> &nbsp;&middot;&nbsp; ${formattedDateBg} &nbsp;&middot;&nbsp; БЕЗПЛАТНА Регистрация</span>
         `;
       }
 
@@ -1255,6 +1384,10 @@ App.views.public = {
           <span class="lang-es">${config.heroPill.es}</span>
           <span class="lang-fr">${config.heroPill.fr}</span>
           <span class="lang-en-ca">${config.heroPill['en-ca'] || config.heroPill.en}</span>
+          <span class="lang-fr-eu">${config.heroPill['fr-eu'] || config.heroPill.fr || config.heroPill.en}</span>
+          <span class="lang-nl">${config.heroPill.nl || config.heroPill.en}</span>
+          <span class="lang-sv">${config.heroPill.sv || config.heroPill.en}</span>
+          <span class="lang-bg">${config.heroPill.bg || config.heroPill.en}</span>
         `;
       }
 
@@ -1278,6 +1411,10 @@ App.views.public = {
         setPrefixHighlight('es', config.titlePrefix.es, config.titleHighlight.es);
         setPrefixHighlight('fr', config.titlePrefix.fr, config.titleHighlight.fr);
         setPrefixHighlight('en-ca', config.titlePrefix['en-ca'] || config.titlePrefix.en, config.titleHighlight['en-ca'] || config.titleHighlight.en);
+        setPrefixHighlight('fr-eu', config.titlePrefix['fr-eu'] || config.titlePrefix.fr || config.titlePrefix.en, config.titleHighlight['fr-eu'] || config.titleHighlight.fr || config.titleHighlight.en);
+        setPrefixHighlight('nl', config.titlePrefix.nl || config.titlePrefix.en, config.titleHighlight.nl || config.titleHighlight.en);
+        setPrefixHighlight('sv', config.titlePrefix.sv || config.titlePrefix.en, config.titleHighlight.sv || config.titleHighlight.en);
+        setPrefixHighlight('bg', config.titlePrefix.bg || config.titlePrefix.en, config.titleHighlight.bg || config.titleHighlight.en);
       }
 
       // ── 5. Hero Subtitle ──
@@ -1288,6 +1425,10 @@ App.views.public = {
           <span class="lang-es">${config.subtitleText.es}</span>
           <span class="lang-fr">${config.subtitleText.fr}</span>
           <span class="lang-en-ca">${config.subtitleText['en-ca'] || config.subtitleText.en}</span>
+          <span class="lang-fr-eu">${config.subtitleText['fr-eu'] || config.subtitleText.fr || config.subtitleText.en}</span>
+          <span class="lang-nl">${config.subtitleText.nl || config.subtitleText.en}</span>
+          <span class="lang-sv">${config.subtitleText.sv || config.subtitleText.en}</span>
+          <span class="lang-bg">${config.subtitleText.bg || config.subtitleText.en}</span>
         `;
       }
 
@@ -1304,6 +1445,10 @@ App.views.public = {
           <span class="lang-es">Solo ${spots} plazas disponibles</span>
           <span class="lang-fr">Seulement ${spots} places disponibles</span>
           <span class="lang-en-ca">Only ${spots} spots available</span>
+          <span class="lang-fr-eu">${spots} places disponibles (Q&amp;R en direct)</span>
+          <span class="lang-nl">Slechts ${spots} plaatsen beschikbaar</span>
+          <span class="lang-sv">Endast ${spots} platser tillgängliga</span>
+          <span class="lang-bg">Само ${spots} свободни места</span>
         `;
       }
 
@@ -1316,6 +1461,10 @@ App.views.public = {
           <span class="lang-es">${dayDateEs} &mdash; Tu hora local</span>
           <span class="lang-fr">${dayDateFr} &mdash; Votre heure locale</span>
           <span class="lang-en-ca">${dayDateEn} &mdash; Your Local Time</span>
+          <span class="lang-fr-eu">${dayDateFr} &mdash; Heure Europe (${euTimeFr} ${spainTzLabel} Paris / Bruxelles)</span>
+          <span class="lang-nl">${dayDateNl} &mdash; Lokale tijd (${euTime24} uur ${spainTzLabel} NL / BE)</span>
+          <span class="lang-sv">${dayDateSv} &mdash; Svensk tid (kl. ${euTime24} ${spainTzLabel})</span>
+          <span class="lang-bg">${dayDateBg} &mdash; Българско време (${bgTime24} ${bgTzLabel})</span>
         `;
       }
 
@@ -1353,6 +1502,10 @@ App.views.public = {
           <span class="lang-es">${config.sectionHeadline.es}</span>
           <span class="lang-fr">${config.sectionHeadline.fr}</span>
           <span class="lang-en-ca">${config.sectionHeadline['en-ca'] || config.sectionHeadline.en}</span>
+          <span class="lang-fr-eu">${config.sectionHeadline['fr-eu'] || config.sectionHeadline.fr || config.sectionHeadline.en}</span>
+          <span class="lang-nl">${config.sectionHeadline.nl || config.sectionHeadline.en}</span>
+          <span class="lang-sv">${config.sectionHeadline.sv || config.sectionHeadline.en}</span>
+          <span class="lang-bg">${config.sectionHeadline.bg || config.sectionHeadline.en}</span>
         `;
       }
 
@@ -1363,6 +1516,10 @@ App.views.public = {
           <span class="lang-es">${config.sectionSubheadline.es}</span>
           <span class="lang-fr">${config.sectionSubheadline.fr}</span>
           <span class="lang-en-ca">${config.sectionSubheadline['en-ca'] || config.sectionSubheadline.en}</span>
+          <span class="lang-fr-eu">${config.sectionSubheadline['fr-eu'] || config.sectionSubheadline.fr || config.sectionSubheadline.en}</span>
+          <span class="lang-nl">${config.sectionSubheadline.nl || config.sectionSubheadline.en}</span>
+          <span class="lang-sv">${config.sectionSubheadline.sv || config.sectionSubheadline.en}</span>
+          <span class="lang-bg">${config.sectionSubheadline.bg || config.sectionSubheadline.en}</span>
         `;
       }
 
@@ -1378,12 +1535,20 @@ App.views.public = {
                 <span class="lang-es">${b.title?.es || ''}</span>
                 <span class="lang-fr">${b.title?.fr || ''}</span>
                 <span class="lang-en-ca">${b.title?.['en-ca'] || b.title?.en || ''}</span>
+                <span class="lang-fr-eu">${b.title?.['fr-eu'] || b.title?.fr || b.title?.en || ''}</span>
+                <span class="lang-nl">${b.title?.nl || b.title?.en || ''}</span>
+                <span class="lang-sv">${b.title?.sv || b.title?.en || ''}</span>
+                <span class="lang-bg">${b.title?.bg || b.title?.en || ''}</span>
               </div>
               <div style="color:rgba(255,255,255,.42);font-size:.8rem;line-height:1.55;">
                 <span class="lang-en">${b.desc?.en || ''}</span>
                 <span class="lang-es">${b.desc?.es || ''}</span>
                 <span class="lang-fr">${b.desc?.fr || ''}</span>
                 <span class="lang-en-ca">${b.desc?.['en-ca'] || b.desc?.en || ''}</span>
+                <span class="lang-fr-eu">${b.desc?.['fr-eu'] || b.desc?.fr || b.desc?.en || ''}</span>
+                <span class="lang-nl">${b.desc?.nl || b.desc?.en || ''}</span>
+                <span class="lang-sv">${b.desc?.sv || b.desc?.en || ''}</span>
+                <span class="lang-bg">${b.desc?.bg || b.desc?.en || ''}</span>
               </div>
             </div>
           </div>
@@ -1418,12 +1583,30 @@ App.views.public = {
 
       const cardHeaderTitle = document.getElementById('webinar-card-header-title');
       if (cardHeaderTitle && config.titlePrefix && config.titleHighlight) {
-        cardHeaderTitle.textContent = `${config.titlePrefix.en} ${config.titleHighlight.en} · ${formattedDateEn}`;
+        cardHeaderTitle.innerHTML = `
+          <span class="lang-en">${config.titlePrefix.en} ${config.titleHighlight.en} · ${formattedDateEn}</span>
+          <span class="lang-es">${config.titlePrefix.es} ${config.titleHighlight.es} · ${formattedDateEs}</span>
+          <span class="lang-fr">${config.titlePrefix.fr} ${config.titleHighlight.fr} · ${formattedDateFr}</span>
+          <span class="lang-en-ca">${config.titlePrefix['en-ca'] || config.titlePrefix.en} ${config.titleHighlight['en-ca'] || config.titleHighlight.en} · ${formattedDateEn}</span>
+          <span class="lang-fr-eu">${config.titlePrefix['fr-eu'] || config.titlePrefix.fr || config.titlePrefix.en} ${config.titleHighlight['fr-eu'] || config.titleHighlight.fr || config.titleHighlight.en} · ${formattedDateFr}</span>
+          <span class="lang-nl">${config.titlePrefix.nl || config.titlePrefix.en} ${config.titleHighlight.nl || config.titleHighlight.en} · ${formattedDateNl}</span>
+          <span class="lang-sv">${config.titlePrefix.sv || config.titlePrefix.en} ${config.titleHighlight.sv || config.titleHighlight.en} · ${formattedDateSv}</span>
+          <span class="lang-bg">${config.titlePrefix.bg || config.titlePrefix.en} ${config.titleHighlight.bg || config.titleHighlight.en} · ${formattedDateBg}</span>
+        `;
       }
 
       const cardHeaderSubtitle = document.getElementById('webinar-card-header-subtitle');
       if (cardHeaderSubtitle) {
-        cardHeaderSubtitle.textContent = `${cestTime} ${spainTzLabel} (Spain) | ${edtTime} EDT (Miami/NY/Toronto) | ${edtTime} AST (PR) | ${pdtTime} PDT`;
+        cardHeaderSubtitle.innerHTML = `
+          <span class="lang-en">${cestTime} ${spainTzLabel} (Spain) | ${edtTime} EDT (Miami/NY/Toronto) | ${edtTime} AST (PR) | ${pdtTime} PDT</span>
+          <span class="lang-es">${cestTime24} ${spainTzLabel} (España) | ${edtTime} EDT (Miami/NY) | ${pdtTime} PDT</span>
+          <span class="lang-fr">${cestTime24} ${spainTzLabel} (Espagne) | ${edtTime} EDT (Montréal/Toronto) | ${pdtTime} PDT</span>
+          <span class="lang-en-ca">${edtTime} EDT (Toronto/Ottawa) | ${pdtTime} PDT (Vancouver) | ${cestTime} ${spainTzLabel} (Spain)</span>
+          <span class="lang-fr-eu">${euTimeFr} ${spainTzLabel} (Paris · Bruxelles · Genève · Madrid)</span>
+          <span class="lang-nl">${euTime24} uur ${spainTzLabel} (Amsterdam · Brussel · Alicante)</span>
+          <span class="lang-sv">Kl. ${euTime24} ${spainTzLabel} (Stockholm · Göteborg · Madrid)</span>
+          <span class="lang-bg">${bgTime24} ${bgTzLabel} (София · Пловдив · Варна) &nbsp;|&nbsp; ${euTime24} ${spainTzLabel} (Испания)</span>
+        `;
       }
 
       const submitBtn = document.getElementById('webinar-submit-btn');
@@ -1441,11 +1624,15 @@ App.views.public = {
           <span class="lang-es">${config.organizationLabel.es}</span>
           <span class="lang-fr">${config.organizationLabel.fr}</span>
           <span class="lang-en-ca">${config.organizationLabel['en-ca'] || config.organizationLabel.en}</span>
+          <span class="lang-fr-eu">${config.organizationLabel['fr-eu'] || config.organizationLabel.fr || config.organizationLabel.en}</span>
+          <span class="lang-nl">${config.organizationLabel.nl || config.organizationLabel.en}</span>
+          <span class="lang-sv">${config.organizationLabel.sv || config.organizationLabel.en}</span>
+          <span class="lang-bg">${config.organizationLabel.bg || config.organizationLabel.en}</span>
         `;
       }
 
       const agencyInput = document.getElementById('webinar-agency');
-      if (agencyInput && config.organizationPlaceholder) {
+      if (agencyInput && config.organizationPlaceholder && (!window.App || window.App.getLanguage() === 'en')) {
         agencyInput.placeholder = config.organizationPlaceholder;
       }
 
@@ -1457,6 +1644,10 @@ App.views.public = {
           <span class="lang-es">Únete al webinar en vivo "${config.titlePrefix.es} ${config.titleHighlight.es}" el ${formattedDateEs}. ${config.subtitleText?.es || ''}</span>
           <span class="lang-fr">Rejoignez le webinaire en direct "${config.titlePrefix.fr} ${config.titleHighlight.fr}" le ${formattedDateFr}. ${config.subtitleText?.fr || ''}</span>
           <span class="lang-en-ca">Join the "${config.titlePrefix['en-ca'] || config.titlePrefix.en} ${config.titleHighlight['en-ca'] || config.titleHighlight.en}" live webinar on ${formattedDateEn}. ${config.subtitleText?.['en-ca'] || config.subtitleText?.en || ''}</span>
+          <span class="lang-fr-eu">Participez à la conférence en direct "${config.titlePrefix['fr-eu'] || config.titlePrefix.fr} ${config.titleHighlight['fr-eu'] || config.titleHighlight.fr}" le ${formattedDateFr}.</span>
+          <span class="lang-nl">Neem deel aan het live webinar "${config.titlePrefix.nl || config.titlePrefix.en} ${config.titleHighlight.nl || config.titleHighlight.en}" op ${formattedDateNl}.</span>
+          <span class="lang-sv">Delta i live-webbinariet "${config.titlePrefix.sv || config.titlePrefix.en} ${config.titleHighlight.sv || config.titleHighlight.en}" den ${formattedDateSv}.</span>
+          <span class="lang-bg">Включете се в уебинара на живо „${config.titlePrefix.bg || config.titlePrefix.en} ${config.titleHighlight.bg || config.titleHighlight.en}“ на ${formattedDateBg}.</span>
         `;
       }
 
@@ -1473,7 +1664,7 @@ App.views.public = {
           const now = new Date();
           const diff = targetDate - now;
           if (diff <= 0) {
-            countdownEl.innerHTML = '<span style="font-size:1.4rem;font-weight:700;color:#fff;">🎙️ The webinar is LIVE!</span>';
+            countdownEl.innerHTML = '<span style="font-size:1.4rem;font-weight:700;color:#fff;">🎙️ <span class="lang-en">The webinar is LIVE!</span><span class="lang-es">¡El webinar está EN VIVO!</span><span class="lang-fr">Le webinaire est EN DIRECT !</span><span class="lang-en-ca">The webinar is LIVE!</span><span class="lang-fr-eu">La conférence est EN DIRECT !</span><span class="lang-nl">Het webinar is NU LIVE!</span><span class="lang-sv">Webbinariet sänds NU LIVE!</span><span class="lang-bg">Уебинарът е НА ЖИВО!</span></span>';
             return;
           }
           const d = Math.floor(diff / 86400000);
@@ -1485,22 +1676,22 @@ App.views.public = {
             <div class="webinar-countdown-row" style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;align-items:center;">
               <div class="webinar-countdown-unit" style="text-align:center;min-width:52px;">
                 <div class="webinar-countdown-num" style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${d}</div>
-                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Days</span><span class="lang-es">Días</span><span class="lang-fr">Jours</span><span class="lang-en-ca">Days</span></div>
+                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Days</span><span class="lang-es">Días</span><span class="lang-fr">Jours</span><span class="lang-en-ca">Days</span><span class="lang-fr-eu">Jours</span><span class="lang-nl">Dagen</span><span class="lang-sv">Dagar</span><span class="lang-bg">Дни</span></div>
               </div>
               <div class="webinar-countdown-sep" style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
               <div class="webinar-countdown-unit" style="text-align:center;min-width:52px;">
                 <div class="webinar-countdown-num" style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(h)}</div>
-                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Hours</span><span class="lang-es">Horas</span><span class="lang-fr">Heures</span><span class="lang-en-ca">Hours</span></div>
+                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Hours</span><span class="lang-es">Horas</span><span class="lang-fr">Heures</span><span class="lang-en-ca">Hours</span><span class="lang-fr-eu">Heures</span><span class="lang-nl">Uur</span><span class="lang-sv">Timmar</span><span class="lang-bg">Часа</span></div>
               </div>
               <div class="webinar-countdown-sep" style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
               <div class="webinar-countdown-unit" style="text-align:center;min-width:52px;">
                 <div class="webinar-countdown-num" style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(m)}</div>
-                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Min</span><span class="lang-es">Min</span><span class="lang-fr">Min</span><span class="lang-en-ca">Min</span></div>
+                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Min</span><span class="lang-es">Min</span><span class="lang-fr">Min</span><span class="lang-en-ca">Min</span><span class="lang-fr-eu">Min</span><span class="lang-nl">Min</span><span class="lang-sv">Min</span><span class="lang-bg">Мин</span></div>
               </div>
               <div class="webinar-countdown-sep" style="font-size:2rem;color:rgba(255,255,255,.3);padding-bottom:18px;">:</div>
               <div class="webinar-countdown-unit" style="text-align:center;min-width:52px;">
                 <div class="webinar-countdown-num" style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;font-variant-numeric:tabular-nums;">${pad(s)}</div>
-                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Sec</span><span class="lang-es">Seg</span><span class="lang-fr">Sec</span><span class="lang-en-ca">Sec</span></div>
+                <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.55);margin-top:4px;"><span class="lang-en">Sec</span><span class="lang-es">Seg</span><span class="lang-fr">Sec</span><span class="lang-en-ca">Sec</span><span class="lang-fr-eu">Sec</span><span class="lang-nl">Sec</span><span class="lang-sv">Sek</span><span class="lang-bg">Сек</span></div>
               </div>
             </div>`;
         }
@@ -1550,31 +1741,60 @@ App.views.public = {
 
     function populateStates(country) {
       if (!stateSelect) return;
-      const isEs = document.body.classList.contains('lang-es');
-      const isFr = document.body.classList.contains('lang-fr');
+      const curLang = (window.App && typeof window.App.getLanguage === 'function') ? window.App.getLanguage() : 'en';
       if (country === 'United States' || !country) {
-        const lbl = isEs ? '— Selecciona Estado —' : (isFr ? '— Sélectionner un État —' : '— Select State —');
-        stateSelect.innerHTML = `<option value="" data-i18n-en="— Select State —" data-i18n-es="— Selecciona Estado —" data-i18n-fr="— Sélectionner un État —" data-i18n-en-ca="— Select State —">${lbl}</option>` +
+        const map = {
+          en: '— Select State —', es: '— Selecciona Estado —', fr: '— Sélectionner un État —', 'en-ca': '— Select State —',
+          'fr-eu': '— Sélectionner un État —', nl: '— Kies een staat —', sv: '— Välj delstat —', bg: '— Изберете щат —'
+        };
+        stateSelect.innerHTML = `<option value="" data-i18n-en="${map.en}" data-i18n-es="${map.es}" data-i18n-fr="${map.fr}" data-i18n-en-ca="${map['en-ca']}" data-i18n-fr-eu="${map['fr-eu']}" data-i18n-nl="${map.nl}" data-i18n-sv="${map.sv}" data-i18n-bg="${map.bg}">${map[curLang] || map.en}</option>` +
           US_STATES.map(s => `<option value="${s}">${s}</option>`).join('');
       } else if (country === 'Canada') {
-        const lbl = isEs ? '— Selecciona Provincia / Territorio —' : (isFr ? '— Sélectionner une Province —' : '— Select Province / Territory —');
-        stateSelect.innerHTML = `<option value="" data-i18n-en="— Select Province / Territory —" data-i18n-es="— Selecciona Provincia / Territorio —" data-i18n-fr="— Sélectionner une Province —" data-i18n-en-ca="— Select Province / Territory —">${lbl}</option>` +
+        const map = {
+          en: '— Select Province / Territory —', es: '— Selecciona Provincia / Territorio —', fr: '— Sélectionner une Province —', 'en-ca': '— Select Province / Territory —',
+          'fr-eu': '— Sélectionner une Province —', nl: '— Kies een provincie —', sv: '— Välj provins —', bg: '— Изберете провинция —'
+        };
+        stateSelect.innerHTML = `<option value="" data-i18n-en="${map.en}" data-i18n-es="${map.es}" data-i18n-fr="${map.fr}" data-i18n-en-ca="${map['en-ca']}" data-i18n-fr-eu="${map['fr-eu']}" data-i18n-nl="${map.nl}" data-i18n-sv="${map.sv}" data-i18n-bg="${map.bg}">${map[curLang] || map.en}</option>` +
           CA_PROVINCES.map(s => `<option value="${s}">${s}</option>`).join('');
       } else if (country === 'Puerto Rico') {
-        const lbl = isEs ? '— Selecciona Municipio / Región —' : (isFr ? '— Sélectionner une Municipalité —' : '— Select Region / Municipality —');
-        stateSelect.innerHTML = `<option value="" data-i18n-en="— Select Region / Municipality —" data-i18n-es="— Selecciona Municipio / Región —" data-i18n-fr="— Sélectionner une Municipalité —" data-i18n-en-ca="— Select Region / Municipality —">${lbl}</option>` +
+        const map = {
+          en: '— Select Region / Municipality —', es: '— Selecciona Municipio / Región —', fr: '— Sélectionner une Municipalité —', 'en-ca': '— Select Region / Municipality —',
+          'fr-eu': '— Sélectionner une région —', nl: '— Kies een regio —', sv: '— Välj kommun / region —', bg: '— Изберете регион —'
+        };
+        stateSelect.innerHTML = `<option value="" data-i18n-en="${map.en}" data-i18n-es="${map.es}" data-i18n-fr="${map.fr}" data-i18n-en-ca="${map['en-ca']}" data-i18n-fr-eu="${map['fr-eu']}" data-i18n-nl="${map.nl}" data-i18n-sv="${map.sv}" data-i18n-bg="${map.bg}">${map[curLang] || map.en}</option>` +
           PR_AREAS.map(s => `<option value="${s}">${s}</option>`).join('');
       } else if (country === 'Other') {
-        stateSelect.innerHTML = `<option value="International" data-i18n-en="🌍 International" data-i18n-es="🌍 Internacional" data-i18n-fr="🌍 International" data-i18n-en-ca="🌍 International" selected>${isEs ? '🌍 Internacional' : '🌍 International'}</option>`;
+        const map = {
+          en: '🌍 International', es: '🌍 Internacional', fr: '🌍 International', 'en-ca': '🌍 International',
+          'fr-eu': '🌍 International', nl: '🌍 Internationaal', sv: '🌍 Internationellt', bg: '🌍 Международен'
+        };
+        stateSelect.innerHTML = `<option value="International" data-i18n-en="${map.en}" data-i18n-es="${map.es}" data-i18n-fr="${map.fr}" data-i18n-en-ca="${map['en-ca']}" data-i18n-fr-eu="${map['fr-eu']}" data-i18n-nl="${map.nl}" data-i18n-sv="${map.sv}" data-i18n-bg="${map.bg}" selected>${map[curLang] || map.en}</option>`;
       } else {
+        const genMap = {
+          en: `📍 ${country} (General)`, es: `📍 ${country} (Principal / General)`, fr: `📍 ${country} (Général)`, 'en-ca': `📍 ${country} (General)`,
+          'fr-eu': `📍 ${country} (Ensemble du pays)`, nl: `📍 ${country} (Algemeen)`, sv: `📍 ${country} (Hela landet)`, bg: `📍 ${country} (Общо)`
+        };
+        const capMap = {
+          en: `🏙️ ${country} — Capital / Metro`, es: `🏙️ ${country} — Capital / Área Metropolitana`, fr: `🏙️ ${country} — Capitale / Métropole`, 'en-ca': `🏙️ ${country} — Capital / Metro`,
+          'fr-eu': `🏙️ ${country} — Capitale / Métropole`, nl: `🏙️ ${country} — Randstad / Hoofdstad`, sv: `🏙️ ${country} — Storstadsregion`, bg: `🏙️ ${country} — Столица / Голям град`
+        };
+        const othMap = {
+          en: '🌍 Other / International', es: '🌍 Otro / Internacional', fr: '🌍 Autre / International', 'en-ca': '🌍 Other / International',
+          'fr-eu': '🌍 Autre région', nl: '🌍 Andere regio', sv: '🌍 Annan region', bg: '🌍 Друг регион'
+        };
         stateSelect.innerHTML =
-          `<option value="${country} — General" selected>📍 ${country} (${isEs ? 'Principal / General' : 'General'})</option>` +
-          `<option value="${country} — Capital / Metro">🏙️ ${country} — Capital / Metro</option>` +
-          `<option value="International" data-i18n-en="🌍 Other / International" data-i18n-es="🌍 Otro / Internacional" data-i18n-fr="🌍 Autre / International" data-i18n-en-ca="🌍 Other / International">${isEs ? '🌍 Otro / Internacional' : '🌍 Other / International'}</option>`;
+          `<option value="${country} — General" data-i18n-en="${genMap.en}" data-i18n-es="${genMap.es}" data-i18n-fr="${genMap.fr}" data-i18n-en-ca="${genMap['en-ca']}" data-i18n-fr-eu="${genMap['fr-eu']}" data-i18n-nl="${genMap.nl}" data-i18n-sv="${genMap.sv}" data-i18n-bg="${genMap.bg}" selected>${genMap[curLang] || genMap.en}</option>` +
+          `<option value="${country} — Capital / Metro" data-i18n-en="${capMap.en}" data-i18n-es="${capMap.es}" data-i18n-fr="${capMap.fr}" data-i18n-en-ca="${capMap['en-ca']}" data-i18n-fr-eu="${capMap['fr-eu']}" data-i18n-nl="${capMap.nl}" data-i18n-sv="${capMap.sv}" data-i18n-bg="${capMap.bg}">${capMap[curLang] || capMap.en}</option>` +
+          `<option value="International" data-i18n-en="${othMap.en}" data-i18n-es="${othMap.es}" data-i18n-fr="${othMap.fr}" data-i18n-en-ca="${othMap['en-ca']}" data-i18n-fr-eu="${othMap['fr-eu']}" data-i18n-nl="${othMap.nl}" data-i18n-sv="${othMap.sv}" data-i18n-bg="${othMap.bg}">${othMap[curLang] || othMap.en}</option>`;
       }
     }
 
     if (countrySelect && stateSelect) {
+      const curLangInit = (window.App && typeof window.App.getLanguage === 'function') ? window.App.getLanguage() : 'en';
+      const defaultCountryByLang = { 'fr-eu': 'France', nl: 'Netherlands', sv: 'Sweden', bg: 'Bulgaria', 'en-ca': 'Canada', fr: 'Canada' };
+      if (defaultCountryByLang[curLangInit] && countrySelect.value === 'United States') {
+        countrySelect.value = defaultCountryByLang[curLangInit];
+      }
       populateStates(countrySelect.value || 'United States');
       countrySelect.addEventListener('change', () => populateStates(countrySelect.value));
     }
@@ -1795,7 +2015,11 @@ App.views.public = {
           en: '— Select an agent —',
           es: '— Selecciona un agente —',
           fr: '— Sélectionner un agent —',
-          'en-ca': '— Select an agent —'
+          'en-ca': '— Select an agent —',
+          'fr-eu': '— Sélectionner un conseiller —',
+          nl: '— Kies een adviseur —',
+          sv: '— Välj en rådgivare —',
+          bg: '— Изберете консултант —'
         }
       });
     };
@@ -1842,7 +2066,7 @@ App.views.public = {
       const restoreBtn = () => {
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = '🎙️ <span class="lang-en">Reserve My Free Spot Now</span><span class="lang-es">Reservar Mi Plaza Gratuita Ahora</span><span class="lang-fr">Réserver Ma Place Gratuite Maintenant</span><span class="lang-en-ca">Reserve My Free Spot Now</span>';
+          btn.innerHTML = '🎙️ <span class="lang-en">Reserve My Free Spot Now</span><span class="lang-es">Reservar Mi Plaza Gratuita Ahora</span><span class="lang-fr">Réserver Ma Place Gratuite Maintenant</span><span class="lang-en-ca">Reserve My Free Spot Now</span><span class="lang-fr-eu">Confirmer mon inscription gratuite</span><span class="lang-nl">Meld mij nu gratis aan</span><span class="lang-sv">Registrera min kostnadsfria plats</span><span class="lang-bg">Запази безплатното ми място сега</span>';
         }
       };
       if (btn) { btn.disabled = true; btn.innerHTML = '<span style="opacity:.7">Registering…</span>'; }

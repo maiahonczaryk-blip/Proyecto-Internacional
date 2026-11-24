@@ -5,17 +5,23 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  // ── Language Selector (4 idiomas: EN, ES, FR, EN-CA) ──
+  // ── Language Selector (8 idiomas: EN, ES, FR-CA, EN-CA, FR-EU, NL, SV, BG) ──
   const body = document.body;
   let currentLang = 'en';
   const LANG_STORAGE_KEY = 'remax_lang';
 
   const langConfig = {
-    en:      { code: 'EN' },
-    es:      { code: 'ES' },
-    fr:      { code: 'FR' },
-    'en-ca': { code: 'EN-CA' }
+    en:      { code: 'EN',    htmlLang: 'en' },
+    es:      { code: 'ES',    htmlLang: 'es' },
+    fr:      { code: 'FR-CA', htmlLang: 'fr-CA' },
+    'en-ca': { code: 'EN-CA', htmlLang: 'en-CA' },
+    'fr-eu': { code: 'FR',    htmlLang: 'fr' },
+    nl:      { code: 'NL',    htmlLang: 'nl' },
+    sv:      { code: 'SV',    htmlLang: 'sv' },
+    bg:      { code: 'BG',    htmlLang: 'bg' }
   };
+  const ALL_BODY_LANG_CLASSES = Object.keys(langConfig).map(k => 'lang-' + k);
+  const NON_DASHBOARD_LANGS = ['fr', 'en-ca', 'fr-eu', 'nl', 'sv', 'bg'];
 
   const langSelectorWrapper = document.getElementById('lang-selector-wrapper');
   const langSelectorBtn = document.getElementById('lang-selector-btn');
@@ -24,9 +30,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const langDropdown = document.getElementById('lang-dropdown');
   const langDropdownItems = document.querySelectorAll('.lang-dropdown-item');
 
+  function toDatasetSuffix(lang) {
+    return lang.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('');
+  }
+
   function syncDynamicI18nAttributes(lang) {
-    const attrKey = lang === 'en-ca' ? 'i18nEnCa' : ('i18n' + lang.charAt(0).toUpperCase() + lang.slice(1));
-    const fallbackKey = lang === 'es' ? 'i18nEs' : 'i18nEn';
+    const suffix = toDatasetSuffix(lang);
+    const attrKey = 'i18n' + suffix;
+    const fallbackKey = lang === 'es' ? 'i18nEs' : (lang === 'fr-eu' ? 'i18nFr' : 'i18nEn');
 
     // Sync <option> and text-only elements carrying data-i18n-* attributes
     document.querySelectorAll('[data-i18n-en], [data-i18n-es]').forEach(el => {
@@ -36,10 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Sync input/textarea placeholders carrying data-placeholder-en / data-placeholder-es
-    const phKey = lang === 'es' ? 'placeholderEs' : 'placeholderEn';
+    // Sync input/textarea placeholders carrying data-placeholder-*
+    const phKey = 'placeholder' + suffix;
+    const phFallbackKey = lang === 'es' ? 'placeholderEs' : (lang === 'fr-eu' ? 'placeholderFr' : 'placeholderEn');
     document.querySelectorAll('[data-placeholder-en], [data-placeholder-es]').forEach(el => {
-      const nextPh = el.dataset[phKey] || el.dataset.placeholderEn || el.dataset.placeholderEs;
+      const nextPh = el.dataset[phKey] || el.dataset[phFallbackKey] || el.dataset.placeholderEn || el.dataset.placeholderEs;
       if (nextPh !== undefined) {
         el.placeholder = nextPh;
       }
@@ -55,21 +67,21 @@ document.addEventListener('DOMContentLoaded', () => {
   function setLang(lang, options = {}) {
     if (!langConfig[lang]) return;
     const isDashboard = body.classList.contains('dashboard-body');
-    const effectiveLang = (isDashboard && (lang === 'fr' || lang === 'en-ca')) ? 'en' : lang;
+    const effectiveLang = (isDashboard && NON_DASHBOARD_LANGS.includes(lang)) ? 'en' : lang;
     currentLang = effectiveLang;
 
-    // Persist preference across sessions unless suppressed (e.g. dashboard fallback from FR/EN-CA)
+    // Persist preference across sessions unless suppressed (e.g. dashboard fallback)
     if (options.persist !== false) {
       try { localStorage.setItem(LANG_STORAGE_KEY, effectiveLang); } catch(e) {}
     }
 
     // Update body class
-    body.classList.remove('lang-en', 'lang-es', 'lang-fr', 'lang-en-ca');
+    body.classList.remove(...ALL_BODY_LANG_CLASSES);
     body.classList.add('lang-' + effectiveLang);
 
-    // Update html lang attribute
-    const htmlLangMap = { en: 'en', es: 'es', fr: 'fr', 'en-ca': 'en-CA' };
-    document.documentElement.lang = htmlLangMap[effectiveLang] || 'en';
+    // Update html lang attribute & data-lang attribute
+    document.documentElement.lang = langConfig[effectiveLang].htmlLang || 'en';
+    document.documentElement.setAttribute('data-lang', effectiveLang);
 
     // Update button appearance on landing navbar (code only — flag handled by CSS span)
     if (langCode) langCode.textContent = langConfig[effectiveLang].code;
@@ -154,18 +166,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // Auto-detect from browser language
         const bl = (navigator.language || navigator.userLanguage || '').toLowerCase();
         if (bl.startsWith('es')) lang = 'es';
-        else if (bl.startsWith('fr')) lang = 'fr';
-        // en-CA detection: Canadian English or Canadian French
-        if (bl === 'en-ca') lang = 'en-ca';
-        if (bl === 'fr-ca') lang = 'fr';
+        else if (bl === 'fr-ca') lang = 'fr';
+        else if (bl.startsWith('fr')) lang = 'fr-eu';
+        else if (bl === 'en-ca') lang = 'en-ca';
+        else if (bl.startsWith('nl')) lang = 'nl';
+        else if (bl.startsWith('sv')) lang = 'sv';
+        else if (bl.startsWith('bg')) lang = 'bg';
       }
     } catch(e) { lang = 'en'; }
 
     // Dashboard pages (app.html) only have EN and ES content.
-    // If FR or EN-CA was saved on the landing page, render EN on dashboards without overwriting saved FR/EN-CA.
+    // If another public language was saved on the landing page, render EN on dashboards without overwriting saved preference.
     const isDashboard = body.classList.contains('dashboard-body');
-    const isFallbackFromFrCa = isDashboard && (lang === 'fr' || lang === 'en-ca');
-    setLang(isFallbackFromFrCa ? 'en' : lang, { persist: !isFallbackFromFrCa || !hadSaved });
+    const isFallback = isDashboard && NON_DASHBOARD_LANGS.includes(lang);
+    setLang(isFallback ? 'en' : lang, { persist: !isFallback || !hadSaved });
   })();
 
   function updateFormPlaceholders(lang) {
@@ -174,25 +188,121 @@ document.addEventListener('DOMContentLoaded', () => {
         'first-name': 'John',
         'last-name': 'Smith',
         'email': 'john@example.com',
-        'phone': '+1 (555) 123-4567'
+        'phone': '+1 (555) 123-4567',
+        'referral-firstName': 'John',
+        'referral-lastName': 'Smith',
+        'referral-email': 'john@example.com',
+        'referral-phone': '+1 (555) 123-4567',
+        'referral-country': 'United States',
+        'webinar-firstName': 'John',
+        'webinar-lastName': 'Smith',
+        'webinar-email': 'john@example.com',
+        'webinar-phone': '+1 (555) 123-4567'
       },
       es: {
         'first-name': 'María',
         'last-name': 'García',
         'email': 'maria@ejemplo.com',
-        'phone': '+34 600 123 456'
+        'phone': '+34 600 123 456',
+        'referral-firstName': 'María',
+        'referral-lastName': 'García',
+        'referral-email': 'maria@ejemplo.com',
+        'referral-phone': '+34 600 123 456',
+        'referral-country': 'España / Puerto Rico',
+        'webinar-firstName': 'María',
+        'webinar-lastName': 'García',
+        'webinar-email': 'maria@ejemplo.com',
+        'webinar-phone': '+34 600 123 456'
       },
       fr: {
         'first-name': 'Jean',
-        'last-name': 'Dupont',
-        'email': 'jean@exemple.fr',
-        'phone': '+33 6 12 34 56 78'
+        'last-name': 'Tremblay',
+        'email': 'jean@exemple.ca',
+        'phone': '+1 (514) 555-1234',
+        'referral-firstName': 'Jean',
+        'referral-lastName': 'Tremblay',
+        'referral-email': 'jean@exemple.ca',
+        'referral-phone': '+1 (514) 555-1234',
+        'referral-country': 'Canada',
+        'webinar-firstName': 'Jean',
+        'webinar-lastName': 'Tremblay',
+        'webinar-email': 'jean@exemple.ca',
+        'webinar-phone': '+1 (514) 555-1234'
       },
       'en-ca': {
         'first-name': 'James',
         'last-name': 'Thompson',
         'email': 'james@example.ca',
-        'phone': '+1 (416) 555-1234'
+        'phone': '+1 (416) 555-1234',
+        'referral-firstName': 'James',
+        'referral-lastName': 'Thompson',
+        'referral-email': 'james@example.ca',
+        'referral-phone': '+1 (416) 555-1234',
+        'referral-country': 'Canada',
+        'webinar-firstName': 'James',
+        'webinar-lastName': 'Thompson',
+        'webinar-email': 'james@example.ca',
+        'webinar-phone': '+1 (416) 555-1234'
+      },
+      'fr-eu': {
+        'first-name': 'Laurent',
+        'last-name': 'Moreau',
+        'email': 'laurent.moreau@exemple.fr',
+        'phone': '+33 6 12 34 56 78',
+        'referral-firstName': 'Laurent',
+        'referral-lastName': 'Moreau',
+        'referral-email': 'laurent.moreau@exemple.fr',
+        'referral-phone': '+33 6 12 34 56 78',
+        'referral-country': 'France',
+        'webinar-firstName': 'Laurent',
+        'webinar-lastName': 'Moreau',
+        'webinar-email': 'laurent.moreau@exemple.fr',
+        'webinar-phone': '+33 6 12 34 56 78'
+      },
+      nl: {
+        'first-name': 'Jeroen',
+        'last-name': 'van Dijk',
+        'email': 'jeroen@voorbeeld.nl',
+        'phone': '+31 6 1234 5678',
+        'referral-firstName': 'Jeroen',
+        'referral-lastName': 'van Dijk',
+        'referral-email': 'jeroen@voorbeeld.nl',
+        'referral-phone': '+31 6 1234 5678',
+        'referral-country': 'Nederland',
+        'webinar-firstName': 'Jeroen',
+        'webinar-lastName': 'van Dijk',
+        'webinar-email': 'jeroen@voorbeeld.nl',
+        'webinar-phone': '+31 6 1234 5678'
+      },
+      sv: {
+        'first-name': 'Erik',
+        'last-name': 'Lindqvist',
+        'email': 'erik.lindqvist@exempel.se',
+        'phone': '+46 70 123 45 67',
+        'referral-firstName': 'Erik',
+        'referral-lastName': 'Lindqvist',
+        'referral-email': 'erik.lindqvist@exempel.se',
+        'referral-phone': '+46 70 123 45 67',
+        'referral-country': 'Sverige',
+        'webinar-firstName': 'Erik',
+        'webinar-lastName': 'Lindqvist',
+        'webinar-email': 'erik.lindqvist@exempel.se',
+        'webinar-phone': '+46 70 123 45 67'
+      },
+      bg: {
+        'first-name': 'Георги',
+        'last-name': 'Димитров',
+        'email': 'georgi@primer.bg',
+        'phone': '+359 88 812 3456',
+        'referral-firstName': 'Георги',
+        'referral-lastName': 'Димитров',
+        'referral-email': 'georgi@primer.bg',
+        'referral-phone': '+359 88 812 3456',
+        'referral-country': 'България',
+        'webinar-firstName': 'Георги',
+        'webinar-lastName': 'Димитров',
+        'webinar-email': 'georgi@primer.bg',
+        'webinar-phone': '+359 88 812 3456'
       }
     };
     Object.entries(placeholders[lang] || {}).forEach(([id, placeholder]) => {
@@ -350,13 +460,21 @@ document.addEventListener('DOMContentLoaded', () => {
           en: '✓ Registered Successfully',
           es: '✓ Registrado con Éxito',
           fr: '✓ Inscription réussie',
-          'en-ca': '✓ Registered Successfully'
+          'en-ca': '✓ Registered Successfully',
+          'fr-eu': '✓ Inscription confirmée',
+          nl: '✓ Aanmelding bevestigd',
+          sv: '✓ Anmälan är bekräftad',
+          bg: '✓ Регистрацията е успешна'
         };
         const detailMsgs = {
           en: '🎉 Check your email for webinar details and your free guide!',
           es: '🎉 ¡Revisa tu email para los detalles del webinar y tu guía gratuita!',
-          fr: '🎉 Consultez votre e-mail pour les détails du webinaire et votre guide gratuit !',
-          'en-ca': '🎉 Check your email for webinar details and your free guide!'
+          fr: '🎉 Consultez votre courriel pour les détails du webinaire et votre guide gratuit !',
+          'en-ca': '🎉 Check your email for webinar details and your free guide!',
+          'fr-eu': '🎉 Consultez votre boîte mail pour recevoir votre lien d’accès et le guide patrimonial offert !',
+          nl: '🎉 Bekijk je e-mail voor de deelnamelink en je gratis aankoopgids!',
+          sv: '🎉 Håll utkik i din inkorg – där finns din länk till webbinariet och vår kostnadsfria köpguide!',
+          bg: '🎉 Проверете имейла си за линка към уебинара и Вашето безплатно ръководство!'
         };
         submitBtn.innerHTML = successMsgs[currentLang] || successMsgs['en'];
 
@@ -496,9 +614,9 @@ document.addEventListener('DOMContentLoaded', () => {
           title: "Get Your NIE",
           desc: "The NIE (Foreigner Identity Number) is essential for buying property, opening bank accounts, or contracting utility services in Spain. Our partner law firm handles the entire application process with the immigration office or consulate, saving you any travel.",
           highlights: [
-            { icon: "⏱", text: "1–2 semaines" },
+            { icon: "⏱", text: "1–2 weeks" },
             { icon: "🏰", text: "Fuster & Associates" },
-            { icon: "🌐", text: "100% à distance" }
+            { icon: "🌐", text: "100% remote" }
           ]
         },
         es: {
@@ -527,6 +645,42 @@ document.addEventListener('DOMContentLoaded', () => {
             { icon: "🏰", text: "Fuster & Associates" },
             { icon: "🌐", text: "100% remote" }
           ]
+        },
+        'fr-eu': {
+          title: "Obtention de votre NIE",
+          desc: "En tant que citoyen européen, aucun visa n'est requis : seule votre carte d'identité ou passeport et le NIE (numéro d'identification fiscale espagnol) sont nécessaires pour acquérir un bien. Le cabinet Fuster & Associates l'obtient pour vous par simple procuration, sans quitter la France ou la Belgique.",
+          highlights: [
+            { icon: "🇪🇺", text: "Simple CNI / Passeport" },
+            { icon: "⏱", text: "Sous 1 à 2 semaines" },
+            { icon: "⚖️", text: "Géré par avocat" }
+          ]
+        },
+        nl: {
+          title: "NIE-nummer aanvragen",
+          desc: "Als EU-burger heb je geen visum nodig — alleen een geldig paspoort of ID-kaart en een Spaans fiscaal nummer (NIE). Ons aangesloten advocatenkantoor Fuster & Associates regelt jouw NIE snel en volledig op volmacht, zonder gedoe bij het consulaat.",
+          highlights: [
+            { icon: "🇪🇺", text: "Geen visum nodig" },
+            { icon: "⏱", text: "Binnen 1–2 weken" },
+            { icon: "🌐", text: "100% op afstand" }
+          ]
+        },
+        sv: {
+          title: "Skaffa ditt NIE-nummer",
+          desc: "Som EU-medborgare behöver du inget visum — endast pass eller nationellt ID-kort samt ett spanskt skatte-ID (NIE) för att köpa bostad. Vår partnerbyrå Fuster & Associates ordnar hela ansökan tryggt via fullmakt utan att du behöver resa ner i förväg.",
+          highlights: [
+            { icon: "🇪🇺", text: "Fri rörlighet inom EU" },
+            { icon: "⏱", text: "1–2 veckor" },
+            { icon: "🌐", text: "Via fullmakt hemifrån" }
+          ]
+        },
+        bg: {
+          title: "Издаване на NIE номер",
+          desc: "Като граждани на ЕС не се нуждаете от виза — достатъчни са лична карта или паспорт и испански данъчен номер за чужденци (NIE). Адвокатска кантора Fuster & Associates поема цялата процедура чрез пълномощно, без излишни разкарвания.",
+          highlights: [
+            { icon: "🇪🇺", text: "Само с лична карта / паспорт" },
+            { icon: "⏱", text: "1–2 седмици" },
+            { icon: "🌐", text: "100% дистанционно" }
+          ]
         }
       },
       2: {
@@ -536,7 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
           highlights: [
             { icon: "🏦", text: "Banco UCI partner" },
             { icon: "📱", text: "Remote setup" },
-            { icon: "✅", text: "Sans déplacement" }
+            { icon: "✅", text: "No travel needed" }
           ]
         },
         es: {
@@ -564,6 +718,42 @@ document.addEventListener('DOMContentLoaded', () => {
             { icon: "🏦", text: "Banco UCI partner" },
             { icon: "📱", text: "Remote setup" },
             { icon: "✅", text: "No travel needed" }
+          ]
+        },
+        'fr-eu': {
+          title: "Compte bancaire espagnol & SEPA",
+          desc: "Zéro frais de change : vos virements s'effectuent directement en euros dans l'espace SEPA. Nous ouvrons votre compte espagnol à distance pour le règlement chez le notaire et les prélèvements (eau, électricité, copropriété, IBI), et étudions votre financement via Banco UCI.",
+          highlights: [
+            { icon: "💶", text: "Virement SEPA en euros" },
+            { icon: "🏦", text: "Crédit via Banco UCI" },
+            { icon: "📱", text: "Ouverture à distance" }
+          ]
+        },
+        nl: {
+          title: "Spaanse bankrekening & SEPA",
+          desc: "Geen wisselkoerskosten: alles verloopt gewoon in euro's via SEPA. Wij openen op afstand je Spaanse bankrekening voor de notariële betaling en automatische incasso van vaste lasten (water, stroom, VvE en IBI), plus eventuele financiering tot 70–75% via Banco UCI.",
+          highlights: [
+            { icon: "💶", text: "Direct in euro's (SEPA)" },
+            { icon: "🏦", text: "Hypotheek via Banco UCI" },
+            { icon: "📱", text: "Volledig digitaal" }
+          ]
+        },
+        sv: {
+          title: "Spanskt bankkonto & finansiering",
+          desc: "Vi hjälper dig att öppna ett spanskt eurokonto på distans för köpeskillingen samt autogiro för el, vatten, samfällighet (comunidad) och fastighetsskatt. Vill du låna i euro erbjuder vår partner Banco UCI förhandsbesked inom 48 timmar.",
+          highlights: [
+            { icon: "🏦", text: "Partner Banco UCI" },
+            { icon: "💶", text: "Konto & lån i euro" },
+            { icon: "📱", text: "Öppnas på distans" }
+          ]
+        },
+        bg: {
+          title: "Испанска банкова сметка в евро",
+          desc: "Съдействаме за бързо и дистанционно откриване на испанска сметка за SEPA преводи в евро и автоматично плащане на комунални разходи и местни данъци. При желание за финансиране нашият партньор Banco UCI предлага ипотеки за граждани на ЕС с предварително одобрение до 48 часа.",
+          highlights: [
+            { icon: "💶", text: "SEPA преводи в евро" },
+            { icon: "🏦", text: "Ипотека от Banco UCI" },
+            { icon: "📱", text: "Дистанционно откриване" }
           ]
         }
       },
@@ -603,6 +793,42 @@ document.addEventListener('DOMContentLoaded', () => {
             { icon: "💰", text: "Tax optimisation" },
             { icon: "🏖", text: "Investment or vacation" }
           ]
+        },
+        'fr-eu': {
+          title: "Stratégie patrimoniale & fiscale",
+          desc: "Résidence secondaire au soleil, investissement locatif à fort rendement ou préparation de retraite : nous structurons votre projet (achat en nom propre ou société, convention fiscale franco-espagnole / belgo-espagnole, licence touristique) pour maximiser votre rendement net.",
+          highlights: [
+            { icon: "🏛️", text: "Structuration patrimoniale" },
+            { icon: "💰", text: "Convention fiscale UE" },
+            { icon: "🏖", text: "Usage mixte ou locatif" }
+          ]
+        },
+        nl: {
+          title: "Strategie, rendement & Box 3",
+          desc: "Zoek je een zonnige tweede woning voor jezelf, puur verhuurrendement of een slimme combinatie? Samen met onze fiscalisten stemmen we aankoopstructuur, verhuurvergunning en het Nederlands-Spaans belastingverdrag (Box 3-vrijstelling ter voorkoming van dubbele belasting) helder af.",
+          highlights: [
+            { icon: "📊", text: "Helder rendementsplan" },
+            { icon: "💶", text: "Slim buitenlands vastgoed" },
+            { icon: "🏖", text: "Eigen gebruik + verhuur" }
+          ]
+        },
+        sv: {
+          title: "Lägg upp rätt strategi",
+          desc: "Drömmer du om ett vinterboende i solen, en trygg europlacering med uthyrningsintäkter eller en kombination av båda? Vi skräddarsyr upplägget utifrån dina mål, uthyrningslicens och skatteavtalet mellan Sverige och Spanien.",
+          highlights: [
+            { icon: "📊", text: "Skräddarsydd plan" },
+            { icon: "💶", text: "Kapitalplacering i euro" },
+            { icon: "☀️", text: "Semesterhem & uthyrning" }
+          ]
+        },
+        bg: {
+          title: "Инвестиционна или семейна стратегия",
+          desc: "Определяме точната цел: сигурна защита на капитала в Западна Европа с висока доходност от целогодишен туризъм, ваканционен дом за семейството или комбинация от двете — с пълна данъчна яснота по спогодбата между България и Испания.",
+          highlights: [
+            { icon: "📊", text: "Индивидуален план" },
+            { icon: "💶", text: "Доходност в евро" },
+            { icon: "🏖", text: "Инвестиция или втори дом" }
+          ]
         }
       },
       4: {
@@ -611,8 +837,8 @@ document.addEventListener('DOMContentLoaded', () => {
           desc: "We filter the best properties on the Costa Blanca based on your criteria. We access the complete RE/MAX database and off-market listings to ensure you only visit highly qualified options.",
           highlights: [
             { icon: "🏠", text: "RE/MAX database" },
-            { icon: "🔒", text: "Accès hors marché" },
-            { icon: "🎯", text: "Pré-qualifiées" }
+            { icon: "🔒", text: "Off-market access" },
+            { icon: "🎯", text: "Pre-qualified" }
           ]
         },
         es: {
@@ -640,6 +866,42 @@ document.addEventListener('DOMContentLoaded', () => {
             { icon: "🏠", text: "RE/MAX Database" },
             { icon: "🔒", text: "Off-market access" },
             { icon: "🎯", text: "Pre-qualified" }
+          ]
+        },
+        'fr-eu': {
+          title: "Chasse immobilière sur mesure",
+          desc: "Contrairement à une agence classique qui ne montre que sa vitrine, nous représentons vos intérêts d'acheteur avec accès à l'intégralité du marché Costa Blanca (Jávea, Altea, Alicante, Benidorm), aux programmes neufs garantis et aux biens confidentiels hors marché.",
+          highlights: [
+            { icon: "🏠", text: "Accès marché global + off-market" },
+            { icon: "✈️", text: "À 2h de vol pour vos visites" },
+            { icon: "🎯", text: "Sélection vérifiée" }
+          ]
+        },
+        nl: {
+          title: "Gerichte woningselectie (Aankoopbegeleiding)",
+          desc: "In Spanje werkt een verkoopmakelaar voor de verkoper — wij staan 100% aan jouw kant als aankoopbegeleider. Je krijgt toegang tot het volledige aanbod aan de Costa Blanca (o.a. Jávea, Altea, Alicante, Santa Pola), inclusief nieuwbouw met bankgarantie en off-market parels.",
+          highlights: [
+            { icon: "🏠", text: "100% jouw aankoopbelang" },
+            { icon: "🔒", text: "Inclusief off-market aanbod" },
+            { icon: "✈️", text: "2,5u vliegen voor VIP-bezichtiging" }
+          ]
+        },
+        sv: {
+          title: "Handplockat urval & visningsresa",
+          desc: "Vi representerar dig som köpare och filtrerar fram rätt bostäder längs hela Costa Blanca (Alicante, Santa Pola, Altea, Jávea, Torrevieja) — både kvalitetssäkrad nyproduktion med bankgaranti och exklusiva off-market-objekt.",
+          highlights: [
+            { icon: "🏠", text: "Hela RE/MAX-nätverket" },
+            { icon: "🔒", text: "Off-market & nyproduktion" },
+            { icon: "🎯", text: "Personliga visningar på plats" }
+          ]
+        },
+        bg: {
+          title: "Подбрана селекция от имоти до ключ",
+          desc: "За разлика от стандартните оферти на шпакловка и замазка, ние филтрираме само проверени, напълно завършени имоти и ново строителство с банкова гаранция по цялата Коста Бланка — включително ексклузивни off-market предложения от мрежата на RE/MAX.",
+          highlights: [
+            { icon: "🏠", text: "Имоти до ключ + off-market" },
+            { icon: "🔒", text: "Банкова гаранция при ново стр." },
+            { icon: "🎯", text: "VIP огледи на място или видео" }
           ]
         }
       },
@@ -679,6 +941,42 @@ document.addEventListener('DOMContentLoaded', () => {
             { icon: "📋", text: "Registry check" },
             { icon: "🛡", text: "Zero risk" }
           ]
+        },
+        'fr-eu': {
+          title: "Audit juridique complet (Due Diligence)",
+          desc: "Point essentiel à connaître pour un Français ou un Belge : en Espagne, le notaire ne vérifie pas l'urbanisme ni les dettes cachées comme en France. C'est pourquoi nos avocats Fuster & Associates auditent intégralement le Registre foncier, le cadastre, les permis de construire, la copropriété et la licence locative avant tout engagement.",
+          highlights: [
+            { icon: "⚖️", text: "Audit urbanistique & cadastral" },
+            { icon: "📋", text: "Zéro dette ni vice caché" },
+            { icon: "🛡", text: "Protection juridique totale" }
+          ]
+        },
+        nl: {
+          title: "Juridisch boekenonderzoek (Due Diligence)",
+          desc: "Cruciaal verschil met Nederland: een Spaanse notaris controleert géén bestemmingsplannen, illegale aanbouwen of openstaande VvE-schulden. Daarom controleert Fuster & Associates vooraf het eigendomsregister, kadaster, bouwvergunningen, woonvergunning (licencia de primera ocupación) en verhuurmogelijkheden.",
+          highlights: [
+            { icon: "⚖️", text: "Volledige bouw- & eigendomscheck" },
+            { icon: "📋", text: "Geen verborgen schulden" },
+            { icon: "🛡", text: "100% juridische zekerheid" }
+          ]
+        },
+        sv: {
+          title: "Juridisk granskning (Due Diligence)",
+          desc: "För din totala trygghet granskar advokatbyrån Fuster & Associates fastighetsregistret (Nota Simple), bygglov, inflyttningslicens, eventuella skulder i bostadsföreningen samt uthyrningsregler innan du binder dig — inga obehagliga överraskningar.",
+          highlights: [
+            { icon: "⚖️", text: "Oberoende juristkontroll" },
+            { icon: "📋", text: "Skuld- & bygglovskontroll" },
+            { icon: "🛡", text: "100 % trygg affär" }
+          ]
+        },
+        bg: {
+          title: "Пълен правен одит (Due Diligence)",
+          desc: "Ключова стъпка за пълно спокойствие: адвокатите от Fuster & Associates извършват щателна проверка в Имотния регистър за вещни тежести, ипотеки, данъчни или етажна собственост задължения, градоустройствена законност, Акт за въвеждане в експлоатация и лиценз за отдаване под наем.",
+          highlights: [
+            { icon: "⚖️", text: "Пълна проверка за тежести" },
+            { icon: "📋", text: "Градоустройство и лицензи" },
+            { icon: "🛡", text: "Нулев правен риск" }
+          ]
         }
       },
       6: {
@@ -717,6 +1015,42 @@ document.addEventListener('DOMContentLoaded', () => {
             { icon: "🔐", text: "Funds in trust" },
             { icon: "❄️", text: "Price locked" }
           ]
+        },
+        'fr-eu': {
+          title: "Offre & Dépôt de réservation",
+          desc: "Une fois le prix négocié, un dépôt de réservation (3 000 € à 10 000 €) bloque immédiatement le bien à votre profit et retire l'annonce du marché. Les fonds sont sécurisés sur compte séquestre et intégralement déduits du prix final.",
+          highlights: [
+            { icon: "💶", text: "3 000 € – 10 000 €" },
+            { icon: "🔐", text: "Compte séquestre sécurisé" },
+            { icon: "❄️", text: "Bien bloqué & prix figé" }
+          ]
+        },
+        nl: {
+          title: "Reservering & Derdengeldenrekening",
+          desc: "Zodra we de beste prijs hebben uitonderhandeld, haalt een reserveringsborg (€ 3.000 – € 10.000) de woning direct van de markt. Dit bedrag staat veilig op een geblokkeerde klantenrekening en wordt volledig verrekend bij de overdracht.",
+          highlights: [
+            { icon: "💶", text: "€ 3.000 – € 10.000" },
+            { icon: "🔐", text: "Veilig in depot (escrow)" },
+            { icon: "❄️", text: "Prijs vastgezet" }
+          ]
+        },
+        sv: {
+          title: "Reservation & Klientmedelskonto",
+          desc: "När vi har förhandlat fram rätt pris tas bostaden bort från marknaden genom en reservationsavgift (€3 000 – €10 000). Beloppet hålls tryggt på klientmedelskonto och dras av från slutpriset vid tillträdet.",
+          highlights: [
+            { icon: "💶", text: "€3 000 – €10 000" },
+            { icon: "🔐", text: "Tryggt klientmedelskonto" },
+            { icon: "❄️", text: "Låst pris" }
+          ]
+        },
+        bg: {
+          title: "Резервация и блокиране на имота",
+          desc: "След договаряне на най-добрата цена, резервационен депозит (€3 000 – €10 000) сваля имота от пазара и фиксира цената. Сумата се съхранява сигурно по доверителна (ескроу) сметка и се приспада от крайната продажна цена.",
+          highlights: [
+            { icon: "💶", text: "€3 000 – €10 000" },
+            { icon: "🔐", text: "Защитена ескроу сметка" },
+            { icon: "❄️", text: "Фиксирана цена" }
+          ]
         }
       },
       7: {
@@ -743,8 +1077,8 @@ document.addEventListener('DOMContentLoaded', () => {
           desc: "Signature de la promesse de vente (Contrato de Arras) qui détaille toutes les conditions de la transaction et requiert un acompte de 10%. Ce contrat lie juridiquement les deux parties et fixe les garanties et les délais de réalisation.",
           highlights: [
             { icon: "📝", text: "Promesse de vente" },
-            { icon: "💰", text: "10% deposit" },
-            { icon: "⚖️", text: "Legally binding" }
+            { icon: "💰", text: "Acompte de 10%" },
+            { icon: "⚖️", text: "Juridiquement contraignant" }
           ]
         },
         'en-ca': {
@@ -752,8 +1086,44 @@ document.addEventListener('DOMContentLoaded', () => {
           desc: "Signing the Purchase Agreement (Contrato de Arras) which details all the conditions of the sale and requires a 10% deposit. This contract legally binds both parties and establishes guarantees and completion dates.",
           highlights: [
             { icon: "📝", text: "Purchase Agreement" },
-            { icon: "💰", text: "Acompte de 10%" },
-            { icon: "⚖️", text: "Juridiquement contraignant" }
+            { icon: "💰", text: "10% deposit" },
+            { icon: "⚖️", text: "Legally binding" }
+          ]
+        },
+        'fr-eu': {
+          title: "Compromis de vente (Contrato de Arras)",
+          desc: "Équivalent espagnol du compromis de vente : le Contrato de Arras fixe le prix, l'inventaire, la date butoir chez le notaire et s'accompagne d'un acompte de 10 % (et de garanties bancaires légales obligatoires pour tout achat sur plan / VEFA).",
+          highlights: [
+            { icon: "📝", text: "Compromis rédigé par avocat" },
+            { icon: "💰", text: "Acompte de 10 %" },
+            { icon: "⚖️", text: "Garantie légale bilatérale" }
+          ]
+        },
+        nl: {
+          title: "Koopovereenkomst (Contrato de Arras)",
+          desc: "Het Spaanse voorlopig koopcontract (Contrato de Arras) legt alle voorwaarden, opleverdatum en inventaris juridisch vast, met een aanbetaling van 10% (bij nieuwbouw altijd gedekt door verplichte Spaanse bankgarantie).",
+          highlights: [
+            { icon: "📝", text: "Contrato de Arras" },
+            { icon: "💰", text: "10% aanbetaling" },
+            { icon: "⚖️", text: "Wettelijke bankgarantie" }
+          ]
+        },
+        sv: {
+          title: "Köpekontrakt (Contrato de Arras)",
+          desc: "Nu tecknas det juridiskt bindande köpekontraktet (Contrato de Arras) med 10 % handpenning, tydliga villkor och tillträdesdatum. Vid nyproduktion omfattas varje delbetalning av lagstadgad spansk bankgaranti.",
+          highlights: [
+            { icon: "📝", text: "Arras-kontrakt" },
+            { icon: "💰", text: "10 % handpenning" },
+            { icon: "⚖️", text: "Bankgaranti vid nybyggt" }
+          ]
+        },
+        bg: {
+          title: "Предварителен договор (Contrato de Arras)",
+          desc: "Подписване на обвързващия предварителен договор (Contrato de Arras) с 10% капаро, точни срокове и опис на обзавеждането. По испанския закон при отказ на продавача той дължи връщане на капарото в двоен размер, а при ново строителство плащанията са обезпечени с банкова гаранция.",
+          highlights: [
+            { icon: "📝", text: "Договор Arras" },
+            { icon: "💰", text: "10% депозит" },
+            { icon: "⚖️", text: "Двойна законова защита" }
           ]
         }
       },
@@ -789,9 +1159,45 @@ document.addEventListener('DOMContentLoaded', () => {
           title: "Completion",
           desc: "The final signing before a Public Notary where the title is transferred and the remaining payment is made. If you cannot travel to Spain, you can grant a Power of Attorney (POA) to our law firm to sign 100% remotely from Canada.",
           highlights: [
-            { icon: "🔑", text: "Clés en main" },
-            { icon: "🏰", text: "Notaire public" },
+            { icon: "🔑", text: "Keys in hand" },
+            { icon: "🏰", text: "Public Notary" },
             { icon: "🌐", text: "Remote from Canada" }
+          ]
+        },
+        'fr-eu': {
+          title: "Acte authentique (Escritura) & Clés en main",
+          desc: "Signature de l'Escritura devant notaire en Espagne (en personne ou 100 % à distance par procuration). Dans la foulée, nous transférons les contrats d'eau/électricité/fibre et, si vous le souhaitez, Inmomás Holidays prend le relais pour la gestion locative intégrale.",
+          highlights: [
+            { icon: "🔑", text: "Remise des clés" },
+            { icon: "🏰", text: "Acte notarié inscrit" },
+            { icon: "🏡", text: "Gestion locative clé en main" }
+          ]
+        },
+        nl: {
+          title: "Notariële overdracht (Escritura) & Sleutels",
+          desc: "De officiële eigendomsoverdracht bij de Spaanse notaris — persoonlijk aan de Costa Blanca of 100% op afstand via volmacht. Wij zetten meteen nutsvoorzieningen en belastingen op jouw naam, en desgewenst neemt Inmomás Holidays direct het volledige verhuurbeheer over.",
+          highlights: [
+            { icon: "🔑", text: "Sleuteloverdracht" },
+            { icon: "🏰", text: "Spaanse notaris" },
+            { icon: "🏡", text: "Zorgeloos verhuurbeheer" }
+          ]
+        },
+        sv: {
+          title: "Tillträde (Escritura) & Nycklarna i handen",
+          desc: "Slutlig signering av lagfarten (Escritura) inför spansk Notarius Publicus — på plats i solen eller helt på distans via fullmakt. Vi ordnar överflyttning av el, vatten och bredband, och Inmomás Holidays kan ta hand om all uthyrning och tillsyn när du är i Sverige.",
+          highlights: [
+            { icon: "🔑", text: "Nycklarna i handen" },
+            { icon: "🏰", text: "Notarius Publicus" },
+            { icon: "🏡", text: "Full tillsyn & uthyrning" }
+          ]
+        },
+        bg: {
+          title: "Нотариален акт (Escritura) и ключове в ръка",
+          desc: "Окончателно изповядване на сделката пред испански нотариус — лично на място или 100% дистанционно чрез пълномощно. Прехвърляме партидите за ток, вода и интернет, а при желание Inmomás Holidays поема цялостното управление и отдаване под наем.",
+          highlights: [
+            { icon: "🔑", text: "Ключове в ръка" },
+            { icon: "🏰", text: "Нотариално вписване" },
+            { icon: "🏡", text: "Управление от разстояние" }
           ]
         }
       }
@@ -800,7 +1206,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function updatePipeline(stepNum) {
       currentStep = stepNum;
       const body = document.body;
-      const lang = body.classList.contains('lang-es') ? 'es' : body.classList.contains('lang-en-ca') ? 'en-ca' : body.classList.contains('lang-fr') ? 'fr' : 'en';
+      const activeMatch = Object.keys(langConfig).find(k => body.classList.contains('lang-' + k)) || 'en';
+      const lang = activeMatch;
       const details = stepDetails[stepNum][lang] || stepDetails[stepNum]['en'];
       
       // Update node states
@@ -827,7 +1234,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Update step badge
       if (detailsStepBadge) {
-        const stepLabels = { en: 'Step', es: 'Paso', fr: 'Étape', 'en-ca': 'Step' };
+        const stepLabels = { en: 'Step', es: 'Paso', fr: 'Étape', 'en-ca': 'Step', 'fr-eu': 'Étape', nl: 'Stap', sv: 'Steg', bg: 'Стъпка' };
         detailsStepBadge.textContent = `${stepLabels[lang] || 'Step'} ${stepNum}`;
       }
       
@@ -985,51 +1392,96 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       
       const bodyEl = document.body;
-      const lang = bodyEl.classList.contains('lang-es') ? 'es'
-                 : bodyEl.classList.contains('lang-en-ca') ? 'en-ca'
-                 : bodyEl.classList.contains('lang-fr') ? 'fr'
-                 : 'en';
+      const lang = Object.keys(langConfig).find(k => bodyEl.classList.contains('lang-' + k)) || 'en';
       
       const t = {
         en: {
           intro: 'Please enter your details to download the Complete Guide to Buying in Spain for free.',
           firstName: 'First Name', firstPlaceholder: 'e.g. John',
           lastName: 'Last Name', lastPlaceholder: 'e.g. Doe',
-          email: 'Email Address', phone: 'Phone Number',
-          phonePlaceholder: 'e.g. +1 (514) 555-0199',
+          email: 'Email Address', emailPlaceholder: 'john@example.com',
+          phone: 'Phone Number', phonePlaceholder: 'e.g. +1 (305) 555-0199',
           btn: 'Download Full Guide (PDF)',
           modalTitle: "Download Buyer's Guide",
-          toast: 'Thank you! Redirecting to download...'
+          toast: 'Thank you! Redirecting to download...',
+          dossierHash: 'en'
         },
         es: {
           intro: 'Por favor, déjanos tus datos para descargar la Guía Completa de Compra en España de forma gratuita.',
           firstName: 'Nombre', firstPlaceholder: 'Ej. Juan',
           lastName: 'Apellidos', lastPlaceholder: 'Ej. Pérez',
-          email: 'Correo Electrónico', phone: 'Número de Teléfono',
-          phonePlaceholder: '+34 600 123 456',
+          email: 'Correo Electrónico', emailPlaceholder: 'juan@ejemplo.com',
+          phone: 'Número de Teléfono', phonePlaceholder: '+34 600 123 456',
           btn: 'Descargar Guía Completa (PDF)',
           modalTitle: 'Descarga la Guía del Comprador',
-          toast: '¡Gracias! Redirigiendo a la descarga...'
+          toast: '¡Gracias! Redirigiendo a la descarga...',
+          dossierHash: 'es'
         },
         fr: {
           intro: "Veuillez saisir vos coordonnées pour télécharger gratuitement le Guide Complet d'Achat en Espagne.",
-          firstName: 'First Name', firstPlaceholder: 'e.g. John',
-          lastName: 'Nom', lastPlaceholder: 'ex. Dupont',
-          email: 'Adresse e-mail', phone: 'Numéro de téléphone',
-          phonePlaceholder: '+33 6 12 34 56 78',
-          btn: 'Download Full Guide (PDF)',
-          modalTitle: "Download Buyer's Guide (Canada)",
-          toast: 'Thank you! Redirecting to download...'
+          firstName: 'Prénom', firstPlaceholder: 'ex. Jean',
+          lastName: 'Nom', lastPlaceholder: 'ex. Tremblay',
+          email: 'Adresse courriel', emailPlaceholder: 'jean@exemple.ca',
+          phone: 'Numéro de téléphone', phonePlaceholder: '+1 (514) 555-0199',
+          btn: 'Télécharger le Guide Complet (PDF)',
+          modalTitle: "Guide d'Achat en Espagne (Canada)",
+          toast: 'Merci ! Redirection vers le téléchargement...',
+          dossierHash: 'fr'
         },
         'en-ca': {
           intro: 'Please enter your details to download the Complete Guide to Buying in Spain for free.',
           firstName: 'First Name', firstPlaceholder: 'e.g. John',
           lastName: 'Last Name', lastPlaceholder: 'e.g. MacDonald',
-          email: 'Email Address', phone: 'Phone Number',
-          phonePlaceholder: 'e.g. +1 (416) 555-0199',
+          email: 'Email Address', emailPlaceholder: 'john@example.ca',
+          phone: 'Phone Number', phonePlaceholder: 'e.g. +1 (416) 555-0199',
           btn: 'Download Full Guide (PDF)',
           modalTitle: "Download Buyer's Guide (Canada)",
-          toast: 'Thank you! Redirecting to download...'
+          toast: 'Thank you! Redirecting to download...',
+          dossierHash: 'en-ca'
+        },
+        'fr-eu': {
+          intro: "Indiquez vos coordonnées pour accéder gratuitement au Guide Complet d'Acquisition & Fiscalité en Espagne.",
+          firstName: 'Prénom', firstPlaceholder: 'ex. Laurent',
+          lastName: 'Nom', lastPlaceholder: 'ex. Moreau',
+          email: 'Adresse e-mail', emailPlaceholder: 'laurent@exemple.fr',
+          phone: 'Téléphone portable', phonePlaceholder: '+33 6 12 34 56 78',
+          btn: "Télécharger le Guide d'Achat (PDF)",
+          modalTitle: "Guide d'Acquisition en Espagne",
+          toast: 'Merci ! Ouverture de votre guide en cours...',
+          dossierHash: 'fr'
+        },
+        nl: {
+          intro: 'Vul je gegevens in en ontvang direct en vrijblijvend onze uitgebreide Aankoopgids voor Spanje.',
+          firstName: 'Voornaam', firstPlaceholder: 'bijv. Jeroen',
+          lastName: 'Achternaam', lastPlaceholder: 'bijv. van Dijk',
+          email: 'E-mailadres', emailPlaceholder: 'jeroen@voorbeeld.nl',
+          phone: 'Telefoonnummer', phonePlaceholder: '+31 6 1234 5678',
+          btn: 'Download Volledige Gids (PDF)',
+          modalTitle: 'Gratis Aankoopgids Spanje',
+          toast: 'Bedankt! Je wordt doorgestuurd naar de gids...',
+          dossierHash: 'en'
+        },
+        sv: {
+          intro: 'Fyll i dina uppgifter för kostnadsfri tillgång till vår kompletta köpguide för bostad i Spanien.',
+          firstName: 'Förnamn', firstPlaceholder: 't.ex. Erik',
+          lastName: 'Efternamn', lastPlaceholder: 't.ex. Lindqvist',
+          email: 'E-postadress', emailPlaceholder: 'erik@exempel.se',
+          phone: 'Mobilnummer', phonePlaceholder: '+46 70 123 45 67',
+          btn: 'Ladda ner Köpguiden (PDF)',
+          modalTitle: 'Köpguide för Bostad i Spanien',
+          toast: 'Tack! Öppnar guiden...',
+          dossierHash: 'en'
+        },
+        bg: {
+          intro: 'Въведете Вашите данни за безплатен достъп до Пълното ръководство за покупка на имот в Испания.',
+          firstName: 'Име', firstPlaceholder: 'напр. Георги',
+          lastName: 'Фамилия', lastPlaceholder: 'напр. Димитров',
+          email: 'Имейл адрес', emailPlaceholder: 'georgi@primer.bg',
+          phone: 'Телефонен номер', phonePlaceholder: '+359 88 812 3456',
+          btn: 'Изтегли Пълното Ръководство (PDF)',
+          modalTitle: 'Ръководство на Купувача в Испания',
+          toast: 'Благодарим Ви! Пренасочване към ръководството...',
+          dossierHash: 'en'
         }
       };
       const s = t[lang] || t['en'];
@@ -1052,11 +1504,11 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div>
               <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: #0a1628;">${s.email}</label>
-              <input type="email" id="lead-email" required placeholder="name@example.com" style="width: 100%; padding: 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 6px; font-family: inherit;">
+              <input type="email" id="lead-email" required placeholder="${s.emailPlaceholder}" style="width: 100%; padding: 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 6px; font-family: inherit;">
             </div>
             <div>
               <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: #0a1628;">${s.phone}</label>
-              <input type="tel" id="lead-phone" required placeholder="e.g. +1 (305) 555-0199" style="width: 100%; padding: 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 6px; font-family: inherit;">
+              <input type="tel" id="lead-phone" required placeholder="${s.phonePlaceholder}" style="width: 100%; padding: 0.75rem; border: 1.5px solid #e5e7eb; border-radius: 6px; font-family: inherit;">
             </div>
             <button type="submit" class="btn btn-primary" style="background: #e51937; color: white; width: 100%; padding: 0.85rem; font-size: 0.95rem; font-weight: 700; border-radius: 6px; margin-top: 0.8rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
@@ -1086,10 +1538,11 @@ document.addEventListener('DOMContentLoaded', () => {
               lastName: document.getElementById('lead-last-name').value,
               email: document.getElementById('lead-email').value,
               phone: document.getElementById('lead-phone').value,
+              language: lang,
               source: 'download_dossier'
             };
 
-            const dossierUrl = `dossier.html#${lang}`;
+            const dossierUrl = `dossier.html#${s.dossierHash || 'en'}`;
 
             App.utils.showToast(
               s.toast,

@@ -2409,7 +2409,7 @@ App.auth = (function() {
 
   /* ---- Webinar Settings (B2B vs B2C Switch & Date Config) ---- */
   const DEFAULT_WEBINAR_SETTINGS = {
-    configVersion: 4, // Bump this whenever activeType or date changes to force-override stale Firestore/localStorage data
+    configVersion: 5, // Bump this whenever activeType or date changes to force-override stale Firestore/localStorage data
     activeType: 'b2c', // Default next upcoming webinar: B2C for Buyers & Investors (Oct 29, 2026 at 6:00 PM CET / 1:00 PM EDT / 10:00 AM PDT)
     date: '2026-10-29',
     time: '18:00', // 6:00 PM CET (18:00 h Spain / 1:00 PM EDT / 10:00 AM PDT)
@@ -2427,88 +2427,188 @@ App.auth = (function() {
         en: '🔴 LIVE WEBINAR · 🇺🇸 Exclusively for US, Canadian & Puerto Rico Realtors · 🇵🇷 FREE Registration',
         es: '🔴 WEBINAR EN VIVO · 🇺🇸 Exclusivo para Realtors de EE.UU., Canadá y Puerto Rico · 🇵🇷 Registro GRATUITO',
         fr: '🔴 WEBINAIRE EN DIRECT · 🇺🇸 Réservé aux Agents US, Canadiens & Porto Rico · 🇵🇷 Inscription GRATUITE',
-        'en-ca': '🔴 LIVE WEBINAR · 🇺🇸 Exclusively for US, Canadian & Puerto Rico Realtors · 🇵🇷 FREE Registration'
+        'en-ca': '🔴 LIVE WEBINAR · 🇺🇸 Exclusively for US, Canadian & Puerto Rico Realtors · 🇵🇷 FREE Registration',
+        'fr-eu': '🔴 CONFÉRENCE PARTENAIRES · 🇪🇸 Réservée aux Agences, Mandataires & CGP (FR / BE) · Inscription GRATUITE',
+        nl: '🔴 PARTNERWEBINAR · 🇪🇸 Voor Makelaars & Financieel Adviseurs (NL / BE) · GRATIS Deelname',
+        sv: '🔴 PARTNERWEBBINARIUM · 🇪🇸 För Fastighetsmäklare & Rådgivare i Sverige · Kostnadsfri Anmälan',
+        bg: '🔴 ПАРТНЬОРСКИ УЕБИНАР · 🇪🇸 За агенции за имоти и брокери в България · БЕЗПЛАТНА Регистрация'
       },
       heroPill: {
         en: 'RE/MAX Inmomás International — Realtor Partner Masterclass',
         es: 'RE/MAX Inmomás International — Masterclass para Realtors Partners',
         fr: 'RE/MAX Inmomás International — Masterclass VIP Partenaires',
-        'en-ca': 'RE/MAX Inmomás International — Realtor Partner Masterclass'
+        'en-ca': 'RE/MAX Inmomás International — Realtor Partner Masterclass',
+        'fr-eu': 'RE/MAX Inmomás International — Rencontre Partenaires Agences & CGP',
+        nl: 'RE/MAX Inmomás International — Partnerbijeenkomst Makelaars',
+        sv: 'RE/MAX Inmomás International — Partnerwebbinarium för Mäklare',
+        bg: 'RE/MAX Inmomás International — Партньорска среща за брокери'
       },
       titlePrefix: {
         en: 'Beyond',
         es: 'Beyond',
         fr: 'Au-Delà des',
-        'en-ca': 'Beyond'
+        'en-ca': 'Beyond',
+        'fr-eu': 'Réseau Partenaire',
+        nl: 'Internationaal',
+        sv: 'Partnernätverk',
+        bg: 'Партньорство'
       },
       titleHighlight: {
         en: 'Borders',
         es: 'Borders',
         fr: 'Frontières',
-        'en-ca': 'Borders'
+        'en-ca': 'Borders',
+        'fr-eu': 'Espagne',
+        nl: 'Partnernetwerk',
+        sv: 'Spanien',
+        bg: 'в Испания'
       },
       subtitleText: {
         en: 'The live masterclass where top US, Canadian & Puerto Rico Realtors discover how to earn 25% referral commissions in Spain\'s booming luxury market — with zero extra work.',
         es: 'La masterclass en vivo donde los mejores Realtors de EE.UU., Canadá y Puerto Rico descubren cómo ganar el 25% de comisión de referidos en España — sin listados ni trabajo adicional.',
         fr: 'La masterclass en direct où les meilleurs agents découvrent comment gagner 25% de commission de référence en Espagne — sans effort supplémentaire.',
-        'en-ca': 'The live masterclass where top US, Canadian & Puerto Rico Realtors discover how to earn 25% referral commissions in Spain\'s booming luxury market — with zero extra work.'
+        'en-ca': 'The live masterclass where top US, Canadian & Puerto Rico Realtors discover how to earn 25% referral commissions in Spain\'s booming luxury market — with zero extra work.',
+        'fr-eu': 'Découvrez comment accompagner vos clients français et belges sur la Costa Blanca et percevoir jusqu\'à 25 % de rétrocession d\'honoraires par convention officielle.',
+        nl: 'Ontdek hoe je als Nederlands of Vlaams makelaarskantoor tot 25% doorverwijzingsvergoeding ontvangt op verkopen aan de Costa Blanca — met volledige klantbescherming.',
+        sv: 'Upptäck hur svenska mäklare och rådgivare tjänar upp till 25 % hänvisningsprovision vid bostadsköp på Costa Blanca — med fullt juridiskt ansvar på plats.',
+        bg: 'Научете как българските агенции и брокери получават до 25% партньорска комисиона при сделки в Испания — с пълен правен и административен обхват на място.'
       },
       sectionHeadline: {
         en: 'Why Every US, Canadian & Puerto Rico Realtor Should Attend',
         es: 'Por qué todo Realtor de EE.UU., Canadá y Puerto Rico debería asistir',
         fr: 'Pourquoi chaque agent US, canadien et porto-ricain devrait assister',
-        'en-ca': 'Why Every US, Canadian & Puerto Rico Realtor Should Attend'
+        'en-ca': 'Why Every US, Canadian & Puerto Rico Realtor Should Attend',
+        'fr-eu': 'Pourquoi rejoindre notre réseau d\'apporteurs d\'affaires en Espagne',
+        nl: 'Waarom samenwerken met ons team aan de Costa Blanca werkt',
+        sv: 'Därför samarbetar svenska mäklare med vårt team i Spanien',
+        bg: 'Защо водещи агенции от България си партнират с нас в Испания'
       },
       sectionSubheadline: {
         en: 'In just 60 minutes, learn the exact system our collaborators use to close international deals and earn 25% commissions from their home office.',
         es: 'En solo 60 minutos, aprende el sistema exacto que usan nuestros colaboradores para cerrar acuerdos internacionales y ganar el 25% de comisión desde su oficina.',
         fr: 'En 60 minutes, découvrez le système exact utilisé par nos partenaires pour conclure des transactions internationales.',
-        'en-ca': 'In just 60 minutes, learn the exact system our collaborators use to close international deals and earn 25% commissions.'
+        'en-ca': 'In just 60 minutes, learn the exact system our collaborators use to close international deals and earn 25% commissions.',
+        'fr-eu': 'En 60 minutes, découvrez notre convention B2B, le suivi CRM transparent et le versement SEPA après acte notarié.',
+        nl: 'In 60 minuten zie je exact hoe onze samenwerkingsovereenkomst, CRM-tracking en SEPA-uitbetaling na notariële overdracht werken.',
+        sv: 'På 60 minuter går vi igenom samarbetsavtalet, realtidsuppföljning i CRM och SEPA-utbetalning direkt efter tillträdet.',
+        bg: 'В рамките на 60 минути представяме договора за партньорство, проследяването в CRM в реално време и изплащането по SEPA след нотариус.'
       },
       bannerText: {
         en: 'Beyond Borders · September 24 · 7:00 PM CEST (1:00 PM EDT / 10:00 AM PDT) · Free for Realtors & Brokers',
         es: 'Beyond Borders · 24 de Septiembre · 19:00 h España (1:00 PM EDT / Miami · NY · PR) · Gratuito para Realtors y Brokers',
         fr: 'Beyond Borders · 24 Septembre · 19 h CEST (13 h EDT) · Gratuit pour les Agents & Courtiers',
-        'en-ca': 'Beyond Borders · September 24 · 7:00 PM CEST (1:00 PM EDT / 10:00 AM PDT) · Free for Realtors & Brokers'
+        'en-ca': 'Beyond Borders · September 24 · 7:00 PM CEST (1:00 PM EDT / 10:00 AM PDT) · Free for Realtors & Brokers',
+        'fr-eu': 'Conférence Partenaires Espagne · Gratuit pour Agences, Mandataires & CGP',
+        nl: 'Partnerwebinar Spanje · Gratis voor Makelaars & Financieel Adviseurs',
+        sv: 'Partnerwebbinarium Spanien · Kostnadsfritt för Mäklare & Rådgivare',
+        bg: 'Партньорски уебинар за Испания · Безплатно за агенции и брокери'
       },
       formCardTitle: {
         en: 'Beyond Borders · Realtor VIP Pass',
         es: 'Beyond Borders · Pase VIP Realtors',
         fr: 'Beyond Borders · Pass VIP Agents',
-        'en-ca': 'Beyond Borders · Realtor VIP Pass'
+        'en-ca': 'Beyond Borders · Realtor VIP Pass',
+        'fr-eu': 'Réseau Partenaire Espagne · Accès Professionnel',
+        nl: 'Partnernetwerk Spanje · Deelname Makelaars',
+        sv: 'Partnernätverk Spanien · Mäklaranmälan',
+        bg: 'Партньорска мрежа Испания · Професионален достъп'
       },
       organizationLabel: {
         en: 'Real Estate Agency / Brokerage *',
         es: 'Agencia Inmobiliaria / Brokerage *',
         fr: 'Agence Immobilière / Brokerage *',
-        'en-ca': 'Real Estate Agency / Brokerage *'
+        'en-ca': 'Real Estate Agency / Brokerage *',
+        'fr-eu': 'Agence Immobilière / Réseau / Cabinet CGP *',
+        nl: 'Makelaarskantoor / Adviespraktijk *',
+        sv: 'Fastighetsmäklarbyrå / Företag *',
+        bg: 'Агенция за недвижими имоти / Компания *'
       },
       organizationPlaceholder: 'e.g. RE/MAX Premier — Miami',
       benefits: [
         {
           icon: '💰',
-          title: { en: 'Commission Structure', es: 'Estructura de Comisiones', fr: 'Structure des Commissions', 'en-ca': 'Commission Structure' },
-          desc: { en: 'Earn €3,000–€15,000+ per referred deal. No risk, no paperwork, no extra clients to manage.', es: 'Gana entre €3.000 y €15.000+ por referido. Sin riesgo, sin papeleo, sin clientes extra.', fr: 'Gagnez entre 3 000 € et 15 000 €+ par transaction référée.', 'en-ca': 'Earn €3,000–€15,000+ per referred deal.' }
+          title: {
+            en: 'Commission Structure', es: 'Estructura de Comisiones', fr: 'Structure des Commissions', 'en-ca': 'Commission Structure',
+            'fr-eu': 'Rétrocession d\'Honoraires Claire', nl: 'Heldere Vergoedingsstructuur', sv: 'Tydlig Provisionsmodell', bg: 'Ясна комисионна структура'
+          },
+          desc: {
+            en: 'Earn €3,000–€15,000+ per referred deal. No risk, no paperwork, no extra clients to manage.',
+            es: 'Gana entre €3.000 y €15.000+ por referido. Sin riesgo, sin papeleo, sin clientes extra.',
+            fr: 'Gagnez entre 3 000 € et 15 000 €+ par transaction référée.',
+            'en-ca': 'Earn €3,000–€15,000+ per referred deal.',
+            'fr-eu': '15 % à 25 % de notre commission agence (3 000 € à 15 000 €+ par acte) versés par virement SEPA sur facture.',
+            nl: '15% tot 25% van onze verkoopcourtage (€ 3.000 tot € 15.000+ per overdracht), netjes op factuur via SEPA.',
+            sv: '15 % till 25 % av vårt mäklararvode (3 000 € till 15 000 €+ per affär) utbetalas via SEPA mot faktura.',
+            bg: 'От 15% до 25% от нашата комисиона (€3 000 – €15 000+ на сделка), изплатени по SEPA банков път след изповядване.'
+          }
         },
         {
           icon: '🏖️',
-          title: { en: 'Spain Market Deep-Dive', es: 'Análisis del Mercado Español', fr: 'Analyse du Marché Espagnol', 'en-ca': 'Spain Market Deep-Dive' },
-          desc: { en: 'Costa Blanca, Costa del Sol, Madrid & Valencia. 35,000+ North Americans bought in Spain last year.', es: 'Costa Blanca, Costa del Sol, Madrid y Valencia. Más de 35.000 norteamericanos compraron en España el año pasado.', fr: 'Costa Blanca, Costa del Sol, Madrid et Valence.', 'en-ca': 'Costa Blanca, Costa del Sol, Madrid & Valencia.' }
+          title: {
+            en: 'Spain Market Deep-Dive', es: 'Análisis del Mercado Español', fr: 'Analyse du Marché Espagnol', 'en-ca': 'Spain Market Deep-Dive',
+            'fr-eu': 'Analyse du Marché Costa Blanca', nl: 'Marktinzicht Costa Blanca', sv: 'Marknadsanalys Costa Blanca', bg: 'Анализ на пазара на Коста Бланка'
+          },
+          desc: {
+            en: 'Costa Blanca, Costa del Sol, Madrid & Valencia. 35,000+ North Americans bought in Spain last year.',
+            es: 'Costa Blanca, Costa del Sol, Madrid y Valencia. Más de 35.000 norteamericanos compraron en España el año pasado.',
+            fr: 'Costa Blanca, Costa del Sol, Madrid et Valence.',
+            'en-ca': 'Costa Blanca, Costa del Sol, Madrid & Valencia.',
+            'fr-eu': 'Alicante, Altea, Jávea et Orihuela Costa : pourquoi la demande française et belge atteint des records.',
+            nl: 'Waarom steeds meer Nederlanders en Vlamingen door Box 3 kiezen voor nieuwbouw en verhuur aan de Costa Blanca.',
+            sv: 'Alicante, Altea, Jávea och Torrevieja — stark svensk efterfrågan på sol, golf och tillgångar i euro.',
+            bg: 'Аликанте, Алтеа и Ориуела Коста — защо българските купувачи търсят имоти до ключ с целогодишен наем в евро.'
+          }
         },
         {
           icon: '📋',
-          title: { en: 'Step-by-Step Referral Process', es: 'Proceso de Referido Paso a Paso', fr: 'Processus de Référence Étape par Étape', 'en-ca': 'Step-by-Step Referral Process' },
-          desc: { en: 'From first conversation to closed deal. We handle everything in Spain — you just make the intro.', es: 'Desde la primera conversación hasta el cierre. Nosotros gestionamos todo en España — tú solo haces la presentación.', fr: 'De la première conversation à la signature. Nous gérons tout.', 'en-ca': 'From first conversation to closed deal.' }
+          title: {
+            en: 'Step-by-Step Referral Process', es: 'Proceso de Referido Paso a Paso', fr: 'Processus de Référence Étape par Étape', 'en-ca': 'Step-by-Step Referral Process',
+            'fr-eu': 'Suivi de A à Z sur Place', nl: 'Volledige Ontzorging in Spanje', sv: 'Helhetsansvar på Plats i Spanien', bg: 'Пълно обслужване на място'
+          },
+          desc: {
+            en: 'From first conversation to closed deal. We handle everything in Spain — you just make the intro.',
+            es: 'Desde la primera conversación hasta el cierre. Nosotros gestionamos todo en España — tú solo haces la presentación.',
+            fr: 'De la première conversation à la signature. Nous gérons tout.',
+            'en-ca': 'From first conversation to closed deal.',
+            'fr-eu': 'Vous présentez votre client ; nos conseillers, avocats Fuster & Associates et courtiers UCI gèrent tout le dossier.',
+            nl: 'Jij doet de warme introductie; ons team verzorgt bezichtigingen, juridische due diligence, NIE en notaris.',
+            sv: 'Du introducerar kunden — vi sköter visningar, juristgranskning hos Fuster & Associates, NIE och tillträde.',
+            bg: 'Вие правите запознанството — нашият екип поема огледите, адвокатската проверка, NIE, ипотеката и нотариуса.'
+          }
         },
         {
           icon: '🤝',
-          title: { en: 'Become a Certified Collaborator', es: 'Conviértete en Colaborador Certificado', fr: 'Devenez Collaborateur Certifié', 'en-ca': 'Become a Certified Collaborator' },
-          desc: { en: 'Join our exclusive network. Get your referral link, dashboard access, and co-branded marketing materials.', es: 'Únete a nuestra red exclusiva. Obtén tu enlace de referido, acceso al panel y materiales de marca compartida.', fr: 'Rejoignez notre réseau exclusif.', 'en-ca': 'Join our exclusive network.' }
+          title: {
+            en: 'Become a Certified Collaborator', es: 'Conviértete en Colaborador Certificado', fr: 'Devenez Collaborateur Certifié', 'en-ca': 'Become a Certified Collaborator',
+            'fr-eu': 'Portail Partenaire & Protection Client', nl: 'Eigen Partnerportaal & Klantbescherming', sv: 'Egen Partnerportal & Kundskydd', bg: 'Партньорски портал и защита на клиента'
+          },
+          desc: {
+            en: 'Join our exclusive network. Get your referral link, dashboard access, and co-branded marketing materials.',
+            es: 'Únete a nuestra red exclusiva. Obtén tu enlace de referido, acceso al panel y materiales de marca compartida.',
+            fr: 'Rejoignez notre réseau exclusif.',
+            'en-ca': 'Join our exclusive network.',
+            'fr-eu': 'Lien personnalisé co-brandé avec votre logo, traçabilité CRM en temps réel et convention signée.',
+            nl: 'Persoonlijke verwijzingslink met je kantoorlogo, realtime statusupdates en schriftelijke klantbescherming.',
+            sv: 'Personlig co-brandad länk med er byrålogotyp, realtidsstatus i CRM och skriftligt kundskydd.',
+            bg: 'Персонален линк с логото на Вашата агенция, прозрачен CRM статус и договорна защита на всеки подаден клиент.'
+          }
         },
         {
           icon: '📊',
-          title: { en: 'Live Q&A with Our Directors', es: 'Preguntas y Respuestas en Vivo', fr: 'Questions/Réponses en Direct', 'en-ca': 'Live Q&A with Our Directors' },
-          desc: { en: 'Ask our Spanish real estate specialists, legal experts and international director directly.', es: 'Pregunta directamente a nuestros especialistas inmobiliarios, expertos legales y director internacional.', fr: 'Posez vos questions à nos spécialistes.', 'en-ca': 'Ask our Spanish real estate specialists directly.' }
+          title: {
+            en: 'Live Q&A with Our Directors', es: 'Preguntas y Respuestas en Vivo', fr: 'Questions/Réponses en Direct', 'en-ca': 'Live Q&A with Our Directors',
+            'fr-eu': 'Échange en Direct avec la Direction', nl: 'Live Q&A met Onze Directie', sv: 'Direkt Frågestund med Ledningen', bg: 'Въпроси и отговори с ръководството'
+          },
+          desc: {
+            en: 'Ask our Spanish real estate specialists, legal experts and international director directly.',
+            es: 'Pregunta directamente a nuestros especialistas inmobiliarios, expertos legales y director internacional.',
+            fr: 'Posez vos questions à nos spécialistes.',
+            'en-ca': 'Ask our Spanish real estate specialists directly.',
+            'fr-eu': 'Posez directement vos questions à notre direction internationale, nos avocats et nos spécialistes crédit.',
+            nl: 'Stel al je vragen direct aan onze internationale directie, Spaanse juristen en hypotheekspecialisten.',
+            sv: 'Ställ dina frågor direkt till vår internationella ledning, spanska jurister och bolånespecialister.',
+            bg: 'Задайте въпросите си директно към международния ни директор, испанските адвокати и кредитните експерти.'
+          }
         }
       ]
     },
@@ -2523,88 +2623,188 @@ App.auth = (function() {
         en: '🔴 LIVE WEBINAR · 🇪🇸 Living, Moving & Investing in Spain · 🏡 FREE Masterclass',
         es: '🔴 WEBINAR EN VIVO · 🇪🇸 Vivir, Mudarse e Invertir en España · 🏡 Masterclass GRATUITA',
         fr: '🔴 WEBINAIRE EN DIRECT · 🇪🇸 Vivre et Investir en Espagne · 🏡 Masterclass GRATUITE',
-        'en-ca': '🔴 LIVE WEBINAR · 🇪🇸 Living, Moving & Investing in Spain · 🏡 FREE Masterclass'
+        'en-ca': '🔴 LIVE WEBINAR · 🇪🇸 Living, Moving & Investing in Spain · 🏡 FREE Masterclass',
+        'fr-eu': '🔴 CONFÉRENCE EN DIRECT · 🇪🇸 Acheter, S\'installer & Investir sur la Costa Blanca · Accès GRATUIT',
+        nl: '🔴 LIVE WEBINAR · 🇪🇸 Zorgeloos Kopen, Overwinteren & Verhuren in Spanje · GRATIS Deelname',
+        sv: '🔴 LIVE WEBBINARIUM · 🇪🇸 Tryggt Bostadsköp, Juridik & Livsstil i Spanien · Kostnadsfritt',
+        bg: '🔴 УЕБИНАР НА ЖИВО · 🇪🇸 Покупка на имот, правна сигурност и доходност в Испания · БЕЗПЛАТНО'
       },
       heroPill: {
         en: 'RE/MAX Inmomás International — Buyer & Investor Masterclass',
         es: 'RE/MAX Inmomás International — Masterclass para Compradores e Inversores',
         fr: 'RE/MAX Inmomás International — Masterclass Acheteurs & Investisseurs',
-        'en-ca': 'RE/MAX Inmomás International — Buyer & Investor Masterclass'
+        'en-ca': 'RE/MAX Inmomás International — Buyer & Investor Masterclass',
+        'fr-eu': 'RE/MAX Inmomás International — Conférence Acquéreurs & Investisseurs',
+        nl: 'RE/MAX Inmomás International — Informatiesessie Kopers & Beleggers',
+        sv: 'RE/MAX Inmomás International — Webbinarium för Bostadsköpare',
+        bg: 'RE/MAX Inmomás International — Уебинар за купувачи и инвеститори'
       },
       titlePrefix: {
         en: 'Spain',
         es: 'Descubre',
         fr: 'Découvrez',
-        'en-ca': 'Spain'
+        'en-ca': 'Spain',
+        'fr-eu': 'Cap sur',
+        nl: 'Zorgeloos kopen',
+        sv: 'Ditt hem',
+        bg: 'Имот в'
       },
       titleHighlight: {
         en: 'Unlocked',
         es: 'España',
         fr: 'l\'Espagne',
-        'en-ca': 'Unlocked'
+        'en-ca': 'Unlocked',
+        'fr-eu': 'l\'Espagne',
+        nl: 'in Spanje',
+        sv: 'i Spanien',
+        bg: 'Испания'
       },
       subtitleText: {
         en: 'The complete practical guide for buyers and investors from the US, Canada and Puerto Rico: how to safely buy property, obtain residence visas, and enjoy the Mediterranean lifestyle in Spain.',
         es: 'La guía práctica integral para compradores e inversores de EE.UU., Canadá y Puerto Rico: cómo comprar propiedades de forma 100% segura, gestionar visados de residencia y disfrutar del estilo de vida mediterráneo en España.',
         fr: 'Le guide pratique complet pour les acheteurs et investisseurs: comment acheter en toute sécurité, obtenir un visa de résidence et vivre en Espagne.',
-        'en-ca': 'The complete practical guide for buyers and investors from North America: safely buy property, obtain visas, and enjoy life in Spain.'
+        'en-ca': 'The complete practical guide for buyers and investors from North America: safely buy property, obtain visas, and enjoy life in Spain.',
+        'fr-eu': 'Le guide concret pour les acquéreurs français et belges : audit juridique indépendant, conventions fiscales, crédit non-résident jusqu\'à 70 % et sélection de biens sur la Costa Blanca.',
+        nl: 'De praktische gids voor Nederlandse en Vlaamse kopers: juridische zekerheid via een eigen advocaat, kosten koper, Box 3-vrijstelling, hypotheek tot 70% en verhuur op de Costa Blanca.',
+        sv: 'Den sakliga guiden för svenska bostadsköpare: oberoende juristgranskning, skatteavtalet Sverige–Spanien, bolån i euro upp till 70 % och tryggt distansköp på Costa Blanca.',
+        bg: 'Практическият наръчник за купувачи и инвеститори от България: пълна адвокатска проверка, номер NIE без визи, ипотека до 70% в евро и целогодишна доходност на Коста Бланка.'
       },
       sectionHeadline: {
         en: 'Everything You Need to Know Before Buying or Moving to Spain',
         es: 'Todo lo que necesitas saber antes de comprar o mudarte a España',
         fr: 'Tout ce que vous devez savoir avant d\'acheter ou vous installer en Espagne',
-        'en-ca': 'Everything You Need to Know Before Buying or Moving to Spain'
+        'en-ca': 'Everything You Need to Know Before Buying or Moving to Spain',
+        'fr-eu': 'Les points essentiels à maîtriser avant d\'acheter ou d\'investir en Espagne',
+        nl: 'Alles wat je vooraf moet weten voordat je een woning koopt in Spanje',
+        sv: 'Allt du behöver ha koll på innan du köper bostad i Spanien',
+        bg: 'Всичко, което трябва да знаете преди покупка на имот в Испания'
       },
       sectionSubheadline: {
         en: 'Avoid costly mistakes. Learn the legal, tax, financial, and lifestyle secrets from Spain\'s leading international real estate specialists.',
         es: 'Evita errores costosos. Conoce las claves legales, fiscales, de financiación y estilo de vida con los especialistas de RE/MAX Inmomás.',
         fr: 'Évitez les erreurs coûteuses. Découvrez les aspects juridiques, fiscaux et financiers avec nos spécialistes RE/MAX Inmomás.',
-        'en-ca': 'Avoid costly mistakes. Learn the legal, tax, financial, and lifestyle secrets from RE/MAX Inmomás.'
+        'en-ca': 'Avoid costly mistakes. Learn the legal, tax, financial, and lifestyle secrets from RE/MAX Inmomás.',
+        'fr-eu': 'Évitez les pièges urbanistiques et fiscaux grâce à l\'accompagnement coordonné de RE/MAX Inmomás, Fuster & Associates et Banco UCI.',
+        nl: 'Voorkom juridische en fiscale verrassingen met één vast aanspreekpunt van RE/MAX Inmomás, Fuster & Associates en Banco UCI.',
+        sv: 'Undvik kostsamma misstag med samordnad rådgivning från RE/MAX Inmomás, Fuster & Associates jurister och Banco UCI.',
+        bg: 'Спестете си скъпи грешки с обединения екип на RE/MAX Inmomás, адвокатска кантора Fuster & Associates и Banco UCI.'
       },
       bannerText: {
         en: 'Spain Unlocked · October 29 · 1:00 PM EDT / 6:00 PM Spain · Free Masterclass for Buyers & Investors',
         es: 'Descubre España · 29 de Octubre · 18:00 h España (1:00 PM EDT) · Masterclass Gratuita para Compradores e Inversores',
         fr: 'Découvrez l\'Espagne · 29 Octobre · 18 h CET (13 h EDT) · Masterclass Gratuite pour Acheteurs & Investisseurs',
-        'en-ca': 'Spain Unlocked · October 29 · 1:00 PM EDT / 6:00 PM Spain · Free Masterclass for Buyers & Investors'
+        'en-ca': 'Spain Unlocked · October 29 · 1:00 PM EDT / 6:00 PM Spain · Free Masterclass for Buyers & Investors',
+        'fr-eu': 'Cap sur l\'Espagne · Conférence en direct · 18h00 CET (Paris / Bruxelles) · Accès gratuit',
+        nl: 'Zorgeloos kopen in Spanje · Live webinar · 18:00 uur CET (NL / BE) · Gratis deelname',
+        sv: 'Ditt hem i Spanien · Live webbinarium · kl. 18:00 CET (Sverige) · Kostnadsfri anmälan',
+        bg: 'Имот в Испания · Уебинар на живо · 19:00 ч. BG време (18:00 CET) · Безплатен достъп'
       },
       formCardTitle: {
         en: 'Spain Unlocked · Free Masterclass Registration',
         es: 'Descubre España · Registro Gratuito a la Masterclass',
         fr: 'Découvrez l\'Espagne · Inscription Gratuite',
-        'en-ca': 'Spain Unlocked · Free Masterclass Registration'
+        'en-ca': 'Spain Unlocked · Free Masterclass Registration',
+        'fr-eu': 'Cap sur l\'Espagne · Inscription Gratuite',
+        nl: 'Zorgeloos kopen in Spanje · Gratis Aanmelding',
+        sv: 'Ditt hem i Spanien · Kostnadsfri Anmälan',
+        bg: 'Имот в Испания · Безплатна регистрация'
       },
       organizationLabel: {
         en: 'Primary Goal / Interest in Spain *',
         es: 'Objetivo Principal / Interés en España *',
         fr: 'Objectif Principal / Intérêt en Espagne *',
-        'en-ca': 'Primary Goal / Interest in Spain *'
+        'en-ca': 'Primary Goal / Interest in Spain *',
+        'fr-eu': 'Votre Projet Principal en Espagne *',
+        nl: 'Belangrijkste Doel in Spanje *',
+        sv: 'Huvudsakligt Syfte i Spanien *',
+        bg: 'Основна цел / Интерес в Испания *'
       },
-      organizationPlaceholder: 'e.g. Buying a Holiday Home / Golden Visa / Relocating',
+      organizationPlaceholder: 'e.g. Buying a Holiday Home / Investment / Relocating',
       benefits: [
         {
           icon: '🛡️',
-          title: { en: 'Safe Buying Process & Legal Security', es: 'Compra 100% Segura y Garantías', fr: 'Achat Sécurisé & Garanties', 'en-ca': 'Safe Buying Process & Legal Security' },
-          desc: { en: 'NIE number, bank accounts, contracts (Arras), registry checks, and notary closing without surprises.', es: 'Obtención de NIE, apertura de cuenta bancaria, contratos de arras, verificación registral y firma notarial sin sorpresas.', fr: 'Numéro NIE, comptes bancaires, contrats et notaire sans surprises.', 'en-ca': 'NIE number, bank accounts, contracts and notary closing.' }
+          title: {
+            en: 'Safe Buying Process & Legal Security', es: 'Compra 100% Segura y Garantías', fr: 'Achat Sécurisé & Garanties', 'en-ca': 'Safe Buying Process & Legal Security',
+            'fr-eu': 'Sécurité Juridique & Rôle de l\'Avocat', nl: 'Juridische Zekerheid & Due Diligence', sv: 'Juridisk Trygghet & Oberoende Kontroll', bg: '100% Правна сигурност и проверка'
+          },
+          desc: {
+            en: 'NIE number, bank accounts, contracts (Arras), registry checks, and notary closing without surprises.',
+            es: 'Obtención de NIE, apertura de cuenta bancaria, contratos de arras, verificación registral y firma notarial sin sorpresas.',
+            fr: 'Numéro NIE, comptes bancaires, contrats et notaire sans surprises.',
+            'en-ca': 'NIE number, bank accounts, contracts and notary closing.',
+            'fr-eu': 'Pourquoi l\'audit d\'avocat complète le notaire espagnol : urbanisme, registre foncier, contrat d\'Arras et signature.',
+            nl: 'Waarom een eigen advocaat in Spanje essentieel is: kadastercheck, bouwvergunningen, derdengeldenrekening en notaris.',
+            sv: 'Varför oberoende jurist behövs utöver spansk notarie: skuldfrihetsintyg, bygglov, Arras-avtal och tryggt tillträde.',
+            bg: 'Пълна проверка за тежести и градоустройствен статут, предварителен договор (Arras), клиентска сметка и нотариус.'
+          }
         },
         {
           icon: '🛂',
-          title: { en: 'Visas & Residency Pathways', es: 'Visados y Vías de Residencia', fr: 'Visas & Chemins de Résidence', 'en-ca': 'Visas & Residency Pathways' },
-          desc: { en: 'Digital Nomad Visa, Non-Lucrative Visa, and Real Estate Investment residency requirements explained simply.', es: 'Visado de Nómada Digital, Visado No Lucrativo y requisitos de residencia por inversión inmobiliaria explicados con claridad.', fr: 'Visa Nomade Digital, Visa Non Lucratif et options de résidence.', 'en-ca': 'Digital Nomad Visa, Non-Lucrative Visa, and residency requirements.' }
+          title: {
+            en: 'Visas & Residency Pathways', es: 'Visados y Vías de Residencia', fr: 'Visas & Chemins de Résidence', 'en-ca': 'Visas & Residency Pathways',
+            'fr-eu': 'Statut Citoyen UE, NIE & Résidence', nl: 'EU-vrijheid, NIE-nummer & Inschrijving', sv: 'EU-frihet, NIE-nummer & Registrering', bg: 'Права в ЕС, номер NIE и регистрация'
+          },
+          desc: {
+            en: 'Digital Nomad Visa, Non-Lucrative Visa, and Real Estate Investment residency requirements explained simply.',
+            es: 'Visado de Nómada Digital, Visado No Lucrativo y requisitos de residencia por inversión inmobiliaria explicados con claridad.',
+            fr: 'Visa Nomade Digital, Visa Non Lucratif et options de résidence.',
+            'en-ca': 'Digital Nomad Visa, Non-Lucrative Visa, and residency requirements.',
+            'fr-eu': 'Zéro visa requis pour Français et Belges : obtention du NIE par procuration et enregistrement résident UE (> 183 jours).',
+            nl: 'Geen visum nodig als EU-burger: snel je NIE-nummer regelen via volmacht en het verschil tussen 2e woning en emigratie.',
+            sv: 'Inget visum krävs som EU-medborgare: smidig NIE-ansökan via fullmakt samt skillnaden mellan fritidsboende och utflytt.',
+            bg: 'Без визи за български граждани: бързо издаване на NIE чрез пълномощно, банкова сметка в евро и адресна регистрация.'
+          }
         },
         {
           icon: '🏖️',
-          title: { en: 'Best Areas: Coast, Sun & Cities', es: 'Mejores Zonas: Costa, Sol y Ciudades', fr: 'Meilleures Régions: Côte & Villes', 'en-ca': 'Best Areas: Coast, Sun & Cities' },
-          desc: { en: 'Compare Costa Blanca (Alicante/Jávea), Costa del Sol (Málaga/Marbella), Madrid and Valencia for lifestyle & ROI.', es: 'Compara Costa Blanca (Alicante/Jávea), Costa del Sol (Málaga/Marbella), Madrid y Valencia según estilo de vida y rentabilidad.', fr: 'Comparez Costa Blanca, Costa del Sol, Madrid et Valence.', 'en-ca': 'Compare Costa Blanca, Costa del Sol, Madrid and Valencia.' }
+          title: {
+            en: 'Best Areas: Coast, Sun & Cities', es: 'Mejores Zonas: Costa, Sol y Ciudades', fr: 'Meilleures Régions: Côte & Villes', 'en-ca': 'Best Areas: Coast, Sun & Cities',
+            'fr-eu': 'Microclimats & Secteurs Porteurs', nl: 'Regiokeuze & Verhuurpotentieel', sv: 'Områdesguide: Costa Blanca Nord & Syd', bg: 'Най-добрите райони за живот и доходност'
+          },
+          desc: {
+            en: 'Compare Costa Blanca (Alicante/Jávea), Costa del Sol (Málaga/Marbella), Madrid and Valencia for lifestyle & ROI.',
+            es: 'Compara Costa Blanca (Alicante/Jávea), Costa del Sol (Málaga/Marbella), Madrid y Valencia según estilo de vida y rentabilidad.',
+            fr: 'Comparez Costa Blanca, Costa del Sol, Madrid et Valence.',
+            'en-ca': 'Compare Costa Blanca, Costa del Sol, Madrid and Valencia.',
+            'fr-eu': 'Comparatif Altea, Jávea, Alicante, Orihuela Costa et Valence selon votre budget, vols directs et rendement locatif.',
+            nl: 'Vergelijk Jávea, Altea, Alicante, Guardamar en Orihuela Costa op leefklimaat, directe vluchten en verhuurrendement.',
+            sv: 'Jämför Alicante, Altea, Jávea, Santa Pola och Torrevieja/Orihuela Costa utifrån soltimmar, golf och uthyrning.',
+            bg: 'Сравнение между Аликанте, Алтеа, Хавеа и Ориуела Коста спрямо бюджет, директни полети и 12-месечна заетост.'
+          }
         },
         {
           icon: '💶',
-          title: { en: 'Taxes, Mortgages & Financing', es: 'Impuestos, Hipotecas y Financiación', fr: 'Fiscalité, Prêts & Financement', 'en-ca': 'Taxes, Mortgages & Financing' },
-          desc: { en: 'How non-resident mortgages work (up to 70%), transfer taxes (ITP/IVA), tax exemptions, and running costs.', es: 'Cómo funcionan las hipotecas para no residentes (hasta el 70%), ITP/IVA, exenciones fiscales y costes de mantenimiento.', fr: 'Prêts non-résidents jusqu\'à 70%, taxes de transfert et coûts d\'entretien.', 'en-ca': 'How non-resident mortgages work (up to 70%) and taxes.' }
+          title: {
+            en: 'Taxes, Mortgages & Financing', es: 'Impuestos, Hipotecas y Financiación', fr: 'Fiscalité, Prêts & Financement', 'en-ca': 'Taxes, Mortgages & Financing',
+            'fr-eu': 'Fiscalité Européenne & Crédit 70 %', nl: 'Kosten Koper, Box 3 & Hypotheek', sv: 'Skatter, Kostnadskalkyl & Bolån', bg: 'Данъци, разходи и ипотека до 70%'
+          },
+          desc: {
+            en: 'How non-resident mortgages work (up to 70%), transfer taxes (ITP/IVA), tax exemptions, and running costs.',
+            es: 'Cómo funcionan las hipotecas para no residentes (hasta el 70%), ITP/IVA, exenciones fiscales y costes de mantenimiento.',
+            fr: 'Prêts non-résidents jusqu\'à 70%, taxes de transfert et coûts d\'entretien.',
+            'en-ca': 'How non-resident mortgages work (up to 70%) and taxes.',
+            'fr-eu': 'Frais d\'acquisition (~12–13 %), conventions fiscales FR/BE, déduction des charges UE (19 % net) et prêt UCI jusqu\'à 70 %.',
+            nl: 'Transparant overzicht aankoopkosten (~12–13%), dubbele-belastingverdrag NL/BE, EU-kostenaftrek en financiering tot 70%.',
+            sv: 'Exakta tilläggskostnader (~12–13 %), skatteavtalet Sverige–Spanien, EU-avdrag på hyresintäkter och bolån upp till 70 %.',
+            bg: 'Точна разбивка на разходите (~12–13%), СИДДО България–Испания, нисък годишен данък сгради (IBI) и кредит от Banco UCI.'
+          }
         },
         {
           icon: '🎙️',
-          title: { en: 'Live Q&A with Relocation Advisors', es: 'Preguntas y Respuestas con Expertos', fr: 'Q&R en Direct avec nos Conseillers', 'en-ca': 'Live Q&A with Relocation Advisors' },
-          desc: { en: 'Direct access to our Spanish property consultants, bilingual lawyers, and relocation specialists.', es: 'Acceso directo y en tiempo real a nuestros consultores inmobiliarios, abogados bilingües y equipo de relocalización.', fr: 'Accès direct à nos consultants immobiliers et avocats bilingues.', 'en-ca': 'Direct access to our property consultants and lawyers.' }
+          title: {
+            en: 'Live Q&A with Relocation Advisors', es: 'Preguntas y Respuestas con Expertos', fr: 'Q&R en Direct avec nos Conseillers', 'en-ca': 'Live Q&A with Relocation Advisors',
+            'fr-eu': 'Questions-Réponses en Direct', nl: 'Live Vragen Stellen aan Specialisten', sv: 'Direkt Frågestund med Specialister', bg: 'Въпроси и отговори на живо'
+          },
+          desc: {
+            en: 'Direct access to our Spanish property consultants, bilingual lawyers, and relocation specialists.',
+            es: 'Acceso directo y en tiempo real a nuestros consultores inmobiliarios, abogados bilingües y equipo de relocalización.',
+            fr: 'Accès direct à nos consultants immobiliers et avocats bilingues.',
+            'en-ca': 'Direct access to our property consultants and lawyers.',
+            'fr-eu': 'Posez vos questions en direct à nos conseillers immobiliers, avocats fiscalistes et courtiers hypothécaires.',
+            nl: 'Stel je vragen rechtstreeks aan onze aankoopadviseurs, juristen en hypotheekspecialisten op de Costa Blanca.',
+            sv: 'Ställ dina frågor direkt till våra fastighetsrådgivare, jurister och bolånespecialister på plats i Spanien.',
+            bg: 'Задайте въпросите си директно към нашите имотни консултанти, адвокати и кредитни специалисти в Испания.'
+          }
         }
       ]
     }

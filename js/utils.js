@@ -2575,14 +2575,18 @@ App.utils.getUserDisplayName = function(u) {
 };
 
 App.utils._getCurrentLang = function() {
-  const htmlLang = (document.documentElement.getAttribute('data-lang') || localStorage.getItem('lang') || 'en').toLowerCase();
-  if (htmlLang === 'es' || htmlLang === 'fr' || htmlLang === 'en-ca') return htmlLang;
+  if (window.App && typeof window.App.getLanguage === 'function') {
+    const appLang = String(window.App.getLanguage() || '').toLowerCase();
+    if (['en', 'es', 'fr', 'en-ca', 'fr-eu', 'nl', 'sv', 'bg'].includes(appLang)) return appLang;
+  }
+  const htmlLang = (document.documentElement.getAttribute('data-lang') || localStorage.getItem('remax_lang') || localStorage.getItem('lang') || 'en').toLowerCase();
+  if (['es', 'fr', 'en-ca', 'fr-eu', 'nl', 'sv', 'bg'].includes(htmlLang)) return htmlLang;
   return 'en';
 };
 
 App.utils._getLocalizedText = function(map) {
   const lang = App.utils._getCurrentLang();
-  return map[lang] || map.en || '';
+  return map[lang] || (lang === 'fr-eu' ? map.fr : null) || map.en || '';
 };
 
 App.utils.getApprovedUsersByRole = async function(role) {
@@ -2662,12 +2666,17 @@ App.utils.populateInmomasAgentSelect = async function(selectEl, opts = {}) {
   if (!selectEl) return [];
   const prevValue = opts.preserveValue !== false ? selectEl.value : '';
 
-  const placeholder = opts.placeholder || {
+  const defaultPlaceholder = {
     en: '— None / Select an agent (Optional) —',
     es: '— Ninguno / Seleccionar agente (Opcional) —',
     fr: '— Aucun / Sélectionner un agent (Optionnel) —',
-    'en-ca': '— None / Select an agent (Optional) —'
+    'en-ca': '— None / Select an agent (Optional) —',
+    'fr-eu': '— Aucun / Sélectionner un conseiller (Facultatif) —',
+    nl: '— Geen / Kies een adviseur (Optioneel) —',
+    sv: '— Ingen / Välj rådgivare (Valfritt) —',
+    bg: '— Няма / Изберете консултант (По желание) —'
   };
+  const placeholder = opts.placeholder ? { ...defaultPlaceholder, ...opts.placeholder } : defaultPlaceholder;
 
   const renderOptions = (agents) => {
     selectEl.innerHTML = '';
@@ -2677,6 +2686,10 @@ App.utils.populateInmomasAgentSelect = async function(selectEl, opts = {}) {
     defaultOpt.setAttribute('data-i18n-es', placeholder.es);
     defaultOpt.setAttribute('data-i18n-fr', placeholder.fr);
     defaultOpt.setAttribute('data-i18n-en-ca', placeholder['en-ca'] || placeholder.en);
+    defaultOpt.setAttribute('data-i18n-fr-eu', placeholder['fr-eu'] || placeholder.fr || placeholder.en);
+    defaultOpt.setAttribute('data-i18n-nl', placeholder.nl || placeholder.en);
+    defaultOpt.setAttribute('data-i18n-sv', placeholder.sv || placeholder.en);
+    defaultOpt.setAttribute('data-i18n-bg', placeholder.bg || placeholder.en);
     defaultOpt.textContent = App.utils._getLocalizedText(placeholder);
     selectEl.appendChild(defaultOpt);
 
@@ -2715,13 +2728,21 @@ App.utils.populateBrokerSelect = async function(selectEl, opts = {}) {
     en: 'Direct Agent Agreement (15%) / No Broker',
     es: 'Acuerdo Directo con Agente (15%) / Sin Broker',
     fr: 'Accord Direct Agent (15%) / Sans Courtier',
-    'en-ca': 'Direct Agent Agreement (15%) / No Broker'
+    'en-ca': 'Direct Agent Agreement (15%) / No Broker',
+    'fr-eu': 'Mandataire / Indépendant (15 %) — Sans agence de rattachement',
+    nl: 'Zelfstandig adviseur (15%) / Geen kantooraansluiting',
+    sv: 'Fristående mäklare / rådgivare (15 %) — Utan mäklarbyrå',
+    bg: 'Индивидуален консултант (15%) / Без агенция'
   };
   const otherLabel = {
     en: 'Other Broker / Agency (enter manually — 25%)',
     es: 'Otro Broker / Agencia (introducir manualmente — 25%)',
     fr: 'Autre Courtier / Agence (saisir manuellement — 25%)',
-    'en-ca': 'Other Broker / Agency (enter manually — 25%)'
+    'en-ca': 'Other Broker / Agency (enter manually — 25%)',
+    'fr-eu': 'Autre Agence / Réseau (saisir manuellement — 25 %)',
+    nl: 'Ander Makelaarskantoor (handmatig invullen — 25%)',
+    sv: 'Annan Mäklarbyrå (ange manuellt — 25 %)',
+    bg: 'Друга агенция / компания (въведете ръчно — 25%)'
   };
 
   const renderOptions = (brokers) => {
@@ -2733,6 +2754,10 @@ App.utils.populateBrokerSelect = async function(selectEl, opts = {}) {
     defaultOpt.setAttribute('data-i18n-es', noneLabel.es);
     defaultOpt.setAttribute('data-i18n-fr', noneLabel.fr);
     defaultOpt.setAttribute('data-i18n-en-ca', noneLabel['en-ca']);
+    defaultOpt.setAttribute('data-i18n-fr-eu', noneLabel['fr-eu']);
+    defaultOpt.setAttribute('data-i18n-nl', noneLabel.nl);
+    defaultOpt.setAttribute('data-i18n-sv', noneLabel.sv);
+    defaultOpt.setAttribute('data-i18n-bg', noneLabel.bg);
     defaultOpt.textContent = App.utils._getLocalizedText(noneLabel);
     selectEl.appendChild(defaultOpt);
 
@@ -2751,6 +2776,10 @@ App.utils.populateBrokerSelect = async function(selectEl, opts = {}) {
       otherOpt.setAttribute('data-i18n-es', otherLabel.es);
       otherOpt.setAttribute('data-i18n-fr', otherLabel.fr);
       otherOpt.setAttribute('data-i18n-en-ca', otherLabel['en-ca']);
+      otherOpt.setAttribute('data-i18n-fr-eu', otherLabel['fr-eu']);
+      otherOpt.setAttribute('data-i18n-nl', otherLabel.nl);
+      otherOpt.setAttribute('data-i18n-sv', otherLabel.sv);
+      otherOpt.setAttribute('data-i18n-bg', otherLabel.bg);
       otherOpt.textContent = App.utils._getLocalizedText(otherLabel);
       selectEl.appendChild(otherOpt);
     }
