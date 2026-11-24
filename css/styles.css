@@ -165,22 +165,79 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
-/* --- Language Toggle (4 idiomas: EN, ES, FR-Canada, EN-CA) --- */
+/* --- Language Toggle (8 idiomas: EN, ES, FR-CA, EN-CA, FR-EU, NL, SV, BG) ---
+   Shared components that only output .lang-en/.lang-es (e.g. referral-agreement.js)
+   automatically fall back to .lang-en when no sibling in the active language exists. */
 body.lang-en .lang-es,
 body.lang-en .lang-fr,
-body.lang-en .lang-en-ca { display: none !important; }
+body.lang-en .lang-en-ca,
+body.lang-en .lang-fr-eu,
+body.lang-en .lang-nl,
+body.lang-en .lang-sv,
+body.lang-en .lang-bg { display: none !important; }
 
-body.lang-es .lang-en,
+body.lang-es .lang-en:has(~ .lang-es),
+body.lang-es .lang-es ~ .lang-en,
 body.lang-es .lang-fr,
-body.lang-es .lang-en-ca { display: none !important; }
+body.lang-es .lang-en-ca,
+body.lang-es .lang-fr-eu,
+body.lang-es .lang-nl,
+body.lang-es .lang-sv,
+body.lang-es .lang-bg { display: none !important; }
 
-body.lang-fr .lang-en,
+body.lang-fr .lang-en:has(~ .lang-fr),
+body.lang-fr .lang-fr ~ .lang-en,
 body.lang-fr .lang-es,
-body.lang-fr .lang-en-ca { display: none !important; }
+body.lang-fr .lang-en-ca,
+body.lang-fr .lang-fr-eu,
+body.lang-fr .lang-nl,
+body.lang-fr .lang-sv,
+body.lang-fr .lang-bg { display: none !important; }
 
-body.lang-en-ca .lang-en,
+body.lang-en-ca .lang-en:has(~ .lang-en-ca),
+body.lang-en-ca .lang-en-ca ~ .lang-en,
 body.lang-en-ca .lang-es,
-body.lang-en-ca .lang-fr { display: none !important; }
+body.lang-en-ca .lang-fr,
+body.lang-en-ca .lang-fr-eu,
+body.lang-en-ca .lang-nl,
+body.lang-en-ca .lang-sv,
+body.lang-en-ca .lang-bg { display: none !important; }
+
+body.lang-fr-eu .lang-en:has(~ .lang-fr-eu),
+body.lang-fr-eu .lang-fr-eu ~ .lang-en,
+body.lang-fr-eu .lang-es,
+body.lang-fr-eu .lang-fr,
+body.lang-fr-eu .lang-en-ca,
+body.lang-fr-eu .lang-nl,
+body.lang-fr-eu .lang-sv,
+body.lang-fr-eu .lang-bg { display: none !important; }
+
+body.lang-nl .lang-en:has(~ .lang-nl),
+body.lang-nl .lang-nl ~ .lang-en,
+body.lang-nl .lang-es,
+body.lang-nl .lang-fr,
+body.lang-nl .lang-en-ca,
+body.lang-nl .lang-fr-eu,
+body.lang-nl .lang-sv,
+body.lang-nl .lang-bg { display: none !important; }
+
+body.lang-sv .lang-en:has(~ .lang-sv),
+body.lang-sv .lang-sv ~ .lang-en,
+body.lang-sv .lang-es,
+body.lang-sv .lang-fr,
+body.lang-sv .lang-en-ca,
+body.lang-sv .lang-fr-eu,
+body.lang-sv .lang-nl,
+body.lang-sv .lang-bg { display: none !important; }
+
+body.lang-bg .lang-en:has(~ .lang-bg),
+body.lang-bg .lang-bg ~ .lang-en,
+body.lang-bg .lang-es,
+body.lang-bg .lang-fr,
+body.lang-bg .lang-en-ca,
+body.lang-bg .lang-fr-eu,
+body.lang-bg .lang-nl,
+body.lang-bg .lang-sv { display: none !important; }
 
 /* Segmented EN | ES Language Switcher for Dashboards (Sidebar & Topbar) */
 .dashboard-lang-switch {

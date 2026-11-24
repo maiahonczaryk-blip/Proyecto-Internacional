@@ -122,7 +122,11 @@ App.views.auth = {
               en: '✅ Reset link sent! Check your inbox (and spam folder).',
               es: '✅ ¡Enlace enviado! Revisa tu bandeja de entrada (y la carpeta de spam).',
               fr: '✅ Lien envoyé&nbsp;! Vérifiez votre boîte de réception (et les spams).',
-              'en-ca': '✅ Reset link sent! Check your inbox (and spam folder).'
+              'en-ca': '✅ Reset link sent! Check your inbox (and spam folder).',
+              'fr-eu': '✅ Lien de réinitialisation envoyé ! Vérifiez votre boîte de réception (ainsi que vos courriers indésirables).',
+              nl: '✅ Herstellink verzonden! Controleer je inbox (en eventueel je ongewenste e-mail).',
+              sv: '✅ Återställningslänk skickad! Kontrollera din inkorg (och skräppostmappen).',
+              bg: '✅ Линкът за възстановяване е изпратен! Проверете входящата си поща (и папка Спам).'
             };
             forgotMsg.innerHTML = msgs[lang] || msgs.en;
             forgotSend.innerHTML = '✓';
