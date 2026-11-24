@@ -3781,6 +3781,260 @@ App.auth = (function() {
     };
   }
 
+  /* ============================================
+     B2B & Client Tracking Persistence Methods
+     (Write access strictly restricted to agent_inmomas)
+     ============================================ */
+
+  function assertAgentInmomasTrackingWrite() {
+    if (!currentUser || currentUser.role !== 'agent_inmomas') {
+      throw new Error('Solo los Agentes Inmomás pueden actualizar el seguimiento.');
+    }
+  }
+
+  async function updateUserNewsletter(userId, subscribed) {
+    assertAgentInmomasTrackingWrite();
+    const isSub = Boolean(subscribed);
+    const nowIso = new Date().toISOString();
+    const patch = {
+      newsletterConsent: isSub,
+      newsletterConsentAt: isSub ? nowIso : null,
+      updatedAt: nowIso
+    };
+
+    if (App.useMock) {
+      const idx = App.demoData.users.findIndex(u => u.id === userId);
+      if (idx === -1) throw new Error('User not found.');
+      App.demoData.users[idx] = { ...App.demoData.users[idx], ...patch };
+      saveDemoData();
+      return App.demoData.users[idx];
+    }
+
+    await App.db.collection('users').doc(userId).update(patch);
+    return { id: userId, ...patch };
+  }
+
+  async function addB2BTrackingUpdate(userId, updateData = {}) {
+    assertAgentInmomasTrackingWrite();
+    const author = currentUser || {};
+    const nowIso = new Date().toISOString();
+    const dateVal = String(updateData.date || nowIso.slice(0, 10)).trim();
+    const entry = {
+      id: 'b2b_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      date: dateVal,
+      channel: String(updateData.channel || 'llamada').trim(),
+      note: String(updateData.note || '').trim(),
+      authorId: author.id || '',
+      authorName: `${author.firstName || ''} ${author.lastName || ''}`.trim() || author.email || 'Equipo Inmomás',
+      createdAt: nowIso
+    };
+
+    const sortUpdates = (arr) => [...arr].sort((a, b) => {
+      const da = String(a.date || a.createdAt || '');
+      const db = String(b.date || b.createdAt || '');
+      if (db !== da) return db.localeCompare(da);
+      return String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
+    });
+
+    if (App.useMock) {
+      const idx = App.demoData.users.findIndex(u => u.id === userId);
+      if (idx === -1) throw new Error('User not found.');
+      const existing = Array.isArray(App.demoData.users[idx].b2bUpdates) ? App.demoData.users[idx].b2bUpdates : [];
+      const next = sortUpdates([entry, ...existing]);
+      App.demoData.users[idx].b2bUpdates = next;
+      App.demoData.users[idx].b2bLastContactAt = next[0] ? next[0].date : null;
+      App.demoData.users[idx].updatedAt = nowIso;
+      saveDemoData();
+      return { entry, b2bUpdates: next };
+    }
+
+    const docRef = App.db.collection('users').doc(userId);
+    const snap = await docRef.get();
+    if (!snap.exists) throw new Error('User not found.');
+    const existing = Array.isArray(snap.data().b2bUpdates) ? snap.data().b2bUpdates : [];
+    const next = sortUpdates([entry, ...existing]);
+    await docRef.update({
+      b2bUpdates: next,
+      b2bLastContactAt: next[0] ? next[0].date : null,
+      updatedAt: nowIso
+    });
+    return { entry, b2bUpdates: next };
+  }
+
+  async function deleteB2BTrackingUpdate(userId, updateId) {
+    assertAgentInmomasTrackingWrite();
+    const nowIso = new Date().toISOString();
+    if (App.useMock) {
+      const idx = App.demoData.users.findIndex(u => u.id === userId);
+      if (idx === -1) throw new Error('User not found.');
+      const existing = Array.isArray(App.demoData.users[idx].b2bUpdates) ? App.demoData.users[idx].b2bUpdates : [];
+      const next = existing.filter(e => e.id !== updateId);
+      App.demoData.users[idx].b2bUpdates = next;
+      App.demoData.users[idx].b2bLastContactAt = next[0] ? next[0].date : null;
+      App.demoData.users[idx].updatedAt = nowIso;
+      saveDemoData();
+      return { b2bUpdates: next };
+    }
+
+    const docRef = App.db.collection('users').doc(userId);
+    const snap = await docRef.get();
+    if (!snap.exists) throw new Error('User not found.');
+    const existing = Array.isArray(snap.data().b2bUpdates) ? snap.data().b2bUpdates : [];
+    const next = existing.filter(e => e.id !== updateId);
+    await docRef.update({
+      b2bUpdates: next,
+      b2bLastContactAt: next[0] ? next[0].date : null,
+      updatedAt: nowIso
+    });
+    return { b2bUpdates: next };
+  }
+
+  async function updateClientTrackingProfile(clientId, profileData = {}) {
+    assertAgentInmomasTrackingWrite();
+    const author = currentUser || {};
+    const authorName = `${author.firstName || ''} ${author.lastName || ''}`.trim() || author.email || 'Equipo Inmomás';
+    const nowIso = new Date().toISOString();
+
+    const buildPatch = (existingClient) => {
+      const patch = { updatedAt: nowIso };
+      if (profileData.clientType !== undefined) {
+        const cleanType = String(profileData.clientType || '').toUpperCase().trim();
+        patch.clientType = (cleanType === 'A' || cleanType === 'B') ? cleanType : '';
+      }
+      if (profileData.temperature !== undefined) {
+        const cleanTemp = String(profileData.temperature || '').toLowerCase().trim();
+        const validTemp = ['hot', 'warm', 'cold'].includes(cleanTemp) ? cleanTemp : '';
+        patch.temperature = validTemp;
+
+        const incomingDate = profileData.temperatureSetAt !== undefined
+          ? String(profileData.temperatureSetAt || '').trim()
+          : (validTemp ? nowIso.slice(0, 10) : '');
+        patch.temperatureSetAt = validTemp ? (incomingDate || nowIso.slice(0, 10)) : null;
+
+        const prevTemp = existingClient.temperature || '';
+        const prevDate = existingClient.temperatureSetAt || '';
+        const history = Array.isArray(existingClient.temperatureHistory) ? [...existingClient.temperatureHistory] : [];
+        if (validTemp && (validTemp !== prevTemp || patch.temperatureSetAt !== prevDate)) {
+          history.unshift({
+            temperature: validTemp,
+            setAt: patch.temperatureSetAt,
+            changedBy: authorName,
+            recordedAt: nowIso
+          });
+          patch.temperatureHistory = history;
+        }
+      }
+      if (profileData.searchCriteria !== undefined && typeof profileData.searchCriteria === 'object') {
+        const sc = {
+          zones: String(profileData.searchCriteria.zones || '').trim(),
+          propertyType: String(profileData.searchCriteria.propertyType || '').trim(),
+          budget: String(profileData.searchCriteria.budget || '').trim(),
+          bedrooms: String(profileData.searchCriteria.bedrooms || '').trim(),
+          bathrooms: String(profileData.searchCriteria.bathrooms || '').trim(),
+          operationPurpose: String(profileData.searchCriteria.operationPurpose || '').trim(),
+          financing: String(profileData.searchCriteria.financing || '').trim(),
+          mustHaves: String(profileData.searchCriteria.mustHaves || '').trim()
+        };
+        patch.searchCriteria = sc;
+        if (sc.zones) patch.interestArea = sc.zones;
+        if (sc.budget) patch.budget = sc.budget;
+        if (sc.operationPurpose) patch.objective = sc.operationPurpose;
+      }
+      return patch;
+    };
+
+    if (App.useMock) {
+      const idx = App.demoData.clients.findIndex(c => c.id === clientId);
+      if (idx === -1) throw new Error('Client not found.');
+      const patch = buildPatch(App.demoData.clients[idx]);
+      App.demoData.clients[idx] = { ...App.demoData.clients[idx], ...patch };
+      saveDemoData();
+      return App.demoData.clients[idx];
+    }
+
+    const docRef = App.db.collection('clients').doc(clientId);
+    const snap = await docRef.get();
+    if (!snap.exists) throw new Error('Client not found.');
+    const patch = buildPatch(snap.data() || {});
+    await docRef.update(patch);
+    return { id: clientId, ...snap.data(), ...patch };
+  }
+
+  async function addClientTrackingUpdate(clientId, updateData = {}) {
+    assertAgentInmomasTrackingWrite();
+    const author = currentUser || {};
+    const nowIso = new Date().toISOString();
+    const dateVal = String(updateData.date || nowIso.slice(0, 10)).trim();
+    const entry = {
+      id: 'clu_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      date: dateVal,
+      channel: String(updateData.channel || 'llamada').trim(),
+      note: String(updateData.note || '').trim(),
+      authorId: author.id || '',
+      authorName: `${author.firstName || ''} ${author.lastName || ''}`.trim() || author.email || 'Equipo Inmomás',
+      createdAt: nowIso
+    };
+
+    const sortUpdates = (arr) => [...arr].sort((a, b) => {
+      const da = String(a.date || a.createdAt || '');
+      const db = String(b.date || b.createdAt || '');
+      if (db !== da) return db.localeCompare(da);
+      return String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
+    });
+
+    if (App.useMock) {
+      const idx = App.demoData.clients.findIndex(c => c.id === clientId);
+      if (idx === -1) throw new Error('Client not found.');
+      const existing = Array.isArray(App.demoData.clients[idx].trackingUpdates) ? App.demoData.clients[idx].trackingUpdates : [];
+      const next = sortUpdates([entry, ...existing]);
+      App.demoData.clients[idx].trackingUpdates = next;
+      App.demoData.clients[idx].lastTrackingAt = next[0] ? next[0].date : null;
+      App.demoData.clients[idx].updatedAt = nowIso;
+      saveDemoData();
+      return { entry, trackingUpdates: next };
+    }
+
+    const docRef = App.db.collection('clients').doc(clientId);
+    const snap = await docRef.get();
+    if (!snap.exists) throw new Error('Client not found.');
+    const existing = Array.isArray(snap.data().trackingUpdates) ? snap.data().trackingUpdates : [];
+    const next = sortUpdates([entry, ...existing]);
+    await docRef.update({
+      trackingUpdates: next,
+      lastTrackingAt: next[0] ? next[0].date : null,
+      updatedAt: nowIso
+    });
+    return { entry, trackingUpdates: next };
+  }
+
+  async function deleteClientTrackingUpdate(clientId, updateId) {
+    assertAgentInmomasTrackingWrite();
+    const nowIso = new Date().toISOString();
+    if (App.useMock) {
+      const idx = App.demoData.clients.findIndex(c => c.id === clientId);
+      if (idx === -1) throw new Error('Client not found.');
+      const existing = Array.isArray(App.demoData.clients[idx].trackingUpdates) ? App.demoData.clients[idx].trackingUpdates : [];
+      const next = existing.filter(e => e.id !== updateId);
+      App.demoData.clients[idx].trackingUpdates = next;
+      App.demoData.clients[idx].lastTrackingAt = next[0] ? next[0].date : null;
+      App.demoData.clients[idx].updatedAt = nowIso;
+      saveDemoData();
+      return { trackingUpdates: next };
+    }
+
+    const docRef = App.db.collection('clients').doc(clientId);
+    const snap = await docRef.get();
+    if (!snap.exists) throw new Error('Client not found.');
+    const existing = Array.isArray(snap.data().trackingUpdates) ? snap.data().trackingUpdates : [];
+    const next = existing.filter(e => e.id !== updateId);
+    await docRef.update({
+      trackingUpdates: next,
+      lastTrackingAt: next[0] ? next[0].date : null,
+      updatedAt: nowIso
+    });
+    return { trackingUpdates: next };
+  }
+
   /* ---- Public API ---- */
   return {
     init,
@@ -3841,6 +4095,12 @@ App.auth = (function() {
     deleteWebinarFeedback,
     autoEnrollClientWebinar,
     autoEnrollRealtorWebinar,
-    syncMissingWebinarRegistrations
+    syncMissingWebinarRegistrations,
+    updateUserNewsletter,
+    addB2BTrackingUpdate,
+    deleteB2BTrackingUpdate,
+    updateClientTrackingProfile,
+    addClientTrackingUpdate,
+    deleteClientTrackingUpdate
   };
 })();
