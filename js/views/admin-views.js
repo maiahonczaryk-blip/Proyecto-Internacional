@@ -2081,7 +2081,9 @@
           </option>
         `).join('')}
       `;
-      const availableBrokers = allSysUsers.filter(u => u.role === 'broker' && u.status !== 'rejected' && u.id !== user.id);
+      const availableBrokers = allSysUsers
+        .filter(u => u.role === 'broker' && (u.status === 'active' || u.status === 'approved' || u.id === currentBrkId) && u.id !== user.id)
+        .sort((a, b) => `${a.firstName || ''} ${a.lastName || ''}`.localeCompare(`${b.firstName || ''} ${b.lastName || ''}`));
       const brokerOptions = `
         <option value="">-- Sin Broker (Directo: 15 % Agente / 10 % Colaborador) --</option>
         ${availableBrokers.map(b => `
@@ -2090,7 +2092,9 @@
           </option>
         `).join('')}
       `;
-      const localAgents = allSysUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
+      const localAgents = allSysUsers
+        .filter(u => u.role === 'agent_inmomas' && (u.status === 'active' || u.status === 'approved'))
+        .sort((a, b) => `${a.firstName || ''} ${a.lastName || ''}`.localeCompare(`${b.firstName || ''} ${b.lastName || ''}`));
       const resolvedInmomas = App.utils.resolveAssignedInmomasAgent
         ? App.utils.resolveAssignedInmomasAgent(user, allSysUsers, modalLookup)
         : { id: null, name: '', inherited: false };
@@ -2793,7 +2797,9 @@
       // Populate RE/MAX Inmomás Agent Filter
       const agentSel = document.getElementById('admin-client-filter-agent');
       if (agentSel) {
-        const localAgents = allUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
+        const localAgents = allUsers
+          .filter(u => u.role === 'agent_inmomas' && (u.status === 'active' || u.status === 'approved'))
+          .sort((a, b) => `${a.firstName || ''} ${a.lastName || ''}`.localeCompare(`${b.firstName || ''} ${b.lastName || ''}`));
         agentSel.innerHTML = '<option value="">🇪🇸 Todos los Agentes Inmomás</option>' +
           '<option value="__unassigned__" ' + (clientAgentFilter === '__unassigned__' ? 'selected' : '') + '>⚠️ Sin Agente Asignado</option>' +
           localAgents.map(a => {
@@ -3049,7 +3055,9 @@
       const clientRegionBadge = App.utils.getRegionBadge ? App.utils.getRegionBadge(clientRegion, true) : '';
 
       // Get all active local agents sorted/grouped by Client's Region
-      const localAgents = allUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
+      const localAgents = allUsers
+        .filter(u => u.role === 'agent_inmomas' && (u.status === 'active' || u.status === 'approved'))
+        .sort((a, b) => `${a.firstName || ''} ${a.lastName || ''}`.localeCompare(`${b.firstName || ''} ${b.lastName || ''}`));
       const dropdownOptions = buildSmartMasAgentOptions(localAgents, client.localAgentId || '', clientRegion, '-- Seleccionar Agente RE/MAX Inmomás --');
 
       const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(client.status)}">${App.utils.getStatusLabel(client.status)}</span>`;
@@ -3310,7 +3318,9 @@
       if (!lead) return;
 
       // Get all active local agents with regional grouping
-      const localAgents = allUsers.filter(u => u.role === 'agent_inmomas' && u.status === 'active');
+      const localAgents = allUsers
+        .filter(u => u.role === 'agent_inmomas' && (u.status === 'active' || u.status === 'approved'))
+        .sort((a, b) => `${a.firstName || ''} ${a.lastName || ''}`.localeCompare(`${b.firstName || ''} ${b.lastName || ''}`));
       const leadRegion = App.utils.getRecordRegion ? App.utils.getRecordRegion(lead, allUsers) : '';
       const dropdownOptions = buildSmartMasAgentOptions(localAgents, lead.localAgentId || '', leadRegion, '-- Seleccionar Agente RE/MAX Inmomás --');
 

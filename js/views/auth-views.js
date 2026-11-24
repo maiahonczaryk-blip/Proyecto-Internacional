@@ -720,32 +720,11 @@ App.views.auth = {
       const newForm = form.cloneNode(true);
       form.parentNode.replaceChild(newForm, form);
       
-      // Populate brokers
+      // Populate approved Brokers dynamically
       const brokerSelect = newForm.querySelector('#register-broker');
       if (brokerSelect) {
-        const populateBrokerSelect = (brokersList) => {
-          const currentVal = brokerSelect.value;
-          brokerSelect.innerHTML = '<option value="">Acuerdo Directo con Agente (15%) / Sin Broker</option>';
-          brokersList.forEach(b => {
-            const opt = document.createElement('option');
-            opt.value = b.id;
-            opt.textContent = `${b.firstName} ${b.lastName} - ${b.agencyName || 'Brokerage (25%)'}`;
-            brokerSelect.appendChild(opt);
-          });
-          const otherOpt = document.createElement('option');
-          otherOpt.value = 'other';
-          otherOpt.textContent = 'Otro Broker / Agencia (introducir manualmente — 25%)';
-          brokerSelect.appendChild(otherOpt);
-          if (currentVal) brokerSelect.value = currentVal;
-        };
-
-        const initialBrokers = (App.demoData && App.demoData.users ? App.demoData.users : []).filter(u => u.role === 'broker' && u.status === 'active');
-        populateBrokerSelect(initialBrokers);
-        if (App.auth && typeof App.auth.getAllUsers === 'function') {
-          App.auth.getAllUsers({ role: 'broker' }).then(list => {
-            const activeBrokers = (list || []).filter(u => u.role === 'broker' && u.status === 'active');
-            if (activeBrokers.length > 0) populateBrokerSelect(activeBrokers);
-          }).catch(() => {});
+        if (App.utils && typeof App.utils.populateBrokerSelect === 'function') {
+          App.utils.populateBrokerSelect(brokerSelect).catch(() => {});
         }
 
         // Show/hide manual fields when 'other' is selected
@@ -756,6 +735,12 @@ App.views.auth = {
           if (brokerManualGroup) brokerManualGroup.style.display = isOther ? 'block' : 'none';
           if (agencyManualGroup) agencyManualGroup.style.display = isOther ? 'block' : 'none';
         });
+      }
+
+      // Populate approved RE/MAX Inmomás Agents dynamically
+      const inmomasSelect = newForm.querySelector('#register-inmomas-agent');
+      if (inmomasSelect && App.utils && typeof App.utils.populateInmomasAgentSelect === 'function') {
+        App.utils.populateInmomasAgentSelect(inmomasSelect).catch(() => {});
       }
       
       // Toggle fields based on role (public registration only allows Broker or Realtor)
@@ -802,7 +787,9 @@ App.views.auth = {
         const brokerId = brokerSelect ? brokerSelect.value : '';
         const isManualBroker = brokerId === 'other';
         const refCode = sessionStorage.getItem('referralCode') || null;
-        const inmomasAgent = (newForm.querySelector('#register-inmomas-agent')?.value || '').trim();
+        const inmomasAgentEl = newForm.querySelector('#register-inmomas-agent');
+        const inmomasAgent = (inmomasAgentEl?.value || '').trim();
+        const inmomasAgentId = inmomasAgentEl?.selectedOptions?.[0]?.dataset?.agentId || null;
         const data = {
           role: selectedRole,
           firstName: newForm.querySelector('#register-firstName').value,
@@ -819,6 +806,7 @@ App.views.auth = {
             : (agencyNameInput ? agencyNameInput.value : ''),
           brokerId: isManualBroker ? '' : brokerId,
           brokerNameManual: isManualBroker ? (newForm.querySelector('#register-broker-manual')?.value || '') : '',
+          inmomasAgentId: inmomasAgentId || null,
           inmomasAgentName: inmomasAgent || null,
           termsAccepted: true,
           termsAcceptedAt: new Date().toISOString(),
@@ -858,7 +846,9 @@ App.views.auth = {
           const firstName = newForm.querySelector('#register-firstName').value;
           const lastName = newForm.querySelector('#register-lastName').value;
           const refCode = sessionStorage.getItem('referralCode') || null;
-          const inmomasAgent = (newForm.querySelector('#register-inmomas-agent')?.value || '').trim();
+          const inmomasAgentEl = newForm.querySelector('#register-inmomas-agent');
+          const inmomasAgent = (inmomasAgentEl?.value || '').trim();
+          const inmomasAgentId = inmomasAgentEl?.selectedOptions?.[0]?.dataset?.agentId || null;
 
           const countryVal = newForm.querySelector('#register-country').value;
           let selectedRegions = [];
@@ -878,6 +868,7 @@ App.views.auth = {
             regions: selectedRegions,
             agencyName: agencyNameInput ? agencyNameInput.value : '',
             brokerId: brokerSelect ? brokerSelect.value : '',
+            inmomasAgentId: inmomasAgentId || null,
             inmomasAgentName: inmomasAgent || null,
             termsAccepted: true,
             termsAcceptedAt: new Date().toISOString(),
