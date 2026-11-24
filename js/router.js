@@ -73,7 +73,7 @@ App.router = (function() {
     'agent_inmomas/documents':        { view: 'view-agent-documents',  role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Documents' },
     'agent_inmomas/finances':         { view: 'view-agent-finances',   role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Finances' },
     'agent_inmomas/webinar':          { view: 'view-agent-webinar',    role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Webinar Registrations' },
-    'agent_inmomas/partners':         { view: 'view-agent-partners',   role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'My Partners' },
+    'agent_inmomas/partners':         { view: 'view-agent-partners',   role: 'agent_inmomas', sidebar: 'agent_inmomas', title: 'Colaboradores' },
 
     // Colaborador routes
     'colaborador/dashboard': { view: 'view-agent-dashboard',       role: 'colaborador', sidebar: 'colaborador', title: 'Dashboard' },
