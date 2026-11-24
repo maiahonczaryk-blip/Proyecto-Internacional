@@ -2558,6 +2558,216 @@ App.utils.renderInmomasAgentBadge = function(user, allUsers = [], opts = {}) {
   return `<span class="${cls}" title="${titleText}">${prefix} ${escapedName}${viaSuffix}</span>`;
 };
 
+/* ============================================
+   Dynamic Approved Directory Helpers
+   (RE/MAX Inmomás Agents & Brokers)
+   ============================================ */
+App.utils.isApprovedUserStatus = function(status) {
+  const s = String(status || '').trim().toLowerCase();
+  return s === 'active' || s === 'approved';
+};
+
+App.utils.getUserDisplayName = function(u) {
+  if (!u || typeof u !== 'object') return '';
+  const combined = `${u.firstName || ''} ${u.lastName || ''}`.trim();
+  if (combined) return combined;
+  return String(u.name || '').trim();
+};
+
+App.utils._getCurrentLang = function() {
+  const htmlLang = (document.documentElement.getAttribute('data-lang') || localStorage.getItem('lang') || 'en').toLowerCase();
+  if (htmlLang === 'es' || htmlLang === 'fr' || htmlLang === 'en-ca') return htmlLang;
+  return 'en';
+};
+
+App.utils._getLocalizedText = function(map) {
+  const lang = App.utils._getCurrentLang();
+  return map[lang] || map.en || '';
+};
+
+App.utils.getApprovedUsersByRole = async function(role) {
+  let rawList = [];
+  try {
+    if (App.demoMode) {
+      rawList = (App.demoData && Array.isArray(App.demoData.users) ? App.demoData.users : [])
+        .filter(u => u && u.role === role);
+    } else if (App.auth && typeof App.auth.getAllUsers === 'function') {
+      rawList = await App.auth.getAllUsers({ role });
+    } else if (App.db) {
+      const snap = await App.db.collection('users').where('role', '==', role).get();
+      rawList = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+    }
+  } catch (err) {
+    console.warn(`[Directory] Failed to load approved ${role} users:`, err);
+    return [];
+  }
+
+  const seenIds = new Set();
+  const seenNames = new Set();
+  const approved = [];
+
+  (rawList || []).forEach(u => {
+    if (!u || u.role !== role) return;
+    if (!App.utils.isApprovedUserStatus(u.status)) return;
+    const displayName = App.utils.getUserDisplayName(u);
+    if (!displayName) return;
+
+    const idKey = u.id ? String(u.id).trim() : '';
+    const nameKey = displayName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
+    if (idKey && seenIds.has(idKey)) return;
+    if (role === 'agent_inmomas' && seenNames.has(nameKey)) return;
+
+    if (idKey) seenIds.add(idKey);
+    seenNames.add(nameKey);
+    approved.push({ ...u, _displayName: displayName });
+  });
+
+  approved.sort((a, b) => a._displayName.localeCompare(b._displayName, undefined, { sensitivity: 'base' }));
+  return approved;
+};
+
+App.utils.getApprovedInmomasAgents = function() {
+  return App.utils.getApprovedUsersByRole('agent_inmomas');
+};
+
+App.utils.getApprovedBrokers = function() {
+  return App.utils.getApprovedUsersByRole('broker');
+};
+
+App.utils.matchInmomasAgentOption = function(selectEl, referrer) {
+  if (!selectEl || !referrer) return false;
+  const refId = referrer.id ? String(referrer.id).trim() : '';
+  const refCode = referrer.referralCode ? String(referrer.referralCode).trim().toUpperCase() : '';
+  const refName = App.utils.getUserDisplayName(referrer).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
+
+  const opts = Array.from(selectEl.options || []).filter(o => o.value);
+  const match = opts.find(o => {
+    if (refId && o.dataset.agentId && o.dataset.agentId === refId) return true;
+    if (refCode && o.dataset.referralCode && o.dataset.referralCode.toUpperCase() === refCode) return true;
+    if (refName) {
+      const optName = String(o.value).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
+      if (optName === refName) return true;
+    }
+    return false;
+  });
+
+  if (match) {
+    selectEl.value = match.value;
+    return true;
+  }
+  return false;
+};
+
+App.utils.populateInmomasAgentSelect = async function(selectEl, opts = {}) {
+  if (!selectEl) return [];
+  const prevValue = opts.preserveValue !== false ? selectEl.value : '';
+
+  const placeholder = opts.placeholder || {
+    en: '— None / Select an agent (Optional) —',
+    es: '— Ninguno / Seleccionar agente (Opcional) —',
+    fr: '— Aucun / Sélectionner un agent (Optionnel) —',
+    'en-ca': '— None / Select an agent (Optional) —'
+  };
+
+  const renderOptions = (agents) => {
+    selectEl.innerHTML = '';
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.setAttribute('data-i18n-en', placeholder.en);
+    defaultOpt.setAttribute('data-i18n-es', placeholder.es);
+    defaultOpt.setAttribute('data-i18n-fr', placeholder.fr);
+    defaultOpt.setAttribute('data-i18n-en-ca', placeholder['en-ca'] || placeholder.en);
+    defaultOpt.textContent = App.utils._getLocalizedText(placeholder);
+    selectEl.appendChild(defaultOpt);
+
+    agents.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a._displayName || App.utils.getUserDisplayName(a);
+      opt.textContent = opt.value;
+      if (a.id) opt.dataset.agentId = a.id;
+      if (a.referralCode) opt.dataset.referralCode = a.referralCode;
+      selectEl.appendChild(opt);
+    });
+
+    if (prevValue && Array.from(selectEl.options).some(o => o.value === prevValue)) {
+      selectEl.value = prevValue;
+    }
+    if (opts.preselectReferrer && !selectEl.value) {
+      App.utils.matchInmomasAgentOption(selectEl, opts.preselectReferrer);
+    }
+  };
+
+  // Render clean placeholder immediately while loading
+  if (!selectEl.options.length || (selectEl.options[0] && selectEl.options[0].querySelector && selectEl.options[0].querySelector('span'))) {
+    renderOptions([]);
+  }
+
+  const agents = await App.utils.getApprovedInmomasAgents();
+  renderOptions(agents);
+  return agents;
+};
+
+App.utils.populateBrokerSelect = async function(selectEl, opts = {}) {
+  if (!selectEl) return [];
+  const prevValue = opts.preserveValue !== false ? selectEl.value : '';
+
+  const noneLabel = {
+    en: 'Direct Agent Agreement (15%) / No Broker',
+    es: 'Acuerdo Directo con Agente (15%) / Sin Broker',
+    fr: 'Accord Direct Agent (15%) / Sans Courtier',
+    'en-ca': 'Direct Agent Agreement (15%) / No Broker'
+  };
+  const otherLabel = {
+    en: 'Other Broker / Agency (enter manually — 25%)',
+    es: 'Otro Broker / Agencia (introducir manualmente — 25%)',
+    fr: 'Autre Courtier / Agence (saisir manuellement — 25%)',
+    'en-ca': 'Other Broker / Agency (enter manually — 25%)'
+  };
+
+  const renderOptions = (brokers) => {
+    selectEl.innerHTML = '';
+
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.setAttribute('data-i18n-en', noneLabel.en);
+    defaultOpt.setAttribute('data-i18n-es', noneLabel.es);
+    defaultOpt.setAttribute('data-i18n-fr', noneLabel.fr);
+    defaultOpt.setAttribute('data-i18n-en-ca', noneLabel['en-ca']);
+    defaultOpt.textContent = App.utils._getLocalizedText(noneLabel);
+    selectEl.appendChild(defaultOpt);
+
+    brokers.forEach(b => {
+      const opt = document.createElement('option');
+      const fullName = b._displayName || App.utils.getUserDisplayName(b);
+      opt.value = b.id;
+      opt.textContent = b.agencyName ? `${fullName} - ${b.agencyName}` : `${fullName} - Brokerage (25%)`;
+      selectEl.appendChild(opt);
+    });
+
+    if (opts.includeOther !== false) {
+      const otherOpt = document.createElement('option');
+      otherOpt.value = 'other';
+      otherOpt.setAttribute('data-i18n-en', otherLabel.en);
+      otherOpt.setAttribute('data-i18n-es', otherLabel.es);
+      otherOpt.setAttribute('data-i18n-fr', otherLabel.fr);
+      otherOpt.setAttribute('data-i18n-en-ca', otherLabel['en-ca']);
+      otherOpt.textContent = App.utils._getLocalizedText(otherLabel);
+      selectEl.appendChild(otherOpt);
+    }
+
+    if (prevValue && Array.from(selectEl.options).some(o => o.value === prevValue)) {
+      selectEl.value = prevValue;
+    }
+  };
+
+  // Render clean shell immediately (never leak demo brokers when demoMode is false)
+  renderOptions([]);
+
+  const brokers = await App.utils.getApprovedBrokers();
+  renderOptions(brokers);
+  return brokers;
+};
+
 
 
 

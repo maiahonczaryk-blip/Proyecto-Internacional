@@ -214,6 +214,15 @@ App.views.public = {
     const masRegionsWrap = document.getElementById('referral-agent-mas-regions-wrap');
     const masRegionsCheckboxes = document.getElementById('referral-agent-mas-regions-checkboxes');
     const inmomasAgentGroup = document.getElementById('referral-inmomas-agent-group');
+    const referralInmomasSelect = document.getElementById('referral-inmomas-agent');
+
+    if (referralInmomasSelect && App.utils && typeof App.utils.populateInmomasAgentSelect === 'function') {
+      App.utils.populateInmomasAgentSelect(referralInmomasSelect).then(() => {
+        if (referrer && !referralInmomasSelect.value) {
+          App.utils.matchInmomasAgentOption(referralInmomasSelect, referrer);
+        }
+      }).catch(() => {});
+    }
 
     if (profCountrySel && App.utils && App.utils.getCountryOptionsHtml) {
       profCountrySel.innerHTML = App.utils.getCountryOptionsHtml('United States', false);
@@ -528,27 +537,10 @@ App.views.public = {
           `;
         }
 
-        // Pre-select RE/MAX Inmomás Agent dropdown if the referrer is one of our Inmomás agents
+        // Pre-select RE/MAX Inmomás Agent dropdown if the referrer is one of our approved Inmomás agents
         const inmomasSelect = document.getElementById('referral-inmomas-agent');
-        if (inmomasSelect && !inmomasSelect.value) {
-          const refFull = `${referrer.firstName || ''} ${referrer.lastName || ''}`.toLowerCase();
-          if (refFull.includes('jamisa') || refFull.includes('james') || refFull.includes('lavoie') || refFull.includes('isabelle') || refFull.includes('isabel')) {
-            inmomasSelect.value = 'James Lavoie Montero';
-          } else if (refFull.includes('angel') || refFull.includes('ángel') || refFull.includes('debra') || refFull.includes('débora') || refFull.includes('nadal')) {
-            inmomasSelect.value = 'Angel Luis Rodriguez / Debra Nadal';
-          } else if (refFull.includes('sepehr') || refFull.includes('hosseini')) {
-            inmomasSelect.value = 'Sepehr Hosseini';
-          } else if (refFull.includes('josé') || refFull.includes('jose martinez') || refFull.includes('josé martínez')) {
-            inmomasSelect.value = 'José Martínez';
-          } else if (refFull.includes('maia') || refFull.includes('honczaryk')) {
-            inmomasSelect.value = 'Maia Honczaryk';
-          } else if (refFull.includes('denise') || refFull.includes('mcneal')) {
-            inmomasSelect.value = 'Denise McNeal';
-          } else if (refFull.includes('giancarlo') || refFull.includes('agudelo')) {
-            inmomasSelect.value = 'Giancarlo Agudelo';
-          } else if (refFull.includes('ana martínez') || refFull.includes('ana martinez')) {
-            inmomasSelect.value = 'Ana Martínez';
-          }
+        if (inmomasSelect && !inmomasSelect.value && App.utils && typeof App.utils.matchInmomasAgentOption === 'function') {
+          App.utils.matchInmomasAgentOption(inmomasSelect, referrer);
         }
       }
 
@@ -858,7 +850,9 @@ App.views.public = {
           const lastName = (form.querySelector('#referral-lastName')?.value || '').trim();
           const email = (form.querySelector('#referral-email')?.value || '').trim();
           const phone = (form.querySelector('#referral-phone')?.value || '').trim();
-          const inmomasAgent = (form.querySelector('#referral-inmomas-agent')?.value || '').trim();
+          const inmomasAgentEl = form.querySelector('#referral-inmomas-agent');
+          const inmomasAgent = (inmomasAgentEl?.value || '').trim();
+          const inmomasAgentIdSelected = inmomasAgentEl?.selectedOptions?.[0]?.dataset?.agentId || null;
           const termsChecked = form.querySelector('#referral-terms')?.checked;
 
           const typeSelEl = form.querySelector('#referral-type-select');
@@ -918,6 +912,9 @@ App.views.public = {
             }
 
             if (inmomasAgent) {
+              if (!clientPayload.localAgentId && inmomasAgentIdSelected) {
+                clientPayload.localAgentId = inmomasAgentIdSelected;
+              }
               if (!clientPayload.localAgentName) {
                 clientPayload.localAgentName = inmomasAgent;
               }
@@ -1003,7 +1000,9 @@ App.views.public = {
               referredByAdmin: Boolean(referrer && referrer.role === 'admin'),
               referredByAgentInmomas: Boolean((referrer && referrer.role === 'agent_inmomas') || (refCode && refCode.toUpperCase().trim().startsWith('LOC-'))),
               referredBy: contactType === 'agent_inmomas' ? null : (referrer ? referrer.id : (refCode || inmomasAgent || null)),
-              inmomasAgentId: (referrer && referrer.role === 'agent_inmomas' && contactType !== 'agent_inmomas') ? referrer.id : null,
+              inmomasAgentId: contactType === 'agent_inmomas'
+                ? null
+                : (inmomasAgentIdSelected || ((referrer && referrer.role === 'agent_inmomas') ? referrer.id : null)),
               inmomasAgentName: resolvedInmomasName,
               notes: notes || (market ? `Zona: ${market}` : ''),
               termsAccepted: true,
@@ -1706,19 +1705,30 @@ App.views.public = {
       try {
         let collaborators = [];
 
+        const isApproved = (s) => App.utils && typeof App.utils.isApprovedUserStatus === 'function'
+          ? App.utils.isApprovedUserStatus(s)
+          : (s === 'active' || s === 'approved');
+
         if (App.demoMode && App.demoData && App.demoData.users) {
           collaborators = App.demoData.users.filter(u =>
             ['embajador', 'colaborador', 'realtor', 'broker'].includes(u.role) &&
-            u.status === 'active'
+            isApproved(u.status)
           );
         } else if (!App.demoMode && App.db) {
-          // Firestore: query each role separately (Firestore doesn't support array-contains for 'in' on role without composite index)
+          // Firestore: query each role separately and filter approved/active in JS to avoid composite-index issues
           const roles = ['embajador', 'colaborador', 'realtor', 'broker'];
           const snaps = await Promise.all(
-            roles.map(r => App.db.collection('users').where('role', '==', r).where('status', '==', 'active').get())
+            roles.map(r => App.db.collection('users').where('role', '==', r).get())
           );
+          const seenIds = new Set();
           snaps.forEach(snap => {
-            snap.docs.forEach(doc => collaborators.push({ id: doc.id, ...doc.data() }));
+            snap.docs.forEach(doc => {
+              const u = { id: doc.id, ...doc.data() };
+              if (isApproved(u.status) && !seenIds.has(u.id)) {
+                seenIds.add(u.id);
+                collaborators.push(u);
+              }
+            });
           });
         }
 
@@ -1776,6 +1786,21 @@ App.views.public = {
       }
     }
 
+    // Populate RE/MAX Inmomás referring agent dropdown dynamically from approved agent_inmomas users
+    const populateWebinarInmomasAgents = async () => {
+      const agentSel = document.getElementById('webinar-referrer-name');
+      if (!agentSel || !App.utils || typeof App.utils.populateInmomasAgentSelect !== 'function') return;
+      await App.utils.populateInmomasAgentSelect(agentSel, {
+        placeholder: {
+          en: '— Select an agent —',
+          es: '— Selecciona un agente —',
+          fr: '— Sélectionner un agent —',
+          'en-ca': '— Select an agent —'
+        }
+      });
+    };
+    populateWebinarInmomasAgents().catch(() => {});
+
     if (hearSelect) {
       hearSelect.addEventListener('change', async () => {
         const val = hearSelect.value;
@@ -1786,6 +1811,9 @@ App.views.public = {
           referrerWrap.style.display = showAgent ? '' : 'none';
           const agentInp = document.getElementById('webinar-referrer-name');
           if (agentInp) agentInp.required = showAgent;
+          if (showAgent && agentInp && agentInp.options.length <= 1) {
+            await populateWebinarInmomasAgents();
+          }
         }
 
         // Show/hide collaborator wrap
