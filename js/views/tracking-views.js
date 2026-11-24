@@ -45,6 +45,34 @@ App.views.tracking = (function() {
     return Boolean(currentUser && currentUser.role === 'agent_inmomas');
   }
 
+  function normalizePipelinePhase(status) {
+    const map = {
+      'new': 'contacted',
+      'seguimiento': 'contacted',
+      'options_sent': 'first_property_meeting',
+      'offer_made': 'negotiation',
+      'notary_pending': 'negotiation',
+      'completed': 'closed'
+    };
+    const s = String(status || 'contacted').trim();
+    return map[s] || s;
+  }
+
+  function getPipelinePhaseList() {
+    const order = (App.utils && Array.isArray(App.utils.clientStatusOrder))
+      ? App.utils.clientStatusOrder
+      : ['contacted', 'service_presentation', 'mandate_signed', 'first_property_meeting', 'second_property_meeting', 'properties_visited', 'negotiation', 'closed'];
+    const labelsEs = (App.utils && App.utils.clientStatusLabelsEs) || {};
+    return order.map(key => ({ key, label: labelsEs[key] || key }));
+  }
+
+  function getPipelinePhaseOptionsHtml(selectedPhase) {
+    const norm = normalizePipelinePhase(selectedPhase);
+    return getPipelinePhaseList()
+      .map(p => `<option value="${esc(p.key)}" ${p.key === norm ? 'selected' : ''}>${esc(p.label)}</option>`)
+      .join('');
+  }
+
   function todayIso() {
     return new Date().toISOString().slice(0, 10);
   }
@@ -717,6 +745,17 @@ App.views.tracking = (function() {
            <span class="lang-es">Gestiona tus clientes asignados: Tipo A/B, temperatura con fecha de seteo y control de plazos, características de la búsqueda y actualizaciones.</span>`;
     }
 
+    const pipelineLink = document.getElementById('trk-cli-pipeline-link');
+    if (pipelineLink) {
+      pipelineLink.setAttribute('href', currentUser.role === 'admin' ? '#admin/clients' : '#agent_inmomas/clients');
+    }
+
+    const phaseSel = document.getElementById('trk-cli-filter-phase');
+    if (phaseSel && phaseSel.options.length <= 1) {
+      phaseSel.innerHTML = `<option value="">📊 Fase Pipeline: Todas</option>` +
+        getPipelinePhaseList().map(p => `<option value="${esc(p.key)}">${esc(p.label)}</option>`).join('');
+    }
+
     const regSel = document.getElementById('trk-cli-filter-region');
     if (regSel && App.utils && App.utils.getRegionFilterOptionsHtml && regSel.options.length <= 1) {
       regSel.innerHTML = App.utils.getRegionFilterOptionsHtml('');
@@ -724,7 +763,7 @@ App.views.tracking = (function() {
 
     const tbody = document.getElementById('trk-cli-table-body');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted);">Cargando seguimiento de clientes...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted);">Cargando seguimiento de clientes...</td></tr>`;
     }
 
     try {
@@ -740,7 +779,7 @@ App.views.tracking = (function() {
     } catch (err) {
       console.error('[Tracking] initClients error:', err);
       if (tbody) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#ef4444;">Error cargando datos de seguimiento de clientes.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:#ef4444;">Error cargando datos de seguimiento de clientes.</td></tr>`;
       }
     }
   }
@@ -765,12 +804,17 @@ App.views.tracking = (function() {
 
     const isAdmin = currentUser.role === 'admin';
     const searchQ = (document.getElementById('trk-cli-search')?.value || '').toLowerCase().trim();
+    const phaseFilter = document.getElementById('trk-cli-filter-phase')?.value || '';
     const typeFilter = document.getElementById('trk-cli-filter-type')?.value || '';
     const tempFilter = document.getElementById('trk-cli-filter-temp')?.value || '';
     const regFilter = document.getElementById('trk-cli-filter-region')?.value || '';
     const agentFilter = isAdmin ? (document.getElementById('trk-cli-filter-agent')?.value || '') : '';
 
     let filtered = [...allClients];
+
+    if (phaseFilter) {
+      filtered = filtered.filter(c => normalizePipelinePhase(c.status) === phaseFilter);
+    }
 
     if (typeFilter === 'unassigned') filtered = filtered.filter(c => !c.clientType);
     else if (typeFilter) filtered = filtered.filter(c => c.clientType === typeFilter);
@@ -820,7 +864,7 @@ App.views.tracking = (function() {
     if (filtered.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="6" style="text-align:center; padding:2.25rem; color:var(--text-muted);">
+          <td colspan="7" style="text-align:center; padding:2.25rem; color:var(--text-muted);">
             <span class="lang-en">No clients match your filters.</span>
             <span class="lang-es">No hay clientes que coincidan con los filtros seleccionados.</span>
           </td>
@@ -829,8 +873,14 @@ App.views.tracking = (function() {
     }
 
     tbody.innerHTML = filtered.map(c => {
+      const editable = canEdit();
       const fullName = `${c.firstName || ''} ${c.lastName || ''}`.trim() || c.email || '—';
-      const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(c.status)}" style="font-size:0.7rem;">${App.utils.getStatusLabel(c.status)}</span>`;
+      const statusBadge = `<span class="badge ${App.utils.getStatusBadgeClass(c.status)}" style="font-size:0.72rem;">${App.utils.getStatusLabel(c.status)}</span>`;
+      const phaseCellHtml = editable
+        ? `<select class="trk-phase-select" onchange="App.views.tracking.changeClientPipelinePhase('${esc(c.id)}', this.value)" title="Cambiar fase (se sincroniza con la Pipeline)">
+             ${getPipelinePhaseOptionsHtml(c.status)}
+           </select>`
+        : statusBadge;
       const assignedAgent = c.localAgentName || (allUsers.find(u => u.id === c.localAgentId)?.firstName ? `${allUsers.find(u => u.id === c.localAgentId).firstName} ${allUsers.find(u => u.id === c.localAgentId).lastName || ''}`.trim() : '');
       const agentLine = isAdmin && assignedAgent ? `<div class="trk-submeta">🇪🇸 Agente: <strong>${esc(assignedAgent)}</strong></div>` : '';
 
@@ -893,17 +943,17 @@ App.views.tracking = (function() {
         <tr>
           <td>
             <div class="trk-person-name">${esc(fullName)}</div>
-            <div style="margin-top:4px;">${statusBadge}</div>
             <div class="trk-submeta">${esc(c.email || '—')}${c.phone ? ` · ${esc(c.phone)}` : ''}</div>
             ${agentLine}
           </td>
+          <td>${phaseCellHtml}</td>
           <td style="text-align:center;">${typeHtml}</td>
           <td>${tempHtml}</td>
           <td>${criteriaHtml}</td>
           <td>${lastUpdateHtml}</td>
           <td style="text-align:right; white-space:nowrap;">
-            <button type="button" class="btn ${canEdit() ? 'btn-primary' : 'btn-outline'} btn-sm" onclick="App.views.tracking.openClientModal('${esc(c.id)}')">
-              ${canEdit()
+            <button type="button" class="btn ${editable ? 'btn-primary' : 'btn-outline'} btn-sm" onclick="App.views.tracking.openClientModal('${esc(c.id)}')">
+              ${editable
                 ? `📋 <span class="lang-en">Manage</span><span class="lang-es">Gestionar</span>`
                 : `👁️ <span class="lang-en">View File</span><span class="lang-es">Ver Ficha</span>`}
             </button>
@@ -985,9 +1035,15 @@ App.views.tracking = (function() {
 
     const clientBodyMainHtml = editable
       ? `
-        <!-- 1. Clasificación y Temperatura -->
+        <!-- 1. Clasificación, Fase en Pipeline y Temperatura -->
         <div class="trk-form-box">
-          <h4 class="trk-section-title">🌡️ Clasificación y Temperatura del Cliente</h4>
+          <h4 class="trk-section-title">🌡️ Clasificación, Fase en Pipeline y Temperatura</h4>
+          <div style="margin-bottom:10px;">
+            <label class="trk-label">📊 Fase en Pipeline (sincronizada bidireccionalmente con Mis Clientes)</label>
+            <select id="trk-cli-phase" class="form-input" style="margin-bottom:0;">
+              ${getPipelinePhaseOptionsHtml(c.status)}
+            </select>
+          </div>
           <div style="display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:10px;margin-bottom:10px;" class="trk-grid-3">
             <div>
               <label class="trk-label">Tipo de Cliente</label>
@@ -1170,8 +1226,32 @@ App.views.tracking = (function() {
     preview.innerHTML = `<strong>Plazo / Expectativa:</strong> ${esc(dl.elapsedLabel)} · ${esc(dl.deadlineLabel)}`;
   }
 
+  async function changeClientPipelinePhase(clientId, newPhase) {
+    if (!canEdit()) return;
+    if (!newPhase) return;
+    try {
+      const idx = allClients.findIndex(c => c.id === clientId);
+      const prevPhase = idx !== -1 ? normalizePipelinePhase(allClients[idx].status) : '';
+      if (prevPhase === newPhase) return;
+
+      await App.auth.updateClientStatus(clientId, newPhase, 'Fase actualizada desde Seguimiento de Clientes');
+      if (idx !== -1) {
+        allClients[idx].status = newPhase;
+        allClients[idx].updatedAt = new Date().toISOString();
+      }
+      const labelEs = (App.utils && App.utils.clientStatusLabelsEs && App.utils.clientStatusLabelsEs[newPhase]) || newPhase;
+      App.utils.showToast(`✅ Fase actualizada a "${labelEs}" (sincronizada con la Pipeline).`, 'success');
+      renderClientsTable();
+    } catch (err) {
+      console.error('[Tracking] changeClientPipelinePhase error:', err);
+      App.utils.showToast('Error actualizando la fase en la Pipeline.', 'error');
+      renderClientsTable();
+    }
+  }
+
   async function saveClientProfile(clientId) {
     if (!canEdit()) return;
+    const nextPhase = document.getElementById('trk-cli-phase')?.value || '';
     const clientType = document.getElementById('trk-cli-type')?.value || '';
     const temperature = document.getElementById('trk-cli-temp')?.value || '';
     let temperatureSetAt = document.getElementById('trk-cli-temp-date')?.value || '';
@@ -1191,17 +1271,22 @@ App.views.tracking = (function() {
     };
 
     try {
+      const idx = allClients.findIndex(c => c.id === clientId);
+      const prevPhase = idx !== -1 ? normalizePipelinePhase(allClients[idx].status) : '';
+      if (nextPhase && nextPhase !== prevPhase) {
+        await App.auth.updateClientStatus(clientId, nextPhase, 'Fase actualizada desde Seguimiento de Clientes');
+      }
+
       const updated = await App.auth.updateClientTrackingProfile(clientId, {
         clientType,
         temperature,
         temperatureSetAt,
         searchCriteria
       });
-      const idx = allClients.findIndex(c => c.id === clientId);
       if (idx !== -1) {
-        allClients[idx] = { ...allClients[idx], ...updated };
+        allClients[idx] = { ...allClients[idx], ...updated, ...(nextPhase ? { status: nextPhase } : {}) };
       }
-      App.utils.showToast('✅ Clasificación, temperatura y búsqueda guardadas.', 'success');
+      App.utils.showToast('✅ Clasificación, fase, temperatura y búsqueda guardadas.', 'success');
       renderClientsTable();
       openClientModal(clientId);
     } catch (err) {
@@ -1333,6 +1418,7 @@ App.views.tracking = (function() {
     renderClientsTable,
     openClientModal,
     onTempInputChange,
+    changeClientPipelinePhase,
     saveClientProfile,
     submitClientUpdate,
     deleteClientUpdate,

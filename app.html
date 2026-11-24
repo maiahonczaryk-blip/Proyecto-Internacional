@@ -8,7 +8,7 @@
   <meta property="og:title" content="REMAX Inmomás — International Advisory Division">
   <meta property="og:description" content="Your trusted team for buying property on Spain's Costa Blanca. Legal, tax & real estate advisory for international buyers.">
   <meta property="og:type" content="website">
-  <link rel="stylesheet" href="css/styles.css?v=20261124_v1">
+  <link rel="stylesheet" href="css/styles.css?v=20261124_v2">
   <link rel="icon" type="image/png" href="Globo_CMYK.png">
   <!-- EmailJS SDK — free email sending from the browser (200 emails/month) -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -485,7 +485,7 @@
       <a href="#agent_inmomas/documents" class="sidebar-link"><span class="sidebar-link__icon">📄</span> <span class="lang-en">Documents</span><span class="lang-es">Documentos</span></a>
       <a href="#agent_inmomas/finances" class="sidebar-link"><span class="sidebar-link__icon">💰</span> <span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></a>
       <a href="#agent_inmomas/webinar" class="sidebar-link"><span class="sidebar-link__icon">🎙️</span> <span class="lang-en">Webinar</span><span class="lang-es">Webinar</span></a>
-      <a href="#agent_inmomas/partners" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> <span class="lang-en">My Realtors</span><span class="lang-es">Mis Realtors</span></a>
+      <a href="#agent_inmomas/partners" class="sidebar-link"><span class="sidebar-link__icon">🤝</span> <span class="lang-en">Collaborators</span><span class="lang-es">Colaboradores</span></a>
     </nav>
 
     <!-- Colaborador Sidebar Nav -->
@@ -611,7 +611,7 @@
         <a href="#agent_inmomas/documents" class="mobile-section-pill"><span class="mobile-section-pill__icon">📄</span><span><span class="lang-en">Docs</span><span class="lang-es">Documentos</span></span></a>
         <a href="#agent_inmomas/finances" class="mobile-section-pill"><span class="mobile-section-pill__icon">💰</span><span><span class="lang-en">Finances</span><span class="lang-es">Finanzas</span></span></a>
         <a href="#agent_inmomas/webinar" class="mobile-section-pill"><span class="mobile-section-pill__icon">🎙️</span><span>Webinar</span></a>
-        <a href="#agent_inmomas/partners" class="mobile-section-pill"><span class="mobile-section-pill__icon">👥</span><span>Realtors</span></a>
+        <a href="#agent_inmomas/partners" class="mobile-section-pill"><span class="mobile-section-pill__icon">👥</span><span><span class="lang-en">Collaborators</span><span class="lang-es">Colaboradores</span></span></a>
       </div>
 
       <!-- Colaborador Section Grid -->
@@ -2080,6 +2080,9 @@
               <option value="">🌍 Todas las Regiones</option>
             </select>
             <input type="text" id="agent-client-search" class="form-input" oninput="App.views.agentInmomas.filterClients()" placeholder="🔍 Buscar cliente o país..." style="margin-bottom:0; min-width:200px; font-size:0.85rem; padding:7px 12px;">
+            <a href="#agent_inmomas/tracking-clients" class="btn btn-outline btn-sm" style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; font-size:0.85rem; border-radius:8px; white-space:nowrap;">
+              🎯 <span class="lang-en">Client Tracking</span><span class="lang-es">Seguimiento Clientes</span>
+            </a>
             <button type="button" class="btn btn-primary btn-sm" onclick="App.views.agentInmomas.showAddClientModal()" style="display:inline-flex; align-items:center; gap:6px; padding:7px 14px; font-size:0.85rem; border-radius:8px; white-space:nowrap;">
               ➕ <span class="lang-en">Register Client</span><span class="lang-es">Registrar Cliente</span>
             </button>
@@ -2158,11 +2161,11 @@
       <div class="dashboard-content">
         <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
           <div>
-            <h1>🤝 <span class="lang-en">My Realtors / Partners</span><span class="lang-es">Mis Realtors / Partners</span></h1>
-            <p class="dashboard-subtitle"><span class="lang-en">Brokers and Realtors assigned to you or registered through your link, segmented by region &amp; country</span><span class="lang-es">Brokers y Realtors bajo tu paraguas o registrados por tu enlace, segmentados por región y país</span></p>
+            <h1>🤝 <span class="lang-en">Collaborators</span><span class="lang-es">Colaboradores</span></h1>
+            <p class="dashboard-subtitle"><span class="lang-en">Ambassadors, Brokers, Realtors &amp; Collaborators assigned to you or registered through your link, segmented by region &amp; country</span><span class="lang-es">Embajadores, Brokers, Realtors y Colaboradores bajo tu paraguas o registrados por tu enlace, segmentados por región y país</span></p>
           </div>
           <button type="button" class="btn btn-primary btn-sm" onclick="App.views.agentInmomas.exportPartnersToExcel()">
-            📥 <span class="lang-en">Export Partners</span><span class="lang-es">Exportar Partners</span>
+            📥 <span class="lang-en">Export Collaborators</span><span class="lang-es">Exportar Colaboradores</span>
           </button>
         </div>
 
@@ -2363,9 +2366,14 @@
               <span class="lang-es">Seguimiento de clientes: Tipo A/B, temperatura (Caliente/Templado/Frío) con fecha de seteo y plazos, características de búsqueda y updates.</span>
             </p>
           </div>
-          <button type="button" class="btn btn-primary btn-sm" onclick="App.views.tracking.exportClientsExcel()">
-            📥 <span class="lang-en">Export Excel</span><span class="lang-es">Exportar Excel</span>
-          </button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <a id="trk-cli-pipeline-link" href="#agent_inmomas/clients" class="btn btn-outline btn-sm">
+              🤝 <span class="lang-en">View Pipeline</span><span class="lang-es">Ver Pipeline</span>
+            </a>
+            <button type="button" class="btn btn-primary btn-sm" onclick="App.views.tracking.exportClientsExcel()">
+              📥 <span class="lang-en">Export Excel</span><span class="lang-es">Exportar Excel</span>
+            </button>
+          </div>
         </div>
 
         <!-- KPI Summary Row -->
@@ -2400,6 +2408,11 @@
         <div class="dashboard-filters trk-filters-bar">
           <div class="form-group" style="margin-bottom:0; flex:1.5; min-width:210px;">
             <input type="text" id="trk-cli-search" class="form-input" oninput="App.views.tracking.renderClientsTable()" placeholder="🔍 Buscar por nombre, zona, presupuesto, búsqueda o updates...">
+          </div>
+          <div class="form-group" style="margin-bottom:0; min-width:190px;">
+            <select id="trk-cli-filter-phase" class="form-select" onchange="App.views.tracking.renderClientsTable()">
+              <option value="">📊 Fase Pipeline: Todas</option>
+            </select>
           </div>
           <div class="form-group" style="margin-bottom:0; min-width:140px;">
             <select id="trk-cli-filter-type" class="form-select" onchange="App.views.tracking.renderClientsTable()">
@@ -2437,6 +2450,7 @@
               <thead>
                 <tr>
                   <th><span class="lang-en">Client</span><span class="lang-es">Cliente</span></th>
+                  <th><span class="lang-en">Pipeline Phase</span><span class="lang-es">Fase en Pipeline</span></th>
                   <th style="text-align:center;"><span class="lang-en">Type</span><span class="lang-es">Tipo</span></th>
                   <th><span class="lang-en">Temperature &amp; Horizon</span><span class="lang-es">Temperatura y Plazos</span></th>
                   <th><span class="lang-en">Search Criteria</span><span class="lang-es">Características de Búsqueda</span></th>
@@ -2445,7 +2459,7 @@
                 </tr>
               </thead>
               <tbody id="trk-cli-table-body">
-                <tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">Cargando...</td></tr>
+                <tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--text-muted);">Cargando...</td></tr>
               </tbody>
             </table>
           </div>
@@ -3263,7 +3277,7 @@
       </a>
       <a href="#agent_inmomas/partners" class="dashboard-bnav-item">
         <span class="dashboard-bnav-icon">👥</span>
-        <span class="lang-en">Realtors</span><span class="lang-es">Realtors</span>
+        <span class="lang-en">Collab.</span><span class="lang-es">Colaboradores</span>
       </a>
       <a href="#profile" class="dashboard-bnav-item">
         <span class="dashboard-bnav-icon">👤</span>
@@ -3403,7 +3417,7 @@
   <script src="js/marketing-lab.js?v=20261122_v2"></script>
   <script src="js/marketing-videos.js?v=20261123_v3"></script>
   <script src="js/referral-branding.js?v=20261119_v2"></script>
-  <script src="js/router.js?v=20261124_v1"></script>
+  <script src="js/router.js?v=20261124_v2"></script></script>
   <script src="js/views/auth-views.js?v=20261120_v10"></script>
   <script src="js/views/admin-views.js?v=20261120_v13"></script>
   <script src="js/views/embajador-views.js?v=20261120_v12"></script>
@@ -3411,7 +3425,7 @@
   <script src="js/views/realtor-views.js?v=20261120_v8"></script>
   <script src="js/views/agent-views.js?v=20261123_v16"></script>
   <script src="js/views/partner-views.js?v=20261120_v5"></script>
-  <script src="js/views/tracking-views.js?v=20261124_v1"></script>
+  <script src="js/views/tracking-views.js?v=20261124_v2"></script>
   <script src="js/referral-agreement.js?v=20261123_v7"></script>
   <script src="js/main.js?v=20261119_v3"></script>
   <script>
