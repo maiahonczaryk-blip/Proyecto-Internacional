@@ -444,19 +444,19 @@ App.router = (function() {
         
         const roleLabelsHtml = {
           admin: '🛡️ Admin · RE/MAX Inmomás',
-          embajador: '👑 <span class="lang-en">Ambassador</span><span class="lang-es">Embajador</span>',
-          agent_inmomas: '🇪🇸 <span class="lang-en">Inmomás Agent</span><span class="lang-es">Agente Inmomás</span>',
-          colaborador: '🤝 <span class="lang-en">Collaborator</span><span class="lang-es">Colaborador</span>',
-          broker: '🏢 Broker',
-          realtor: '🏠 Realtor',
-          partner: '🤝 Partner'
+          embajador: '👑 <span><span class="lang-en">Ambassador</span><span class="lang-es">Embajador</span><span class="lang-fr">Ambassadeur</span><span class="lang-fr-eu">Ambassadeur</span><span class="lang-nl">Ambassadeur</span><span class="lang-sv">Ambassadör</span><span class="lang-bg">Посланик</span></span>',
+          agent_inmomas: '🇪🇸 <span><span class="lang-en">Inmomás Agent</span><span class="lang-es">Agente Inmomás</span><span class="lang-fr">Agent Inmomás</span><span class="lang-fr-eu">Conseiller Inmomás</span><span class="lang-nl">Inmomás-adviseur</span><span class="lang-sv">Inmomás-rådgivare</span><span class="lang-bg">Консултант Inmomás</span></span>',
+          colaborador: '🤝 <span><span class="lang-en">Collaborator</span><span class="lang-es">Colaborador</span><span class="lang-fr">Collaborateur</span><span class="lang-fr-eu">Apporteur / CGP</span><span class="lang-nl">Partner</span><span class="lang-sv">Partner</span><span class="lang-bg">Партньор</span></span>',
+          broker: '🏢 <span><span class="lang-en">Broker</span><span class="lang-es">Broker</span><span class="lang-fr">Agence / Courtier</span><span class="lang-fr-eu">Agence / Cabinet</span><span class="lang-nl">Makelaarskantoor</span><span class="lang-sv">Mäklarbyrå</span><span class="lang-bg">Агенция</span></span>',
+          realtor: '🏠 <span><span class="lang-en">Realtor</span><span class="lang-es">Realtor</span><span class="lang-fr">Courtier / Agent</span><span class="lang-fr-eu">Mandataire / Agent</span><span class="lang-nl">Makelaar</span><span class="lang-sv">Mäklare</span><span class="lang-bg">Брокер</span></span>',
+          partner: '🤝 <span><span class="lang-en">Partner</span><span class="lang-es">Partner</span><span class="lang-fr">Partenaire</span><span class="lang-fr-eu">Partenaire</span><span class="lang-nl">Partner</span><span class="lang-sv">Partner</span><span class="lang-bg">Партньор</span></span>'
         };
         let formattedRoleHtml = roleLabelsHtml[user.role] || App.utils.escapeHtml(user.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : '');
         if (user.role !== 'admin' && App.utils && typeof App.utils.getUserRegions === 'function') {
           const uRegs = App.utils.getUserRegions(user);
           if (uRegs.length > 0 && App.utils.REGIONS && App.utils.REGIONS[uRegs[0]]) {
             const regMeta = App.utils.REGIONS[uRegs[0]];
-            formattedRoleHtml += ` · <span class="lang-en">${App.utils.escapeHtml(regMeta.shortEn)}</span><span class="lang-es">${App.utils.escapeHtml(regMeta.shortEs)}</span>`;
+            formattedRoleHtml += ` · <span><span class="lang-en">${App.utils.escapeHtml(regMeta.shortEn)}</span><span class="lang-es">${App.utils.escapeHtml(regMeta.shortEs)}</span></span>`;
           }
         }
         const initials = App.utils.getInitials(user.firstName, user.lastName);
