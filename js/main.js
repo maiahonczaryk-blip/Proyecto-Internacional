@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     bg:      { code: 'BG',    htmlLang: 'bg' }
   };
   const ALL_BODY_LANG_CLASSES = Object.keys(langConfig).map(k => 'lang-' + k);
-  const NON_DASHBOARD_LANGS = ['fr', 'en-ca', 'fr-eu', 'nl', 'sv', 'bg'];
 
   const langSelectorWrapper = document.getElementById('lang-selector-wrapper');
   const langSelectorBtn = document.getElementById('lang-selector-btn');
@@ -57,20 +56,21 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Sync aria-pressed on segmented EN | ES switch buttons
-    const effectiveDashLang = (lang === 'es') ? 'es' : 'en';
+    // Sync aria-pressed on segmented switch buttons & value on compact portal selects
     document.querySelectorAll('.dashboard-lang-switch__opt[data-set-lang]').forEach(btn => {
-      btn.setAttribute('aria-pressed', btn.dataset.setLang === effectiveDashLang ? 'true' : 'false');
+      btn.setAttribute('aria-pressed', btn.dataset.setLang === lang ? 'true' : 'false');
+    });
+    document.querySelectorAll('[data-portal-lang-select]').forEach(sel => {
+      if (sel.value !== lang) sel.value = lang;
     });
   }
 
   function setLang(lang, options = {}) {
     if (!langConfig[lang]) return;
-    const isDashboard = body.classList.contains('dashboard-body');
-    const effectiveLang = (isDashboard && NON_DASHBOARD_LANGS.includes(lang)) ? 'en' : lang;
+    const effectiveLang = lang;
     currentLang = effectiveLang;
 
-    // Persist preference across sessions unless suppressed (e.g. dashboard fallback)
+    // Persist preference across sessions unless suppressed
     if (options.persist !== false) {
       try { localStorage.setItem(LANG_STORAGE_KEY, effectiveLang); } catch(e) {}
     }
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.documentElement.lang = langConfig[effectiveLang].htmlLang || 'en';
     document.documentElement.setAttribute('data-lang', effectiveLang);
 
-    // Update button appearance on landing navbar (code only — flag handled by CSS span)
+    // Update button appearance on landing/dashboard navbar (code only — flag handled by CSS span)
     if (langCode) langCode.textContent = langConfig[effectiveLang].code;
 
     // Update active state on dropdown items
@@ -135,7 +135,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Delegate clicks on segmented EN | ES buttons ([data-set-lang]) anywhere in the app
+  // Compact <select data-portal-lang-select> in sidebar & mobile topbar
+  document.addEventListener('change', (e) => {
+    const sel = e.target.closest('[data-portal-lang-select]');
+    if (sel && sel.value) {
+      setLang(sel.value, { persist: true });
+    }
+  });
+
+  // Delegate clicks on segmented buttons ([data-set-lang]) anywhere in the app
   document.addEventListener('click', (e) => {
     const optBtn = e.target.closest('[data-set-lang]');
     if (optBtn) {
@@ -145,8 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (targetLang) setLang(targetLang, { persist: true });
       return;
     }
+    if (e.target.closest('[data-portal-lang-select]')) return;
     const toggleContainer = e.target.closest('#sidebar-lang-toggle, #mobile-lang-toggle');
-    if (toggleContainer) {
+    if (toggleContainer && !toggleContainer.querySelector('select')) {
       e.preventDefault();
       const next = body.classList.contains('lang-es') ? 'en' : 'es';
       setLang(next, { persist: true });
@@ -156,12 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize: saved preference → browser language → 'en' fallback
   (function initLang() {
     let lang = 'en';
-    let hadSaved = false;
     try {
       const saved = localStorage.getItem(LANG_STORAGE_KEY);
       if (saved && langConfig[saved]) {
         lang = saved;
-        hadSaved = true;
       } else {
         // Auto-detect from browser language
         const bl = (navigator.language || navigator.userLanguage || '').toLowerCase();
@@ -175,11 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch(e) { lang = 'en'; }
 
-    // Dashboard pages (app.html) only have EN and ES content.
-    // If another public language was saved on the landing page, render EN on dashboards without overwriting saved preference.
-    const isDashboard = body.classList.contains('dashboard-body');
-    const isFallback = isDashboard && NON_DASHBOARD_LANGS.includes(lang);
-    setLang(isFallback ? 'en' : lang, { persist: !isFallback || !hadSaved });
+    setLang(lang, { persist: true });
   })();
 
   function updateFormPlaceholders(lang) {
